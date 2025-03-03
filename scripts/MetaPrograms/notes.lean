@@ -290,7 +290,6 @@ def perturbationTheory : Note where
     .name ``FieldSpecification.FieldOpAlgebra.wicks_theorem_normal_order .complete
     ]
 
-
 def harmonicOscillator : Note where
   title := "The Quantum Harmonic Oscillator in Lean 4"
   curators := ["Joseph Tooby-Smith"]
@@ -343,14 +342,35 @@ def harmonicOscillator : Note where
     .name ``QuantumMechanics.OneDimension.HarmonicOscillator.fourierIntegral_zero_of_mem_orthogonal .complete,
     .name ``QuantumMechanics.OneDimension.HarmonicOscillator.eigenfunction_completeness .complete,
     ]
+
+def higgsPotential : Note where
+  title := "The Higgs potential in Lean 4 🚧"
+  curators := ["Joseph Tooby-Smith"]
+  parts := [
+    .warning "This note is under construction (03-March-2025).",
+    .h1 "Introduction",
+    .p "The Higgs potential is a key part of the Standard Model of particle physics.
+      It is a scalar potential which is used to give mass to the elementary particles.
+      The Higgs potential is a polynomial of degree four in the Higgs field.",
+    .h1 "The Higgs field",
+    .name ``StandardModel.HiggsVec .incomplete,
+  ]
+
+def notesToMake : List (Note × String) := [
+    (perturbationTheory, "perturbationTheory"),
+    (harmonicOscillator, "harmonicOscillator"),
+    (higgsPotential, "higgsPotential")]
+
+def makeYML (nt : Note × String) : IO UInt32 := do
+  let n := nt.1
+  let s := nt.2
+  let ymlString ← CoreM.withImportModules #[`PhysLean] (n.toYML).run'
+  let fileOut : System.FilePath := {toString := s!"./docs/_data/{s}.yml"}
+  IO.FS.writeFile fileOut ymlString
+  IO.println (s!"YML file made for {n.title}.")
+  pure 0
+
 unsafe def main (_ : List String) : IO UInt32 := do
   initSearchPath (← findSysroot)
-  let ymlString ← CoreM.withImportModules #[`PhysLean] (perturbationTheory.toYML).run'
-  let fileOut : System.FilePath := {toString := "./docs/_data/perturbationTheory.yml"}
-  IO.println (s!"YML file made for perturbation theory.")
-  IO.FS.writeFile fileOut ymlString
-  let ymlString2 ← CoreM.withImportModules #[`PhysLean] (harmonicOscillator.toYML).run'
-  let fileOut2 : System.FilePath := {toString := "./docs/_data/harmonicOscillator.yml"}
-  IO.println (s!"YML file made for harmonic oscillator.")
-  IO.FS.writeFile fileOut2 ymlString2
+  let _ ← notesToMake.mapM makeYML
   pure 0
