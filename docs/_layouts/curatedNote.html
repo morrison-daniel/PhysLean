@@ -92,7 +92,41 @@ function toggleDyslexiaMode() {
       {% if entry.isThm %}Theorem{% else %}Lemma{% endif %}{% endif %} {{ entry.declNo }}</a></b>
       (<a href = "{{ entry.link }}" style="color: #2c5282;">{{ entry.name }}</a>)<b>:</b>
       {% if entry.status == "incomplete" %}🚧{% endif %}
-      <div style="margin-left: 1em;">{{ entry.docString | markdownify}}</div>
+    <!-- Drop down menu for each result-->
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+      <div style="margin-left: 1em; flex: 1;">{{ entry.docString | markdownify}}</div>
+      <div class="dropdown" style="position: relative; margin-left: 10px;">
+      <button class="dropdown-btn" onclick="toggleDropdown(event, this)"
+        style="background: none; border: 1px solid #e8e6e6; border-radius: 4px; cursor: pointer; padding: 2px 8px; font-weight: bold;">⋮</button>
+      <div class="dropdown-content" style="display: none; position: absolute; right: 0; background-color: #f9f9f9; min-width: 180px;
+        box-shadow: 0px 4px 8px rgba(0,0,0,0.1); z-index: 10; border-radius: 4px; border: 1px solid #e8e6e6;">
+      <a href="https://github.com/HEPLean/PhysLean/issues/new?template=NoteDocString.yml&title=Docstring%20improvement&name={{ entry.name }}&improvement=**Old version:**%0A%0A{{ entry.docString}}%0A%0A**New version:**%0A%0A" style="color: #2c5282; padding: 10px 16px; text-decoration: none; display: block; border-bottom: 1px solid #efefef;" onmouseover="this.style.color='#4299e1'" onmouseout="this.style.color='#2c5282'" target="_blank" rel="noopener noreferrer">Suggest doc-string improvements</a>
+      <a href="https://github.com/HEPLean/PhysLean/issues/new?title=Name improvement of {{ entry.name }}&body=**Old name:**%0A%0A{{ entry.name }}%0A%0A**New name:**" style="color: #2c5282; padding: 10px 16px; text-decoration: none; display: block; border-bottom: 1px solid #efefef;" onmouseover="this.style.color='#4299e1'" onmouseout="this.style.color='#2c5282'" target="_blank" rel="noopener noreferrer">Suggest name improvements</a>
+      <a href="https://github.com/HEPLean/PhysLean/issues/new?title=Lean code improvement to {{ entry.name }}&body=**Improvements:**%0A%0A" style="color: #2c5282; padding: 10px 16px; text-decoration: none; display: block; border-bottom: 1px solid #efefef;" onmouseover="this.style.color='#4299e1'" onmouseout="this.style.color='#2c5282'" target="_blank" rel="noopener noreferrer">Suggest Lean code improvements</a>
+      </div>
+      </div>
+    </div>
+    <script>
+      // Add click event listener to close dropdowns when clicking outside
+      document.addEventListener('click', function(event) {
+      const dropdowns = document.getElementsByClassName('dropdown-content');
+      for (let dropdown of dropdowns) {
+        if (dropdown.style.display === 'block' &&
+          !event.target.matches('.dropdown-btn') &&
+          !dropdown.contains(event.target)) {
+        dropdown.style.display = 'none';
+        }
+      }
+      });
+
+      // Toggle dropdown function
+      function toggleDropdown(event, button) {
+      event.stopPropagation();
+      const dropdownContent = button.nextElementSibling;
+      dropdownContent.style.display = dropdownContent.style.display === 'block' ? 'none' : 'block';
+      }
+    </script>
+    <!-- End drop down menu -->
     <details class="code-block-container">
     <summary style="font-size: 0.8em; margin-left: 1em;">Show Lean code:</summary>
     <pre style="background: none; margin: 0;"><code class="language-lean">{{ entry.declString }}</code></pre>
