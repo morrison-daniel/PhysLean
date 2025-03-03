@@ -18,5 +18,4 @@ Some directories which are NOT currently place holders are:
 - Quantum Mechanics
 - Relativity
 
-
 -/
