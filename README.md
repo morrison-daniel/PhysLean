@@ -1,6 +1,6 @@
 
 ![PhysLean](./docs/PhysLeanLogo.jpeg)
-[![](https://img.shields.io/badge/Read_The-Docs-green)](heplean.com)
+[![](https://img.shields.io/badge/Read_The-Docs-green)](https://heplean.com)
 [![](https://img.shields.io/badge/Get-Involved-green)](heplean.com/GetInvolved.html)
 [![](https://img.shields.io/badge/Lean-Zulip-green)](https://leanprover.zulipchat.com)
 [![](https://img.shields.io/badge/TODO-List-green)](heplean.com/TODOList)
