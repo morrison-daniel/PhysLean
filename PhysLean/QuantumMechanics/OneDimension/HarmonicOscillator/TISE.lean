@@ -230,8 +230,8 @@ lemma deriv_deriv_eigenfunction (n : ℕ) (x : ℝ) :
       · congr
         conv_rhs =>
           rw [physHermite_succ]
-        simp only [nsmul_eq_mul, cast_ofNat, derivative_physHermite, add_tsub_cancel_right, cast_add,
-          cast_one, map_sub, map_mul, Polynomial.aeval_X, map_add, map_natCast, map_one,
+        simp only [nsmul_eq_mul, cast_ofNat, derivative_physHermite, add_tsub_cancel_right,
+          cast_add, cast_one, map_sub, map_mul, Polynomial.aeval_X, map_add, map_natCast, map_one,
           Complex.ofReal_sub, Complex.ofReal_mul, Complex.ofReal_add, Complex.ofReal_natCast,
           Complex.ofReal_one]
         rw [show (Polynomial.aeval (x / Q.ξ)) 2 = 2 by simp [Polynomial.aeval]]
