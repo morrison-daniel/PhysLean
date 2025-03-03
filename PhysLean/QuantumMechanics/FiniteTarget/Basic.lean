@@ -29,6 +29,7 @@ namespace FiniteTarget
 variable {n : ℕ} {ℏ : ℝ} {hℏ : 0 < ℏ} (A : FiniteTarget n hℏ)
 
 /-- The Hilbert space associated with a finite target theory `A`. -/
+@[nolint unusedArguments]
 abbrev V (_ : FiniteTarget n hℏ) := Fin n → ℂ
 
 /-- Given a finite target QM system `A`, the time evolution matrix for a `t : ℝ`,
