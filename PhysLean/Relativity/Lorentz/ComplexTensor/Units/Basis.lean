@@ -33,25 +33,11 @@ lemma coContrUnit_tensorBasis : coContrUnit =
     + complexLorentzTensor.tensorBasis ![Color.down, Color.up] (fun _ => 1)
     + complexLorentzTensor.tensorBasis ![Color.down, Color.up] (fun _ => 2)
     + complexLorentzTensor.tensorBasis ![Color.down, Color.up] (fun _ => 3) := by
-  have hI1 (n : ℕ) : @OfNat.ofNat (Fin (complexLorentzTensor.repDim
-        (![Color.down, Color.up] ((fun i => i) ⟨0, Nat.zero_lt_two⟩)))) n Fin.instOfNat =
-        @OfNat.ofNat (Fin 4) n Fin.instOfNat := by rfl
-  have hI2 : @DFunLike.coe (Basis (Fin 4) ℂ ↑Lorentz.complexCo.V)
-          (Fin 4) (fun x => ↑Lorentz.complexCo.V) Basis.instFunLike
-          = @DFunLike.coe (Basis (Fin 4) ℂ (CoeSort.coe Lorentz.complexCo)) (Fin 4)
-          (fun x => CoeSort.coe Lorentz.complexCo) Basis.instFunLike := by rfl
-  have hI3 : @DFunLike.coe (Basis (Fin 4) ℂ ↑Lorentz.complexContr.V)
-          (Fin 4) (fun x => ↑Lorentz.complexContr.V) Basis.instFunLike
-          = @DFunLike.coe (Basis (Fin 4) ℂ (CoeSort.coe Lorentz.complexContr)) (Fin 4)
-          (fun x => CoeSort.coe Lorentz.complexContr) Basis.instFunLike := by rfl
-  have hI4 : @OfNat.ofNat complexLorentzTensor.k 1 One.toOfNat1 =
-    @OfNat.ofNat ℂ 1 One.toOfNat1 := by rfl
   trans {δ' | μ ν}ᵀ.tensor
   · simp
   rw [tensorNode_coContrUnit]
   simp only [Nat.succ_eq_add_one, Nat.reduceAdd, constTwoNode_tensor,
-    Action.instMonoidalCategory_tensorObj_V, Action.instMonoidalCategory_tensorUnit_V,
-    hI4]
+    Action.instMonoidalCategory_tensorObj_V, Action.instMonoidalCategory_tensorUnit_V]
   rw (transparency := .instances) [Lorentz.coContrUnit_apply_one]
   rw [Lorentz.coContrUnitVal_expand_tmul]
   simp only [Fin.isValue, map_add]
@@ -66,11 +52,11 @@ lemma coContrUnit_tensorBasis : coContrUnit =
     fin_cases i
     · simp only [Nat.succ_eq_add_one, Nat.reduceAdd, Fin.zero_eta, Fin.isValue, OverColor.mk_hom,
         cons_val_zero, Fin.cases_zero]
-      simp [complexLorentzTensor, hI1, hI2]
+      simp [complexLorentzTensor]
     · simp only [Nat.succ_eq_add_one, Nat.reduceAdd, Fin.zero_eta, Fin.isValue, OverColor.mk_hom,
         cons_val_zero, Fin.cases_zero]
       simp only [complexLorentzTensor, Discrete.functor_obj_eq_as, Monoidal.tensorUnit_obj,
-        Fin.mk_one, Fin.isValue, cons_val_one, head_cons, hI1, hI3,
+        Fin.mk_one, Fin.isValue, cons_val_one, head_cons,
         Lorentz.complexContrBasisFin4_apply_zero,
         Lorentz.complexContrBasisFin4_apply_two, Lorentz.complexContrBasisFin4_apply_one,
         Lorentz.complexContrBasisFin4_apply_three]
@@ -81,25 +67,11 @@ lemma contrCoUnit_tensorBasis : contrCoUnit =
     + complexLorentzTensor.tensorBasis ![Color.up, Color.down] (fun _ => 1)
     + complexLorentzTensor.tensorBasis ![Color.up, Color.down] (fun _ => 2)
     + complexLorentzTensor.tensorBasis ![Color.up, Color.down] (fun _ => 3) := by
-  have hI1 (n : ℕ) : @OfNat.ofNat (Fin (complexLorentzTensor.repDim
-        (![Color.up, Color.down] ((fun i => i) ⟨0, Nat.zero_lt_two⟩)))) n Fin.instOfNat =
-        @OfNat.ofNat (Fin 4) n Fin.instOfNat := by rfl
-  have hI2 : @DFunLike.coe (Basis (Fin 4) ℂ ↑Lorentz.complexCo.V)
-          (Fin 4) (fun x => ↑Lorentz.complexCo.V) Basis.instFunLike
-          = @DFunLike.coe (Basis (Fin 4) ℂ (CoeSort.coe Lorentz.complexCo)) (Fin 4)
-          (fun x => CoeSort.coe Lorentz.complexCo) Basis.instFunLike := by rfl
-  have hI3 : @DFunLike.coe (Basis (Fin 4) ℂ ↑Lorentz.complexContr.V)
-          (Fin 4) (fun x => ↑Lorentz.complexContr.V) Basis.instFunLike
-          = @DFunLike.coe (Basis (Fin 4) ℂ (CoeSort.coe Lorentz.complexContr)) (Fin 4)
-          (fun x => CoeSort.coe Lorentz.complexContr) Basis.instFunLike := by rfl
-  have hI4 : @OfNat.ofNat complexLorentzTensor.k 1 One.toOfNat1 =
-    @OfNat.ofNat ℂ 1 One.toOfNat1 := by rfl
   trans {δ | μ ν}ᵀ.tensor
   · simp
   rw [tensorNode_contrCoUnit]
   simp only [Nat.succ_eq_add_one, Nat.reduceAdd, constTwoNode_tensor,
-    Action.instMonoidalCategory_tensorObj_V, Action.instMonoidalCategory_tensorUnit_V,
-    hI4]
+    Action.instMonoidalCategory_tensorObj_V, Action.instMonoidalCategory_tensorUnit_V]
   rw (transparency := .instances) [Lorentz.contrCoUnit_apply_one]
   rw [Lorentz.contrCoUnitVal_expand_tmul]
   simp only [Fin.isValue, map_add]
@@ -114,11 +86,11 @@ lemma contrCoUnit_tensorBasis : contrCoUnit =
     fin_cases i
     · simp only [Nat.succ_eq_add_one, Nat.reduceAdd, Fin.zero_eta, Fin.isValue, OverColor.mk_hom,
         cons_val_zero, Fin.cases_zero]
-      simp [complexLorentzTensor, hI1, hI3]
+      simp [complexLorentzTensor]
     · simp only [Nat.succ_eq_add_one, Nat.reduceAdd, Fin.zero_eta, Fin.isValue, OverColor.mk_hom,
         cons_val_zero, Fin.cases_zero]
       simp only [complexLorentzTensor, Discrete.functor_obj_eq_as, Monoidal.tensorUnit_obj,
-        Fin.mk_one, Fin.isValue, cons_val_one, head_cons, hI1, hI2,
+        Fin.mk_one, Fin.isValue, cons_val_one, head_cons,
         Lorentz.complexCoBasisFin4_apply_one, Lorentz.complexCoBasisFin4_apply_zero,
         Lorentz.complexCoBasisFin4_apply_two, Lorentz.complexCoBasisFin4_apply_three]
       rfl
@@ -143,7 +115,6 @@ lemma altLeftLeftUnit_tensorBasis : altLeftLeftUnit =
     · simp only [complexLorentzTensor, Discrete.functor_obj_eq_as, Monoidal.tensorUnit_obj,
         Nat.succ_eq_add_one, Nat.reduceAdd, Fin.zero_eta, Fin.isValue, OverColor.mk_hom,
         cons_val_zero, Fin.cases_zero]
-      rfl
     · simp only [Nat.succ_eq_add_one, Nat.reduceAdd, Fin.mk_one, Fin.isValue, OverColor.mk_hom,
       cons_val_one, head_cons]
       rfl
@@ -168,7 +139,6 @@ lemma leftAltLeftUnit_tensorBasis : leftAltLeftUnit =
     · simp only [complexLorentzTensor, Discrete.functor_obj_eq_as, Monoidal.tensorUnit_obj,
         Nat.succ_eq_add_one, Nat.reduceAdd, Fin.zero_eta, Fin.isValue, OverColor.mk_hom,
         cons_val_zero, Fin.cases_zero]
-      rfl
     · simp only [Nat.succ_eq_add_one, Nat.reduceAdd, Fin.mk_one, Fin.isValue, OverColor.mk_hom,
       cons_val_one, head_cons]
       rfl
@@ -193,7 +163,6 @@ lemma altRightRightUnit_tensorBasis : altRightRightUnit =
     · simp only [complexLorentzTensor, Discrete.functor_obj_eq_as, Monoidal.tensorUnit_obj,
         Nat.succ_eq_add_one, Nat.reduceAdd, Fin.zero_eta, Fin.isValue, OverColor.mk_hom,
         cons_val_zero, Fin.cases_zero]
-      rfl
     · simp only [Nat.succ_eq_add_one, Nat.reduceAdd, Fin.mk_one, Fin.isValue, OverColor.mk_hom,
       cons_val_one, head_cons]
       rfl
@@ -218,7 +187,6 @@ lemma rightAltRightUnit_tensorBasis : rightAltRightUnit =
     · simp only [complexLorentzTensor, Discrete.functor_obj_eq_as, Monoidal.tensorUnit_obj,
         Nat.succ_eq_add_one, Nat.reduceAdd, Fin.zero_eta, Fin.isValue, OverColor.mk_hom,
         cons_val_zero, Fin.cases_zero]
-      rfl
     · simp only [Nat.succ_eq_add_one, Nat.reduceAdd, Fin.mk_one, Fin.isValue, OverColor.mk_hom,
       cons_val_one, head_cons]
       rfl

@@ -179,7 +179,7 @@ lemma contrSwapHom_contrMapSnd_tprod (x : (i : (𝟭 Type).obj (OverColor.mk c).
   rfl
 
 lemma contrSwapHom_tprod (x : (i : (𝟭 Type).obj (OverColor.mk c).left) →
-    CoeSort.coe (S.FD.obj { as := (OverColor.mk c).hom i })) :
+    (S.FD.obj { as := (OverColor.mk c).hom i })) :
     ((PiTensorProduct.tprod S.k)
     fun k => x (q.i.succAbove (q.j.succAbove (q.k.succAbove (q.l.succAbove k))))) =
     ((lift.obj S.FD).map q.contrSwapHom).hom

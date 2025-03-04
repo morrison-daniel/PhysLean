@@ -84,7 +84,7 @@ lemma toSelfAdjointMap_apply_σSAL_inl (M : SL(2, ℂ)) :
     + ((- ‖M.1 0 0‖ ^ 2 - ‖M.1 0 1‖ ^ 2 + ‖M.1 1 0‖ ^ 2 + ‖M.1 1 1‖ ^ 2) / 2) •
       PauliMatrix.σSAL (Sum.inr 2) := by
   simp only [toSelfAdjointMap, PauliMatrix.σSAL, Fin.isValue, Basis.coe_mk, PauliMatrix.σSAL',
-    PauliMatrix.σ0, LinearMap.coe_mk, AddHom.coe_mk, norm_eq_abs, neg_add_rev, PauliMatrix.σ1,
+    PauliMatrix.σ0, LinearMap.coe_mk, AddHom.coe_mk, neg_add_rev, PauliMatrix.σ1,
     neg_of, neg_cons, neg_zero, neg_empty, neg_mul, PauliMatrix.σ2, neg_neg, PauliMatrix.σ3]
   ext1
   simp only [Fin.isValue, AddSubgroup.coe_add, selfAdjoint.val_smul, smul_of, smul_cons, real_smul,
@@ -102,10 +102,10 @@ lemma toSelfAdjointMap_apply_σSAL_inl (M : SL(2, ℂ)) :
   ext x y
   match x, y with
   | 0, 0 =>
-    simp only [Fin.isValue, norm_eq_abs, cons_val', cons_val_zero, empty_val', cons_val_fin_one]
+    simp only [Fin.isValue, cons_val', cons_val_zero, empty_val', cons_val_fin_one]
     ring_nf
   | 0, 1 =>
-    simp only [Fin.isValue, norm_eq_abs, cons_val', cons_val_one, head_cons, empty_val',
+    simp only [Fin.isValue, cons_val', cons_val_one, head_cons, empty_val',
       cons_val_fin_one, cons_val_zero]
     ring_nf
     rw [← re_add_im (M.1 0 0), ← re_add_im (M.1 0 1), ← re_add_im (M.1 1 0), ← re_add_im (M.1 1 1)]
@@ -116,7 +116,7 @@ lemma toSelfAdjointMap_apply_σSAL_inl (M : SL(2, ℂ)) :
     simp only [Fin.isValue, I_sq, mul_neg, mul_one, neg_mul, neg_neg, one_mul, sub_neg_eq_add]
     ring
   | 1, 0 =>
-    simp only [Fin.isValue, norm_eq_abs, cons_val', cons_val_zero, empty_val', cons_val_fin_one,
+    simp only [Fin.isValue, cons_val', cons_val_zero, empty_val', cons_val_fin_one,
       cons_val_one, head_fin_const]
     ring_nf
     rw [← re_add_im (M.1 0 0), ← re_add_im (M.1 0 1), ← re_add_im (M.1 1 0), ← re_add_im (M.1 1 1)]
@@ -127,7 +127,7 @@ lemma toSelfAdjointMap_apply_σSAL_inl (M : SL(2, ℂ)) :
     simp only [Fin.isValue, I_sq, mul_neg, mul_one, neg_mul, neg_neg, one_mul, sub_neg_eq_add]
     ring
   | 1, 1 =>
-    simp only [Fin.isValue, norm_eq_abs, cons_val', cons_val_one, head_cons, empty_val',
+    simp only [Fin.isValue, cons_val', cons_val_one, head_cons, empty_val',
       cons_val_fin_one, head_fin_const]
     ring_nf
 

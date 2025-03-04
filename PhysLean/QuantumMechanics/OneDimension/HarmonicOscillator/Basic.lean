@@ -72,7 +72,6 @@ structure HarmonicOscillator where
 
 namespace HarmonicOscillator
 
-open Nat
 open PhysLean HilbertSpace
 open MeasureTheory
 
@@ -135,7 +134,7 @@ lemma one_over_ξ : 1/Q.ξ = √(Q.m * Q.ω / Q.ℏ) := by
   have := Q.hℏ
   field_simp [ξ]
 
-lemma ξ_inverse : Q.ξ⁻¹ = √(Q.m * Q.ω / Q.ℏ):= by
+lemma ξ_inverse : Q.ξ⁻¹ = √(Q.m * Q.ω / Q.ℏ) := by
   rw [inv_eq_one_div]
   exact one_over_ξ Q
 
@@ -183,7 +182,7 @@ lemma schrodingerOperator_eq (ψ : ℝ → ℂ) :
 
 /-- The schrodinger operator written in terms of `ξ`. -/
 lemma schrodingerOperator_eq_ξ (ψ : ℝ → ℂ) : Q.schrodingerOperator ψ =
-    fun x => (Q.ℏ ^2 / (2 * Q.m)) * (- (deriv (deriv ψ) x) +  (1/Q.ξ^2 )^2 * x^2 * ψ x) := by
+    fun x => (Q.ℏ ^2 / (2 * Q.m)) * (- (deriv (deriv ψ) x) + (1/Q.ξ^2)^2 * x^2 * ψ x) := by
   funext x
   simp [schrodingerOperator_eq, ξ_sq, ξ_inverse, ξ_ne_zero, ξ_pos, ξ_abs, ← Complex.ofReal_pow]
   have hm' := Complex.ofReal_ne_zero.mpr Q.m_ne_zero

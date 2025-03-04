@@ -117,7 +117,7 @@ lemma toGL_embedding : IsEmbedding toGL.toFun where
 
 /-- The instance of a topological group on `SO(3)`, defined through the embedding of `SO(3)`
   into `GL(n)`. -/
-instance : TopologicalGroup SO(3) :=
+instance : IsTopologicalGroup SO(3) :=
   IsInducing.topologicalGroup toGL toGL_embedding.toIsInducing
 
 /-- The determinant of an `SO(3)` matrix minus the identity is equal to zero. -/

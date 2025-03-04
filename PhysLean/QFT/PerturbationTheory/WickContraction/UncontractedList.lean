@@ -99,7 +99,7 @@ lemma fin_list_sorted_split :
 lemma fin_list_sorted_indexOf_filter_le_mem :
     (l : List (Fin n)) → (hl : l.Sorted (· ≤ ·)) → (i : Fin n) →
     (hl : i ∈ l) →
-    List.indexOf i (List.filter (fun x => decide (↑i ≤ ↑x)) l) = 0
+    List.idxOf i (List.filter (fun x => decide (↑i ≤ ↑x)) l) = 0
   | [], _, _, _ => by simp
   | a :: l, hl, i, hi => by
     simp only [List.sorted_cons] at hl
@@ -125,10 +125,10 @@ lemma fin_list_sorted_indexOf_filter_le_mem :
 lemma fin_list_sorted_indexOf_mem :
     (l : List (Fin n)) → (hl : l.Sorted (· ≤ ·)) → (i : Fin n) →
     (hi : i ∈ l) →
-    l.indexOf i = (l.filter (fun x => x.1 < i.1)).length := by
+    l.idxOf i = (l.filter (fun x => x.1 < i.1)).length := by
   intro l hl i hi
   conv_lhs => rw [fin_list_sorted_split l hl i]
-  rw [List.indexOf_append_of_not_mem]
+  rw [List.idxOf_append_of_not_mem]
   erw [fin_list_sorted_indexOf_filter_le_mem l hl i hi]
   · simp
   · simp
@@ -275,11 +275,11 @@ lemma filter_uncontractedList (c : WickContraction n) (p : Fin n → Prop) [Deci
 def uncontractedIndexEquiv (c : WickContraction n) :
     Fin (c.uncontractedList).length ≃ c.uncontracted where
   toFun i := ⟨c.uncontractedList.get i, c.uncontractedList_get_mem_uncontracted i⟩
-  invFun i := ⟨List.indexOf i.1 c.uncontractedList,
-    List.indexOf_lt_length_iff.mpr ((c.uncontractedList_mem_iff i.1).mpr i.2)⟩
+  invFun i := ⟨List.idxOf i.1 c.uncontractedList,
+    List.idxOf_lt_length_iff.mpr ((c.uncontractedList_mem_iff i.1).mpr i.2)⟩
   left_inv i := by
     ext
-    exact List.get_indexOf (uncontractedList_nodup c) _
+    exact List.get_idxOf (uncontractedList_nodup c) _
   right_inv i := by
     ext
     simp

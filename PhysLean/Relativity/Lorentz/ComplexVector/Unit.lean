@@ -54,7 +54,7 @@ def contrCoUnit : 𝟙_ (Rep ℂ SL(2,ℂ)) ⟶ complexContr ⊗ complexCo where
     refine ModuleCat.hom_ext ?_
     refine LinearMap.ext fun x : ℂ => ?_
     simp only [Action.instMonoidalCategory_tensorObj_V, Action.instMonoidalCategory_tensorUnit_V,
-      Action.tensorUnit_ρ', CategoryTheory.Category.id_comp, Action.tensor_ρ', ModuleCat.hom_comp,
+      Action.tensorUnit_ρ, CategoryTheory.Category.id_comp, Action.tensor_ρ, ModuleCat.hom_comp,
       Function.comp_apply]
     change x • contrCoUnitVal =
       (TensorProduct.map (complexContr.ρ M) (complexCo.ρ M)) (x • contrCoUnitVal)
@@ -104,7 +104,7 @@ def coContrUnit : 𝟙_ (Rep ℂ SL(2,ℂ)) ⟶ complexCo ⊗ complexContr where
     refine ModuleCat.hom_ext ?_
     refine LinearMap.ext fun x : ℂ => ?_
     simp only [Action.instMonoidalCategory_tensorObj_V, Action.instMonoidalCategory_tensorUnit_V,
-      Action.tensorUnit_ρ', CategoryTheory.Category.id_comp, Action.tensor_ρ', ModuleCat.hom_comp,
+      Action.tensorUnit_ρ, CategoryTheory.Category.id_comp, Action.tensor_ρ, ModuleCat.hom_comp,
       Function.comp_apply]
     change x • coContrUnitVal =
       (TensorProduct.map (complexCo.ρ M) (complexContr.ρ M)) (x • coContrUnitVal)
@@ -143,11 +143,11 @@ lemma contr_contrCoUnit (x : complexCo) :
     Fintype.sum_sum_type, Finset.univ_unique, Fin.default_eq_zero, Fin.isValue,
     Finset.sum_singleton, Fin.sum_univ_three, tmul_add, add_tmul, smul_tmul, tmul_smul, map_add,
     _root_.map_smul]
-  have h1' (x y : CoeSort.coe complexCo) (z : CoeSort.coe complexContr) :
+  have h1' (x y : complexCo.V) (z : complexContr.V) :
     (α_ complexCo.V complexContr.V complexCo.V).inv (x ⊗ₜ[ℂ] z ⊗ₜ[ℂ] y) = (x ⊗ₜ[ℂ] z) ⊗ₜ[ℂ] y := rfl
   repeat rw [h1']
-  have h1'' (y : CoeSort.coe complexCo)
-    (z : CoeSort.coe complexCo ⊗[ℂ] CoeSort.coe complexContr) :
+  have h1'' (y : complexCo.V)
+    (z : complexCo.V ⊗[ℂ] complexContr.V) :
     (coContrContraction.hom ▷ complexCo.V) (z ⊗ₜ[ℂ] y) = (coContrContraction.hom z) ⊗ₜ[ℂ] y := rfl
   repeat rw (config := { transparency := .instances }) [h1'']
   repeat rw [coContrContraction_basis']
@@ -177,12 +177,12 @@ lemma contr_coContrUnit (x : complexContr) :
     Fintype.sum_sum_type, Finset.univ_unique, Fin.default_eq_zero, Fin.isValue,
     Finset.sum_singleton, Fin.sum_univ_three, tmul_add, add_tmul, smul_tmul, tmul_smul, map_add,
     _root_.map_smul]
-  have h1' (x y : CoeSort.coe complexContr) (z : CoeSort.coe complexCo) :
+  have h1' (x y : complexContr.V) (z : complexCo.V) :
     (α_ complexContr.V complexCo.V complexContr.V).inv
     (x ⊗ₜ[ℂ] z ⊗ₜ[ℂ] y) = (x ⊗ₜ[ℂ] z) ⊗ₜ[ℂ] y := rfl
   repeat rw [h1']
-  have h1'' (y : CoeSort.coe complexContr)
-    (z : CoeSort.coe complexContr ⊗[ℂ] CoeSort.coe complexCo) :
+  have h1'' (y : complexContr.V)
+    (z : complexContr.V ⊗[ℂ] complexCo.V) :
     (contrCoContraction.hom ▷ complexContr.V) (z ⊗ₜ[ℂ] y) =
     (contrCoContraction.hom z) ⊗ₜ[ℂ] y := rfl
   repeat rw (config := { transparency := .instances }) [h1'']

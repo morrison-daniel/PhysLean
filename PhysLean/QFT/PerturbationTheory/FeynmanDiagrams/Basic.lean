@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Joseph Tooby-Smith
 -/
 import Mathlib.Tactic.FinCases
-import Mathlib.CategoryTheory.Comma.Over
+import Mathlib.CategoryTheory.Comma.Over.Basic
 import Mathlib.CategoryTheory.IsomorphismClasses
 import Mathlib.Data.Fintype.Perm
 import Mathlib.Combinatorics.SimpleGraph.Connectivity.WalkCounting

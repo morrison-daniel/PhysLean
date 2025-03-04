@@ -93,7 +93,7 @@ instance : ContMDiffVectorBundle ⊤ HiggsVec HiggsBundle SpaceTime.asSmoothMani
 /-- The type `HiggsField` is defined such that elements are smooth sections of the trivial
   vector bundle `HiggsBundle`. Such elements are Higgs fields. Since `HiggsField` is
   trivial as a vector bundle, a Higgs field is equivalent to a smooth map
-  from  `SpaceTime` to `HiggsVec`. -/
+  from `SpaceTime` to `HiggsVec`. -/
 abbrev HiggsField : Type := ContMDiffSection SpaceTime.asSmoothManifold HiggsVec ⊤ HiggsBundle
 
 /-- Given a vector in `HiggsVec` the constant Higgs field with value equal to that

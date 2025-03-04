@@ -94,7 +94,7 @@ def leftMetric : 𝟙_ (Rep ℂ SL(2,ℂ)) ⟶ leftHanded ⊗ leftHanded where
     refine ModuleCat.hom_ext ?_
     refine LinearMap.ext fun x : ℂ => ?_
     simp only [Action.instMonoidalCategory_tensorObj_V, Action.instMonoidalCategory_tensorUnit_V,
-      Action.tensorUnit_ρ', CategoryTheory.Category.id_comp, Action.tensor_ρ', ModuleCat.hom_comp,
+      Action.tensorUnit_ρ, CategoryTheory.Category.id_comp, Action.tensor_ρ, ModuleCat.hom_comp,
       Function.comp_apply]
     change x • leftMetricVal =
       (TensorProduct.map (leftHanded.ρ M) (leftHanded.ρ M)) (x • leftMetricVal)
@@ -141,7 +141,7 @@ def altLeftMetric : 𝟙_ (Rep ℂ SL(2,ℂ)) ⟶ altLeftHanded ⊗ altLeftHande
     refine ModuleCat.hom_ext ?_
     refine LinearMap.ext fun x : ℂ => ?_
     simp only [Action.instMonoidalCategory_tensorObj_V, Action.instMonoidalCategory_tensorUnit_V,
-      Action.tensorUnit_ρ', CategoryTheory.Category.id_comp, Action.tensor_ρ', ModuleCat.hom_comp,
+      Action.tensorUnit_ρ, CategoryTheory.Category.id_comp, Action.tensor_ρ, ModuleCat.hom_comp,
       Function.comp_apply]
     change x • altLeftMetricVal =
       (TensorProduct.map (altLeftHanded.ρ M) (altLeftHanded.ρ M)) (x • altLeftMetricVal)
@@ -187,7 +187,7 @@ def rightMetric : 𝟙_ (Rep ℂ SL(2,ℂ)) ⟶ rightHanded ⊗ rightHanded wher
     refine ModuleCat.hom_ext ?_
     refine LinearMap.ext fun x : ℂ => ?_
     simp only [Action.instMonoidalCategory_tensorObj_V, Action.instMonoidalCategory_tensorUnit_V,
-      Action.tensorUnit_ρ', CategoryTheory.Category.id_comp, Action.tensor_ρ', ModuleCat.hom_comp,
+      Action.tensorUnit_ρ, CategoryTheory.Category.id_comp, Action.tensor_ρ, ModuleCat.hom_comp,
       Function.comp_apply]
     change x • rightMetricVal =
       (TensorProduct.map (rightHanded.ρ M) (rightHanded.ρ M)) (x • rightMetricVal)
@@ -243,7 +243,7 @@ def altRightMetric : 𝟙_ (Rep ℂ SL(2,ℂ)) ⟶ altRightHanded ⊗ altRightHa
     refine ModuleCat.hom_ext ?_
     refine LinearMap.ext fun x : ℂ => ?_
     simp only [Action.instMonoidalCategory_tensorObj_V, Action.instMonoidalCategory_tensorUnit_V,
-      Action.tensorUnit_ρ', CategoryTheory.Category.id_comp, Action.tensor_ρ', ModuleCat.hom_comp,
+      Action.tensorUnit_ρ, CategoryTheory.Category.id_comp, Action.tensor_ρ, ModuleCat.hom_comp,
       Function.comp_apply]
     change x • altRightMetricVal =
       (TensorProduct.map (altRightHanded.ρ M) (altRightHanded.ρ M)) (x • altRightMetricVal)

@@ -175,25 +175,29 @@ lemma VusVubVcdSq_eq (θ₁₂ θ₁₃ θ₂₃ δ₁₃ : ℝ) (h1 : 0 ≤ Rea
     VusVubVcdSq ⟦standParam θ₁₂ θ₁₃ θ₂₃ δ₁₃⟧ =
     Real.sin θ₁₂ ^ 2 * Real.cos θ₁₃ ^ 2 * Real.sin θ₁₃ ^ 2 * Real.sin θ₂₃ ^ 2 := by
   simp only [VusVubVcdSq, VusAbs, VAbs, VAbs', Fin.isValue, standParam, standParamAsMatrix,
-      neg_mul, Quotient.lift_mk, cons_val', cons_val_one, head_cons,
-    empty_val', cons_val_fin_one, cons_val_zero, _root_.map_mul, VubAbs, cons_val_two, tail_cons,
-    VcbAbs, VudAbs, Complex.abs_ofReal]
+    neg_mul, Quotient.lift_mk, cons_val', cons_val_one, head_cons,
+    empty_val', cons_val_fin_one, cons_val_zero, Complex.norm_mul, VubAbs, cons_val_two,
+    Nat.succ_eq_add_one, Nat.reduceAdd, tail_cons, VcbAbs, VudAbs]
   by_cases hx : Real.cos θ₁₃ ≠ 0
-  · rw [Complex.abs_exp]
+  · rw [Complex.norm_exp]
     simp only [neg_re, mul_re, I_re, ofReal_re, zero_mul, I_im, ofReal_im, mul_zero, sub_self,
       neg_zero, Real.exp_zero, mul_one, _root_.sq_abs]
-    rw [_root_.abs_of_nonneg h1, _root_.abs_of_nonneg h3, _root_.abs_of_nonneg h2,
-      _root_.abs_of_nonneg h4]
+    rw [Complex.norm_of_nonneg h1, Complex.norm_of_nonneg h3, Complex.norm_of_nonneg h2,
+      Complex.norm_of_nonneg h4]
     simp only [sq]
     ring_nf
     nth_rewrite 2 [Real.sin_sq θ₁₂]
     ring_nf
+    have h1 : ‖(Real.sin θ₁₃ : ℂ)‖ ^ 2 = Real.sin θ₁₃ ^ 2 := by
+      rw [@sq_eq_sq_iff_abs_eq_abs]
+      rw [Complex.norm_real]
+      simp
+    rw [h1]
     field_simp
     ring
   · simp only [ne_eq, Decidable.not_not] at hx
     rw [hx]
-    simp only [abs_zero, mul_zero, ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, zero_pow,
-      zero_mul, add_zero, div_zero]
+    simp
 
 open Invariant in
 lemma mulExpδ₁₃_eq (θ₁₂ θ₁₃ θ₂₃ δ₁₃ : ℝ) (h1 : 0 ≤ Real.sin θ₁₂)

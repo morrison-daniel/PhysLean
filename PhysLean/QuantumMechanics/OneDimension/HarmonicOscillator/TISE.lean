@@ -70,7 +70,7 @@ lemma deriv_eigenfunction_zero : deriv (Q.eigenfunction 0) =
   ring
 
 lemma deriv_eigenfunction_zero' : deriv (Q.eigenfunction 0) =
-    (- √2  / (2 * Q.ξ) : ℂ) • Q.eigenfunction 1 := by
+    (- √2 / (2 * Q.ξ) : ℂ) • Q.eigenfunction 1 := by
   rw [deriv_eigenfunction_zero]
   funext x
   simp only [Complex.ofReal_div, Complex.ofReal_neg, Complex.ofReal_one, Complex.ofReal_pow,
@@ -89,7 +89,7 @@ lemma deriv_physHermite_characteristic_length (n : ℕ) :
   match n with
   | 0 =>
     rw [physHermite_zero]
-    simp  [deriv_const_mul_field', Complex.ofReal_div, Complex.ofReal_mul, Algebra.smul_mul_assoc,
+    simp [deriv_const_mul_field', Complex.ofReal_div, Complex.ofReal_mul, Algebra.smul_mul_assoc,
       Complex.ofReal_zero, zero_mul, zero_add, zero_div, cast_zero, Complex.ofReal_zero, zero_smul]
   | n + 1 =>
     funext x
@@ -158,7 +158,6 @@ lemma deriv_deriv_eigenfunction_zero (x : ℝ) : deriv (deriv (Q.eigenfunction 0
   simp only [Complex.ofReal_one, Complex.ofReal_pow, one_mul, one_pow, inv_pow]
   ring
 
-
 lemma deriv_deriv_eigenfunction_succ (n : ℕ) (x : ℝ) :
     deriv (fun x => deriv (Q.eigenfunction (n + 1)) x) x =
     Complex.ofReal (1/√(2 ^ (n + 1) * (n + 1) !) * (1/Q.ξ)) *
@@ -183,7 +182,7 @@ lemma deriv_deriv_eigenfunction_succ (n : ℕ) (x : ℝ) :
   simp only [differentiableAt_const, deriv_mul, deriv_const', zero_mul, mul_zero, add_zero,
     deriv_add, zero_add]
   rw [deriv_mul (by fun_prop) (by fun_prop)]
-  simp  [deriv_mul_const_field', Complex.deriv_ofReal, mul_one]
+  simp [deriv_mul_const_field', Complex.deriv_ofReal, mul_one]
   nth_rewrite 2 [deriv_physHermite_characteristic_length]
   ring_nf
   simp only [one_div, Complex.ofReal_inv, cast_add, cast_one, add_tsub_cancel_right]
@@ -195,7 +194,7 @@ lemma deriv_deriv_eigenfunction (n : ℕ) (x : ℝ) :
   match n with
   | 0 => simpa using Q.deriv_deriv_eigenfunction_zero x
   | n + 1 =>
-    trans Complex.ofReal (1/Real.sqrt (2 ^ (n + 1) * (n + 1) !) ) *
+    trans Complex.ofReal (1/Real.sqrt (2 ^ (n + 1) * (n + 1) !)) *
         (((- 1 / Q.ξ ^ 2) * (2 * (n + 1)
         + (1 + (- 1/ Q.ξ ^ 2) * x ^ 2)) *
         (physHermite (n + 1) (x/Q.ξ))) * Q.eigenfunction 0 x)
@@ -223,7 +222,7 @@ lemma deriv_deriv_eigenfunction (n : ℕ) (x : ℝ) :
       trans (- 1/ Q.ξ^2) * (2 * (n + 1) *
             (2 * ((1 / Q.ξ) * x) * (physHermite n (x/Q.ξ)) -
             2 * n * (physHermite (n - 1) (x/Q.ξ)))
-            + (1 + (- 1 / Q.ξ^2) * x ^ 2) * (physHermite (n + 1) ( x/Q.ξ)))
+            + (1 + (- 1 / Q.ξ^2) * x ^ 2) * (physHermite (n + 1) (x/Q.ξ)))
       · ring_nf
       trans (- 1 / Q.ξ^2) * (2 * (n + 1) * (physHermite (n + 1) (x/Q.ξ))
             + (1 + (- 1/ Q.ξ^2) * x ^ 2) * (physHermite (n + 1) (x/Q.ξ)))

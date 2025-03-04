@@ -262,7 +262,7 @@ lemma toGL_embedding : IsEmbedding (@toGL d).toFun where
 
 /-- The embedding of the Lorentz group into `GL(n, ℝ)` gives `LorentzGroup d` an instance
   of a topological group. -/
-instance : TopologicalGroup (LorentzGroup d) :=
+instance : IsTopologicalGroup (LorentzGroup d) :=
   IsInducing.topologicalGroup toGL toGL_embedding.toIsInducing
 
 /-!

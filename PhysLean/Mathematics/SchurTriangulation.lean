@@ -85,27 +85,6 @@ variable [RCLike 𝕜]
 section
 variable [NormedAddCommGroup E] [InnerProductSpace 𝕜 E]
 
-section
-variable [FiniteDimensional 𝕜 E] [Fintype n] [DecidableEq n]
-
-lemma toMatrixOrthonormal_apply_apply (b : OrthonormalBasis n 𝕜 E) (f : Module.End 𝕜 E)
-    (i j : n) :
-    toMatrixOrthonormal b f i j = ⟪b i, f (b j)⟫_𝕜 :=
-  calc
-    _ = b.repr (f (b j)) i := f.toMatrix_apply ..
-    _ = ⟪b i, f (b j)⟫_𝕜 := b.repr_apply_apply ..
-
-lemma toMatrixOrthonormal_reindex [Fintype m] [DecidableEq m]
-    (b : OrthonormalBasis m 𝕜 E) (e : m ≃ n) (f : Module.End 𝕜 E) :
-    toMatrixOrthonormal (b.reindex e) f = Matrix.reindex e e (toMatrixOrthonormal b f) :=
-  Matrix.ext fun i j =>
-    calc toMatrixOrthonormal (b.reindex e) f i j
-      _ = (b.reindex e).repr (f (b.reindex e j)) i := f.toMatrix_apply ..
-      _ = b.repr (f (b (e.symm j))) (e.symm i) := by simp
-      _ = toMatrixOrthonormal b f (e.symm i) (e.symm j) := Eq.symm <| f.toMatrix_apply ..
-
-end
-
 /-- **Don't use this definition directly.** Instead, use `Matrix.schurTriangulationBasis`,
 `Matrix.schurTriangulationUnitary`, and `Matrix.schurTriangulation`. See also
 `LinearMap.SchurTriangulationAux.of` and `Matrix.schurTriangulationAux`. -/
