@@ -103,7 +103,7 @@ lemma ℏ_ne_zero : Q.ℏ ≠ 0 := by
 
 -/
 
-/-- The characteristic length `ξ` of the harmonic oscilator is defined
+/-- The characteristic length `ξ` of the harmonic oscillator is defined
   as `√(ℏ /(m ω))`. -/
 noncomputable def ξ : ℝ := √(Q.ℏ / (Q.m * Q.ω))
 
