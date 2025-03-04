@@ -31,9 +31,9 @@ def PhysLeanTextLinter : Type := Array String → Array (String × ℕ × ℕ)
 
 /-- Checks if there are two consecutive empty lines. -/
 def doubleEmptyLineLinter : PhysLeanTextLinter := fun lines ↦ Id.run do
-  let enumLines := (lines.toList.enumFrom 1)
+  let enumLines := (lines.toList.zipIdx 1)
   let pairLines := List.zip enumLines (List.tail! enumLines)
-  let errors := pairLines.filterMap (fun ((lno1, l1), _, l2) ↦
+  let errors := pairLines.filterMap (fun ((l1, lno1), l2, _) ↦
     if l1.length == 0 && l2.length == 0  then
       some (s!" Double empty line. ", lno1, 1)
     else none)
@@ -41,8 +41,8 @@ def doubleEmptyLineLinter : PhysLeanTextLinter := fun lines ↦ Id.run do
 
 /-- Checks if there is a double space in the line, which is not at the start. -/
 def doubleSpaceLinter : PhysLeanTextLinter := fun lines ↦ Id.run do
-  let enumLines := (lines.toList.enumFrom 1)
-  let errors := enumLines.filterMap (fun (lno, l) ↦
+  let enumLines := (lines.toList.zipIdx 1)
+  let errors := enumLines.filterMap (fun (l, lno) ↦
     if String.containsSubstr l.trimLeft "  " then
       let k := (Substring.findAllSubstr l "  ").toList.getLast?
       let col := match k with
@@ -53,8 +53,8 @@ def doubleSpaceLinter : PhysLeanTextLinter := fun lines ↦ Id.run do
   errors.toArray
 
 def longLineLinter : PhysLeanTextLinter := fun lines ↦ Id.run do
-  let enumLines := (lines.toList.enumFrom 1)
-  let errors := enumLines.filterMap (fun (lno, l) ↦
+  let enumLines := (lines.toList.zipIdx 1)
+  let errors := enumLines.filterMap (fun (l, lno) ↦
     if l.length > 100 ∧ ¬ String.containsSubstr l "http" then
       some (s!" Line is too long.", lno, 100)
     else none)
@@ -62,8 +62,8 @@ def longLineLinter : PhysLeanTextLinter := fun lines ↦ Id.run do
 
 /-- Substring linter. -/
 def substringLinter (s : String) : PhysLeanTextLinter := fun lines ↦ Id.run do
-  let enumLines := (lines.toList.enumFrom 1)
-  let errors := enumLines.filterMap (fun (lno, l) ↦
+  let enumLines := (lines.toList.zipIdx 1)
+  let errors := enumLines.filterMap (fun (l, lno) ↦
     if String.containsSubstr l s then
       let k := (Substring.findAllSubstr l s).toList.getLast?
       let col := match k with
@@ -74,8 +74,8 @@ def substringLinter (s : String) : PhysLeanTextLinter := fun lines ↦ Id.run do
   errors.toArray
 
 def endLineLinter (s : String) : PhysLeanTextLinter := fun lines ↦ Id.run do
-  let enumLines := (lines.toList.enumFrom 1)
-  let errors := enumLines.filterMap (fun (lno, l) ↦
+  let enumLines := (lines.toList.zipIdx 1)
+  let errors := enumLines.filterMap (fun (l, lno) ↦
     if l.endsWith s then
       some (s!" Line ends with `{s}`.", lno, l.length)
     else none)
@@ -83,8 +83,8 @@ def endLineLinter (s : String) : PhysLeanTextLinter := fun lines ↦ Id.run do
 
 /-- Number of space at new line must be even. -/
 def numInitialSpacesEven : PhysLeanTextLinter := fun lines ↦ Id.run do
-  let enumLines := (lines.toList.enumFrom 1)
-  let errors := enumLines.filterMap (fun (lno, l) ↦
+  let enumLines := (lines.toList.zipIdx 1)
+  let errors := enumLines.filterMap (fun (l, lno) ↦
     let numSpaces := (l.takeWhile (· == ' ')).length
     if numSpaces % 2 != 0 then
       some (s!"Number of initial spaces is not even.", lno, 1)

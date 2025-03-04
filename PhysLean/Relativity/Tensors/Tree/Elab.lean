@@ -380,7 +380,7 @@ partial def getContrPos (stx : Syntax) : TermElabM (List (ℕ × ℕ)) := do
   let ind ← getIndices stx
   let indFilt : List (TSyntax `indexExpr) := ind.filter (fun x => ¬ indexExprIsNum x)
   let indEnum := indFilt.zipIdx
-  let bind := List.flatMap  (fun a => indEnum.map (fun b => (a, b))) indEnum
+  let bind := List.flatMap (fun a => indEnum.map (fun b => (a, b))) indEnum
   let filt ← bind.filterMapM (fun x => indexPosEq x.1 x.2)
   if ¬ ((filt.map Prod.fst).Nodup ∧ (filt.map Prod.snd).Nodup) then
     throwError "To many contractions"

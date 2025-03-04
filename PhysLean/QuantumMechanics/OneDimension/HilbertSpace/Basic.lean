@@ -55,7 +55,7 @@ lemma memHS_iff {f : ℝ → ℂ} : MemHS f ↔
     exact Continuous.comp_aestronglyMeasurable continuous_norm h1
   simp only [h0, true_and]
   simp only [HasFiniteIntegral, enorm_pow]
-  simp only [enorm, nnnorm,  Real.norm_eq_abs, abs_norm]
+  simp only [enorm, nnnorm, Real.norm_eq_abs, abs_norm]
 
 lemma aeEqFun_mk_mem_iff (f : ℝ → ℂ) (hf : AEStronglyMeasurable f volume) :
     AEEqFun.mk f hf ∈ HilbertSpace ↔ MemHS f := by

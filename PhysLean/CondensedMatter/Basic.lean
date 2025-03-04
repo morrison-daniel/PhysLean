@@ -10,7 +10,6 @@ Authors: Joseph Tooby-Smith
 This directory is currently a place holder.
 Please feel free to contribute!
 
-
 Some directories which are NOT currently place holders are:
 - Mathematics
 - Meta
@@ -18,6 +17,5 @@ Some directories which are NOT currently place holders are:
 - QFT
 - Quantum Mechanics
 - Relativity
-
 
 -/

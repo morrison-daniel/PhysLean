@@ -143,11 +143,11 @@ lemma contr_contrCoUnit (x : complexCo) :
     Fintype.sum_sum_type, Finset.univ_unique, Fin.default_eq_zero, Fin.isValue,
     Finset.sum_singleton, Fin.sum_univ_three, tmul_add, add_tmul, smul_tmul, tmul_smul, map_add,
     _root_.map_smul]
-  have h1' (x y :  complexCo.V) (z :  complexContr.V) :
+  have h1' (x y : complexCo.V) (z : complexContr.V) :
     (α_ complexCo.V complexContr.V complexCo.V).inv (x ⊗ₜ[ℂ] z ⊗ₜ[ℂ] y) = (x ⊗ₜ[ℂ] z) ⊗ₜ[ℂ] y := rfl
   repeat rw [h1']
   have h1'' (y : complexCo.V)
-    (z :  complexCo.V ⊗[ℂ] complexContr.V) :
+    (z : complexCo.V ⊗[ℂ] complexContr.V) :
     (coContrContraction.hom ▷ complexCo.V) (z ⊗ₜ[ℂ] y) = (coContrContraction.hom z) ⊗ₜ[ℂ] y := rfl
   repeat rw (config := { transparency := .instances }) [h1'']
   repeat rw [coContrContraction_basis']
@@ -182,7 +182,7 @@ lemma contr_coContrUnit (x : complexContr) :
     (x ⊗ₜ[ℂ] z ⊗ₜ[ℂ] y) = (x ⊗ₜ[ℂ] z) ⊗ₜ[ℂ] y := rfl
   repeat rw [h1']
   have h1'' (y : complexContr.V)
-    (z :  complexContr.V ⊗[ℂ] complexCo.V) :
+    (z : complexContr.V ⊗[ℂ] complexCo.V) :
     (contrCoContraction.hom ▷ complexContr.V) (z ⊗ₜ[ℂ] y) =
     (contrCoContraction.hom z) ⊗ₜ[ℂ] y := rfl
   repeat rw (config := { transparency := .instances }) [h1'']

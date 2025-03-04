@@ -35,7 +35,7 @@ abbrev V (_ : FiniteTarget n hℏ) := Fin n → ℂ
 /-- Given a finite target QM system `A`, the time evolution matrix for a `t : ℝ`,
   `A.timeEvolutionMatrix t` is defined as `e ^ (- I t /ℏ * A.H)`. -/
 noncomputable def timeEvolutionMatrix (A : FiniteTarget n hℏ) (t : ℝ) : Matrix (Fin n) (Fin n) ℂ :=
-  NormedSpace.exp ℂ  (- (Complex.I * t / ℏ) • A.H)
+  NormedSpace.exp ℂ (- (Complex.I * t / ℏ) • A.H)
 
 /-- Given a finite target QM system `A`, `timeEvolution` is the linear map from
   `A.V` to `A.V` obtained by multiplication with `timeEvolutionMatrix`. -/

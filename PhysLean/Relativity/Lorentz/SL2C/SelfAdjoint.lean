@@ -72,8 +72,7 @@ $$\begin{align}
 \begin{vmatrix}
   \operatorname{Re}(x\bar{y}) & -\operatorname{Im}(x\bar{y}) \\
   \operatorname{Im}(x\bar{y}) & \operatorname{Re}(x\bar{y})
-\end{vmatrix} \det\left(
-  \begin{bmatrix} \lvert x\rvert^2 & □ \\ 0 & \lvert y\rvert^2 \end{bmatrix} -
+\end{vmatrix} \det\left(\begin{bmatrix} \lvert x\rvert^2 & □ \\ 0 & \lvert y\rvert^2 \end{bmatrix} -
   \begin{bmatrix} □ & □ \\ 0 & 0 \end{bmatrix}
   \begin{bmatrix} □ & □ \\ □ & □ \end{bmatrix}
   \begin{bmatrix} 0 & □ \\ 0 & □ \end{bmatrix}

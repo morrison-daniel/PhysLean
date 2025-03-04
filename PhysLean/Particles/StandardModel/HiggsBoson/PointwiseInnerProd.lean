@@ -113,7 +113,7 @@ lemma smooth_innerProd (φ1 φ2 : HiggsField) : ContMDiff 𝓘(ℝ, SpaceTime) �
   the function `SpaceTime → ℝ` obtained by taking the square norm of the
   pointwise Higgs vector. In other words, `normSq φ x = ‖φ x‖ ^ 2`.
 
-  The notation `‖φ‖_H^2` is used for the `normSq φ`  -/
+  The notation `‖φ‖_H^2` is used for the `normSq φ`. -/
 @[simp]
 def normSq (φ : HiggsField) : SpaceTime → ℝ := fun x => ‖φ x‖ ^ 2
 

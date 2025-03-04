@@ -175,7 +175,7 @@ lemma orthogonal_physHermite_of_mem_orthogonal (f : ℝ → ℂ) (hf : MemHS f)
     or_false, Real.sqrt_nonneg] at h1
   have h0 : n ! ≠ 0 := by
     exact factorial_ne_zero n
-  have h0' : ¬ (√Q.ξ = 0 ∨ √Real.pi = 0):= by
+  have h0' : ¬ (√Q.ξ = 0 ∨ √Real.pi = 0) := by
     simpa using And.intro (Real.sqrt_ne_zero'.mpr Q.ξ_pos) (Real.sqrt_ne_zero'.mpr Real.pi_pos)
   simp only [h0, h0', or_self, false_or] at h1
   rw [← h1]
