@@ -291,7 +291,7 @@ def perturbationTheory : Note where
     ]
 
 def harmonicOscillator : Note where
-  title := "The Quantum Harmonic Oscillator in Lean 4"
+  title := "The Quantum Harmonic Oscillator"
   curators := ["Joseph Tooby-Smith"]
   parts := [
     .h1 "Introduction",
@@ -344,16 +344,33 @@ def harmonicOscillator : Note where
     ]
 
 def higgsPotential : Note where
-  title := "The Higgs potential in Lean 4 🚧"
+  title := "The Higgs potential 🚧"
   curators := ["Joseph Tooby-Smith"]
   parts := [
-    .warning "This note is under construction (03-March-2025).",
     .h1 "Introduction",
     .p "The Higgs potential is a key part of the Standard Model of particle physics.
       It is a scalar potential which is used to give mass to the elementary particles.
       The Higgs potential is a polynomial of degree four in the Higgs field.",
     .h1 "The Higgs field",
-    .name ``StandardModel.HiggsVec .incomplete,
+    .name ``StandardModel.HiggsVec .complete,
+    .name ``StandardModel.HiggsBundle .complete,
+    .name ``StandardModel.HiggsField .complete,
+    .h1 "The Higgs potential",
+    .name ``StandardModel.HiggsField.Potential .complete,
+    .name ``StandardModel.HiggsField.normSq .complete,
+    .name ``StandardModel.HiggsField.Potential.toFun .complete,
+    .h2 "Properties of the Higgs potential",
+    .name ``StandardModel.HiggsField.Potential.neg_𝓵_quadDiscrim_zero_bound .complete,
+    .name ``StandardModel.HiggsField.Potential.pos_𝓵_quadDiscrim_zero_bound .complete,
+    .name ``StandardModel.HiggsField.Potential.neg_𝓵_sol_exists_iff .complete,
+    .name ``StandardModel.HiggsField.Potential.pos_𝓵_sol_exists_iff .complete,
+    .h2 "Boundedness of the Higgs potential",
+    .name ``StandardModel.HiggsField.Potential.IsBounded .complete,
+    .name ``StandardModel.HiggsField.Potential.isBounded_𝓵_nonneg .complete,
+    .name ``StandardModel.HiggsField.Potential.isBounded_of_𝓵_pos .complete,
+    .h2 "Maximum and minimum of the Higgs potential",
+    .name ``StandardModel.HiggsField.Potential.isMaxOn_iff_field_of_𝓵_neg .complete,
+    .name ``StandardModel.HiggsField.Potential.isMinOn_iff_field_of_𝓵_pos .complete,
   ]
 
 def notesToMake : List (Note × String) := [

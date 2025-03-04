@@ -36,7 +36,8 @@ open SpaceTime
 In other words, the target space of the Higgs field.
 -/
 
-/-- The complex vector space in which the Higgs field takes values. -/
+/-- The vector space `HiggsVec` is defined to be the complex Euclidean space of dimension 2.
+  For a given spacetime point a Higgs field gives a value in `HiggsVec`. -/
 abbrev HiggsVec := EuclideanSpace ℂ (Fin 2)
 
 namespace HiggsVec
@@ -80,14 +81,19 @@ We also define the Higgs bundle.
 -/
 
 TODO "Make `HiggsBundle` an associated bundle."
-/-- The trivial vector bundle 𝓡² × ℂ². -/
+
+/-- The `HiggsBundle` is defined as the trivial vector bundle with base `SpaceTime` and
+  fiber `HiggsVec`. Thus as a manifold it corresponds to `ℝ⁴ × ℂ²`. -/
 abbrev HiggsBundle := Bundle.Trivial SpaceTime HiggsVec
 
 /-- The instance of a smooth vector bundle with total space `HiggsBundle` and fiber `HiggsVec`. -/
 instance : ContMDiffVectorBundle ⊤ HiggsVec HiggsBundle SpaceTime.asSmoothManifold :=
   Bundle.Trivial.contMDiffVectorBundle HiggsVec
 
-/-- A Higgs field is a smooth section of the Higgs bundle. -/
+/-- The type `HiggsField` is defined such that elements are smooth sections of the trivial
+  vector bundle `HiggsBundle`. Such elements are Higgs fields. Since `HiggsField` is
+  trivial as a vector bundle, a Higgs field is equivalent to a smooth map
+  from  `SpaceTime` to `HiggsVec`. -/
 abbrev HiggsField : Type := ContMDiffSection SpaceTime.asSmoothManifold HiggsVec ⊤ HiggsBundle
 
 /-- Given a vector in `HiggsVec` the constant Higgs field with value equal to that

@@ -31,7 +31,9 @@ open SpaceTime
 
 -/
 
-/-- The parameters of the Higgs potential. -/
+/-- The structure `Potential` is defined with two fields, `μ2` corresponding
+  to the mass-squared of the Higgs boson, and `l` corresponding to the coefficent
+  of the quartic term in the Higgs potential. Note that `l` is usually denoted `λ`. -/
 structure Potential where
   /-- The mass-squared of the Higgs boson. -/
   μ2 : ℝ
@@ -42,7 +44,10 @@ namespace Potential
 
 variable (P : Potential)
 
-/-- The function corresponding to the Higgs potential. -/
+/-- Given a element `P` of `Potential`, `P.toFun` is Higgs potential.
+  It is defined for a Higgs field `φ` and a spacetime point `x` as
+
+  `-μ² ‖φ‖_H^2 x + l * ‖φ‖_H^2 x * ‖φ‖_H^2 x`. -/
 def toFun (φ : HiggsField) (x : SpaceTime) : ℝ :=
   - P.μ2 * ‖φ‖_H^2 x + P.𝓵 * ‖φ‖_H^2 x * ‖φ‖_H^2 x
 
@@ -156,6 +161,10 @@ lemma quadDiscrim_eq_zero_iff_normSq (h : P.𝓵 ≠ 0) (φ : HiggsField) (x : S
     field_simp
     ring
 
+/-- For an element `P` of `Potential`, if `l < 0` then the following upper bound for the potential
+  exists
+
+  `P.toFun φ x ≤ - μ2 ^ 2 / (4 * 𝓵)`. -/
 lemma neg_𝓵_quadDiscrim_zero_bound (h : P.𝓵 < 0) (φ : HiggsField) (x : SpaceTime) :
     P.toFun φ x ≤ - P.μ2 ^ 2 / (4 * P.𝓵) := by
   have h1 := P.quadDiscrim_nonneg (ne_of_lt h) φ x
@@ -167,6 +176,10 @@ lemma neg_𝓵_quadDiscrim_zero_bound (h : P.𝓵 < 0) (φ : HiggsField) (x : Sp
   ring_nf at h2 ⊢
   exact h2
 
+/-- For an element `P` of `Potential`, if `0 < l` then the following lower bound for the potential
+  exists
+
+  `- μ2 ^ 2 / (4 * 𝓵) ≤ P.toFun φ x`. -/
 lemma pos_𝓵_quadDiscrim_zero_bound (h : 0 < P.𝓵) (φ : HiggsField) (x : SpaceTime) :
     - P.μ2 ^ 2 / (4 * P.𝓵) ≤ P.toFun φ x := by
   have h1 := P.neg.neg_𝓵_quadDiscrim_zero_bound (by simpa [neg] using h) φ x
@@ -196,6 +209,14 @@ lemma pos_𝓵_toFun_pos (h : 0 < P.𝓵) (φ : HiggsField) (x : SpaceTime) :
     (P.μ2 < 0 ∧ 0 ≤ P.toFun φ x) ∨ 0 ≤ P.μ2 := by
   simpa using P.neg.neg_𝓵_toFun_neg (by simpa using h) φ x
 
+/-- For an element `P` of `Potential` with `l < 0` and a real `c : ℝ`, there exists
+  a Higgs field `φ` and a spacetime point `x` such that `P.toFun φ x = c` iff one of the
+  following two conditions hold:
+- `0 < μ2` and `c ≤ 0`. That is, if `l` is negative and `μ2` positive, then the potential
+  takes every non-positive value.
+- or `μ2 ≤ 0` and `c ≤ - μ2 ^ 2 / (4 * 𝓵)`. That is, if `l` is negative and `μ2` non-positive,
+  then the potential takes every value less then or equal to its bound.
+-/
 lemma neg_𝓵_sol_exists_iff (h𝓵 : P.𝓵 < 0) (c : ℝ) : (∃ φ x, P.toFun φ x = c) ↔ (0 < P.μ2 ∧ c ≤ 0) ∨
     (P.μ2 ≤ 0 ∧ c ≤ - P.μ2 ^ 2 / (4 * P.𝓵)) := by
   refine Iff.intro (fun ⟨φ, x, hV⟩ => ?_) (fun h => ?_)
@@ -250,6 +271,14 @@ lemma neg_𝓵_sol_exists_iff (h𝓵 : P.𝓵 < 0) (c : ℝ) : (∃ φ x, P.toFu
     refine (quadratic_eq_zero_iff (ne_of_gt h𝓵).symm hdd _).mpr ?_
     simp only [neg_neg, or_true, a]
 
+/-- For an element `P` of `Potential` with `0 < l` and a real `c : ℝ`, there exists
+  a Higgs field `φ` and a spacetime point `x` such that `P.toFun φ x = c` iff one of the
+  following two conditions hold:
+- `μ2 < 0` and `0 ≤ c`. That is, if `l` is positive and `μ2` negative, then the potential
+  takes every non-negative value.
+- or `0 ≤ μ2` and `- μ2 ^ 2 / (4 * 𝓵) ≤ c`. That is, if `l` is positive and `μ2` non-negative,
+  then the potential takes every value greater then or equal to its bound.
+-/
 lemma pos_𝓵_sol_exists_iff (h𝓵 : 0 < P.𝓵) (c : ℝ) : (∃ φ x, P.toFun φ x = c) ↔ (P.μ2 < 0 ∧ 0 ≤ c) ∨
     (0 ≤ P.μ2 ∧ - P.μ2 ^ 2 / (4 * P.𝓵) ≤ c) := by
   have h1 := P.neg.neg_𝓵_sol_exists_iff (by simpa using h𝓵) (- c)
@@ -264,11 +293,16 @@ lemma pos_𝓵_sol_exists_iff (h𝓵 : 0 < P.𝓵) (c : ℝ) : (∃ φ x, P.toFu
 
 -/
 
-/-- The proposition on the coefficients for a potential to be bounded. -/
+/-- Given a element `P` of `Potential`, the proposition `IsBounded P` is true if and only if
+  there exists a real `c` such that for all Higgs fields `φ` and spacetime points `x`,
+  the Higgs potential corresponding to `φ` at `x` is greater then or equal to`c`. I.e.
+
+  `∀ Φ x, c ≤ P.toFun Φ x`. -/
 def IsBounded : Prop :=
   ∃ c, ∀ Φ x, c ≤ P.toFun Φ x
 
-/-- If the potential is bounded, then `P.𝓵` is non-negative. -/
+/-- Given a element `P` of `Potential` which is bounded,
+  the quartic coefficent `𝓵` of `P` is non-negative. -/
 lemma isBounded_𝓵_nonneg (h : P.IsBounded) : 0 ≤ P.𝓵 := by
   by_contra hl
   rw [not_le] at hl
@@ -313,7 +347,7 @@ lemma isBounded_𝓵_nonneg (h : P.IsBounded) : 0 ≤ P.𝓵 := by
       rw [hφ] at hc2
       linarith
 
-/-- If `P.𝓵` is positive, then the potential is bounded. -/
+/-- Given a element `P` of `Potential` with `0 < 𝓵`, then the potential is bounded. -/
 lemma isBounded_of_𝓵_pos (h : 0 < P.𝓵) : P.IsBounded := by
   simp only [IsBounded]
   have h2 := P.pos_𝓵_quadDiscrim_zero_bound h
@@ -401,6 +435,12 @@ lemma isMinOn_iff_field_of_μSq_nonneg_𝓵_pos (h𝓵 : 0 < P.𝓵) (hμ2 : 0 �
   rw [P.isMinOn_iff_of_μSq_nonneg_𝓵_pos h𝓵 hμ2 φ x, ← P.quadDiscrim_eq_zero_iff_normSq
     (Ne.symm (ne_of_lt h𝓵)), P.quadDiscrim_eq_zero_iff (Ne.symm (ne_of_lt h𝓵))]
 
+/-- Given an element `P` of `Potential` with `0 < l`, then the Higgs field `φ` and
+  spacetime point `x` minimize the potential if and only if one of the following conditions
+  holds
+- `0 ≤ μ2` and `‖φ‖_H^2 x = μ2 / (2 * 𝓵)`.
+- or `μ2 < 0` and `φ x = 0`.
+-/
 theorem isMinOn_iff_field_of_𝓵_pos (h𝓵 : 0 < P.𝓵) (φ : HiggsField) (x : SpaceTime) :
     IsMinOn (fun (φ, x) => P.toFun φ x) Set.univ (φ, x) ↔
     (0 ≤ P.μ2 ∧ ‖φ‖_H^2 x = P.μ2 /(2 * P.𝓵)) ∨ (P.μ2 < 0 ∧ φ x = 0) := by
@@ -415,6 +455,12 @@ lemma isMaxOn_iff_isMinOn_neg (φ : HiggsField) (x : SpaceTime) :
   rw [isMaxOn_univ_iff, isMinOn_univ_iff]
   simp_all only [Prod.forall, neg_le_neg_iff]
 
+/-- Given an element `P` of `Potential` with `l < 0`, then the Higgs field `φ` and
+  spacetime point `x` maximizes the potential if and only if one of the following conditions
+  holds
+- `μ2 ≤ 0` and `‖φ‖_H^2 x = μ2 / (2 * 𝓵)`.
+- or `0 < μ2` and `φ x = 0`.
+-/
 lemma isMaxOn_iff_field_of_𝓵_neg (h𝓵 : P.𝓵 < 0) (φ : HiggsField) (x : SpaceTime) :
     IsMaxOn (fun (φ, x) => P.toFun φ x) Set.univ (φ, x) ↔
     (P.μ2 ≤ 0 ∧ ‖φ‖_H^2 x = P.μ2 /(2 * P.𝓵)) ∨ (0 < P.μ2 ∧ φ x = 0) := by
