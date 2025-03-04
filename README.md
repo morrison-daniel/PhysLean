@@ -60,11 +60,9 @@ How HepLean was used: *Theorems from the space-time files of HepLean were includ
 
 ## Contributing
 
-We follow here roughly the same contribution policies as MathLib4 (which can be found [here](https://leanprover-community.github.io/contribute/index.html)).
-
-A guide to contributing can be found [here](https://github.com/HEPLean/HepLean/blob/master/CONTRIBUTING.md).
-
-If you want permission to create a pull-request for this repository contact Joseph Tooby-Smith on the [Lean Zulip](https://leanprover.zulipchat.com), or email.
+We would love to have you involved! See the [Get Involved](https://heplean.com/GetInvolved.html) page to see how you can get involved. 
+Any contributions are welcome! If you have any questions or want permission  permission to create a pull-request for this 
+repository contact Joseph Tooby-Smith on the [Lean Zulip](https://leanprover.zulipchat.com), or email.
 
 ## Installation
 
