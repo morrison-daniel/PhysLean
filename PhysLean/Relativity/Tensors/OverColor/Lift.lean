@@ -89,7 +89,6 @@ lemma objObj'_ρ_tprod (f : OverColor C) (M : G) (x : (i : f.left) → F.obj (Di
   rw [PiTensorProduct.map_tprod]
   rfl
 
-@[simp]
 lemma objObj'_ρ_empty (g : G) : (objObj' F (𝟙_ (OverColor C))).ρ g = LinearMap.id := by
   rw [objObj'_ρ]
   ext x

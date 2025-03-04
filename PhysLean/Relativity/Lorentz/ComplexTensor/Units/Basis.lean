@@ -40,10 +40,6 @@ lemma coContrUnit_tensorBasis : coContrUnit =
           (Fin 4) (fun x => ↑Lorentz.complexCo.V) Basis.instFunLike
           = @DFunLike.coe (Basis (Fin 4) ℂ (Lorentz.complexCo)) (Fin 4)
           (fun x => Lorentz.complexCo) Basis.instFunLike := by rfl
-  have hI3 : @DFunLike.coe (Basis (Fin 4) ℂ ↑Lorentz.complexContr.V)
-          (Fin 4) (fun x => ↑Lorentz.complexContr.V) Basis.instFunLike
-          = @DFunLike.coe (Basis (Fin 4) ℂ (Lorentz.complexContr)) (Fin 4)
-          (fun x => Lorentz.complexContr) Basis.instFunLike := by rfl
   have hI4 : @OfNat.ofNat complexLorentzTensor.k 1 One.toOfNat1 =
     @OfNat.ofNat ℂ 1 One.toOfNat1 := by rfl
   trans {δ' | μ ν}ᵀ.tensor
@@ -70,7 +66,7 @@ lemma coContrUnit_tensorBasis : coContrUnit =
     · simp only [Nat.succ_eq_add_one, Nat.reduceAdd, Fin.zero_eta, Fin.isValue, OverColor.mk_hom,
         cons_val_zero, Fin.cases_zero]
       simp only [complexLorentzTensor, Discrete.functor_obj_eq_as, Monoidal.tensorUnit_obj,
-        Fin.mk_one, Fin.isValue, cons_val_one, head_cons, hI1, hI3,
+        Fin.mk_one, Fin.isValue, cons_val_one, head_cons, hI1,
         Lorentz.complexContrBasisFin4_apply_zero,
         Lorentz.complexContrBasisFin4_apply_two, Lorentz.complexContrBasisFin4_apply_one,
         Lorentz.complexContrBasisFin4_apply_three]
@@ -88,10 +84,6 @@ lemma contrCoUnit_tensorBasis : contrCoUnit =
           (Fin 4) (fun x => ↑Lorentz.complexCo.V) Basis.instFunLike
           = @DFunLike.coe (Basis (Fin 4) ℂ (Lorentz.complexCo)) (Fin 4)
           (fun x => Lorentz.complexCo) Basis.instFunLike := by rfl
-  have hI3 : @DFunLike.coe (Basis (Fin 4) ℂ ↑Lorentz.complexContr.V)
-          (Fin 4) (fun x => ↑Lorentz.complexContr.V) Basis.instFunLike
-          = @DFunLike.coe (Basis (Fin 4) ℂ (Lorentz.complexContr)) (Fin 4)
-          (fun x => Lorentz.complexContr) Basis.instFunLike := by rfl
   have hI4 : @OfNat.ofNat complexLorentzTensor.k 1 One.toOfNat1 =
     @OfNat.ofNat ℂ 1 One.toOfNat1 := by rfl
   trans {δ | μ ν}ᵀ.tensor
@@ -114,7 +106,7 @@ lemma contrCoUnit_tensorBasis : contrCoUnit =
     fin_cases i
     · simp only [Nat.succ_eq_add_one, Nat.reduceAdd, Fin.zero_eta, Fin.isValue, OverColor.mk_hom,
         cons_val_zero, Fin.cases_zero]
-      simp [complexLorentzTensor, hI1, hI3]
+      simp [complexLorentzTensor, hI1]
     · simp only [Nat.succ_eq_add_one, Nat.reduceAdd, Fin.zero_eta, Fin.isValue, OverColor.mk_hom,
         cons_val_zero, Fin.cases_zero]
       simp only [complexLorentzTensor, Discrete.functor_obj_eq_as, Monoidal.tensorUnit_obj,
