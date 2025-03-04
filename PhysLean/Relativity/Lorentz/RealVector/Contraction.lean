@@ -84,7 +84,7 @@ def contrCoContract : Contr d ⊗ Co d ⟶ 𝟙_ (Rep ℝ (LorentzGroup d)) wher
     simp only [one_mulVec, CategoryTheory.Equivalence.symm_inverse,
       Action.functorCategoryEquivalence_functor, Action.FunctorCategoryEquivalence.functor_obj_obj,
       Action.instMonoidalCategory_tensorUnit_V, Action.instMonoidalCategory_tensorObj_V,
-      Action.tensorUnit_ρ', CategoryTheory.Category.comp_id, lift.tmul]
+      Action.tensorUnit_ρ, CategoryTheory.Category.comp_id, lift.tmul]
     rfl
 
 /-- Notation for `contrCoContract` acting on a tmul. -/
@@ -107,7 +107,7 @@ def coContrContract : Co d ⊗ Contr d ⟶ 𝟙_ (Rep ℝ (LorentzGroup d)) wher
     simp only [vecMul_one, CategoryTheory.Equivalence.symm_inverse,
       Action.functorCategoryEquivalence_functor, Action.FunctorCategoryEquivalence.functor_obj_obj,
       Action.instMonoidalCategory_tensorUnit_V, Action.instMonoidalCategory_tensorObj_V,
-      Action.tensorUnit_ρ', CategoryTheory.Category.comp_id, lift.tmul]
+      Action.tensorUnit_ρ, CategoryTheory.Category.comp_id, lift.tmul]
     rfl
 
 /-- Notation for `coContrContract` acting on a tmul. -/
@@ -331,15 +331,16 @@ lemma _root_.LorentzGroup.mem_iff_norm : Λ ∈ LorentzGroup d ↔
   simp only [map_add, LinearMap.add_apply, map_sub, LinearMap.sub_apply] at hp hn
   rw [symm (Λ *ᵥ y) (Λ *ᵥ x), symm y x] at hp hn
   let e : 𝟙_ (Rep ℝ ↑(LorentzGroup d)) ≃ₗ[ℝ] ℝ :=
-    LinearEquiv.refl ℝ (CoeSort.coe (𝟙_ (Rep ℝ ↑(LorentzGroup d))))
+    LinearEquiv.refl ℝ ((𝟙_ (Rep ℝ ↑(LorentzGroup d))))
   apply e.injective
   have hp' := e.injective.eq_iff.mpr hp
   have hn' := e.injective.eq_iff.mpr hn
-  simp only [Action.instMonoidalCategory_tensorUnit_V, Action.instMonoidalCategory_tensorObj_V,
+  simp  [Action.instMonoidalCategory_tensorUnit_V, Action.instMonoidalCategory_tensorObj_V,
     Equivalence.symm_inverse, Action.functorCategoryEquivalence_functor,
     Action.FunctorCategoryEquivalence.functor_obj_obj, map_add, map_sub] at hp' hn'
   linear_combination (norm := ring_nf) (1 / 4) * hp' + (-1/ 4) * hn'
   rw [symm (Λ *ᵥ y) (Λ *ᵥ x), symm y x]
+  simp only [Action.instMonoidalCategory_tensorUnit_V]
   ring
 
 /-!

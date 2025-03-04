@@ -55,7 +55,7 @@ def contrMetric : 𝟙_ (Rep ℂ SL(2,ℂ)) ⟶ complexContr ⊗ complexContr wh
     refine ModuleCat.hom_ext ?_
     refine LinearMap.ext fun x : ℂ => ?_
     simp only [Action.instMonoidalCategory_tensorObj_V, Action.instMonoidalCategory_tensorUnit_V,
-      Action.tensorUnit_ρ', CategoryTheory.Category.id_comp, Action.tensor_ρ', ModuleCat.hom_comp,
+      Action.tensorUnit_ρ, CategoryTheory.Category.id_comp, Action.tensor_ρ, ModuleCat.hom_comp,
       Function.comp_apply]
     change x • contrMetricVal =
       (TensorProduct.map (complexContr.ρ M) (complexContr.ρ M)) (x • contrMetricVal)
@@ -107,7 +107,7 @@ def coMetric : 𝟙_ (Rep ℂ SL(2,ℂ)) ⟶ complexCo ⊗ complexCo where
     refine ModuleCat.hom_ext ?_
     refine LinearMap.ext fun x : ℂ => ?_
     simp only [Action.instMonoidalCategory_tensorObj_V, Action.instMonoidalCategory_tensorUnit_V,
-      Action.tensorUnit_ρ', CategoryTheory.Category.id_comp, Action.tensor_ρ', ModuleCat.hom_comp,
+      Action.tensorUnit_ρ, CategoryTheory.Category.id_comp, Action.tensor_ρ, ModuleCat.hom_comp,
       Function.comp_apply]
     change x • coMetricVal =
       (TensorProduct.map (complexCo.ρ M) (complexCo.ρ M)) (x • coMetricVal)

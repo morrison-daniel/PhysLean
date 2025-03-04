@@ -103,11 +103,11 @@ def indexToIdent (stx : Syntax) : TermElabM Ident :=
 
 /-- Takes a pair ``a b : ℕ × TSyntax `indexExpr``. If `a.1 < b.1` and `a.2 = b.2` then
   outputs `some (a.1, b.1)`, otherwise `none`. -/
-def indexPosEq (a b : ℕ × TSyntax `indexExpr) : TermElabM (Option (ℕ × ℕ)) := do
-  let a' ← indexToIdent a.2
-  let b' ← indexToIdent b.2
-  if a.1 < b.1 ∧ Lean.TSyntax.getId a' = Lean.TSyntax.getId b' then
-    return some (a.1, b.1)
+def indexPosEq (a b : TSyntax `indexExpr × ℕ) : TermElabM (Option (ℕ × ℕ)) := do
+  let a' ← indexToIdent a.1
+  let b' ← indexToIdent b.1
+  if a.2 < b.2 ∧ Lean.TSyntax.getId a' = Lean.TSyntax.getId b' then
+    return some (a.2, b.2)
   else
     return none
 
@@ -185,7 +185,7 @@ def getNoIndicesExact (stx : Syntax) : TermElabM ℕ := do
   match n with
   | 1 =>
     match type with
-    | Expr.app _ (Expr.app _ (Expr.app _ c)) =>
+    | Expr.app _ (Expr.app _ (Expr.app _ (Expr.app _ c))) =>
       let typeC ← inferType c
       match typeC with
       | Expr.forallE _ (Expr.app _ a) _ _ =>
@@ -297,10 +297,10 @@ def evalAdjustPos (l : List ℕ) : List ℕ :=
 /-- The positions in getIndicesNode which get evaluated, and the value they take. -/
 partial def getEvalPos (stx : Syntax) : TermElabM (List (ℕ × ℕ)) := do
   let ind ← getIndices stx
-  let indEnum := ind.enum
-  let evals := indEnum.filter (fun x => indexExprIsNum x.2)
-  let evals2 ← (evals.mapM (fun x => indexToNum x.2))
-  let pos := evalAdjustPos (evals.map (fun x => x.1))
+  let indEnum := ind.zipIdx
+  let evals := indEnum.filter (fun x => indexExprIsNum x.1)
+  let evals2 ← (evals.mapM (fun x => indexToNum x.1))
+  let pos := evalAdjustPos (evals.map (fun x => x.2))
   return List.zip pos evals2
 
 /-- For each element of `l : List (ℕ × ℕ)` applies `TensorTree.eval` to the given term. -/
@@ -312,8 +312,8 @@ def evalSyntax (l : List (ℕ × ℕ)) (T : Term) : Term :=
 partial def getContrPos (stx : Syntax) : TermElabM (List (ℕ × ℕ)) := do
   let ind ← getIndices stx
   let indFilt : List (TSyntax `indexExpr) := ind.filter (fun x => ¬ indexExprIsNum x)
-  let indEnum := indFilt.enum
-  let bind := List.flatMap indEnum (fun a => indEnum.map (fun b => (a, b)))
+  let indEnum := indFilt.zipIdx
+  let bind := List.flatMap (fun a => indEnum.map (fun b => (a, b))) indEnum
   let filt ← bind.filterMapM (fun x => indexPosEq x.1 x.2)
   if ¬ ((filt.map Prod.fst).Nodup ∧ (filt.map Prod.snd).Nodup) then
     throwError "To many contractions"
@@ -379,8 +379,8 @@ partial def getIndices (stx : Syntax) : TermElabM (List (TSyntax `indexExpr)) :=
 partial def getContrPos (stx : Syntax) : TermElabM (List (ℕ × ℕ)) := do
   let ind ← getIndices stx
   let indFilt : List (TSyntax `indexExpr) := ind.filter (fun x => ¬ indexExprIsNum x)
-  let indEnum := indFilt.enum
-  let bind := List.flatMap indEnum (fun a => indEnum.map (fun b => (a, b)))
+  let indEnum := indFilt.zipIdx
+  let bind := List.flatMap  (fun a => indEnum.map (fun b => (a, b))) indEnum
   let filt ← bind.filterMapM (fun x => indexPosEq x.1 x.2)
   if ¬ ((filt.map Prod.fst).Nodup ∧ (filt.map Prod.snd).Nodup) then
     throwError "To many contractions"
@@ -408,10 +408,10 @@ end ProdNode
 def getPermutation (l1 l2 : List (TSyntax `indexExpr)) : TermElabM (List (ℕ)) := do
   let l1' ← l1.mapM (fun x => indexToIdent x)
   let l2' ← l2.mapM (fun x => indexToIdent x)
-  let l1enum := l1'.enum
+  let l1enum := l1'.zipIdx
   let l2'' := l2'.filterMap
-    (fun x => l1enum.find? (fun y => Lean.TSyntax.getId y.2 = Lean.TSyntax.getId x))
-  return l2''.map fun x => x.1
+    (fun x => l1enum.find? (fun y => Lean.TSyntax.getId y.1 = Lean.TSyntax.getId x))
+  return l2''.map fun x => x.2
 
 open PhysLean.Fin
 

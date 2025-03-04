@@ -223,25 +223,25 @@ lemma cRow_cross_tRow_eq_uRow (V : CKMMatrix) :
     funext i
     fin_cases i <;> simp
   simp only [h3, Fin.isValue, smul_dotProduct, Pi.conj_apply, smul_eq_mul,
-    uRow_normalized, Fin.isValue, mul_one, mul_conj, ← Complex.sq_abs] at h2
+    uRow_normalized, Fin.isValue, mul_one, mul_conj, ← Complex.sq_norm] at h2
   simp only [Fin.isValue, ofReal_pow, sq_eq_one_iff, ofReal_eq_one] at h2
   cases' h2 with h2 h2
   · have hx : [V]u = (g 0)⁻¹ • (conj ([V]c) ×₃ conj ([V]t)) := by
       rw [← hg, smul_smul, inv_mul_cancel₀, one_smul]
       by_contra hn
       simp [hn] at h2
-    have hg2 : Complex.abs (g 0)⁻¹ = 1 := by
+    have hg2 : norm (g 0)⁻¹ = 1 := by
       simp [@map_inv₀, h2]
     have hg22 : ∃ (τ : ℝ), (g 0)⁻¹ = Complex.exp (τ * I) := by
-      rw [← abs_mul_exp_arg_mul_I (g 0)⁻¹, hg2]
+      rw [← norm_mul_exp_arg_mul_I (g 0)⁻¹, hg2]
       use arg (g 0)⁻¹
       simp
     obtain ⟨τ, hτ⟩ := hg22
     use τ
     rw [hx, hτ]
-  · have hx : Complex.abs (g 0) = -1 := by
+  · have hx : norm (g 0) = -1 := by
       simp [← ofReal_inj, Fin.isValue, ofReal_neg, ofReal_one, h2]
-    have h3 := Complex.abs.nonneg (g 0)
+    have h3 := norm_nonneg (g 0)
     simp_all only [ofReal_neg, ofReal_one, Left.nonneg_neg_iff]
     have h4 : (0 : ℝ) < 1 := by norm_num
     exact False.elim (lt_iff_not_le.mp h4 h3)
@@ -268,13 +268,13 @@ lemma uRow_cross_cRow_eq_tRow (V : CKMMatrix) :
     funext i
     fin_cases i <;> simp
   simp only [h3, Fin.isValue, smul_dotProduct, Pi.conj_apply, smul_eq_mul, tRow_normalized,
-    Fin.isValue, mul_one, mul_conj, ← Complex.sq_abs, ofReal_pow, sq_eq_one_iff,
+    Fin.isValue, mul_one, mul_conj, ← Complex.sq_norm, ofReal_pow, sq_eq_one_iff,
     ofReal_eq_one] at h2
   cases' h2 with h2 h2
   swap
-  · have hx : Complex.abs (g 2) = -1 := by
+  · have hx : norm (g 2) = -1 := by
       simp [h2, ← ofReal_inj, Fin.isValue, ofReal_neg, ofReal_one]
-    have h3 := Complex.abs.nonneg (g 2)
+    have h3 := norm_nonneg (g 2)
     simp_all
     have h4 : (0 : ℝ) < 1 := by norm_num
     exact False.elim (lt_iff_not_le.mp h4 h3)
@@ -282,10 +282,10 @@ lemma uRow_cross_cRow_eq_tRow (V : CKMMatrix) :
       rw [← hg, @smul_smul, inv_mul_cancel₀, one_smul]
       by_contra hn
       simp [hn] at h2
-    have hg2 : Complex.abs (g 2)⁻¹ = 1 := by
+    have hg2 : norm (g 2)⁻¹ = 1 := by
       simp [@map_inv₀, h2]
     have hg22 : ∃ (τ : ℝ), (g 2)⁻¹ = Complex.exp (τ * I) := by
-      rw [← abs_mul_exp_arg_mul_I (g 2)⁻¹]
+      rw [← norm_mul_exp_arg_mul_I (g 2)⁻¹]
       use arg (g 2)⁻¹
       simp [hg2]
     obtain ⟨τ, hτ⟩ := hg22

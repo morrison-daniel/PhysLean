@@ -49,7 +49,7 @@ def leftAltLeftUnit : 𝟙_ (Rep ℂ SL(2,ℂ)) ⟶ leftHanded ⊗ altLeftHanded
     refine ModuleCat.hom_ext ?_
     refine LinearMap.ext fun x : ℂ => ?_
     simp only [Action.instMonoidalCategory_tensorObj_V, Action.instMonoidalCategory_tensorUnit_V,
-      Action.tensorUnit_ρ', CategoryTheory.Category.id_comp, Action.tensor_ρ', ModuleCat.hom_comp,
+      Action.tensorUnit_ρ, CategoryTheory.Category.id_comp, Action.tensor_ρ, ModuleCat.hom_comp,
       Function.comp_apply]
     change x • leftAltLeftUnitVal =
       (TensorProduct.map (leftHanded.ρ M) (altLeftHanded.ρ M)) (x • leftAltLeftUnitVal)
@@ -92,7 +92,7 @@ def altLeftLeftUnit : 𝟙_ (Rep ℂ SL(2,ℂ)) ⟶ altLeftHanded ⊗ leftHanded
     refine ModuleCat.hom_ext ?_
     refine LinearMap.ext fun x : ℂ => ?_
     simp only [Action.instMonoidalCategory_tensorObj_V, Action.instMonoidalCategory_tensorUnit_V,
-      Action.tensorUnit_ρ', CategoryTheory.Category.id_comp, Action.tensor_ρ', ModuleCat.hom_comp,
+      Action.tensorUnit_ρ, CategoryTheory.Category.id_comp, Action.tensor_ρ, ModuleCat.hom_comp,
       Function.comp_apply]
     change x • altLeftLeftUnitVal =
       (TensorProduct.map (altLeftHanded.ρ M) (leftHanded.ρ M)) (x • altLeftLeftUnitVal)
@@ -139,7 +139,7 @@ def rightAltRightUnit : 𝟙_ (Rep ℂ SL(2,ℂ)) ⟶ rightHanded ⊗ altRightHa
     refine ModuleCat.hom_ext ?_
     refine LinearMap.ext fun x : ℂ => ?_
     simp only [Action.instMonoidalCategory_tensorObj_V, Action.instMonoidalCategory_tensorUnit_V,
-      Action.tensorUnit_ρ', CategoryTheory.Category.id_comp, Action.tensor_ρ', ModuleCat.hom_comp,
+      Action.tensorUnit_ρ, CategoryTheory.Category.id_comp, Action.tensor_ρ, ModuleCat.hom_comp,
       Function.comp_apply]
     change x • rightAltRightUnitVal =
       (TensorProduct.map (rightHanded.ρ M) (altRightHanded.ρ M)) (x • rightAltRightUnitVal)
@@ -190,7 +190,8 @@ def altRightRightUnit : 𝟙_ (Rep ℂ SL(2,ℂ)) ⟶ altRightHanded ⊗ rightHa
     refine ModuleCat.hom_ext ?_
     refine LinearMap.ext fun x : ℂ => ?_
     simp only [Action.instMonoidalCategory_tensorObj_V, Action.instMonoidalCategory_tensorUnit_V,
-      Action.tensorUnit_ρ', CategoryTheory.Category.id_comp, Action.tensor_ρ', ModuleCat.hom_comp,
+      Action.tensorUnit_ρ
+      , CategoryTheory.Category.id_comp, Action.tensor_ρ, ModuleCat.hom_comp,
       Function.comp_apply]
     change x • altRightRightUnitVal =
       (TensorProduct.map (altRightHanded.ρ M) (rightHanded.ρ M)) (x • altRightRightUnitVal)

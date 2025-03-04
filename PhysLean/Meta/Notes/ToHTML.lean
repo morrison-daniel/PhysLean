@@ -18,8 +18,8 @@ variable (N : NoteFile)
 
 /-- Sorts `NoteInfo`'s by file name then by line number. -/
 def sortLE (ni1 ni2 : HTMLNote) : Bool :=
-  if N.files.indexOf ni1.fileName ≠ N.files.indexOf ni2.fileName
-  then N.files.indexOf ni1.fileName ≤ N.files.indexOf ni2.fileName
+  if N.files.idxOf ni1.fileName ≠ N.files.idxOf ni2.fileName
+  then N.files.idxOf ni1.fileName ≤ N.files.idxOf ni2.fileName
   else
   ni1.line ≤ ni2.line
 

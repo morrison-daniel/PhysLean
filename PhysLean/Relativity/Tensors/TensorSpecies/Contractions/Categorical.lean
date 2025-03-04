@@ -68,9 +68,9 @@ lemma contrOneTwoLeft_add_right {c1 c2 : S.C} (x : S.F.obj (OverColor.mk ![c1]))
 
 lemma contrOneTwoLeft_tprod_eq {c1 c2 : S.C}
     (fx : (i : (𝟭 Type).obj (OverColor.mk ![c1]).left) →
-      CoeSort.coe (S.FD.obj { as := (OverColor.mk ![c1]).hom i }))
+      (S.FD.obj { as := (OverColor.mk ![c1]).hom i }))
     (fy : (i : (𝟭 Type).obj (OverColor.mk ![S.τ c1, c2]).left)
-      → CoeSort.coe (S.FD.obj { as := (OverColor.mk ![S.τ c1, c2]).hom i })) :
+      → (S.FD.obj { as := (OverColor.mk ![S.τ c1, c2]).hom i })) :
     contrOneTwoLeft (PiTensorProduct.tprod S.k fx) (PiTensorProduct.tprod S.k fy) =
       ((S.tensorToVec c2).inv.hom
       (((S.contr.app (Discrete.mk c1)).hom (fx (0 : Fin 1) ⊗ₜ fy (0 : Fin 2)) •
@@ -99,9 +99,9 @@ lemma contrOneTwoLeft_tprod_eq {c1 c2 : S.C}
 lemma contr_one_two_left_eq_contrOneTwoLeft_tprod {c1 c2 : S.C} (x : S.F.obj (OverColor.mk ![c1]))
     (y : S.F.obj (OverColor.mk ![S.τ c1, c2]))
     (fx : (i : (𝟭 Type).obj (OverColor.mk ![c1]).left) →
-      CoeSort.coe (S.FD.obj { as := (OverColor.mk ![c1]).hom i }))
+      (S.FD.obj { as := (OverColor.mk ![c1]).hom i }))
     (fy : (i : (𝟭 Type).obj (OverColor.mk ![S.τ c1, c2]).left)
-      → CoeSort.coe (S.FD.obj { as := (OverColor.mk ![S.τ c1, c2]).hom i }))
+      → (S.FD.obj { as := (OverColor.mk ![S.τ c1, c2]).hom i }))
     (hx : x = PiTensorProduct.tprod S.k fx)
     (hy : y = PiTensorProduct.tprod S.k fy) :
     {x | μ ⊗ y | μ ν}ᵀ.tensor =
@@ -210,10 +210,10 @@ lemma contrOneTwoLeft_tensorTree {c1 c2 : S.C} (x : S.F.obj (OverColor.mk ![c1])
   constructions and fields of the tensor species. -/
 lemma contr_two_two_inner_tprod (c : S.C) (x : S.F.obj (OverColor.mk ![c, c]))
     (fx : (i : (𝟭 Type).obj (OverColor.mk ![c, c]).left) →
-      CoeSort.coe (S.FD.obj { as := (OverColor.mk ![c, c]).hom i }))
+      (S.FD.obj { as := (OverColor.mk ![c, c]).hom i }))
     (y : S.F.obj (OverColor.mk ![(S.τ c), (S.τ c)]))
     (fy : (i : (𝟭 Type).obj (OverColor.mk ![S.τ c, S.τ c]).left) →
-      CoeSort.coe (S.FD.obj { as := (OverColor.mk ![S.τ c, S.τ c]).hom i }))
+      (S.FD.obj { as := (OverColor.mk ![S.τ c, S.τ c]).hom i }))
     (hx : x = PiTensorProduct.tprod S.k fx)
     (hy : y = PiTensorProduct.tprod S.k fy) :
     {x | μ ν ⊗ y| ν ρ}ᵀ.tensor = (S.F.map (OverColor.mkIso (by

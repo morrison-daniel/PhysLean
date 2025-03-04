@@ -72,7 +72,6 @@ structure HarmonicOscillator where
 
 namespace HarmonicOscillator
 
-open Nat
 open PhysLean HilbertSpace
 open MeasureTheory
 

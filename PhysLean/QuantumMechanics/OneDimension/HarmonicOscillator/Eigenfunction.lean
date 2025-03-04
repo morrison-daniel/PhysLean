@@ -89,15 +89,15 @@ lemma eigenfunction_point_norm (n : ℕ) (x : ℝ) :
     ‖Q.eigenfunction n x‖ = (1/√(2 ^ n * n !) * (1/ √(√Real.pi * Q.ξ))) *
     (|physHermite n (x / Q.ξ)| * Real.exp (- x ^ 2 / (2 * Q.ξ ^ 2))) := by
   rw [eigenfunction_eq]
-  simp only [neg_mul, Complex.ofReal_mul, Complex.norm_eq_abs]
-  rw [AbsoluteValue.map_mul, AbsoluteValue.map_mul]
+  simp only [neg_mul, Complex.ofReal_mul]
+  rw [norm_mul, norm_mul]
   congr
   · simp [Real.sqrt_nonneg, abs_of_nonneg]
   · simp [Real.sqrt_nonneg, abs_of_nonneg]
-  · rw [AbsoluteValue.map_mul]
+  · rw [norm_mul]
     congr 1
     · simp
-    · rw [Complex.abs_ofReal]
+    · rw [Complex.norm_real]
       simp [abs_of_nonneg]
 
 lemma eigenfunction_point_norm_sq (n : ℕ) (x : ℝ) :

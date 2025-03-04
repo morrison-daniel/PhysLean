@@ -303,7 +303,7 @@ lemma orthogonal_exp_of_mem_orthogonal (f : ℝ → ℂ) (hf : MemHS f)
     apply Filter.Tendsto.mul_const
     simp only [Complex.exp, Complex.exp']
     haveI hi : CauSeq.IsComplete ℂ norm :=
-      inferInstanceAs (CauSeq.IsComplete ℂ Complex.abs)
+      inferInstanceAs (CauSeq.IsComplete ℂ norm)
     exact CauSeq.tendsto_limit (Complex.exp' (Complex.I * c * y))
   /- End of rewritting the intergrand as a limit. -/
   /- Rewritting the integral as a limit using dominated_convergence -/
@@ -311,7 +311,7 @@ lemma orthogonal_exp_of_mem_orthogonal (f : ℝ → ℂ) (hf : MemHS f)
       (Complex.I * ↑c * ↑y) ^ r / r ! * (f y * Real.exp (- y^2 / (2 * Q.ξ^2))))
       Filter.atTop (nhds (∫ y : ℝ, Complex.exp (Complex.I * c * y) *
       (f y * Real.exp (- y^2 / (2 * Q.ξ^2))))) := by
-    let bound : ℝ → ℝ := fun x => Real.exp (|c * x|) * Complex.abs (f x) *
+    let bound : ℝ → ℝ := fun x => Real.exp (|c * x|) * norm (f x) *
       (Real.exp (- x ^ 2 / (2 * Q.ξ^2)))
     apply MeasureTheory.tendsto_integral_of_dominated_convergence bound
     · intro n
@@ -344,7 +344,7 @@ lemma orthogonal_exp_of_mem_orthogonal (f : ℝ → ℂ) (hf : MemHS f)
         apply guassian_integrable_polynomial
         simp
     · /- Prove the bound is integrable. -/
-      have hbound : bound = (fun x => Real.exp |c * x| * Complex.abs (f x) *
+      have hbound : bound = (fun x => Real.exp |c * x| * norm (f x) *
           Real.exp (-(1/ (2 * Q.ξ^2)) * x ^ 2)) := by
         simp only [neg_mul, bound]
         funext x
@@ -359,40 +359,40 @@ lemma orthogonal_exp_of_mem_orthogonal (f : ℝ → ℂ) (hf : MemHS f)
       intro y
       rw [← Finset.sum_mul]
       simp only [neg_mul, Complex.ofReal_exp, Complex.ofReal_div, Complex.ofReal_neg,
-        Complex.ofReal_mul, Complex.ofReal_pow, Complex.ofReal_ofNat, norm_mul, Complex.norm_eq_abs,
+        Complex.ofReal_mul, Complex.ofReal_pow, Complex.ofReal_ofNat, norm_mul,
         bound]
       rw [mul_assoc]
       conv_rhs =>
         rw [mul_assoc]
-      have h1 : (Complex.abs (f y) * Complex.abs (Complex.exp (-(↑y ^ 2) / (2 * Q.ξ^2))))
-        = Complex.abs (f y) * Real.exp (-(y ^ 2) / (2 * Q.ξ^2)) := by
+      have h1 : (norm (f y) * norm (Complex.exp (-(↑y ^ 2) / (2 * Q.ξ^2))))
+        = norm (f y) * Real.exp (-(y ^ 2) / (2 * Q.ξ^2)) := by
         simp only [mul_eq_mul_left_iff, map_eq_zero, bound]
         left
-        rw [Complex.abs_exp]
+        rw [Complex.norm_exp]
         congr
         trans (Complex.ofReal (- y ^ 2 / (2 * Q.ξ^2))).re
         · congr
           simp
         · rw [Complex.ofReal_re]
       rw [h1]
-      by_cases hf : Complex.abs (f y) = 0
+      by_cases hf : norm (f y) = 0
       · simp [hf]
       rw [_root_.mul_le_mul_right]
       · have h1 := Real.sum_le_exp_of_nonneg (x := |c * y|) (abs_nonneg (c * y)) n
         refine le_trans ?_ h1
-        have h2 : Complex.abs (∑ i ∈ range n, (Complex.I * (↑c * ↑y)) ^ i / ↑i !) ≤
-          ∑ i ∈ range n, Complex.abs ((Complex.I * (↑c * ↑y)) ^ i / ↑i !) := by
-          exact AbsoluteValue.sum_le _ _ _
+        have h2 : norm (∑ i ∈ range n, (Complex.I * (↑c * ↑y)) ^ i / ↑i !) ≤
+          ∑ i ∈ range n, norm ((Complex.I * (↑c * ↑y)) ^ i / ↑i !) := by
+          exact norm_sum_le _ _
         refine le_trans h2 ?_
         apply le_of_eq
         congr
         funext i
-        simp only [map_div₀, AbsoluteValue.map_pow, AbsoluteValue.map_mul, Complex.abs_I,
-          Complex.abs_ofReal, one_mul, Complex.abs_natCast, bound]
+        simp only [Complex.norm_div, norm_pow, Complex.norm_mul, Complex.norm_I, Complex.norm_real,
+          Real.norm_eq_abs, one_mul, RCLike.norm_natCast, bound]
         congr
         rw [abs_mul]
       · refine mul_pos ?_ ?_
-        have h1 : 0 ≤ Complex.abs (f y) := by exact AbsoluteValue.nonneg Complex.abs (f y)
+        have h1 : 0 ≤ norm (f y) := norm_nonneg (f y)
         apply lt_of_le_of_ne h1 (fun a => hf (id (Eq.symm a)))
         exact Real.exp_pos (- y ^ 2 / (2 * Q.ξ^2))
     · apply Filter.Eventually.of_forall
@@ -463,7 +463,7 @@ lemma fourierIntegral_zero_of_mem_orthogonal (f : ℝ → ℂ) (hf : MemHS f)
 
 lemma zero_of_orthogonal_mk (f : ℝ → ℂ) (hf : MemHS f)
     (hOrth : ∀ n : ℕ, ⟪HilbertSpace.mk (Q.eigenfunction_memHS n), HilbertSpace.mk hf⟫_ℂ = 0)
-    (plancherel_theorem: ∀ {f : ℝ → ℂ} (hf : Integrable f volume) (_ : Memℒp f 2),
+    (plancherel_theorem: ∀ {f : ℝ → ℂ} (hf : Integrable f volume) (_ : MemLp f 2),
       eLpNorm (𝓕 f) 2 volume = eLpNorm f 2 volume) :
     HilbertSpace.mk hf = 0 := by
   have hf' : (fun x => f x * ↑(rexp (- x ^ 2 / (2 * Q.ξ^2))))
@@ -480,7 +480,7 @@ lemma zero_of_orthogonal_mk (f : ℝ → ℂ) (hf : MemHS f)
     simp only [eLpNorm_zero]
     · /- f x * Real.exp (- x^2 / (2 * ξ^2)) is integrable -/
       rw [hf']
-      rw [← memℒp_one_iff_integrable]
+      rw [← memLp_one_iff_integrable]
       apply HilbertSpace.mul_gaussian_mem_Lp_one f hf (1/ (2 * Q.ξ^2)) 0
       simp
     · /- f x * Real.exp (- x^2 / (2 * ξ^2)) is square-integrable -/
@@ -500,7 +500,7 @@ lemma zero_of_orthogonal_mk (f : ℝ → ℂ) (hf : MemHS f)
     · /- f x * Real.exp (- x^2 / (2 * ξ^2)) is strongly measurable -/
       rw [hf']
       apply Integrable.aestronglyMeasurable
-      rw [← memℒp_one_iff_integrable]
+      rw [← memLp_one_iff_integrable]
       apply HilbertSpace.mul_gaussian_mem_Lp_one f hf (1/ (2 * Q.ξ^2)) 0
       simp
     · simp
@@ -509,7 +509,7 @@ lemma zero_of_orthogonal_mk (f : ℝ → ℂ) (hf : MemHS f)
 
 lemma zero_of_orthogonal_eigenVector (f : HilbertSpace)
     (hOrth : ∀ n : ℕ, ⟪HilbertSpace.mk (Q.eigenfunction_memHS n), f⟫_ℂ = 0)
-    (plancherel_theorem: ∀ {f : ℝ → ℂ} (hf : Integrable f volume) (_ : Memℒp f 2),
+    (plancherel_theorem: ∀ {f : ℝ → ℂ} (hf : Integrable f volume) (_ : MemLp f 2),
       eLpNorm (𝓕 f) 2 volume = eLpNorm f 2 volume) : f = 0 := by
   obtain ⟨f, hf, rfl⟩ := HilbertSpace.mk_surjective f
   exact zero_of_orthogonal_mk Q f hf hOrth plancherel_theorem
@@ -527,7 +527,7 @@ lemma zero_of_orthogonal_eigenVector (f : HilbertSpace)
   is zero for `f` orthogonal to all eigenfunctions, and hence the norm of `f` is zero.
 -/
 theorem eigenfunction_completeness
-    (plancherel_theorem : ∀ {f : ℝ → ℂ} (hf : Integrable f volume) (_ : Memℒp f 2),
+    (plancherel_theorem : ∀ {f : ℝ → ℂ} (hf : Integrable f volume) (_ : MemLp f 2),
       eLpNorm (𝓕 f) 2 volume = eLpNorm f 2 volume) :
     (Submodule.span ℂ
     (Set.range (fun n => HilbertSpace.mk (Q.eigenfunction_memHS n)))).topologicalClosure = ⊤ := by

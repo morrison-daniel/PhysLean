@@ -366,7 +366,6 @@ lemma action_constTwoNode {c1 c2 : S.C}
     (Discrete.pairIsoSep S.FD).hom.hom) _ = _
   erw [← v.comm g]
   simp
-  rfl
 
 /-- An `action` node on a `constThreeNode` leaves the tensor invariant. -/
 lemma action_constThreeNode {c1 c2 c3 : S.C}
@@ -382,6 +381,5 @@ lemma action_constThreeNode {c1 c2 c3 : S.C}
     S.FD.obj { as := c3 }).ρ g)) ≫ (Discrete.tripleIsoSep S.FD).hom.hom) _ = _
   erw [← v.comm g]
   simp
-  rfl
 
 end TensorTree

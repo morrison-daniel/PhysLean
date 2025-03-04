@@ -130,8 +130,7 @@ scoped[StandardModel.HiggsField] notation "‖" φ1 "‖_H^2" => normSq φ1
 lemma innerProd_self_eq_normSq (φ : HiggsField) (x : SpaceTime) :
     ⟪φ, φ⟫_H x = ‖φ‖_H^2 x := by
   erw [normSq, @PiLp.norm_sq_eq_of_L2, Fin.sum_univ_two]
-  simp only [innerProd, PiLp.inner_apply, RCLike.inner_apply, conj_mul', norm_eq_abs,
-    Fin.sum_univ_two, ofReal_add, ofReal_pow]
+  simp [innerProd, conj_mul']
 
 lemma normSq_eq_innerProd_self (φ : HiggsField) (x : SpaceTime) :
     ‖φ x‖ ^ 2 = (⟪φ, φ⟫_H x).re := by

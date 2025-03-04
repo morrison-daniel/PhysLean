@@ -33,7 +33,7 @@ open MeasureTheory
 
 /-- The proposition `MemHS f` for a function `f : ℝ → ℂ` is defined
   to be true if the function `f` can be lifted to the Hilbert space. -/
-def MemHS (f : ℝ → ℂ) : Prop := Memℒp f 2 MeasureTheory.volume
+def MemHS (f : ℝ → ℂ) : Prop := MemLp f 2 MeasureTheory.volume
 
 lemma aeStronglyMeasurable_of_memHS {f : ℝ → ℂ} (h : MemHS f) :
     AEStronglyMeasurable f := by
@@ -44,24 +44,24 @@ lemma aeStronglyMeasurable_of_memHS {f : ℝ → ℂ} (h : MemHS f) :
 lemma memHS_iff {f : ℝ → ℂ} : MemHS f ↔
     AEStronglyMeasurable f ∧ Integrable (fun x => ‖f x‖ ^ 2) := by
   rw [MemHS]
-  simp only [Memℒp, Complex.norm_eq_abs, and_congr_right_iff]
+  simp [MemLp, and_congr_right_iff]
   intro h1
-  rw [MeasureTheory.eLpNorm_lt_top_iff_lintegral_rpow_nnnorm_lt_top
+  rw [MeasureTheory.eLpNorm_lt_top_iff_lintegral_rpow_enorm_lt_top
     (Ne.symm (NeZero.ne' 2)) ENNReal.ofNat_ne_top]
   simp only [ENNReal.toReal_ofNat, ENNReal.rpow_ofNat, Integrable]
   have h0 : MeasureTheory.AEStronglyMeasurable
-    (fun x => Complex.abs (f x) ^ 2) MeasureTheory.volume := by
+    (fun x => norm (f x) ^ 2) MeasureTheory.volume := by
     apply MeasureTheory.AEStronglyMeasurable.pow
-    exact Continuous.comp_aestronglyMeasurable Complex.continuous_abs h1
+    exact Continuous.comp_aestronglyMeasurable continuous_norm h1
   simp only [h0, true_and]
   simp only [HasFiniteIntegral, enorm_pow]
-  simp only [enorm, nnnorm, Complex.norm_eq_abs, Real.norm_eq_abs, Complex.abs_abs]
+  simp only [enorm, nnnorm,  Real.norm_eq_abs, abs_norm]
 
 lemma aeEqFun_mk_mem_iff (f : ℝ → ℂ) (hf : AEStronglyMeasurable f volume) :
     AEEqFun.mk f hf ∈ HilbertSpace ↔ MemHS f := by
   rw [MemHS, HilbertSpace]
-  rw [MeasureTheory.Lp.mem_Lp_iff_memℒp]
-  apply MeasureTheory.memℒp_congr_ae
+  rw [MeasureTheory.Lp.mem_Lp_iff_memLp]
+  apply MeasureTheory.memLp_congr_ae
   exact AEEqFun.coeFn_mk f hf
 
 /-- Given a function `f : ℝ → ℂ` such that `MemHS f` is true via `hf`, then `HilbertSpace.mk hf`
@@ -103,23 +103,23 @@ lemma mem_iff' {f : ℝ → ℂ} (hf : MeasureTheory.AEStronglyMeasurable f Meas
     MeasureTheory.AEEqFun.mk f hf ∈ HilbertSpace
     ↔ MeasureTheory.Integrable (fun x => ‖f x‖ ^ 2) := by
   rw [HilbertSpace]
-  rw [MeasureTheory.Lp.mem_Lp_iff_memℒp]
-  simp only [Memℒp, eLpNorm_aeeqFun, Complex.norm_eq_abs]
+  rw [MeasureTheory.Lp.mem_Lp_iff_memLp]
+  simp only [MemLp, eLpNorm_aeeqFun]
   have h1 : MeasureTheory.AEStronglyMeasurable
     (MeasureTheory.AEEqFun.mk f hf) MeasureTheory.volume := by
     apply MeasureTheory.AEEqFun.aestronglyMeasurable
   simp only [h1, true_and]
-  rw [MeasureTheory.eLpNorm_lt_top_iff_lintegral_rpow_nnnorm_lt_top (Ne.symm (NeZero.ne' 2))
+  rw [MeasureTheory.eLpNorm_lt_top_iff_lintegral_rpow_enorm_lt_top (Ne.symm (NeZero.ne' 2))
     ENNReal.ofNat_ne_top]
   simp only [ENNReal.toReal_ofNat, ENNReal.rpow_ofNat, Integrable]
   have h0 : MeasureTheory.AEStronglyMeasurable
-    (fun x => Complex.abs (f x) ^ 2) MeasureTheory.volume := by
+    (fun x => norm (f x) ^ 2) MeasureTheory.volume := by
     apply MeasureTheory.AEStronglyMeasurable.pow
     refine Continuous.comp_aestronglyMeasurable ?_ hf
-    exact Complex.continuous_abs
+    exact continuous_norm
   simp only [h0, true_and]
   simp only [HasFiniteIntegral, enorm_pow]
-  simp only [enorm, nnnorm, Complex.norm_eq_abs, Real.norm_eq_abs, Complex.abs_abs]
+  simp only [enorm, nnnorm, norm_norm]
 
 /-!
 
@@ -149,7 +149,7 @@ lemma gaussian_memHS {b : ℝ} (c : ℝ) (hb : 0 < b) :
   apply And.intro
   · exact gaussian_aestronglyMeasurable c hb
   simp only [neg_mul, Complex.ofReal_exp, Complex.ofReal_neg, Complex.ofReal_mul,
-    Complex.ofReal_pow, Complex.ofReal_sub, Complex.norm_eq_abs, Complex.abs_exp, Complex.neg_re,
+    Complex.ofReal_pow, Complex.ofReal_sub, Complex.norm_exp, Complex.neg_re,
     Complex.mul_re, Complex.ofReal_re, Complex.ofReal_im, zero_mul, sub_zero]
   have h1 : (fun (x : ℝ) => Real.exp (-(b * ((x - c : ℂ) ^ 2).re)) ^ 2) =
     fun y => (fun x => Real.exp (- (2 * b) * x ^ 2)) (y - c) := by
@@ -216,8 +216,8 @@ lemma exp_abs_mul_gaussian_integrable (b c : ℝ) (hb : 0 < b) :
       rw [abs_of_nonneg hx]
 
 lemma mul_gaussian_mem_Lp_one (f : ℝ → ℂ) (hf : MemHS f) (b c : ℝ) (hb : 0 < b) :
-    MeasureTheory.Memℒp (fun x => f x * Real.exp (- b * (x - c) ^ 2)) 1 volume := by
-  refine memℒp_one_iff_integrable.mpr ?_
+    MeasureTheory.MemLp (fun x => f x * Real.exp (- b * (x - c) ^ 2)) 1 volume := by
+  refine memLp_one_iff_integrable.mpr ?_
   let g : HilbertSpace := mk (gaussian_memHS c hb)
   have h1 := MeasureTheory.L2.integrable_inner (𝕜 := ℂ) g (mk hf)
   refine (integrable_congr ?_).mp h1
@@ -239,50 +239,48 @@ lemma mul_gaussian_mem_Lp_one (f : ℝ → ℂ) (hf : MemHS f) (b c : ℝ) (hb :
     simp
 
 lemma mul_gaussian_mem_Lp_two (f : ℝ → ℂ) (hf : MemHS f) (b c : ℝ) (hb : 0 < b) :
-    MeasureTheory.Memℒp (fun x => f x * Real.exp (- b * (x - c) ^ 2)) 2 volume := by
-  apply MeasureTheory.Memℒp.mul_of_top_left (p := 2)
-  · apply MeasureTheory.memℒp_top_of_bound (C := Real.exp (0))
+    MeasureTheory.MemLp (fun x => f x * Real.exp (- b * (x - c) ^ 2)) 2 volume := by
+  refine MeasureTheory.MemLp.mul ?_ hf (q := ⊤)
+  · apply MeasureTheory.memLp_top_of_bound (C := Real.exp (0))
     · exact gaussian_aestronglyMeasurable c hb
     · apply Filter.Eventually.of_forall
       intro x
-      simp only [neg_mul, Complex.norm_eq_abs, zero_sub, even_two, Even.neg_pow]
-      rw [Complex.abs_ofReal]
-      rw [abs_of_nonneg]
-      · simp only [Real.exp_zero, Real.exp_le_one_iff, Left.neg_nonpos_iff]
-        apply mul_nonneg
-        · exact le_of_lt hb
-        · exact sq_nonneg (x - c)
-      · exact Real.exp_nonneg (-(b * (x - c) ^ 2))
-  · exact hf
+      simp only [neg_mul, zero_sub, even_two, Even.neg_pow]
+      rw [Complex.norm_real]
+      simp only [Real.norm_eq_abs, Real.abs_exp, Real.exp_zero, Real.exp_le_one_iff,
+        Left.neg_nonpos_iff]
+      apply mul_nonneg
+      · exact le_of_lt hb
+      · exact sq_nonneg (x - c)
 
 lemma abs_mul_gaussian_integrable (f : ℝ → ℂ) (hf : MemHS f) (b c : ℝ) (hb : 0 < b) :
-    MeasureTheory.Integrable (fun x => Complex.abs (f x) * Real.exp (- b * (x - c)^2)) := by
-  have h1 : (fun x => Complex.abs (f x) * Real.exp (- b * (x - c)^2)) =
-      (fun x => Complex.abs (f x * Real.exp (- b *(x - c)^2))) := by
+    MeasureTheory.Integrable (fun x => norm (f x) * Real.exp (- b * (x - c)^2)) := by
+  have h1 : (fun x => norm (f x) * Real.exp (- b * (x - c)^2)) =
+      (fun x => norm (f x * Real.exp (- b *(x - c)^2))) := by
     funext x
     simp only [neg_mul, Complex.ofReal_exp, Complex.ofReal_neg, Complex.ofReal_mul,
-      Complex.ofReal_pow, Complex.ofReal_sub, AbsoluteValue.map_mul, Complex.abs_exp,
-      Complex.neg_re, Complex.mul_re, Complex.ofReal_re, Complex.ofReal_im, zero_mul, sub_zero,
-      mul_eq_mul_left_iff, Real.exp_eq_exp, neg_inj, map_eq_zero]
+      Complex.ofReal_pow, Complex.ofReal_sub, Complex.norm_mul, Complex.norm_exp, Complex.neg_re,
+      Complex.mul_re, Complex.ofReal_re, Complex.ofReal_im, zero_mul, sub_zero, mul_eq_mul_left_iff,
+      Real.exp_eq_exp, neg_inj, norm_eq_zero]
     left
     left
     rw [← Complex.ofReal_sub, ← Complex.ofReal_pow]
     rw [Complex.ofReal_re]
   rw [h1]
-  have h2 : MeasureTheory.Memℒp (fun x => f x * Real.exp (- b * (x- c)^2)) 1 volume := by
+  have h2 : MeasureTheory.MemLp (fun x => f x * Real.exp (- b * (x- c)^2)) 1 volume := by
     exact mul_gaussian_mem_Lp_one f hf b c hb
-  simpa using MeasureTheory.Memℒp.integrable_norm_rpow h2 (by simp) (by simp)
+  simpa using MeasureTheory.MemLp.integrable_norm_rpow h2 (by simp) (by simp)
 
 lemma exp_mul_abs_mul_gaussian_integrable (f : ℝ → ℂ) (hf : MemHS f)
     (b c : ℝ) (hb : 0 < b) : MeasureTheory.Integrable
-    (fun x => Real.exp (c * x) * Complex.abs (f x) * Real.exp (- b * x ^ 2)) := by
+    (fun x => Real.exp (c * x) * norm (f x) * Real.exp (- b * x ^ 2)) := by
   have h1 : (fun x => Real.exp (c * x) *
-  Complex.abs (f x) * Real.exp (- b * x ^ 2))
+    norm (f x) * Real.exp (- b * x ^ 2))
       = (fun x => Real.exp (c^2 /(4 * b)) *
-      (Complex.abs (f x) * Real.exp (- b * (x - c/(2 * b)) ^ 2))) := by
+      (norm (f x) * Real.exp (- b * (x - c/(2 * b)) ^ 2))) := by
     funext x
     rw [mul_comm,← mul_assoc]
-    trans (Real.exp (c ^ 2 / (4 * b)) * Real.exp (-b * (x - c / (2 * b)) ^ 2)) * Complex.abs (f x)
+    trans (Real.exp (c ^ 2 / (4 * b)) * Real.exp (-b * (x - c / (2 * b)) ^ 2)) * norm (f x)
     swap
     · ring
     rw [← Real.exp_add, ← Real.exp_add]
@@ -295,13 +293,13 @@ lemma exp_mul_abs_mul_gaussian_integrable (f : ℝ → ℂ) (hf : MemHS f)
 
 lemma exp_abs_mul_abs_mul_gaussian_integrable (f : ℝ → ℂ) (hf : MemHS f) (b c : ℝ) (hb : 0 < b) :
     MeasureTheory.Integrable
-    (fun x => Real.exp (|c * x|) * Complex.abs (f x) * Real.exp (- b * x ^ 2)) := by
+    (fun x => Real.exp (|c * x|) * norm (f x) * Real.exp (- b * x ^ 2)) := by
   rw [← MeasureTheory.integrableOn_univ]
   have h1 : Set.univ (α := ℝ) = (Set.Iic 0) ∪ Set.Ici 0 := by
     exact Eq.symm Set.Iic_union_Ici
   rw [h1]
   apply MeasureTheory.IntegrableOn.union
-  · let g := fun x => Real.exp ((- |c|) * x) * Complex.abs (f x) * Real.exp (- b * x ^ 2)
+  · let g := fun x => Real.exp ((- |c|) * x) * norm (f x) * Real.exp (- b * x ^ 2)
     rw [integrableOn_congr_fun (g := g) _ measurableSet_Iic]
     · apply MeasureTheory.IntegrableOn.left_of_union (t := Set.Ici 0)
       rw [← h1, MeasureTheory.integrableOn_univ]
@@ -314,7 +312,7 @@ lemma exp_abs_mul_abs_mul_gaussian_integrable (f : ℝ → ℂ) (hf : MemHS f) (
       rw [abs_mul]
       rw [abs_of_nonpos hx]
       ring
-  · let g := fun x => Real.exp (|c| * x) * Complex.abs (f x) * Real.exp (- b * x ^ 2)
+  · let g := fun x => Real.exp (|c| * x) * norm (f x) * Real.exp (- b * x ^ 2)
     rw [integrableOn_congr_fun (g := g) _ measurableSet_Ici]
     · apply MeasureTheory.IntegrableOn.right_of_union (s := Set.Iic 0)
       rw [← h1, MeasureTheory.integrableOn_univ]

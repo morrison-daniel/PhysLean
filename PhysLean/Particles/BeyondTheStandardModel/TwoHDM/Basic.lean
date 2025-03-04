@@ -69,14 +69,14 @@ lemma swap_fields : P.toFun Φ1 Φ2 =
     (conj P.𝓵₅) (conj P.𝓵₇) (conj P.𝓵₆)).toFun Φ2 Φ1 := by
   funext x
   simp only [toFun, normSq, Complex.add_re, Complex.mul_re, Complex.conj_re, Complex.conj_im,
-    neg_mul, sub_neg_eq_add, one_div, Complex.norm_eq_abs, Complex.inv_re, Complex.re_ofNat,
+    neg_mul, sub_neg_eq_add, one_div, Complex.inv_re, Complex.re_ofNat,
     Complex.normSq_ofNat, div_self_mul_self', Complex.inv_im, Complex.im_ofNat, neg_zero, zero_div,
     zero_mul, sub_zero, Complex.mul_im, add_zero, mul_neg, Complex.ofReal_pow, normSq_apply_re_self,
     normSq_apply_im_zero, mul_zero, zero_add, RingHomCompTriple.comp_apply, RingHom.id_apply]
   ring_nf
   simp only [one_div, add_left_inj, add_right_inj, mul_eq_mul_left_iff]
   left
-  rw [HiggsField.innerProd, HiggsField.innerProd, ← InnerProductSpace.conj_symm, Complex.abs_conj]
+  rw [HiggsField.innerProd, HiggsField.innerProd, ← InnerProductSpace.conj_symm, Complex.norm_conj]
 
 /-- If `Φ₂` is zero the potential reduces to the Higgs potential on `Φ₁`. -/
 lemma right_zero : P.toFun Φ1 0 =
@@ -103,7 +103,7 @@ lemma neg_left : P.toFun (- Φ1) Φ2
   simp only [toFun, normSq, ContMDiffSection.coe_neg, Pi.neg_apply, norm_neg,
     innerProd_neg_left, mul_neg, innerProd_neg_right, Complex.add_re, Complex.neg_re,
     Complex.mul_re, neg_sub, Complex.conj_re, Complex.conj_im, neg_mul, sub_neg_eq_add, neg_add_rev,
-    one_div, Complex.norm_eq_abs, even_two, Even.neg_pow, Complex.inv_re, Complex.re_ofNat,
+    one_div, even_two, Even.neg_pow, Complex.inv_re, Complex.re_ofNat,
     Complex.normSq_ofNat, div_self_mul_self', Complex.inv_im, Complex.im_ofNat, neg_zero, zero_div,
     zero_mul, sub_zero, Complex.mul_im, add_zero, Complex.ofReal_pow, map_neg]
 

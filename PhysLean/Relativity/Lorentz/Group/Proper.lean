@@ -41,7 +41,7 @@ instance : DiscreteTopology ℤ₂ := by
   exact forall_open_iff_discrete.mp fun _ => trivial
 
 /-- The instance of a topological group on `ℤ₂` defined via the discrete topology. -/
-instance : TopologicalGroup ℤ₂ := TopologicalGroup.mk
+instance : IsTopologicalGroup ℤ₂ := IsTopologicalGroup.mk
 
 /-- A continuous function from `({-1, 1} : Set ℝ)` to `ℤ₂`. -/
 @[simps!]

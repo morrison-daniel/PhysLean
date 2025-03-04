@@ -38,12 +38,12 @@ lemma coContrUnit_tensorBasis : coContrUnit =
         @OfNat.ofNat (Fin 4) n Fin.instOfNat := by rfl
   have hI2 : @DFunLike.coe (Basis (Fin 4) ℂ ↑Lorentz.complexCo.V)
           (Fin 4) (fun x => ↑Lorentz.complexCo.V) Basis.instFunLike
-          = @DFunLike.coe (Basis (Fin 4) ℂ (CoeSort.coe Lorentz.complexCo)) (Fin 4)
-          (fun x => CoeSort.coe Lorentz.complexCo) Basis.instFunLike := by rfl
+          = @DFunLike.coe (Basis (Fin 4) ℂ (Lorentz.complexCo)) (Fin 4)
+          (fun x => Lorentz.complexCo) Basis.instFunLike := by rfl
   have hI3 : @DFunLike.coe (Basis (Fin 4) ℂ ↑Lorentz.complexContr.V)
           (Fin 4) (fun x => ↑Lorentz.complexContr.V) Basis.instFunLike
-          = @DFunLike.coe (Basis (Fin 4) ℂ (CoeSort.coe Lorentz.complexContr)) (Fin 4)
-          (fun x => CoeSort.coe Lorentz.complexContr) Basis.instFunLike := by rfl
+          = @DFunLike.coe (Basis (Fin 4) ℂ (Lorentz.complexContr)) (Fin 4)
+          (fun x => Lorentz.complexContr) Basis.instFunLike := by rfl
   have hI4 : @OfNat.ofNat complexLorentzTensor.k 1 One.toOfNat1 =
     @OfNat.ofNat ℂ 1 One.toOfNat1 := by rfl
   trans {δ' | μ ν}ᵀ.tensor
@@ -86,12 +86,12 @@ lemma contrCoUnit_tensorBasis : contrCoUnit =
         @OfNat.ofNat (Fin 4) n Fin.instOfNat := by rfl
   have hI2 : @DFunLike.coe (Basis (Fin 4) ℂ ↑Lorentz.complexCo.V)
           (Fin 4) (fun x => ↑Lorentz.complexCo.V) Basis.instFunLike
-          = @DFunLike.coe (Basis (Fin 4) ℂ (CoeSort.coe Lorentz.complexCo)) (Fin 4)
-          (fun x => CoeSort.coe Lorentz.complexCo) Basis.instFunLike := by rfl
+          = @DFunLike.coe (Basis (Fin 4) ℂ (Lorentz.complexCo)) (Fin 4)
+          (fun x => Lorentz.complexCo) Basis.instFunLike := by rfl
   have hI3 : @DFunLike.coe (Basis (Fin 4) ℂ ↑Lorentz.complexContr.V)
           (Fin 4) (fun x => ↑Lorentz.complexContr.V) Basis.instFunLike
-          = @DFunLike.coe (Basis (Fin 4) ℂ (CoeSort.coe Lorentz.complexContr)) (Fin 4)
-          (fun x => CoeSort.coe Lorentz.complexContr) Basis.instFunLike := by rfl
+          = @DFunLike.coe (Basis (Fin 4) ℂ (Lorentz.complexContr)) (Fin 4)
+          (fun x => Lorentz.complexContr) Basis.instFunLike := by rfl
   have hI4 : @OfNat.ofNat complexLorentzTensor.k 1 One.toOfNat1 =
     @OfNat.ofNat ℂ 1 One.toOfNat1 := by rfl
   trans {δ | μ ν}ᵀ.tensor
@@ -143,7 +143,6 @@ lemma altLeftLeftUnit_tensorBasis : altLeftLeftUnit =
     · simp only [complexLorentzTensor, Discrete.functor_obj_eq_as, Monoidal.tensorUnit_obj,
         Nat.succ_eq_add_one, Nat.reduceAdd, Fin.zero_eta, Fin.isValue, OverColor.mk_hom,
         cons_val_zero, Fin.cases_zero]
-      rfl
     · simp only [Nat.succ_eq_add_one, Nat.reduceAdd, Fin.mk_one, Fin.isValue, OverColor.mk_hom,
       cons_val_one, head_cons]
       rfl
@@ -168,7 +167,6 @@ lemma leftAltLeftUnit_tensorBasis : leftAltLeftUnit =
     · simp only [complexLorentzTensor, Discrete.functor_obj_eq_as, Monoidal.tensorUnit_obj,
         Nat.succ_eq_add_one, Nat.reduceAdd, Fin.zero_eta, Fin.isValue, OverColor.mk_hom,
         cons_val_zero, Fin.cases_zero]
-      rfl
     · simp only [Nat.succ_eq_add_one, Nat.reduceAdd, Fin.mk_one, Fin.isValue, OverColor.mk_hom,
       cons_val_one, head_cons]
       rfl
@@ -193,7 +191,6 @@ lemma altRightRightUnit_tensorBasis : altRightRightUnit =
     · simp only [complexLorentzTensor, Discrete.functor_obj_eq_as, Monoidal.tensorUnit_obj,
         Nat.succ_eq_add_one, Nat.reduceAdd, Fin.zero_eta, Fin.isValue, OverColor.mk_hom,
         cons_val_zero, Fin.cases_zero]
-      rfl
     · simp only [Nat.succ_eq_add_one, Nat.reduceAdd, Fin.mk_one, Fin.isValue, OverColor.mk_hom,
       cons_val_one, head_cons]
       rfl
@@ -218,7 +215,6 @@ lemma rightAltRightUnit_tensorBasis : rightAltRightUnit =
     · simp only [complexLorentzTensor, Discrete.functor_obj_eq_as, Monoidal.tensorUnit_obj,
         Nat.succ_eq_add_one, Nat.reduceAdd, Fin.zero_eta, Fin.isValue, OverColor.mk_hom,
         cons_val_zero, Fin.cases_zero]
-      rfl
     · simp only [Nat.succ_eq_add_one, Nat.reduceAdd, Fin.mk_one, Fin.isValue, OverColor.mk_hom,
       cons_val_one, head_cons]
       rfl

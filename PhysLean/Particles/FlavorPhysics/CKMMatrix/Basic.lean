@@ -304,7 +304,7 @@ end phaseShiftApply
 
 /-- The absolute value of the `(i,j)`th element of `V`. -/
 @[simp]
-def VAbs' (V : unitaryGroup (Fin 3) ℂ) (i j : Fin 3) : ℝ := Complex.abs (V i j)
+def VAbs' (V : unitaryGroup (Fin 3) ℂ) (i j : Fin 3) : ℝ := norm (V i j)
 
 /-- If two CKM matrices are equivalent (under phase shifts), then their absolute values
   are the same. -/
@@ -323,11 +323,11 @@ lemma VAbs'_equiv (i j : Fin 3) (V U : CKMMatrix) (h : V ≈ U) :
   fin_cases i <;> fin_cases j <;>
     simp only [Fin.zero_eta, Fin.isValue, cons_val_zero, zero_mul, add_zero, mul_zero,
       _root_.map_mul, mul_re, I_re, ofReal_re, I_im, ofReal_im, sub_self, Real.exp_zero,
-      one_mul, mul_one, Complex.abs_exp, Fin.mk_one, cons_val_one, head_cons, zero_add,
+      one_mul, mul_one,Fin.mk_one, cons_val_one, head_cons, zero_add,
       head_fin_const, Fin.reduceFinMk, cons_val_two, Nat.succ_eq_add_one, Nat.reduceAdd, tail_cons,
-      tail_val', head_val']
-  all_goals change Complex.abs (0 * _ + _) = _
-  all_goals simp [Complex.abs_exp]
+      tail_val', head_val', Complex.norm_exp, Complex.norm_mul]
+  all_goals change norm (0 * _ + _) = _
+  all_goals simp [Complex.norm_exp]
 
 /-- The absolute value of the `(i,j)`th any representative of `⟦V⟧`. -/
 def VAbs (i j : Fin 3) : Quotient CKMMatrixSetoid → ℝ :=
