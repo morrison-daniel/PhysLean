@@ -18,6 +18,7 @@ open InnerProductSpace
 # The definition of the Minkowski Matrix
 
 -/
+
 /-- The `d.succ`-dimensional real matrix of the form `diag(1, -1, -1, -1, ...)`. -/
 def minkowskiMatrix {d : ℕ} : Matrix (Fin 1 ⊕ Fin d) (Fin 1 ⊕ Fin d) ℝ :=
   LieAlgebra.Orthogonal.indefiniteDiagonal (Fin 1) (Fin d) ℝ

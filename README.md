@@ -12,7 +12,7 @@
 
 A project to digitalize physics.
 
-*(Formally called HepLean)*
+*(Formerly called HepLean)*
 ## Aims of this project
 
 🎯 __Digitalize__ results (meaning calculations, definitions, and theorems) from physics
