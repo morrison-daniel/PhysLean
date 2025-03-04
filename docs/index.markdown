@@ -20,10 +20,10 @@
   </div>
 </div>
 
-**PhysLean was formally called HepLean**
+**PhysLean was formerly called HepLean**
 # 1. Mission of PhysLean
 
-The mission of PhysLean is to digitalize results, meaning definitions, theorems and calculations, from physics into Lean 4 with an initial focus on high energy physics and in a way which is useful to the broad physics community.
+The mission of PhysLean is to digitalize results, meaning definitions, theorems and calculations, from physics into Lean 4  in a way which is useful to the broad physics community.
 
 
 # 2. Vision of PhysLean
@@ -54,29 +54,17 @@ PhysLean has the potential to have the following impact on the physics community
 - Create new avenues through which physics can be taught.
 - Open up new ways to interface between theory and computer programs.
 
-# 5. Where to learn more
+# 5. Motivation for a single monolothic libary for physics
+
+PhysLean is a monolithic library for physics, similar to how Mathlib serves mathematics. It aims to cover the entire field of physics within a single, unified framework. Here are some key motivations for adopting a monolithic approach:
+- Prevents duplication of work: A single, comprehensive library ensures that contributors don’t waste effort reinventing the wheel.
+- Facilitates shared improvements: When everyone works within the same library, enhancements to one part can be easily propagated to others.
+- Simplifies maintenance: A unified library keeps everything up to date together. Individual contributors don’t have to manually update their code to stay compatible with new versions of Mathlib or other dependencies—that responsibility is shared by the community.
+-	Encourages standardization: A single library fosters consistency in notation and conventions, reducing fragmentation in the physics Lean ecosystem.
+- Improves discoverability and usability: With all physics in one place, users can more easily find and apply existing results rather than searching through scattered (possibly incompatible) libraries.
+- Enables better integration across physics subfields – Many areas of physics are interconnected, and a monolithic library allows different domains to interact seamlessly without compatibility issues.
+
+# 6. Where to learn more
 
 You can learn more about PhysLean by reading: [2405.08863](https://inspirehep.net/literature/2787050), or contacting Joseph Tooby-Smith at: joseph at heplean dot com.
 
-# 6. How to get involved
-
-There are a number of different ways to get involved in PhysLean depending on your background.
-
-## 6.1 Physicists
-Physicists, who are not so familiar with Lean, can contribute by adding `informal_definition` and `informal_lemma` to PhysLean. These are English written statements of results which can latter be formalised. Informal definitions and lemmas already in PhysLean can be found (here)[https://heplean.github.io/HepLean/InformalGraph.html].
-
-Here are some tips when writing informal results:
-- For big theorems, break it down into lots of smaller lemmas.
-- Place the informal result in PhysLean in the appropriate file.
-- Add dependencies to the `informal_definition` or  `informal_lemma`.
-- Write the `math` field of the informal result in sufficient detail that it can be understood by someone with little other context.
-
-Physicists can also help by improving documentation on existing results in PhysLean.
-
-## 6.2 Mathematicians with a Lean background
-Mathematicians and people with a Lean background can contribute in a number of ways:
-- Help by formalising `informal_definition` and `informal_lemma` which are currently in PhysLean.
-- Help by golfing and refactoring code.
-
-## 6.3 Computer scientists with a Lean background
-There are a number of metaprograms and infrastructure projects which would improve PhysLean. If you need help in this direction, please get in touch.
