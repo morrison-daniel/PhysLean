@@ -338,6 +338,10 @@ def liftTensor {n : ℕ} {c : Fin n → S.C} {E : Type} [AddCommMonoid E] [Modul
     (S.F.obj (OverColor.mk c) →ₗ[S.k] E) :=
   PiTensorProduct.lift
 
+/-- The number of indices `n` from a tensor. -/
+@[nolint unusedArguments]
+def numIndices {S : TensorSpecies} {n : ℕ} {c : Fin n → S.C} (_ : S.F.obj (OverColor.mk c)) : ℕ := n
+
 end TensorSpecies
 
 end
