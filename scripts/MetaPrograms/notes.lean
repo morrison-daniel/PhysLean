@@ -344,7 +344,7 @@ def harmonicOscillator : Note where
     ]
 
 def higgsPotential : Note where
-  title := "The Higgs potential 🚧"
+  title := "The Higgs potential"
   curators := ["Joseph Tooby-Smith"]
   parts := [
     .h1 "Introduction",
