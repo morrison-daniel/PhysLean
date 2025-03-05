@@ -346,7 +346,7 @@ def getIndicesLeftEq (stx : Syntax) : TermElabM (List (TSyntax `indexExpr)) := d
   | `(tensorExpr| $a:tensorExpr = $_:tensorExpr) => do
       return (← getIndicesFull a)
   | _ =>
-    throwError "Unsupported tensor expression syntax in getIndicesProd: {stx}"
+    throwError "Unsupported tensor expression syntax in getIndicesLeftEq: {stx}"
 
 /-- Gets the indices associated with the RHS of an equality. -/
 def getIndicesRightEq (stx : Syntax) : TermElabM (List (TSyntax `indexExpr)) := do
@@ -354,7 +354,7 @@ def getIndicesRightEq (stx : Syntax) : TermElabM (List (TSyntax `indexExpr)) := 
   | `(tensorExpr| $_:tensorExpr = $a:tensorExpr) => do
       return (← getIndicesFull a)
   | _ =>
-    throwError "Unsupported tensor expression syntax in getIndicesProd: {stx}"
+    throwError "Unsupported tensor expression syntax in getIndicesRightEq: {stx}"
 
 /-!
 
