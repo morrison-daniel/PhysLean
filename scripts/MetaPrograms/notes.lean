@@ -373,10 +373,32 @@ def higgsPotential : Note where
     .name ``StandardModel.HiggsField.Potential.isMinOn_iff_field_of_𝓵_pos .complete,
   ]
 
+def tensors : Note where
+  title := "Tensors and index notation 🚧"
+  curators := ["Joseph Tooby-Smith"]
+  parts := [
+    .warning "This note is a work in progress. (5th March 2025)",
+    .h1 "Introduction",
+    .p "This note is related to: https://arxiv.org/pdf/2411.07667, and concerns the
+      implmentation of tensors and index notation into PhysLean, and
+      its mathematical structure.",
+    .p  "This note is not intended to be a first-introduction to tensors and index notation.",
+    .h1 "Tensor Species",
+    .name ``TensorSpecies .incomplete,
+    .h2 "Example: Complex Lorentz tensors",
+    .h1 "Tensor trees",
+    .name ``TensorTree .incomplete,
+    .name ``TensorTree.tensor .incomplete,
+    .h2 "Node identities",
+    .h1 "Elaboration",
+    .h1 "Example use: Pauli matrices"
+  ]
+
 def notesToMake : List (Note × String) := [
     (perturbationTheory, "perturbationTheory"),
     (harmonicOscillator, "harmonicOscillator"),
-    (higgsPotential, "higgsPotential")]
+    (higgsPotential, "higgsPotential"),
+    (tensors, "tensors")]
 
 def makeYML (nt : Note × String) : IO UInt32 := do
   let n := nt.1
