@@ -184,12 +184,16 @@ def contrListAdjust (l : List (ℕ × ℕ)) : List (ℕ × ℕ) :=
 
 open PhysLean.Fin
 
-/-- Given two lists of indices returns the `List (ℕ)` representing the how one list
+/-- Given two lists of indices, all of which are indent,
+  returns the `List (ℕ)` representing the how one list
   permutes into the other. -/
 def getPermutation (l1 l2 : List (TSyntax `indexExpr)) : TermElabM (List (ℕ)) := do
+  /- Turn every index into an indent. -/
   let l1' ← l1.mapM (fun x => indexToIdent x)
   let l2' ← l2.mapM (fun x => indexToIdent x)
+  /- For `l1 = [α, β, γ, δ]`, `l1enum` is `[(α, 0), (β, 1), (γ, 2), (δ, 3)]` -/
   let l1enum := l1'.zipIdx
+  /- For `l2 = [γ, α, δ, β]`, `l2''` is `[(γ,2), (α, 0), (δ, 3), (β, 1)]` -/
   let l2'' := l2'.filterMap
     (fun x => l1enum.find? (fun y => Lean.TSyntax.getId y.1 = Lean.TSyntax.getId x))
   return l2''.map fun x => x.2
@@ -421,7 +425,8 @@ def equalTermMap (permSyntax : Term) (T1 T2 : Term) : TermElabM Term := do
 
 -/
 
-/-- The function `syntaxFull` -/
+/-- Takes a syntax corresponding to a tensor expression and turns it into a
+  term correspondnig to a tensor tree. -/
 partial def syntaxFull (stx : Syntax) : TermElabM Term := do
   match stx with
   | `(tensorExpr| $T:term | $[$args]*) =>
@@ -466,12 +471,13 @@ partial def syntaxFull (stx : Syntax) : TermElabM Term := do
 
 -/
 
-/-- An elaborator for tensor nodes. This is to be generalized. -/
+/-- Takes a syntax corresponding to a tensor expression and turns it into an
+  expression corresponding to a tensor tree. -/
 def elaborateTensorNode (stx : Syntax) : TermElabM Expr := do
   let tensorExpr ← elabTerm (← syntaxFull stx) none
   return tensorExpr
 
-/-- Syntax turning a tensor expression into a term. -/
+/-- The tensor tree corresponding to a tensor expression. -/
 syntax (name := tensorExprSyntax) "{" tensorExpr "}ᵀ" : term
 
 elab_rules (kind:=tensorExprSyntax) : term
