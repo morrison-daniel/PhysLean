@@ -277,7 +277,7 @@ open Finset
   for any real `c`.
   The proof of this result relies on the expansion of `e ^ (I c x)`
   in terms of `x^r/r!` and using `orthogonal_power_of_mem_orthogonal`
-  along with integrablity conditions. -/
+  along with integrability conditions. -/
 lemma orthogonal_exp_of_mem_orthogonal (f : ℝ → ℂ) (hf : MemHS f)
     (hOrth : ∀ n : ℕ, ⟪HilbertSpace.mk (Q.eigenfunction_memHS n), HilbertSpace.mk hf⟫_ℂ = 0)
     (c : ℝ) : ∫ x : ℝ, Complex.exp (Complex.I * c * x) *
