@@ -21,12 +21,13 @@ import Mathlib.Algebra.Star.Basic
 namespace QuantumMechanics
 
 namespace OneDimension
+
 noncomputable section
 
 /-- The Hilbert space for a one dimensional quantum system is defined as
   the space of almost-everywhere equal equivalence classes of square integrable functions
   from `ℝ` to `ℂ`. -/
-noncomputable abbrev HilbertSpace := MeasureTheory.Lp (α := ℝ) ℂ 2
+abbrev HilbertSpace := MeasureTheory.Lp (α := ℝ) ℂ 2
 
 namespace HilbertSpace
 open MeasureTheory
@@ -39,7 +40,7 @@ lemma aeStronglyMeasurable_of_memHS {f : ℝ → ℂ} (h : MemHS f) :
     AEStronglyMeasurable f := by
   exact h.1
 
-/-- A function `f` statisfies `MemHS f` if and only if it is almost everywhere
+/-- A function `f` satisfies `MemHS f` if and only if it is almost everywhere
   strongly measurable, and square integrable. -/
 lemma memHS_iff {f : ℝ → ℂ} : MemHS f ↔
     AEStronglyMeasurable f ∧ Integrable (fun x => ‖f x‖ ^ 2) := by
