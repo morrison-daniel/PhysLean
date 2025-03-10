@@ -495,6 +495,11 @@ lemma perm_tensorBasis_repr_apply {n m : ℕ} {c : Fin n → S.C} {c1 : Fin m �
     congr 1
     exact eq_iff_iff.mpr <| Equiv.symm_apply_eq
       (TensorBasis.congr (OverColor.Hom.toEquiv σ) (OverColor.Hom.toEquiv_comp_apply σ))
+  · simp only [OverColor.mk_hom, map_zero, Finsupp.coe_zero, Pi.zero_apply, pb]
+  · intro x y hx hy
+    simp_all [pb]
+  · intro x hx a
+    simp_all [pb]
 
 @[simp]
 lemma smul_tensorBasis_repr {c : Fin n → S.C} (a : S.k) (T : TensorTree S c) :
