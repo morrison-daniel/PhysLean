@@ -68,6 +68,7 @@ noncomputable def sol (IC : InitialConditions) : ℝ → ℝ := fun t =>
 lemma sol_eq (IC : InitialConditions) :
     S.sol IC = fun t => IC.x₀ * cos (S.ω * t) + IC.v₀/S.ω * sin (S.ω * t) := rfl
 
+/-- For zero initial conditions, the solution is zero. -/
 lemma sol_zeroIC : S.sol zeroIC = fun _ => 0 := by
   rw [sol_eq]
   funext t
