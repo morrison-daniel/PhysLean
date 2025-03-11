@@ -334,7 +334,7 @@ lemma physHermite_gaussian_integrable (n p m : ℕ) :
       Real.exp (- (1 : ℝ) * x ^ 2) := by
     funext x
     simp
-  exact h0 ▸ guassian_integrable_polynomial  Real.zero_lt_one ..
+  exact h0 ▸ guassian_integrable_polynomial Real.zero_lt_one ..
 
 lemma integral_physHermite_mul_physHermite_eq_integral_deriv_exp (n m : ℕ) :
     ∫ x : ℝ, (physHermite n x * physHermite m x) * Real.exp (-x ^ 2) =
