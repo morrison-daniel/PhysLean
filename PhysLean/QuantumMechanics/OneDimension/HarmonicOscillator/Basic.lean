@@ -17,7 +17,7 @@ This file contains
 - the definition of the Schrodinger operator
 - the definition of eigenfunctions and eigenvalues of the Schrodinger operator in terms
   of Hermite polynomials
-- proof that eigenfunctions and eigenvalues are indeed egienfunctions and eigenvalues.
+- proof that eigenfunctions and eigenvalues are indeed eigenfunctions and eigenvalues.
 
 ## TODO
 - Show that Schrodinger operator is linear.

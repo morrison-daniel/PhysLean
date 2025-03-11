@@ -14,7 +14,7 @@ Completeness of the eigenfunctions follows from Plancherel's theorem.
 The steps of this proof are:
 
 1. Prove that if `f` is orthogonal to all eigenvectors then the Fourier transform of
-  it muliplied by `exp(-c x^2)` for a `0<c` is zero.
+  it multiplied by `exp(-c x^2)` for a `0<c` is zero.
   Part of this is using the concept of `dominated_convergence`.
 2. Use 'Plancherel's theorem' to show that `f` is zero.
 
@@ -282,7 +282,7 @@ lemma orthogonal_exp_of_mem_orthogonal (f : ℝ → ℂ) (hf : MemHS f)
     (hOrth : ∀ n : ℕ, ⟪HilbertSpace.mk (Q.eigenfunction_memHS n), HilbertSpace.mk hf⟫_ℂ = 0)
     (c : ℝ) : ∫ x : ℝ, Complex.exp (Complex.I * c * x) *
     (f x * Real.exp (- x^2 / (2 * Q.ξ^2))) = 0 := by
-  /- Rewriting the intergrand as a limit. -/
+  /- Rewriting the integrand as a limit. -/
   have h1 (y : ℝ) : Filter.Tendsto (fun n => ∑ r ∈ range n,
         (Complex.I * ↑c * ↑y) ^ r / r ! * (f y * Real.exp (- y^2 / (2 * Q.ξ^2))))
       Filter.atTop (nhds (Complex.exp (Complex.I * c * y) *
@@ -305,8 +305,8 @@ lemma orthogonal_exp_of_mem_orthogonal (f : ℝ → ℂ) (hf : MemHS f)
     haveI hi : CauSeq.IsComplete ℂ norm :=
       inferInstanceAs (CauSeq.IsComplete ℂ norm)
     exact CauSeq.tendsto_limit (Complex.exp' (Complex.I * c * y))
-  /- End of rewritting the intergrand as a limit. -/
-  /- Rewritting the integral as a limit using dominated_convergence -/
+  /- End of rewriting the integrand as a limit. -/
+  /- Rewriting the integral as a limit using dominated_convergence -/
   have h1' : Filter.Tendsto (fun n => ∫ y : ℝ, ∑ r ∈ range n,
       (Complex.I * ↑c * ↑y) ^ r / r ! * (f y * Real.exp (- y^2 / (2 * Q.ξ^2))))
       Filter.atTop (nhds (∫ y : ℝ, Complex.exp (Complex.I * c * y) *
