@@ -124,14 +124,17 @@ def allInformalTODO : CoreM (Array FullTODOInfo) := do
   x.mapM informalTODO
 
 def FullTODOInfo.toYAML (todo : FullTODOInfo) : MetaM String := do
+  let content := todo.content
+  let contentIndent := content.replace "\n" "\n    "
   return s!"
-- content: \"{todo.content}\"
-  file: {todo.fileName}
+- file: {todo.fileName}
   githubLink: {Name.toGitHubLink todo.fileName todo.line}
   line: {todo.line}
   isInformalDef: {todo.isInformalDef}
   isInformalLemma: {todo.isInformalLemma}
-  category: {todo.category}"
+  category: {todo.category}
+  content: |
+    {contentIndent}"
 
 unsafe def allTODOs : MetaM (List FullTODOInfo) := do
   let todos ← getTodoInfo
