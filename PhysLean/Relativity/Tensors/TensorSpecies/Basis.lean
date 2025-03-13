@@ -361,6 +361,37 @@ def ContrSection {n : ℕ} {c : Fin n.succ.succ → S.C}
     Finset (Π k, Fin (S.repDim (c k))) :=
     {b' : Π k, Fin (S.repDim (c k)) | ∀ k, b' ((i.succAbove ∘ j.succAbove) k) = b k}
 
+def liftToContrSection {n : ℕ} {c : Fin n.succ.succ → S.C}
+    {i : Fin n.succ.succ} {j : Fin n.succ}
+    (b : Π k, Fin (S.repDim ((c ∘ i.succAbove ∘ j.succAbove) k)))
+    (x : Fin (S.repDim (c i)) × Fin (S.repDim (c (i.succAbove j)))) :
+    (Π k, Fin (S.repDim (c k))) :=
+  let f1 := Fin.insertNthEquiv (fun k => Fin (S.repDim ((c ∘ i.succAbove) k))) j
+    ⟨x.2, b⟩
+  let f2 := Fin.insertNthEquiv (fun k => Fin (S.repDim (c k))) i ⟨x.1, f1⟩
+  f2
+
+lemma liftToContrSection_mem_ContrSection {n : ℕ} {c : Fin n.succ.succ → S.C}
+    {i : Fin n.succ.succ} {j : Fin n.succ}
+    (b : Π k, Fin (S.repDim ((c ∘ i.succAbove ∘ j.succAbove) k)))
+    (x : Fin (S.repDim (c i)) × Fin (S.repDim (c (i.succAbove j)))) :
+    liftToContrSection b x ∈ ContrSection b := by
+  simp [ContrSection, liftToContrSection]
+
+def contrSectionEquiv {n : ℕ} {c : Fin n.succ.succ → S.C}
+    {i : Fin n.succ.succ} {j : Fin n.succ}
+    (b : Π k, Fin (S.repDim ((c ∘ i.succAbove ∘ j.succAbove) k))) :
+    ContrSection b ≃ Fin (S.repDim (c i)) × Fin (S.repDim (c (i.succAbove j))) where
+  toFun b' := ⟨b'.1 i, b'.1 (i.succAbove j)⟩
+  invFun x := ⟨liftToContrSection b x, liftToContrSection_mem_ContrSection b x⟩
+  left_inv b' := by sorry
+  right_inv x := by sorry
+
+instance  {n : ℕ} {c : Fin n.succ.succ → S.C}
+    {i : Fin n.succ.succ} {j : Fin n.succ}
+    (b : Π k, Fin (S.repDim ((c ∘ i.succAbove ∘ j.succAbove) k))) : Fintype (ContrSection b) :=
+    Fintype.ofEquiv _ (contrSectionEquiv b).symm
+
 end TensorBasis
 open TensorBasis
 

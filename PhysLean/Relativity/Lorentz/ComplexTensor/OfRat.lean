@@ -114,11 +114,24 @@ lemma prod_ofRat_ofRat {n n1 : ℕ} {c : Fin n → complexLorentzTensor.C}
   erw [ofRat_tensorBasis_repr_apply]
   simp
 
+@[simp]
+lemma repDim_τ {c : complexLorentzTensor.C} :
+    complexLorentzTensor.repDim (complexLorentzTensor.τ c) = complexLorentzTensor.repDim c := by
+  cases c
+  all_goals
+    rfl
+
+open TensorSpecies.TensorBasis in
 lemma contr_ofRat {n : ℕ} {c : Fin (n + 1 + 1) → complexLorentzTensor.C} {i : Fin (n + 1 + 1)}
     {j : Fin (n + 1)} {h : c (i.succAbove j) = complexLorentzTensor.τ (c i)}
     (f : (Π k, Fin (complexLorentzTensor.repDim (c k))) → RatComplexNum) :
   (contr i j h (tensorNode (ofRat f))).tensor = (tensorNode (ofRat (fun b =>
-    (∑ x : { x // x ∈ TensorSpecies.TensorBasis.ContrSection b },
+    (∑ x : Fin (complexLorentzTensor.repDim (c i)),
+      f (liftToContrSection b (x, Fin.cast (by simp [h]) x)) )))).tensor := by
+  sorry
+  /-
+  (contr i j h (tensorNode (ofRat f))).tensor = (tensorNode (ofRat (fun b =>
+    (∑ x : TensorSpecies.TensorBasis.ContrSection b,
       f x.1 * if (x.1 i).1 = (x.1 (i.succAbove j)).1 then 1 else 0)))).tensor := by
   apply (complexLorentzTensor.tensorBasis _).repr.injective
   ext b
@@ -132,7 +145,7 @@ lemma contr_ofRat {n : ℕ} {c : Fin (n + 1 + 1) → complexLorentzTensor.C} {i 
     rw [← PhysLean.RatComplexNum.toComplexNum.map_mul]
   rw [← map_sum PhysLean.RatComplexNum.toComplexNum]
   erw [ofRat_tensorBasis_repr_apply]
-
+  -/
 lemma smul_nat_ofRat {c : Fin n → complexLorentzTensor.C} (n : ℕ)
     (f1 : (Π j, Fin (complexLorentzTensor.repDim (c j))) → RatComplexNum) :
     (TensorTree.smul n (tensorNode (ofRat f1))).tensor =
