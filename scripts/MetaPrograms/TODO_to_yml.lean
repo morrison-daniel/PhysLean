@@ -38,6 +38,7 @@ inductive PhysLeanCategory
   | StatisticalMechanics
   | Thermodynamics
   | Other
+deriving BEq, DecidableEq
 
 def PhysLeanCategory.string :  PhysLeanCategory → String
   | ClassicalMechanics => "Classical Mechanics"
@@ -54,6 +55,38 @@ def PhysLeanCategory.string :  PhysLeanCategory → String
   | StatisticalMechanics => "Statistical Mechanics"
   | Thermodynamics => "Thermodynamics"
   | Other => "Other"
+
+def PhysLeanCategory.emoji : PhysLeanCategory → String
+  | ClassicalMechanics => "⚙️"
+  | CondensedMatter => "🧊"
+  | Cosmology => "🌌"
+  | Elctromagnetism => "⚡"
+  | Mathematics => "➗"
+  | Meta => "🏛️"
+  | Optics => "🔍"
+  | Particles => "💥"
+  | QFT => "🌊"
+  | QuantumMechanics => "⚛️"
+  | Relativity => "⏳"
+  | StatisticalMechanics => "🎲"
+  | Thermodynamics => "🔥"
+  | Other => "❓"
+
+def PhysLeanCategory.List :  List PhysLeanCategory :=
+  [ PhysLeanCategory.ClassicalMechanics,
+    PhysLeanCategory.CondensedMatter,
+    PhysLeanCategory.Cosmology,
+    PhysLeanCategory.Elctromagnetism,
+    PhysLeanCategory.Mathematics,
+    PhysLeanCategory.Meta,
+    PhysLeanCategory.Optics,
+    PhysLeanCategory.Particles,
+    PhysLeanCategory.QFT,
+    PhysLeanCategory.QuantumMechanics,
+    PhysLeanCategory.Relativity,
+    PhysLeanCategory.StatisticalMechanics,
+    PhysLeanCategory.Thermodynamics,
+    PhysLeanCategory.Other]
 
 instance : ToString PhysLeanCategory where
   toString := PhysLeanCategory.string
@@ -93,13 +126,14 @@ def PhysLeanCategory.ofFileName (n : Name) : PhysLeanCategory :=
 structure FullTODOInfo where
   content : String
   fileName : Name
+  name : Name
   line : Nat
   isInformalDef : Bool
   isInformalLemma : Bool
   category : PhysLeanCategory
 
 def FullTODOInfo.ofTODO (t : todoInfo) : FullTODOInfo :=
-  {content := t.content, fileName := t.fileName, line := t.line,
+  {content := t.content, fileName := t.fileName, line := t.line, name := t.fileName,
    isInformalDef := false, isInformalLemma := false, category := PhysLeanCategory.ofFileName t.fileName}
 
 unsafe def getTodoInfo : MetaM (Array FullTODOInfo) := do
@@ -116,7 +150,7 @@ def informalTODO (x : ConstantInfo) : CoreM FullTODOInfo := do
   let isInformalDef := Informal.isInformalDef x
   let isInformalLemma := Informal.isInformalLemma x
   let category := PhysLeanCategory.ofFileName file
-  return {content := docString, fileName := file, line := lineNo,
+  return {content := docString, fileName := file, line := lineNo, name := name,
           isInformalDef := isInformalDef, isInformalLemma := isInformalLemma, category := category}
 
 def allInformalTODO : CoreM (Array FullTODOInfo) := do
@@ -125,16 +159,17 @@ def allInformalTODO : CoreM (Array FullTODOInfo) := do
 
 def FullTODOInfo.toYAML (todo : FullTODOInfo) : MetaM String := do
   let content := todo.content
-  let contentIndent := content.replace "\n" "\n    "
+  let contentIndent := content.replace "\n" "\n      "
   return s!"
-- file: {todo.fileName}
-  githubLink: {Name.toGitHubLink todo.fileName todo.line}
-  line: {todo.line}
-  isInformalDef: {todo.isInformalDef}
-  isInformalLemma: {todo.isInformalLemma}
-  category: {todo.category}
-  content: |
-    {contentIndent}"
+  - file: {todo.fileName}
+    githubLink: {Name.toGitHubLink todo.fileName todo.line}
+    line: {todo.line}
+    isInformalDef: {todo.isInformalDef}
+    isInformalLemma: {todo.isInformalLemma}
+    category: {todo.category}
+    name: {todo.name}
+    content: |
+      {contentIndent}"
 
 unsafe def allTODOs : MetaM (List FullTODOInfo) := do
   let todos ← getTodoInfo
@@ -142,15 +177,31 @@ unsafe def allTODOs : MetaM (List FullTODOInfo) := do
   let all := todos ++ informalTODOs
   return  (all.qsort (fun x y => x.fileName.toString < y.fileName.toString)).toList
 
+unsafe def categoriesToYML : MetaM String := do
+  let todos ← allTODOs
+  let mut cat := "Category:\n"
+  for c in PhysLeanCategory.List do
+    let num := (todos.filter (fun x => x.category == c)).length
+    cat := cat ++
+    s!"
+  - name: \"{c}\"
+    num: {num}
+    emoji: \"{c.emoji}\""
+  return cat ++ "\n"
+
 unsafe def todosToYAML : MetaM String := do
   let todos ← allTODOs
   let todosYAML ← todos.mapM FullTODOInfo.toYAML
-  return String.intercalate "\n" todosYAML
+  return "TODOItem:\n" ++ String.intercalate "\n" todosYAML
 
+unsafe def fullTODOYML : MetaM String := do
+  let cat ← categoriesToYML
+  let todos ← todosToYAML
+  return cat ++ todos
 unsafe def main (args : List String) : IO UInt32 := do
   initSearchPath (← findSysroot)
   println! "Generating TODO list."
-  let ymlString ← CoreM.withImportModules #[`PhysLean] (todosToYAML).run'
+  let ymlString ← CoreM.withImportModules #[`PhysLean] (fullTODOYML).run'
   println! ymlString
   let fileOut : System.FilePath := {toString := "./docs/_data/TODO.yml"}
   if "mkFile" ∈ args then
