@@ -30,9 +30,8 @@ TODO "Replace the field strength tensor with a real (rather then complex) Lorent
   Or at the least put the condition that the field strength is real. "
 
 /-- The Field strength is a tensor `F^μ^ν` which is anti-symmetric.
-  This is currently only defined for space dimension  `d = 3`. -/
+  This is currently only defined for space dimension `d = 3`. -/
 noncomputable abbrev FieldStrength := SpaceTime →
-  {F : (complexLorentzTensor.F.obj (OverColor.mk ![Color.up, Color.up])) |
-    {F | μ ν = - (F | ν μ)}ᵀ}
+  {F : ℂT[![Color.up, Color.up]] | {F | μ ν = - (F | ν μ)}ᵀ}
 
 end Electromagnetism

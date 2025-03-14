@@ -250,6 +250,10 @@ def complexLorentzTensor : TensorSpecies where
 
 namespace complexLorentzTensor
 
+/-- A complex lorentz tensor. -/
+scoped[complexLorentzTensor] notation "ℂT[" x "]" =>
+  (complexLorentzTensor.F.obj (OverColor.mk x))
+
 /-- Color for complex Lorentz tensors is decidable. -/
 instance : DecidableEq complexLorentzTensor.C := complexLorentzTensor.instDecidableEqColor
 
@@ -296,5 +300,13 @@ lemma k_instAdd : @HAdd.hAdd complexLorentzTensor.k
 @[simp]
 lemma k_neg : @Neg.neg complexLorentzTensor.k = @Neg.neg ℂ := by rfl
 
+TODO "The lemma `repDim_τ` should hold for any Tensor Species not just complex Lorentz
+  tensors."
+@[simp]
+lemma repDim_τ {c : complexLorentzTensor.C} :
+    complexLorentzTensor.repDim (complexLorentzTensor.τ c) = complexLorentzTensor.repDim c := by
+  cases c
+  all_goals
+    rfl
 end complexLorentzTensor
 end
