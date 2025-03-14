@@ -39,7 +39,7 @@ def pauliContr := (TensorTree.constThreeNodeE complexLorentzTensor .up .upL .upR
 scoped[PauliMatrix] notation "σ^^^" => PauliMatrix.pauliContr
 
 /-- The Pauli matrices as the complex Lorentz tensor `σ_μ^α^{dot β}`. -/
-def pauliCo : (complexLorentzTensor.F.obj (OverColor.mk ![Color.down, Color.upL, Color.upR])) :=
+def pauliCo : ℂT[![Color.down, Color.upL, Color.upR]] :=
   (perm (OverColor.equivToHomEq (Equiv.refl _) (by decide))
   {η' | μ ν ⊗ σ^^^ | ν α β}ᵀ).tensor
 
@@ -47,7 +47,7 @@ def pauliCo : (complexLorentzTensor.F.obj (OverColor.mk ![Color.down, Color.upL,
 scoped[PauliMatrix] notation "σ_^^" => PauliMatrix.pauliCo
 
 /-- The Pauli matrices as the complex Lorentz tensor `σ_μ_{dot β}_α`. -/
-def pauliCoDown : (complexLorentzTensor.F.obj (OverColor.mk ![Color.down, Color.downR, Color.downL])) :=
+def pauliCoDown : ℂT[![Color.down, Color.downR, Color.downL]] :=
   (perm (OverColor.equivToHomEq (Equiv.refl _) (by decide))
   {σ_^^ | μ α β ⊗ εR' | β β' ⊗ εL' | α α' }ᵀ).tensor
 
@@ -55,7 +55,7 @@ def pauliCoDown : (complexLorentzTensor.F.obj (OverColor.mk ![Color.down, Color.
 scoped[PauliMatrix] notation "σ___" => PauliMatrix.pauliCoDown
 
 /-- The Pauli matrices as the complex Lorentz tensor `σ^μ_{dot β}_α`. -/
-def pauliContrDown : (complexLorentzTensor.F.obj (OverColor.mk ![Color.up, Color.downR, Color.downL])) :=
+def pauliContrDown : ℂT[![Color.up, Color.downR, Color.downL]] :=
     (perm (OverColor.equivToHomEq (Equiv.refl _) (by decide))
     {pauliContr | μ α β ⊗ εR' | β β' ⊗ εL' | α α'}ᵀ).tensor
 
@@ -111,12 +111,13 @@ lemma action_pauliCo (g : SL(2,ℂ)) : {g •ₐ pauliCo | μ α β}ᵀ.tensor =
   conv =>
     lhs
     rw [action_tensor_eq <| tensorNode_pauliCo]
-    rw [action_tensor_eq <| perm_tensor_eq <|  contr_tensor_eq <| prod_tensor_eq_snd <| tensorNode_pauliContr]
+    rw [action_tensor_eq <| perm_tensor_eq <| contr_tensor_eq <|
+      prod_tensor_eq_snd <| tensorNode_pauliContr]
     rw [(perm_action _ _ _).symm]
-    rw [perm_tensor_eq <|  (contr_action _ _).symm]
-    rw [perm_tensor_eq <|  contr_tensor_eq <| (prod_action _ _ _).symm]
-    rw [perm_tensor_eq <|  contr_tensor_eq <| prod_tensor_eq_fst <| action_constTwoNode _ _]
-    rw [perm_tensor_eq <|  contr_tensor_eq <| prod_tensor_eq_snd <| action_constThreeNode _ _]
+    rw [perm_tensor_eq <| (contr_action _ _).symm]
+    rw [perm_tensor_eq <| contr_tensor_eq <| (prod_action _ _ _).symm]
+    rw [perm_tensor_eq <| contr_tensor_eq <| prod_tensor_eq_fst <| action_constTwoNode _ _]
+    rw [perm_tensor_eq <| contr_tensor_eq <| prod_tensor_eq_snd <| action_constThreeNode _ _]
   conv =>
     rhs
     rw [tensorNode_pauliCo]
@@ -133,11 +134,12 @@ lemma action_pauliCoDown (g : SL(2,ℂ)) : {g •ₐ pauliCoDown | μ α β}ᵀ.
     rw [perm_tensor_eq <| (contr_action _ _).symm]
     rw [perm_tensor_eq <| contr_tensor_eq <| (prod_action _ _ _).symm]
     rw [perm_tensor_eq <| contr_tensor_eq <| prod_tensor_eq_fst <| (contr_action _ _).symm]
-    rw [perm_tensor_eq <| contr_tensor_eq <| prod_tensor_eq_fst <| contr_tensor_eq <| (prod_action _ _ _).symm]
-    rw [perm_tensor_eq <| contr_tensor_eq <| prod_tensor_eq_fst <| contr_tensor_eq <| prod_tensor_eq_fst <|
-      action_pauliCo _]
-    rw [perm_tensor_eq <| contr_tensor_eq <| prod_tensor_eq_fst <| contr_tensor_eq <| prod_tensor_eq_snd <|
-      action_altRightMetric _]
+    rw [perm_tensor_eq <| contr_tensor_eq <| prod_tensor_eq_fst <|
+      contr_tensor_eq <| (prod_action _ _ _).symm]
+    rw [perm_tensor_eq <| contr_tensor_eq <| prod_tensor_eq_fst <| contr_tensor_eq <|
+      prod_tensor_eq_fst <| action_pauliCo _]
+    rw [perm_tensor_eq <| contr_tensor_eq <| prod_tensor_eq_fst <| contr_tensor_eq <|
+      prod_tensor_eq_snd <| action_altRightMetric _]
     rw [perm_tensor_eq <| contr_tensor_eq <| prod_tensor_eq_snd <| action_altLeftMetric _]
   conv =>
     rhs
@@ -153,11 +155,12 @@ lemma action_pauliContrDown (g : SL(2,ℂ)) : {g •ₐ pauliContrDown | μ α �
     rw [perm_tensor_eq <| (contr_action _ _).symm]
     rw [perm_tensor_eq <| contr_tensor_eq <| (prod_action _ _ _).symm]
     rw [perm_tensor_eq <| contr_tensor_eq <| prod_tensor_eq_fst <| (contr_action _ _).symm]
-    rw [perm_tensor_eq <| contr_tensor_eq <| prod_tensor_eq_fst <| contr_tensor_eq <| (prod_action _ _ _).symm]
-    rw [perm_tensor_eq <| contr_tensor_eq <| prod_tensor_eq_fst <| contr_tensor_eq <| prod_tensor_eq_fst <|
-      action_pauliContr _]
-    rw [perm_tensor_eq <| contr_tensor_eq <| prod_tensor_eq_fst <| contr_tensor_eq <| prod_tensor_eq_snd <|
-      action_altRightMetric _]
+    rw [perm_tensor_eq <| contr_tensor_eq <| prod_tensor_eq_fst <|
+      contr_tensor_eq <| (prod_action _ _ _).symm]
+    rw [perm_tensor_eq <| contr_tensor_eq <| prod_tensor_eq_fst <| contr_tensor_eq <|
+      prod_tensor_eq_fst <| action_pauliContr _]
+    rw [perm_tensor_eq <| contr_tensor_eq <| prod_tensor_eq_fst <| contr_tensor_eq
+      <| prod_tensor_eq_snd <| action_altRightMetric _]
     erw [perm_tensor_eq <| contr_tensor_eq <| prod_tensor_eq_snd <| action_altLeftMetric _]
   conv =>
     rhs

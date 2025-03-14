@@ -27,7 +27,6 @@ namespace PauliMatrix
 open Fermion
 open complexLorentzTensor
 
-
 /-- The statement that ` σᵥᵃᵇ σᵛᵃ'ᵇ' = 2 εᵃᵃ' εᵇᵇ'`. -/
 lemma pauliCo_contr_pauliContr : {σ_^^ | ν α β ⊗ σ^^^ | ν α' β' = 2 •ₜ εL | α α' ⊗ εR | β β'}ᵀ := by
   apply (complexLorentzTensor.tensorBasis _).repr.injective
@@ -69,9 +68,7 @@ lemma pauliCo_contr_pauliContr : {σ_^^ | ν α β ⊗ σ^^^ | ν α' β' = 2 �
   rw [← map_sum PhysLean.RatComplexNum.toComplexNum]
   apply (Function.Injective.eq_iff PhysLean.RatComplexNum.toComplexNum_injective).mpr
   revert b
-  /- 45024067 -/
   decide +kernel
-
 
 lemma pauliCoDown_trace_pauliCo : {σ___ | μ β α ⊗ σ_^^ | ν α β = 2 •ₜ η' | μ ν}ᵀ := by
   conv_lhs =>
@@ -128,13 +125,7 @@ lemma pauliContr_mul_pauliContrDown_add :
   ext b
   simp only [tensorNode_tensor, ofRat_tensorBasis_repr_apply]
   apply (Function.Injective.eq_iff PhysLean.RatComplexNum.toComplexNum_injective).mpr
-  /-
-    Original:                       216724147.
-    Change of rat:  194030298
-    after change of pauli def: 193070741
-    after fintype on contrsection: 61239580,
-    after chaning contr_ofRat: 29817927 -/
-  #count_heartbeats decide +revert +kernel
+  decide +revert +kernel
 
 lemma auliContrDown_pauliContr_mul_add :
     {((σ^__ | μ β α ⊗ σ^^^ | ν α β') + (σ^__ | ν β α ⊗ σ^^^ | μ α β')) =

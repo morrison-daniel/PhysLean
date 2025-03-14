@@ -109,7 +109,7 @@ lemma pauliContr_ofRat : pauliContr = ofRat (fun b =>
     if b 0 = 2 ∧ b 1 = 0 ∧ b 2 = 1 then ⟨0, -1⟩ else
     if b 0 = 2 ∧ b 1 = 1 ∧ b 2 = 0 then ⟨0, 1⟩ else
     if b 0 = 3 ∧ b 1 = 0 ∧ b 2 = 0 then ⟨1, 0⟩ else
-    if  b 0 = 3 ∧ b 1 = 3 ∧ b 2 = 3 then ⟨-1, 0⟩ else 0) := by
+    if b 0 = 3 ∧ b 1 = 3 ∧ b 2 = 3 then ⟨-1, 0⟩ else 0) := by
   apply (complexLorentzTensor.tensorBasis _).repr.injective
   ext b
   rw [pauliContr_tensorBasis]
@@ -128,8 +128,8 @@ lemma pauliCo_ofRat : pauliCo = ofRat (fun b =>
     if b 0 = 0 ∧ b 1 = b 2 then ⟨1, 0⟩ else
     if b 0 = 1 ∧ b 1 ≠ b 2 then ⟨-1, 0⟩ else
     if b 0 = 2 ∧ b 1 = 0 ∧ b 2 = 1 then ⟨0, 1⟩ else
-    if b 0 = 2 ∧ b 1 = 1 ∧ b 2 = 0  then ⟨0, -1⟩ else
-    if b 0 = 3 ∧ b 1 = 0 ∧ b 2 = 0  then ⟨-1, 0⟩ else
+    if b 0 = 2 ∧ b 1 = 1 ∧ b 2 = 0 then ⟨0, -1⟩ else
+    if b 0 = 3 ∧ b 1 = 0 ∧ b 2 = 0 then ⟨-1, 0⟩ else
     if b 0 = 3 ∧ b 1 = 1 ∧ b 2 = 1 then ⟨1, 0⟩ else ⟨0, 0⟩) := by
   apply (complexLorentzTensor.tensorBasis _).repr.injective
   ext b
@@ -155,7 +155,7 @@ lemma pauliCoDown_ofRat : pauliCoDown = ofRat (fun b =>
     if b 0 = 2 ∧ b 1 = 0 ∧ b 2 = 1 then ⟨0, -1⟩ else
     if b 0 = 2 ∧ b 1 = 1 ∧ b 2 = 0 then ⟨0, 1⟩ else
     if b 0 = 3 ∧ b 1 = 1 ∧ b 2 = 1 then ⟨-1, 0⟩ else
-    if b 0 = 3 ∧ b 1 = 0 ∧ b 2 = 0  then ⟨1, 0⟩ else ⟨0, 0⟩) := by
+    if b 0 = 3 ∧ b 1 = 0 ∧ b 2 = 0 then ⟨1, 0⟩ else ⟨0, 0⟩) := by
   apply (complexLorentzTensor.tensorBasis _).repr.injective
   ext b
   rw [pauliCoDown]
@@ -188,7 +188,7 @@ lemma pauliCoDown_ofRat : pauliCoDown = ofRat (fun b =>
 
 lemma pauliContrDown_ofRat : pauliContrDown = ofRat (fun b =>
     if b 0 = 0 ∧ b 1 = b 2 then ⟨1, 0⟩ else
-    if b 0 = 1 ∧ b 1 ≠  b 2 then ⟨-1, 0⟩ else
+    if b 0 = 1 ∧ b 1 ≠ b 2 then ⟨-1, 0⟩ else
     if b 0 = 2 ∧ b 1 = 0 ∧ b 2 = 1 then ⟨0, 1⟩ else
     if b 0 = 2 ∧ b 1 = 1 ∧ b 2 = 0 then ⟨0, -1⟩ else
     if b 0 = 3 ∧ b 1 = 1 ∧ b 2 = 1 then ⟨1, 0⟩ else
