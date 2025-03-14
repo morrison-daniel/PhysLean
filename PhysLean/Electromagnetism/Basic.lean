@@ -32,6 +32,6 @@ TODO "Replace the field strength tensor with a real (rather then complex) Lorent
 /-- The Field strength is a tensor `F^μ^ν` which is anti-symmetric.
   This is currently only defined for space dimension `d = 3`. -/
 noncomputable abbrev FieldStrength := SpaceTime →
-  {F : ℂT[![Color.up, Color.up]] | {F | μ ν = - (F | ν μ)}ᵀ}
+  {F : ℂT[.up, .up] | {F | μ ν = - (F | ν μ)}ᵀ}
 
 end Electromagnetism

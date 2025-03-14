@@ -250,10 +250,12 @@ def complexLorentzTensor : TensorSpecies where
 
 namespace complexLorentzTensor
 
+/-- Complex lorentz tensor. -/
 syntax (name := complexLorentzTensorSyntax) "ℂT[" term,* "]" : term
 
 macro_rules
-  | `(ℂT[$term:term, $terms:term,*]) => `((complexLorentzTensor.F.obj (OverColor.mk (vecCons $term ![$terms,*]))))
+  | `(ℂT[$term:term, $terms:term,*]) =>
+    `((complexLorentzTensor.F.obj (OverColor.mk (vecCons $term ![$terms,*]))))
   | `(ℂT[$term:term]) => `((complexLorentzTensor.F.obj (OverColor.mk (vecCons $term ![]))))
   | `(ℂT[]) =>`((complexLorentzTensor.F.obj (OverColor.mk (vecEmpty))))
 
