@@ -27,7 +27,7 @@ variable (S : TensorSpecies)
   complex Lorentz tensors with rational coefficents with respect to the basis are of this
   form. -/
 noncomputable def ofRat {n : ℕ} {c : Fin n → complexLorentzTensor.C}
-    (f : (Π j, Fin (complexLorentzTensor.repDim (c j))) → RatComplexNum) : ℂT[c] :=
+    (f : (Π j, Fin (complexLorentzTensor.repDim (c j))) → RatComplexNum) : ℂT(c) :=
   (complexLorentzTensor.tensorBasis c).repr.symm <|
   (Finsupp.linearEquivFunOnFinite complexLorentzTensor.k complexLorentzTensor.k
   ((j : Fin n) → Fin (complexLorentzTensor.repDim (c j)))).symm <|

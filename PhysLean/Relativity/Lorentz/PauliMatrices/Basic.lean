@@ -39,7 +39,7 @@ def pauliContr := (TensorTree.constThreeNodeE complexLorentzTensor .up .upL .upR
 scoped[PauliMatrix] notation "σ^^^" => PauliMatrix.pauliContr
 
 /-- The Pauli matrices as the complex Lorentz tensor `σ_μ^α^{dot β}`. -/
-def pauliCo : ℂT[![Color.down, Color.upL, Color.upR]] :=
+def pauliCo : ℂT[.down, .upL, .upR] :=
   (perm (OverColor.equivToHomEq (Equiv.refl _) (by decide))
   {η' | μ ν ⊗ σ^^^ | ν α β}ᵀ).tensor
 
@@ -47,7 +47,7 @@ def pauliCo : ℂT[![Color.down, Color.upL, Color.upR]] :=
 scoped[PauliMatrix] notation "σ_^^" => PauliMatrix.pauliCo
 
 /-- The Pauli matrices as the complex Lorentz tensor `σ_μ_{dot β}_α`. -/
-def pauliCoDown : ℂT[![Color.down, Color.downR, Color.downL]] :=
+def pauliCoDown : ℂT[.down, .downR, .downL] :=
   (perm (OverColor.equivToHomEq (Equiv.refl _) (by decide))
   {σ_^^ | μ α β ⊗ εR' | β β' ⊗ εL' | α α' }ᵀ).tensor
 
@@ -55,7 +55,7 @@ def pauliCoDown : ℂT[![Color.down, Color.downR, Color.downL]] :=
 scoped[PauliMatrix] notation "σ___" => PauliMatrix.pauliCoDown
 
 /-- The Pauli matrices as the complex Lorentz tensor `σ^μ_{dot β}_α`. -/
-def pauliContrDown : ℂT[![Color.up, Color.downR, Color.downL]] :=
+def pauliContrDown : ℂT[.up, .downR, .downL] :=
     (perm (OverColor.equivToHomEq (Equiv.refl _) (by decide))
     {pauliContr | μ α β ⊗ εR' | β β' ⊗ εL' | α α'}ᵀ).tensor
 

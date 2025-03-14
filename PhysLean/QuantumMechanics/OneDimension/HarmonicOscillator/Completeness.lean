@@ -156,25 +156,21 @@ lemma orthogonal_physHermite_of_mem_orthogonal (f : ℝ → ℂ) (hf : MemHS f)
     (n : ℕ) : ∫ (x : ℝ), (physHermite n (x / Q.ξ)) * (f x * ↑(Real.exp (- x ^ 2 / (2 * Q.ξ ^ 2))))
     = 0 := by
   have h1 := Q.orthogonal_eigenfunction_of_mem_orthogonal f hf hOrth n
-  have h2 : (fun (x : ℝ) =>
-          (1 / ↑√(2 ^ n * ↑n !) * (1/ √(√Real.pi * Q.ξ)) : ℂ) *
-            (physHermite n (x/Q.ξ) * f x *
-            Real.exp (- x ^ 2 / (2 * Q.ξ^2))))
-    = fun x => Q.eigenfunction n x * f x := by
+  have h2 : (fun (x : ℝ) => (1 / ↑√(2 ^ n * ↑n !) * (1/ √(√Real.pi * Q.ξ)) : ℂ) *
+      (physHermite n (x/Q.ξ) * f x * Real.exp (- x ^ 2 / (2 * Q.ξ^2))))
+      = fun x => Q.eigenfunction n x * f x := by
     funext x
     simp only [ofNat_nonneg, pow_nonneg, Real.sqrt_mul, Complex.ofReal_mul, one_div, mul_inv_rev,
       neg_mul, Complex.ofReal_exp, Complex.ofReal_div, Complex.ofReal_neg, Complex.ofReal_pow,
       Complex.ofReal_ofNat, eigenfunction_eq]
     ring
-  rw [← h2] at h1
-  rw [MeasureTheory.integral_mul_left] at h1
+  rw [← h2, MeasureTheory.integral_mul_left] at h1
   simp only [ofNat_nonneg, pow_nonneg, Real.sqrt_mul, Complex.ofReal_mul, one_div, mul_inv_rev,
     neg_mul, Complex.ofReal_exp, Complex.ofReal_div, Complex.ofReal_neg, Complex.ofReal_pow,
     Complex.ofReal_ofNat, _root_.mul_eq_zero, inv_eq_zero, Complex.ofReal_eq_zero, cast_nonneg,
     Real.sqrt_eq_zero, cast_eq_zero, pow_eq_zero_iff', OfNat.ofNat_ne_zero, ne_eq, false_and,
     or_false, Real.sqrt_nonneg] at h1
-  have h0 : n ! ≠ 0 := by
-    exact factorial_ne_zero n
+  have h0 : n ! ≠ 0 := factorial_ne_zero n
   have h0' : ¬ (√Q.ξ = 0 ∨ √Real.pi = 0) := by
     simpa using And.intro (Real.sqrt_ne_zero'.mpr Q.ξ_pos) (Real.sqrt_ne_zero'.mpr Real.pi_pos)
   simp only [h0, h0', or_self, false_or] at h1
@@ -250,8 +246,7 @@ lemma orthogonal_power_of_mem_orthogonal (f : ℝ → ℂ) (hf : MemHS f)
       (f x * Complex.exp (- x ^ 2 / (2 * Q.ξ^2))))) := by
       funext x
       ring
-    rw [h2] at h1
-    rw [MeasureTheory.integral_mul_left] at h1
+    rw [h2, MeasureTheory.integral_mul_left] at h1
     simp only [one_div, inv_pow, _root_.mul_eq_zero, inv_eq_zero, pow_eq_zero_iff',
       Complex.ofReal_eq_zero, ξ_ne_zero, ne_eq, false_and, false_or] at h1
     rw [← h1]
