@@ -3,7 +3,7 @@ Copyright (c) 2024 Joseph Tooby-Smith. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Joseph Tooby-Smith
 -/
-import PhysLean.Relativity.Lorentz.RealVector.Basic
+import PhysLean.Relativity.Lorentz.RealTensor.Vector.Pre.Basic
 /-!
 
 # Contraction of Real Lorentz vectors
@@ -435,7 +435,34 @@ lemma same_eq_det_toSelfAdjoint (x : ContrMod 3) :
     Function.comp_apply]
   ring
 
+
 end contrContrContractField
 
+
+/-!
+
+## The contraction on the basis
+
+-/
+
+@[simp]
+lemma contrCoContract_basis {d : ℕ} (i j : Fin 1 ⊕ Fin d) :
+    contrCoContract.hom (contrBasis d i ⊗ₜ coBasis d j) = if i = j then (1 : ℝ) else 0 := by
+  rw [contrCoContract_hom_tmul]
+  simp only [Action.instMonoidalCategory_tensorUnit_V, contrBasis_toFin1dℝ, coBasis_toFin1dℝ,
+    dotProduct_single, mul_one]
+  rw [Pi.single_apply]
+  congr 1
+  simp [eq_comm]
+
+@[simp]
+lemma coContrContract_basis {d : ℕ} (i j : Fin 1 ⊕ Fin d) :
+    coContrContract.hom (coBasis d i ⊗ₜ[ℝ] contrBasis d j) = if i = j then (1 : ℝ) else 0 := by
+  rw [coContrContract_hom_tmul]
+  simp only [Action.instMonoidalCategory_tensorUnit_V, coBasis_toFin1dℝ, contrBasis_toFin1dℝ,
+    dotProduct_single, mul_one]
+  rw [Pi.single_apply]
+  congr 1
+  simp [eq_comm]
 end Lorentz
 end
