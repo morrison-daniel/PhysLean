@@ -93,18 +93,18 @@ lemma equivToIso_mkIso_inv {c1 c2 : X → C} (h : c1 = c2) :
 /-- The morphism from `mk c` to `mk c1` obtained by an equivalence and
   an equality lemma. -/
 def equivToHomEq {c : X → C} {c1 : Y → C} (e : X ≃ Y)
-    (h : ∀ x, c1 x = (c ∘ e.symm) x := by decide) : mk c ⟶ mk c1 :=
+    (h : ∀ x, c1 x = (c ∘ e.symm) x := by simp; decide) : mk c ⟶ mk c1 :=
   (equivToHom e).trans (mkIso (funext fun x => (h x).symm)).hom
 
 @[simp]
 lemma equivToHomEq_hom_left {c : X → C} {c1 : Y → C} (e : X ≃ Y)
-    (h : ∀ x, c1 x = (c ∘ e.symm) x := by decide) : (equivToHomEq e h).hom.left =
+    (h : ∀ x, c1 x = (c ∘ e.symm) x := by simp; decide) : (equivToHomEq e h).hom.left =
     e.toFun := by
   rfl
 
 @[simp]
 lemma equivToHomEq_toEquiv {c : X → C} {c1 : Y → C} (e : X ≃ Y)
-    (h : ∀ x, c1 x = (c ∘ e.symm) x := by decide) : Hom.toEquiv (equivToHomEq e h) = e := by
+    (h : ∀ x, c1 x = (c ∘ e.symm) x := by simp; decide ) : Hom.toEquiv (equivToHomEq e h) = e := by
     rfl
 
 /-- The isomorphism splitting a `mk c` for `Fin 2 → C` into the tensor product of

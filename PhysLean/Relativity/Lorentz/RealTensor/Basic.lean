@@ -149,5 +149,8 @@ scoped[realLorentzTensor] notation "ℝT(" d "," c ")" =>
 /-- Color for real Lorentz tensors is decidable. -/
 instance (d : ℕ) : DecidableEq (realLorentzTensor d).C := realLorentzTensor.instDecidableEqColor
 
+@[simp]
+lemma C_eq_color {d : ℕ} : (realLorentzTensor d).C = Color := rfl
+
 end realLorentzTensor
 end
