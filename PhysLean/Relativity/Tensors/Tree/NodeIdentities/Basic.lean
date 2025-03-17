@@ -102,6 +102,15 @@ lemma add_neg (t : TensorTree S c) : (add t (neg t)).tensor = 0 := by
   rw [add_tensor, neg_tensor]
   simp only [add_neg_cancel]
 
+lemma add_neg_neg (t1 t2 : TensorTree S c) :
+    (add (neg t1) (neg t2)).tensor = (neg (add t1 t2)).tensor := by
+  simp only [add_tensor, neg_tensor, neg_add_rev]
+  abel
+
+lemma smul_comm_neg (a : S.k) (t : TensorTree S c) :
+    (smul a (neg t)).tensor = (neg (smul a t)).tensor := by
+  simp [smul_tensor, neg_tensor, map_smul]
+
 /-!
 
 ## Basic perm identities

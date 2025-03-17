@@ -152,5 +152,11 @@ instance (d : ℕ) : DecidableEq (realLorentzTensor d).C := realLorentzTensor.in
 @[simp]
 lemma C_eq_color {d : ℕ} : (realLorentzTensor d).C = Color := rfl
 
+@[simp]
+lemma repDim_up {d : ℕ} : (realLorentzTensor d).repDim Color.up = 1 + d := rfl
+
+@[simp]
+lemma repDim_down {d : ℕ} : (realLorentzTensor d).repDim Color.down = 1 + d := rfl
+
 end realLorentzTensor
 end

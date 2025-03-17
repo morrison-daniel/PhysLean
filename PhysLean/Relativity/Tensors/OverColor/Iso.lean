@@ -90,6 +90,9 @@ lemma equivToIso_mkIso_inv {c1 c2 : X → C} (h : c1 = c2) :
     Hom.toEquiv (mkIso h).inv = Equiv.refl _ := by
   rfl
 
+TODO "In equivToHomEq the tactic `try {simp; decide}; try decide` can probably be made more
+  efficent."
+
 /-- The morphism from `mk c` to `mk c1` obtained by an equivalence and
   an equality lemma. -/
 def equivToHomEq {c : X → C} {c1 : Y → C} (e : X ≃ Y)
