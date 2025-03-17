@@ -130,17 +130,21 @@ def realLorentzTensor (d : ℕ := 3) : TensorSpecies where
 
 namespace realLorentzTensor
 
+/-- Notation for a real Lorentz tensor. -/
 syntax (name := realLorentzTensorSyntax) "ℝT[" term,* "]" : term
 
 macro_rules
   | `(ℝT[$termDim:term, $term:term, $terms:term,*]) =>
       `(((realLorentzTensor $termDim).F.obj (OverColor.mk (vecCons $term ![$terms,*]))))
-  | `(ℝT[$termDim:term, $term:term]) => `(((realLorentzTensor $termDim).F.obj (OverColor.mk (vecCons $term ![]))))
+  | `(ℝT[$termDim:term, $term:term]) =>
+    `(((realLorentzTensor $termDim).F.obj (OverColor.mk (vecCons $term ![]))))
   | `(ℝT[$termDim:term]) =>`(((realLorentzTensor $termDim).F.obj (OverColor.mk (vecEmpty))))
   | `(ℝT[]) =>`(((realLorentzTensor 3).F.obj (OverColor.mk (vecEmpty))))
 
 set_option quotPrecheck false in
-scoped[realLorentzTensor]  notation "ℝT(" d "," c ")" => (realLorentzTensor d).F.obj (OverColor.mk c)
+/-- Notation for a real Lorentz tensor. -/
+scoped[realLorentzTensor] notation "ℝT(" d "," c ")" =>
+  (realLorentzTensor d).F.obj (OverColor.mk c)
 
 /-- Color for real Lorentz tensors is decidable. -/
 instance (d : ℕ) : DecidableEq (realLorentzTensor d).C := realLorentzTensor.instDecidableEqColor

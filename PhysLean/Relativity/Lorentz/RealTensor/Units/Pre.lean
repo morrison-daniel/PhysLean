@@ -23,13 +23,14 @@ namespace Lorentz
 def preContrCoUnitVal (d : ℕ := 3) : (Contr d ⊗ Co d).V :=
   contrCoToMatrixRe.symm 1
 
-
 /-- Expansion of `preContrCoUnitVal` into basis. -/
 lemma preContrCoUnitVal_expand_tmul {d : ℕ} : preContrCoUnitVal d =
-    ∑ i,  contrBasis d i ⊗ₜ[ℝ] coBasis d i := by
-  simp only [Action.instMonoidalCategory_tensorObj_V, preContrCoUnitVal, Fin.isValue]
-  erw [contrCoToMatrixRe_symm_expand_tmul]
-  simp
+    ∑ i, contrBasis d i ⊗ₜ[ℝ] coBasis d i := by
+  simp only [preContrCoUnitVal, Fin.isValue]
+  rw [contrCoToMatrixRe_symm_expand_tmul]
+  simp only [Fintype.sum_sum_type, Finset.univ_unique, Fin.default_eq_zero, Fin.isValue,
+    Finset.sum_singleton, ne_eq, reduceCtorEq, not_false_eq_true, one_apply_ne, zero_smul,
+    Finset.sum_const_zero, add_zero, one_apply_eq, one_smul, zero_add, add_right_inj]
   congr
   funext x
   rw [Finset.sum_eq_single x]
@@ -62,8 +63,8 @@ def preContrCoUnit (d : ℕ := 3) : 𝟙_ (Rep ℝ (LorentzGroup d)) ⟶ Contr d
       (TensorProduct.map ((Contr d).ρ M) ((Co d).ρ M)) (x • preContrCoUnitVal d)
     simp only [Action.instMonoidalCategory_tensorObj_V, _root_.map_smul]
     apply congrArg
-    simp only [Action.instMonoidalCategory_tensorObj_V, preContrCoUnitVal]
-    erw [contrCoToMatrixRe_ρ_symm]
+    simp only [preContrCoUnitVal]
+    rw [contrCoToMatrixRe_ρ_symm]
     apply congrArg
     simp
 
@@ -77,10 +78,12 @@ def preCoContrUnitVal (d : ℕ := 3) : (Co d ⊗ Contr d).V :=
 
 /-- Expansion of `preCoContrUnitVal` into basis. -/
 lemma preCoContrUnitVal_expand_tmul {d : ℕ} : preCoContrUnitVal d =
-    ∑ i,  coBasis d i ⊗ₜ[ℝ] contrBasis d i := by
-  simp only [Action.instMonoidalCategory_tensorObj_V, preCoContrUnitVal, Fin.isValue]
-  erw [coContrToMatrixRe_symm_expand_tmul]
-  simp
+    ∑ i, coBasis d i ⊗ₜ[ℝ] contrBasis d i := by
+  simp only [preCoContrUnitVal]
+  rw [coContrToMatrixRe_symm_expand_tmul]
+  simp only [Fintype.sum_sum_type, Finset.univ_unique, Fin.default_eq_zero, Fin.isValue,
+    Finset.sum_singleton, ne_eq, reduceCtorEq, not_false_eq_true, one_apply_ne, zero_smul,
+    Finset.sum_const_zero, add_zero, one_apply_eq, one_smul, zero_add, add_right_inj]
   congr
   funext x
   rw [Finset.sum_eq_single x]
@@ -113,8 +116,8 @@ def preCoContrUnit (d : ℕ) : 𝟙_ (Rep ℝ (LorentzGroup d)) ⟶ Co d ⊗ Con
       (TensorProduct.map ((Co d).ρ M) ((Contr d).ρ M)) (x • preCoContrUnitVal d)
     simp only [Action.instMonoidalCategory_tensorObj_V, _root_.map_smul]
     apply congrArg
-    simp only [Action.instMonoidalCategory_tensorObj_V, preCoContrUnitVal]
-    erw [coContrToMatrixRe_ρ_symm]
+    simp only [preCoContrUnitVal]
+    rw [coContrToMatrixRe_ρ_symm]
     apply congrArg
     symm
     refine transpose_eq_one.mp ?h.h.h.a
@@ -146,11 +149,10 @@ lemma contr_preContrCoUnit {d : ℕ} (x : Co d) :
   obtain ⟨c, rfl⟩ := (mem_span_range_iff_exists_fun ℝ).mp (Basis.mem_span (coBasis d) x)
   have h3 (i : Fin 1 ⊕ Fin d) : (CategoryTheory.ConcreteCategory.hom coContrContract.hom)
         ((∑ i : Fin 1 ⊕ Fin d, c i • (coBasis d) i) ⊗ₜ[ℝ] (contrBasis d) i) = c i := by
-      simp [sum_tmul, - Fintype.sum_sum_type, smul_tmul]
+      simp only [sum_tmul, smul_tmul, tmul_smul, map_sum, _root_.map_smul, smul_eq_mul]
       conv_lhs =>
         enter [2, x]
-        /- Work out why erw needed here! -/
-        erw [coContrContract_basis]
+        rw [coContrContract_basis]
       simp
   conv_lhs =>
     enter [2, 2, i]
@@ -165,7 +167,7 @@ lemma contr_preCoContrUnit {d : ℕ} (x : (Contr d)) :
   have h1 : ((α_ (Contr d) _ (Contr d)).inv.hom (x ⊗ₜ[ℝ] (preCoContrUnit d).hom (1 : ℝ)))
       = ∑ i, (x ⊗ₜ[ℝ] coBasis d i) ⊗ₜ[ℝ] contrBasis d i := by
     rw [preCoContrUnit_apply_one, preCoContrUnitVal_expand_tmul]
-    simp  [tmul_sum, - Fintype.sum_sum_type]
+    simp [tmul_sum, - Fintype.sum_sum_type]
   rw [h1]
   have h2 : (contrCoContract ▷ (Contr d)).hom (∑ i, (x ⊗ₜ[ℝ] coBasis d i) ⊗ₜ[ℝ] contrBasis d i)
       = ∑ i, ((contrCoContract).hom (x ⊗ₜ[ℝ] coBasis d i)) ⊗ₜ[ℝ] contrBasis d i := by
@@ -174,11 +176,10 @@ lemma contr_preCoContrUnit {d : ℕ} (x : (Contr d)) :
   obtain ⟨c, rfl⟩ := (mem_span_range_iff_exists_fun ℝ).mp (Basis.mem_span (contrBasis d) x)
   have h3 (i : Fin 1 ⊕ Fin d) : (CategoryTheory.ConcreteCategory.hom contrCoContract.hom)
         ((∑ i : Fin 1 ⊕ Fin d, c i • (contrBasis d) i) ⊗ₜ[ℝ] (coBasis d) i) = c i := by
-      simp [sum_tmul, - Fintype.sum_sum_type, smul_tmul]
+      simp only [sum_tmul, smul_tmul, tmul_smul, map_sum, _root_.map_smul, smul_eq_mul]
       conv_lhs =>
         enter [2, x]
-        /- Work out why erw needed here! -/
-        erw [contrCoContract_basis]
+        rw [contrCoContract_basis]
       simp
   conv_lhs =>
     enter [2, 2, i]

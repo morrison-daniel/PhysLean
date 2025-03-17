@@ -435,9 +435,7 @@ lemma same_eq_det_toSelfAdjoint (x : ContrMod 3) :
     Function.comp_apply]
   ring
 
-
 end contrContrContractField
-
 
 /-!
 
@@ -445,7 +443,6 @@ end contrContrContractField
 
 -/
 
-@[simp]
 lemma contrCoContract_basis {d : ℕ} (i j : Fin 1 ⊕ Fin d) :
     contrCoContract.hom (contrBasis d i ⊗ₜ coBasis d j) = if i = j then (1 : ℝ) else 0 := by
   rw [contrCoContract_hom_tmul]
@@ -455,7 +452,6 @@ lemma contrCoContract_basis {d : ℕ} (i j : Fin 1 ⊕ Fin d) :
   congr 1
   simp [eq_comm]
 
-@[simp]
 lemma coContrContract_basis {d : ℕ} (i j : Fin 1 ⊕ Fin d) :
     coContrContract.hom (coBasis d i ⊗ₜ[ℝ] contrBasis d j) = if i = j then (1 : ℝ) else 0 := by
   rw [coContrContract_hom_tmul]
@@ -464,5 +460,6 @@ lemma coContrContract_basis {d : ℕ} (i j : Fin 1 ⊕ Fin d) :
   rw [Pi.single_apply]
   congr 1
   simp [eq_comm]
+
 end Lorentz
 end

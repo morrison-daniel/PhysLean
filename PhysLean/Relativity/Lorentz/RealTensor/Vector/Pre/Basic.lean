@@ -26,7 +26,7 @@ open minkowskiMatrix
 def Contr (d : ℕ) : Rep ℝ (LorentzGroup d) := Rep.of ContrMod.rep
 
 /-- The standard basis of contravariant Lorentz vectors. -/
-def contrBasis (d : ℕ := 3): Basis (Fin 1 ⊕ Fin d) ℝ (Contr d) :=
+def contrBasis (d : ℕ := 3) : Basis (Fin 1 ⊕ Fin d) ℝ (Contr d) :=
   Basis.ofEquivFun ContrMod.toFin1dℝEquiv
 
 @[simp]
@@ -40,7 +40,7 @@ lemma contrBasis_ρ_apply {d : ℕ} (M : LorentzGroup d) (i j : Fin 1 ⊕ Fin d)
 
 @[simp]
 lemma contrBasis_toFin1dℝ {d : ℕ} (i : Fin (1) ⊕ Fin d) :
-     (contrBasis d i).toFin1dℝ = Pi.single i 1 := by
+    (contrBasis d i).toFin1dℝ = Pi.single i 1 := by
   simp only [ContrMod.toFin1dℝ, contrBasis, Basis.coe_ofEquivFun]
   rfl
 
@@ -83,14 +83,13 @@ lemma coBasis_ρ_apply {d : ℕ} (M : LorentzGroup d) (i j : Fin 1 ⊕ Fin d) :
 
 @[simp]
 lemma coBasis_toFin1dℝ {d : ℕ} (i : Fin (1) ⊕ Fin d) :
-     (coBasis d i).toFin1dℝ = Pi.single i 1 := by
+    (coBasis d i).toFin1dℝ = Pi.single i 1 := by
   simp only [ContrMod.toFin1dℝ, coBasis, Basis.coe_ofEquivFun]
   rfl
 
-/-- The standard basis of  covaraitn Lorentz vectors indexed by `Fin (1 + d)`. -/
+/-- The standard basis of covaraitn Lorentz vectors indexed by `Fin (1 + d)`. -/
 def coBasisFin (d : ℕ := 3) : Basis (Fin (1 + d)) ℝ (Co d) :=
   Basis.reindex (coBasis d) finSumFinEquiv
-
 
 open CategoryTheory.MonoidalCategory
 

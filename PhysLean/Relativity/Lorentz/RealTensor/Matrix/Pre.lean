@@ -29,7 +29,7 @@ def contrContrToMatrixRe {d : ℕ} : (Contr d ⊗ Contr d).V ≃ₗ[ℝ]
 /-- Expanding `contrContrToMatrixRe` in terms of the standard basis. -/
 lemma contrContrToMatrixRe_symm_expand_tmul (M : Matrix (Fin 1 ⊕ Fin d) (Fin 1 ⊕ Fin d) ℝ) :
     contrContrToMatrixRe.symm M = ∑ i, ∑ j, M i j • (contrBasis d i ⊗ₜ[ℝ] contrBasis d j) := by
-  simp only [Action.instMonoidalCategory_tensorObj_V, contrContrToMatrixRe, LinearEquiv.trans_symm,
+  simp only [contrContrToMatrixRe, LinearEquiv.trans_symm,
     LinearEquiv.trans_apply, Basis.repr_symm_apply]
   rw [Finsupp.linearCombination_apply_of_mem_supported ℝ (s := Finset.univ)]
   · erw [Finset.sum_product]
@@ -39,7 +39,7 @@ lemma contrContrToMatrixRe_symm_expand_tmul (M : Matrix (Fin 1 ⊕ Fin d) (Fin 1
   · simp
 
 /-- Equivalence of `Co ⊗ Co` to `(1 + d) x (1 + d)` real matrices. -/
-def coCoToMatrixRe {d : ℕ}  : (Co d ⊗ Co d).V ≃ₗ[ℝ]
+def coCoToMatrixRe {d : ℕ} : (Co d ⊗ Co d).V ≃ₗ[ℝ]
     Matrix (Fin 1 ⊕ Fin d) (Fin 1 ⊕ Fin d) ℝ :=
   (Basis.tensorProduct (coBasis d) (coBasis d)).repr ≪≫ₗ
   Finsupp.linearEquivFunOnFinite ℝ ℝ ((Fin 1 ⊕ Fin d) × (Fin 1 ⊕ Fin d)) ≪≫ₗ
@@ -67,7 +67,7 @@ def contrCoToMatrixRe {d : ℕ} : (Contr d ⊗ Co d).V ≃ₗ[ℝ]
 /-- Expansion of ` (coBasis d) (coBasis d)` in terms of the standard basis. -/
 lemma contrCoToMatrixRe_symm_expand_tmul (M : Matrix (Fin 1 ⊕ Fin d) (Fin 1 ⊕ Fin d) ℝ) :
     contrCoToMatrixRe.symm M = ∑ i, ∑ j, M i j • (contrBasis d i ⊗ₜ[ℝ] coBasis d j) := by
-  simp only [Action.instMonoidalCategory_tensorObj_V, contrCoToMatrixRe, LinearEquiv.trans_symm,
+  simp only [contrCoToMatrixRe, LinearEquiv.trans_symm,
     LinearEquiv.trans_apply, Basis.repr_symm_apply]
   rw [Finsupp.linearCombination_apply_of_mem_supported ℝ (s := Finset.univ)]
   · erw [Finset.sum_product]
@@ -105,7 +105,7 @@ lemma contrContrToMatrixRe_ρ {d : ℕ} (v : (Contr d ⊗ Contr d).V) (M : Loren
     contrContrToMatrixRe (TensorProduct.map ((Contr d).ρ M) ((Contr d).ρ M) v) =
     M.1 * contrContrToMatrixRe v * Mᵀ := by
   nth_rewrite 1 [contrContrToMatrixRe]
-  simp only [Action.instMonoidalCategory_tensorObj_V, LinearEquiv.trans_apply]
+  simp only [LinearEquiv.trans_apply]
   trans (LinearEquiv.curry ℝ ℝ (Fin 1 ⊕ Fin d) (Fin 1 ⊕ Fin d)) ((LinearMap.toMatrix
       ((contrBasis d).tensorProduct (contrBasis d))
       ((contrBasis d).tensorProduct (contrBasis d))
@@ -181,13 +181,13 @@ lemma contrCoToMatrixRe_ρ {d : ℕ} (v : ((Contr d) ⊗ (Co d)).V) (M : Lorentz
   simp only [Action.instMonoidalCategory_tensorObj_V, LinearEquiv.trans_apply]
   trans (LinearEquiv.curry ℝ ℝ (Fin 1 ⊕ Fin d) (Fin 1 ⊕ Fin d)) ((LinearMap.toMatrix
       ((contrBasis d).tensorProduct (coBasis d))
-      ((contrBasis d).tensorProduct  (coBasis d))
+      ((contrBasis d).tensorProduct (coBasis d))
       (TensorProduct.map ((Contr d).ρ M) ((Co d).ρ M))
       *ᵥ ((Finsupp.linearEquivFunOnFinite ℝ ℝ ((Fin 1 ⊕ Fin d) × (Fin 1 ⊕ Fin d)))
-      (((contrBasis d).tensorProduct  (coBasis d)).repr v))))
+      (((contrBasis d).tensorProduct (coBasis d)).repr v))))
   · apply congrArg
-    have h1 := (LinearMap.toMatrix_mulVec_repr ((contrBasis d).tensorProduct  (coBasis d))
-      ((contrBasis d).tensorProduct  (coBasis d))
+    have h1 := (LinearMap.toMatrix_mulVec_repr ((contrBasis d).tensorProduct (coBasis d))
+      ((contrBasis d).tensorProduct (coBasis d))
       (TensorProduct.map ((Contr d).ρ M) ((Co d).ρ M)) v)
     erw [h1]
     rfl
@@ -264,7 +264,7 @@ lemma contrContrToMatrixRe_ρ_symm {d : ℕ} (v : Matrix (Fin 1 ⊕ Fin d) (Fin 
   simp
 
 lemma coCoToMatrixRe_ρ_symm {d : ℕ} (v : Matrix (Fin 1 ⊕ Fin d) (Fin 1 ⊕ Fin d) ℝ)
-    (M : LorentzGroup d)  :
+    (M : LorentzGroup d) :
     TensorProduct.map ((Co d).ρ M) ((Co d).ρ M) (coCoToMatrixRe.symm v) =
     coCoToMatrixRe.symm (M.1⁻¹ᵀ * v * M.1⁻¹) := by
   have h1 := coCoToMatrixRe_ρ (coCoToMatrixRe.symm v) M
@@ -279,13 +279,12 @@ lemma contrCoToMatrixRe_ρ_symm {d : ℕ} (v : Matrix (Fin 1 ⊕ Fin d) (Fin 1 �
     TensorProduct.map ((Contr d).ρ M) ((Co d).ρ M) (contrCoToMatrixRe.symm v) =
     contrCoToMatrixRe.symm (M.1 * v * M.1⁻¹) := by
   have h1 := contrCoToMatrixRe_ρ (contrCoToMatrixRe.symm v) M
-  simp only [Action.instMonoidalCategory_tensorObj_V, LinearEquiv.apply_symm_apply,
-    ] at h1
+  simp only [Action.instMonoidalCategory_tensorObj_V, LinearEquiv.apply_symm_apply] at h1
   rw [← h1]
   simp
 
 lemma coContrToMatrixRe_ρ_symm {d : ℕ} (v : Matrix (Fin 1 ⊕ Fin d) (Fin 1 ⊕ Fin d) ℝ)
-    (M : LorentzGroup d)  :
+    (M : LorentzGroup d) :
     TensorProduct.map ((Co d).ρ M) ((Contr d).ρ M) (coContrToMatrixRe.symm v) =
     coContrToMatrixRe.symm (M.1⁻¹ᵀ * v * M.1ᵀ) := by
   have h1 := coContrToMatrixRe_ρ (coContrToMatrixRe.symm v) M
