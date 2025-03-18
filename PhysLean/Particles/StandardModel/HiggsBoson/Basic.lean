@@ -94,7 +94,8 @@ instance : ContMDiffVectorBundle ⊤ HiggsVec HiggsBundle (Lorentz.Vector.asSmoo
   vector bundle `HiggsBundle`. Such elements are Higgs fields. Since `HiggsField` is
   trivial as a vector bundle, a Higgs field is equivalent to a smooth map
   from `SpaceTime` to `HiggsVec`. -/
-abbrev HiggsField : Type := ContMDiffSection (Lorentz.Vector.asSmoothManifold 3) HiggsVec ⊤ HiggsBundle
+abbrev HiggsField : Type := ContMDiffSection
+  (Lorentz.Vector.asSmoothManifold 3) HiggsVec ⊤ HiggsBundle
 
 /-- Given a vector in `HiggsVec` the constant Higgs field with value equal to that
 section. -/
