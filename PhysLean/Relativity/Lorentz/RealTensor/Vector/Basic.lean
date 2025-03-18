@@ -185,7 +185,8 @@ lemma innerProduct_invariant {d : ℕ} (p q : Vector d) (Λ : LorentzGroup d) :
   rw [contr_tensor_eq <| prod_action _ _ _]
   rw [contr_action _]
   rw [← field]
-  simp
+  simp only [Nat.succ_eq_add_one, Nat.reduceAdd, C_eq_color, Fin.isValue, Fin.succAbove_zero,
+    action_field]
   rw [innerProduct]
 
 /-!
