@@ -192,8 +192,10 @@ import PhysLean.Relativity.Lorentz.PauliMatrices.SelfAdjoint
 import PhysLean.Relativity.Lorentz.RealTensor.Basic
 import PhysLean.Relativity.Lorentz.RealTensor.Derivative
 import PhysLean.Relativity.Lorentz.RealTensor.Matrix.Pre
+import PhysLean.Relativity.Lorentz.RealTensor.Metrics.Basic
 import PhysLean.Relativity.Lorentz.RealTensor.Metrics.Pre
 import PhysLean.Relativity.Lorentz.RealTensor.Units.Pre
+import PhysLean.Relativity.Lorentz.RealTensor.Vector.Basic
 import PhysLean.Relativity.Lorentz.RealTensor.Vector.Pre.Basic
 import PhysLean.Relativity.Lorentz.RealTensor.Vector.Pre.Contraction
 import PhysLean.Relativity.Lorentz.RealTensor.Vector.Pre.Modules

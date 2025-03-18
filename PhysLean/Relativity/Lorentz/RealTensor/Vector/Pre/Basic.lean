@@ -48,6 +48,11 @@ lemma contrBasis_toFin1dℝ {d : ℕ} (i : Fin (1) ⊕ Fin d) :
 def contrBasisFin (d : ℕ := 3) : Basis (Fin (1 + d)) ℝ (Contr d) :=
   Basis.reindex (contrBasis d) finSumFinEquiv
 
+@[simp]
+lemma contrBasisFin_toFin1dℝ {d : ℕ} (i : Fin (1 + d)) :
+    (contrBasisFin d i).toFin1dℝ = Pi.single (finSumFinEquiv.symm i) 1 := by
+  simp only [contrBasisFin, Basis.reindex_apply, contrBasis_toFin1dℝ, Basis.coe_ofEquivFun]
+
 /-- The representation of contravariant Lorentz vectors forms a topological space, induced
   by its equivalence to `Fin 1 ⊕ Fin d → ℝ`. -/
 instance : TopologicalSpace (Contr d) := TopologicalSpace.induced
@@ -90,6 +95,11 @@ lemma coBasis_toFin1dℝ {d : ℕ} (i : Fin (1) ⊕ Fin d) :
 /-- The standard basis of covaraitn Lorentz vectors indexed by `Fin (1 + d)`. -/
 def coBasisFin (d : ℕ := 3) : Basis (Fin (1 + d)) ℝ (Co d) :=
   Basis.reindex (coBasis d) finSumFinEquiv
+
+@[simp]
+lemma coBasisFin_toFin1dℝ {d : ℕ} (i : Fin (1 + d)) :
+    (coBasisFin d i).toFin1dℝ = Pi.single (finSumFinEquiv.symm i) 1 := by
+  simp only [coBasisFin, Basis.reindex_apply, coBasis_toFin1dℝ, Basis.coe_ofEquivFun]
 
 open CategoryTheory.MonoidalCategory
 

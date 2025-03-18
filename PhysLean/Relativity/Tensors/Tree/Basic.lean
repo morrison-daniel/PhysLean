@@ -519,6 +519,29 @@ lemma neg_tensorBasis_repr (t : TensorTree S c) :
   rw [neg_tensor]
   simp
 
+lemma field_eq_repr {c : Fin 0 → S.C} (t : TensorTree S c) :
+    t.field = (S.tensorBasis c).repr t.tensor (fun j => Fin.elim0 j) := by
+  simp [field]
+  have h1 (t : (S.F.obj (OverColor.mk c)).V) :
+      S.castFin0ToField t = ((S.tensorBasis c).repr t) fun j => j.elim0 := by
+    obtain ⟨t, rfl⟩ := (S.tensorBasis c).repr.symm.surjective t
+    simp only [Basis.repr_symm_apply, Basis.repr_linearCombination]
+    rw [@Finsupp.linearCombination_unique]
+    simp only [map_smul, smul_eq_mul]
+    trans t default * 1
+    · congr 1
+      · congr 1
+        exact Unique.default_eq default
+      · simp [castFin0ToField, tensorBasis]
+        change (PiTensorProduct.isEmptyEquiv (Fin 0)) (S.fromCoordinates c
+          (Pi.single _ 1)) = _
+        simp [fromCoordinates, basisVector]
+    · simp only [Fin.default_eq_zero, mul_one]
+      congr
+      funext j
+      exact Fin.elim0 j
+  exact h1 t.tensor
+
 /-!
 
 ## The zero tensor tree
