@@ -190,6 +190,7 @@ import PhysLean.Relativity.Lorentz.PauliMatrices.Matrix
 import PhysLean.Relativity.Lorentz.PauliMatrices.Relations
 import PhysLean.Relativity.Lorentz.PauliMatrices.SelfAdjoint
 import PhysLean.Relativity.Lorentz.RealTensor.Basic
+import PhysLean.Relativity.Lorentz.RealTensor.Derivative
 import PhysLean.Relativity.Lorentz.RealTensor.Matrix.Pre
 import PhysLean.Relativity.Lorentz.RealTensor.Metrics.Pre
 import PhysLean.Relativity.Lorentz.RealTensor.Units.Pre
