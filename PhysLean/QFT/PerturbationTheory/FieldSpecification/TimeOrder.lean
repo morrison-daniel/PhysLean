@@ -25,7 +25,7 @@ variable {𝓕 : FieldSpecification}
   asymptotic state, or `φ0` is a positive asymptotic state. -/
 def timeOrderRel : 𝓕.FieldOp → 𝓕.FieldOp → Prop
   | FieldOp.outAsymp _, _ => True
-  | FieldOp.position φ0, FieldOp.position φ1 => φ1.2 0 ≤ φ0.2 0
+  | FieldOp.position φ0, FieldOp.position φ1 => φ1.2 (Sum.inl 0) ≤ φ0.2 (Sum.inl 0)
   | FieldOp.position _, FieldOp.inAsymp _ => True
   | FieldOp.position _, FieldOp.outAsymp _ => False
   | FieldOp.inAsymp _, FieldOp.outAsymp _ => False
@@ -36,7 +36,7 @@ def timeOrderRel : 𝓕.FieldOp → 𝓕.FieldOp → Prop
   `Real.decidableLE`. -/
 noncomputable instance : (φ φ' : 𝓕.FieldOp) → Decidable (timeOrderRel φ φ')
   | FieldOp.outAsymp _, _ => isTrue True.intro
-  | FieldOp.position φ0, FieldOp.position φ1 => inferInstanceAs (Decidable (φ1.2 0 ≤ φ0.2 0))
+  | FieldOp.position φ0, FieldOp.position φ1 => inferInstanceAs (Decidable (φ1.2 (Sum.inl 0) ≤ φ0.2 (Sum.inl 0)))
   | FieldOp.position _, FieldOp.inAsymp _ => isTrue True.intro
   | FieldOp.position _, FieldOp.outAsymp _ => isFalse (fun a => a)
   | FieldOp.inAsymp _, FieldOp.outAsymp _ => isFalse (fun a => a)

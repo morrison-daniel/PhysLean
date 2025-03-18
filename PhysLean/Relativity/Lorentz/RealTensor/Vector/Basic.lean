@@ -4,6 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Matteo Cipollina, Joseph Tooby-Smith
 -/
 import PhysLean.Relativity.Lorentz.RealTensor.Metrics.Basic
+import Mathlib.Geometry.Manifold.IsManifold.Basic
+import Mathlib.Analysis.InnerProductSpace.PiL2
 /-!
 
 ## Metrics as real Lorentz tensors
@@ -51,6 +53,31 @@ def toCoord {d : ℕ} (p : Vector d) : Fin 1 ⊕ Fin d → ℝ :=
   Equiv.piCongrLeft' _ indexEquiv
   (Finsupp.equivFunOnFinite
   (((realLorentzTensor d).tensorBasis _).repr p))
+
+lemma toCoord_injective {d : ℕ} : Function.Injective (@toCoord d) := by
+  intros x y h
+  simp [toCoord] at h
+  erw [Equiv.apply_eq_iff_eq] at h
+  simpa using h
+
+def toCoordLinear {d : ℕ} : Vector d →ₗ[ℝ] (Fin 1 ⊕ Fin d → ℝ) where
+  toFun := toCoord
+  map_add' x y := by
+    simp only [toCoord, Nat.succ_eq_add_one, Nat.reduceAdd, C_eq_color, map_add]
+    rfl
+  map_smul' x y := by
+    simp only [toCoord, Nat.succ_eq_add_one, Nat.reduceAdd, C_eq_color, _root_.map_smul,
+      RingHom.id_apply]
+    rfl
+
+@[simp]
+lemma toCoordLinear_apply {d : ℕ} (p : Vector d) :
+    toCoordLinear p = toCoord p := by rfl
+
+lemma toCoordLinear_injective (d : ℕ) : Function.Injective (@toCoordLinear d) := by
+  intros x y h
+  simp at h
+  exact toCoord_injective h
 
 instance : CoeFun (Vector d) (fun _ => Fin 1 ⊕ Fin d → ℝ) := ⟨toCoord⟩
 
@@ -134,6 +161,37 @@ lemma innerProduct_zero_right {d : ℕ} (p : Vector d) :
     ⟪p, 0⟫ₘ = 0 := by
   rw [innerProduct_toCoord]
   simp [toCoord]
+
+/-!
+
+## Smoothness
+
+-/
+
+
+section smoothness
+
+instance isNormedAddCommGroup (d : ℕ) : NormedAddCommGroup (Vector d) :=
+  NormedAddCommGroup.induced ↑(Vector d).V (Fin 1 ⊕ Fin d → ℝ)
+  (@toCoordLinear d) (toCoordLinear_injective d)
+
+instance isNormedSpace (d : ℕ) :
+    haveI := isNormedAddCommGroup d
+    NormedSpace ℝ (Vector d) :=
+  NormedSpace.induced ℝ (Vector d) (Fin 1 ⊕ Fin d → ℝ) (@toCoordLinear d)
+
+open Manifold
+open Matrix
+open Complex
+open ComplexConjugate
+
+/-- The structure of a smooth manifold on Vector . -/
+def asSmoothManifold (d : ℕ) : ModelWithCorners ℝ (Vector d) (Vector d) := 𝓘(ℝ, Vector d)
+
+/-- The instance of a `ChartedSpace` on `Vector d`. -/
+instance : ChartedSpace (Vector d)  (Vector d) := chartedSpaceSelf (Vector d)
+
+end smoothness
 
 end Vector
 
