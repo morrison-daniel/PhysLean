@@ -360,6 +360,19 @@ lemma action_id {n : ℕ} {c : Fin n → S.C} (t : TensorTree S c) :
     (action 1 t).tensor = t.tensor := by
   simp only [action_tensor, map_one, LinearMap.one_apply]
 
+lemma action_zero {c : Fin 0 → S.C} (g : S.G) (t : TensorTree S c) :
+    (action g t).tensor = t.tensor := by
+  simp [action_tensor, S.F_def]
+  simp [OverColor.lift, lift.obj']
+  erw [lift.objObj'_ρ_from_fin0]
+  simp
+
+@[simp]
+lemma action_field {c : Fin 0 → S.C} (g : S.G) (t : TensorTree S c) :
+    (action g t).field = t.field := by
+  rw [field, action_zero]
+  rfl
+
 /-- An `action` node on a `constTwoNode` leaves the tensor invariant. -/
 lemma action_constTwoNode {c1 c2 : S.C}
     (v : 𝟙_ (Rep S.k S.G) ⟶ S.FD.obj (Discrete.mk c1) ⊗ S.FD.obj (Discrete.mk c2))
