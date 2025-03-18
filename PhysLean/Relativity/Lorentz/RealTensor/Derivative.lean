@@ -23,26 +23,26 @@ open MonoidalCategory
 open TensorSpecies
 namespace realLorentzTensor
 
-/- The derivative of a function `f :  ℝT(d, cm) → ℝT(d, cn)`, giving a function
-   `ℝT(d, cm) → ℝT(d, (Sum.elim cm cn) ∘ finSumFinEquiv.symm)`. -/
+/-- The derivative of a function `f : ℝT(d, cm) → ℝT(d, cn)`, giving a function
+    `ℝT(d, cm) → ℝT(d, (Sum.elim cm cn) ∘ finSumFinEquiv.symm)`. -/
 noncomputable def derivative {d n m : ℕ} {cm : Fin m → (realLorentzTensor d).C}
     {cn : Fin n → (realLorentzTensor d).C} (f : ℝT(d, cm) → ℝT(d, cn)) :
     ℝT(d, cm) → ℝT(d, (Sum.elim cm cn) ∘ finSumFinEquiv.symm) := fun y =>
       ((realLorentzTensor d).tensorBasis _).repr.toEquiv.symm.toFun <|
       Finsupp.equivFunOnFinite.symm <| fun g =>
   let f' := Finsupp.equivFunOnFinite ∘ ((realLorentzTensor d).tensorBasis cn).repr.toEquiv.toFun ∘
-     f ∘ ((realLorentzTensor d).tensorBasis cm).repr.symm.toEquiv.toFun
-     ∘ Finsupp.equivFunOnFinite.symm
+      f ∘ ((realLorentzTensor d).tensorBasis cm).repr.symm.toEquiv.toFun
+      ∘ Finsupp.equivFunOnFinite.symm
   let df' :=
     haveI : NontriviallyNormedField (realLorentzTensor d).k :=
       inferInstanceAs (NontriviallyNormedField ℝ)
     @fderiv (realLorentzTensor d).k _
     (((j : Fin m) → Fin ((realLorentzTensor d).repDim (cm j))) → (realLorentzTensor d).k)
-    _ _ _  (((j : Fin n) → Fin ((realLorentzTensor d).repDim (cn j))) → (realLorentzTensor d).k)
+    _ _ _ (((j : Fin n) → Fin ((realLorentzTensor d).repDim (cn j))) → (realLorentzTensor d).k)
     _ _ _ f'
   let df := (df' ∘ Finsupp.equivFunOnFinite ∘
-   ((realLorentzTensor d).tensorBasis cm).repr.toEquiv.toFun) y
-  let g1 :  ((j : Fin m) → Fin ((realLorentzTensor d).repDim (cm j))) :=
+    ((realLorentzTensor d).tensorBasis cm).repr.toEquiv.toFun) y
+  let g1 : ((j : Fin m) → Fin ((realLorentzTensor d).repDim (cm j))) :=
     fun j => Fin.cast (by simp) (g (finSumFinEquiv (Sum.inl j)))
   let g1Fun : ((j : Fin m) → Fin ((realLorentzTensor d).repDim (cm j))) →
     (realLorentzTensor d).k := Finsupp.equivFunOnFinite
