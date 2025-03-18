@@ -60,6 +60,7 @@ lemma toCoord_injective {d : ℕ} : Function.Injective (@toCoord d) := by
   erw [Equiv.apply_eq_iff_eq] at h
   simpa using h
 
+/-- The coordinates of a Lorentz vector as a linear map. -/
 def toCoordLinear {d : ℕ} : Vector d →ₗ[ℝ] (Fin 1 ⊕ Fin d → ℝ) where
   toFun := toCoord
   map_add' x y := by
@@ -168,7 +169,6 @@ lemma innerProduct_zero_right {d : ℕ} (p : Vector d) :
 
 -/
 
-
 section smoothness
 
 instance isNormedAddCommGroup (d : ℕ) : NormedAddCommGroup (Vector d) :=
@@ -189,7 +189,7 @@ open ComplexConjugate
 def asSmoothManifold (d : ℕ) : ModelWithCorners ℝ (Vector d) (Vector d) := 𝓘(ℝ, Vector d)
 
 /-- The instance of a `ChartedSpace` on `Vector d`. -/
-instance : ChartedSpace (Vector d)  (Vector d) := chartedSpaceSelf (Vector d)
+instance : ChartedSpace (Vector d) (Vector d) := chartedSpaceSelf (Vector d)
 
 end smoothness
 

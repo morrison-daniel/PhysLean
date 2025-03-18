@@ -44,7 +44,7 @@ Note that `⟪p, p⟫ₘ` is defined in the +--- convention.
 def causalCharacter {d : ℕ} (p : Vector d) : CausalCharacter :=
   let v0 := ⟪p, p⟫ₘ
   if v0 = 0 then CausalCharacter.lightLike
-  else if 0 < v0  then CausalCharacter.timeLike
+  else if 0 < v0 then CausalCharacter.timeLike
   else CausalCharacter.spaceLike
 
 /-- The Lorentz vector `p` and `-p` have the same causalCharacter -/
@@ -56,14 +56,14 @@ lemma neg_causalCharacter_eq_self {d : ℕ} (p : Vector d) :
 
 /-- The future light cone of a Lorentz vector `p` is defined as those
   vectors `q` such that
--  `causalCharacter (q - p)` is `timeLike` and
+- `causalCharacter (q - p)` is `timeLike` and
 - `(q - p) (Sum.inl 0)` is positive. -/
 def interiorFutureLightCone {d : ℕ} (p : Vector d) : Set (Vector d) :=
     {q | causalCharacter (q - p) = .timeLike ∧ 0 < (q - p) (Sum.inl 0)}
 
 /-- The backward light cone of a Lorentz vector `p` is defined as those
   vectors `q` such that
--  `causalCharacter (q - p)` is `timeLike` and
+- `causalCharacter (q - p)` is `timeLike` and
 - `(q - p) (Sum.inl 0)` is negative. -/
 def interiorPastLightCone {d : ℕ} (p : Vector d) : Set (Vector d) :=
     {q | causalCharacter (q - p) = .timeLike ∧ (q - p) (Sum.inl 0) < 0}
@@ -92,11 +92,11 @@ def causallyPrecedes {d : ℕ} (p q : Vector d) : Prop :=
   q ∈ interiorPastLightCone p ∨ q ∈ pastLightConeBoundary p
 
 /-- Events `p` and `q` are causally related. -/
-def causallyRelated  {d : ℕ} (p q : Vector d) : Prop :=
+def causallyRelated {d : ℕ} (p q : Vector d) : Prop :=
   causallyFollows p q ∨ causallyFollows q p
 
 /-- Events p and q are causally unrelated (spacelike separated). -/
-def causallyUnrelated  {d : ℕ} (p q : Vector d) : Prop :=
+def causallyUnrelated {d : ℕ} (p q : Vector d) : Prop :=
   causalCharacter (p - q) = CausalCharacter.spaceLike
 
 /-- The causal diamond between events p and q, where p is assumed to causally precede q. -/
