@@ -123,6 +123,18 @@ lemma innerProduct_toCoord {d : ℕ} (p q : Vector d) :
     simp
   · simp
 
+@[simp]
+lemma innerProduct_zero_left {d : ℕ} (q : Vector d) :
+    ⟪0, q⟫ₘ = 0 := by
+  rw [innerProduct_toCoord]
+  simp [toCoord]
+
+@[simp]
+lemma innerProduct_zero_right {d : ℕ} (p : Vector d) :
+    ⟪p, 0⟫ₘ = 0 := by
+  rw [innerProduct_toCoord]
+  simp [toCoord]
+
 end Vector
 
 end Lorentz
