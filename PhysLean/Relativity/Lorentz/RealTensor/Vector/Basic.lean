@@ -163,6 +163,32 @@ lemma innerProduct_zero_right {d : ℕ} (p : Vector d) :
   rw [innerProduct_toCoord]
   simp [toCoord]
 
+@[simp]
+lemma innerProduct_invariant {d : ℕ} (p q : Vector d) (Λ : LorentzGroup d) :
+    ⟪((realLorentzTensor d).F.obj _).ρ Λ p, ((realLorentzTensor d).F.obj _).ρ Λ q⟫ₘ = ⟪p, q⟫ₘ := by
+  rw [innerProduct]
+  have h1 (q : Vector d) :
+    (tensorNode ((((realLorentzTensor d).F.obj (OverColor.mk ![Color.up])).ρ Λ) q)).tensor
+    = (action Λ (tensorNode q)).tensor := by simp [action_tensor]
+  rw [field]
+  rw [contr_tensor_eq <| prod_tensor_eq_snd <| h1 q]
+  rw [contr_tensor_eq <| prod_tensor_eq_fst
+    <| contr_tensor_eq <| prod_tensor_eq_snd <| h1 p]
+  have h2 : (tensorNode (realLorentzTensor.coMetric d)).tensor
+      = (action Λ (tensorNode (realLorentzTensor.coMetric d))).tensor := by
+    rw [action_coMetric]
+  rw [contr_tensor_eq <| prod_tensor_eq_fst
+    <| contr_tensor_eq <| prod_tensor_eq_fst <| h2]
+  rw [contr_tensor_eq <| prod_tensor_eq_fst <| contr_tensor_eq <|
+    prod_action _ _ _]
+  rw [contr_tensor_eq <| prod_tensor_eq_fst <| contr_action _ _]
+  rw [contr_tensor_eq <| prod_action _ _ _]
+  rw [contr_action _]
+  rw [← field]
+  simp only [Nat.succ_eq_add_one, Nat.reduceAdd, C_eq_color, Fin.isValue, Fin.succAbove_zero,
+    action_field]
+  rw [innerProduct]
+
 /-!
 
 ## Smoothness
