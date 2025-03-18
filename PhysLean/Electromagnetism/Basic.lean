@@ -41,7 +41,7 @@ noncomputable abbrev FieldStrength (d : ℕ := 3) :
       TensorTree.tensorNode_tensor, Fin.isValue]
     have h1 : (TensorTree.tensorNode (F1 x + F2 x)).tensor
       = (TensorTree.add (TensorTree.tensorNode (F1 x)) (TensorTree.tensorNode (F2 x))).tensor := by
-      simp
+      simp [add_tensor]
     rw [perm_tensor_eq <| neg_tensor_eq <| h1]
     rw [perm_tensor_eq <| (add_neg_neg _ _).symm]
     rw [perm_add]
@@ -66,8 +66,7 @@ noncomputable abbrev FieldStrength (d : ℕ := 3) :
 
 namespace FieldStrength
 
-
-lemma up_up_antisymmetric_iff_repr {d : ℕ} {F : ℝT[d, .up, .up]}
+lemma mem_of_repr {d : ℕ} {F : ℝT[d, .up, .up]}
     (h : ∀ i j, (((realLorentzTensor d).tensorBasis _).repr F) (fun | 0 => i | 1 => j) =
     - ((((realLorentzTensor d).tensorBasis _).repr F) (fun | 0 => j | 1 => i))) :
     {F | μ ν = - (F | ν μ)}ᵀ := by
@@ -95,6 +94,32 @@ lemma up_up_antisymmetric_iff_repr {d : ℕ} {F : ℝT[d, .up, .up]}
   rw [h2]
   exact h (b 0) (b 1)
 
+lemma repr_symm {d : ℕ} (F : FieldStrength d) (i j : Fin (1 + d))
+    (x : ℝT[d, .up])  :
+    ((realLorentzTensor d).tensorBasis _).repr (F.1 x) (fun | 0 => i | 1 => j)
+    = -  ((realLorentzTensor d).tensorBasis _).repr (F.1 x) (fun | 0 => j | 1 => i)  := by
+  obtain ⟨F, hF⟩ := F
+  simp at hF
+  simp only [Nat.succ_eq_add_one, Nat.reduceAdd, C_eq_color]
+  conv_lhs => rw [hF x]
+  rw [TensorTree.perm_tensorBasis_repr_apply]
+  rw [TensorTree.neg_tensorBasis_repr]
+  simp only [C_eq_color, TensorTree.tensorNode_tensor, OverColor.mk_hom, Fin.isValue,
+    OverColor.equivToHomEq_toEquiv, Finsupp.coe_neg, Pi.neg_apply, neg_inj]
+  congr
+  funext x
+  fin_cases x <;> rfl
+
+@[simp]
+lemma repr_diag_zero {d : ℕ} (F : FieldStrength d) (i : Fin (1 + d))
+    (x : ℝT[d, .up])  :
+    ((realLorentzTensor d).tensorBasis _).repr (F.1 x) (fun | 0 => i | 1 => i)
+    = 0 := by
+  have h1 := repr_symm F i i x
+  have hl (a : ℝ) (ha : a = -a) : a = 0 := by
+    exact CharZero.eq_neg_self_iff.mp ha
+  exact hl _ h1
+
 /-- The field strength from an electric field as an element of `ℝT[d, .up, .up]`. -/
 noncomputable def ofEletricFieldAux {d : ℕ} (E : ElectricField d) (x : ℝT[d, .up]) :
     ℝT[d, .up, .up] := ((realLorentzTensor d).tensorBasis _).repr.symm <|
@@ -115,7 +140,7 @@ noncomputable def ofElectricField {d : ℕ} :  ElectricField d →ₗ[ℝ] Field
     simp only [C_eq_color, Nat.reduceAdd,
       Fin.isValue, Set.mem_setOf_eq]
     intro x
-    apply up_up_antisymmetric_iff_repr
+    apply mem_of_repr
     intro i j
     simp [ofEletricFieldAux]
     match i, j with
@@ -182,7 +207,7 @@ noncomputable def ofMagneticField : MagneticField →ₗ[ℝ] FieldStrength wher
     refine ⟨fun x => ofMagneticFieldAux B x, fun x => ?_⟩
     simp only [C_eq_color, Nat.reduceAdd,
       Fin.isValue, Set.mem_setOf_eq]
-    apply up_up_antisymmetric_iff_repr
+    apply mem_of_repr
     intro i j
     simp [ofMagneticFieldAux]
     fin_cases i <;> fin_cases j <;> simp
@@ -236,7 +261,6 @@ noncomputable def electricField {d : ℕ} : FieldStrength d →ₗ[ℝ] Electric
     simp
     rfl
 
-
 @[simp]
 lemma electricField_ofElectricField {d : ℕ} (E : ElectricField d) :
     electricField (ofElectricField E) = E := by
@@ -275,7 +299,7 @@ lemma magneticField_ofMagneticField (B : MagneticField) :
     magneticField (ofMagneticField B) = B := by
   ext x j
   simp only [magneticField, ofMagneticField, ofMagneticFieldAux, C_eq_color,
-    TensorTree.tensorNode_tensor, Fin.isValue, Set.mem_setOf_eq, up_up_antisymmetric_iff_repr,
+    TensorTree.tensorNode_tensor, Fin.isValue, Set.mem_setOf_eq, mem_of_repr,
     Basis.repr_symm_apply, Basis.repr_linearCombination, Finsupp.equivFunOnFinite_symm_apply_toFun]
   fin_cases j <;> simp
   · rfl
@@ -304,12 +328,95 @@ lemma magneticField_ofElectricField (E : ElectricField) :
   funext x j
   fin_cases j <;> simp
 
+lemma eq_ofElectricField_add_ofMagneticField (F : FieldStrength) :  F =
+    ofElectricField (electricField F) + ofMagneticField (magneticField F) := by
+  simp only [C_eq_color, Nat.succ_eq_add_one, Nat.reduceAdd]
+  ext x
+  simp only [Submodule.coe_add, C_eq_color, Nat.succ_eq_add_one, Nat.reduceAdd, Pi.add_apply]
+  apply ((realLorentzTensor 3).tensorBasis _).repr.injective
+  apply Finsupp.equivFunOnFinite.injective
+  trans Finsupp.equivFunOnFinite
+    ((realLorentzTensor.tensorBasis ![Color.up, Color.up]).repr ((ofElectricField (electricField F)).1 x))
+    +  Finsupp.equivFunOnFinite
+    ((realLorentzTensor.tensorBasis ![Color.up, Color.up]).repr ((ofMagneticField (magneticField F)).1 x))
+  swap
+  · simp only [map_add]
+    rfl
+  simp [ofElectricField, ofMagneticField, ofMagneticFieldAux, ofEletricFieldAux]
+  funext b
+  simp
+  have h1 : ∃ i j, b = (fun | 0 => i | 1 => j) := by
+    use (b 0), (b 1)
+    funext x
+    fin_cases x <;> rfl
+  obtain ⟨i, j, rfl⟩ := h1
+  simp only [Fin.isValue]
+  match i, j with
+  | (1 : Fin 4), (2 : Fin 4) =>
+    simpa [magneticField] using repr_symm F 1 2 x
+  | (1 : Fin 4), (3 : Fin 4) =>
+    simp only [Fin.isValue, magneticField, C_eq_color, Nat.succ_eq_add_one, Nat.reduceAdd,
+      LinearMap.coe_mk, AddHom.coe_mk, zero_add]
+    rfl
+  | (2 : Fin 4), (3 : Fin 4) =>
+    simpa [magneticField] using repr_symm F 2 3 x
+  | (2 : Fin 4), (1 : Fin 4) =>
+    simp only [Fin.isValue, magneticField, C_eq_color, Nat.succ_eq_add_one, Nat.reduceAdd,
+      LinearMap.coe_mk, AddHom.coe_mk, zero_add]
+    rfl
+  | (3 : Fin 4), (1 : Fin 4) =>
+    simpa [magneticField] using repr_symm F 3 1 x
+  | (3 : Fin 4), (2 : Fin 4) =>
+    simp only [Fin.isValue, magneticField, C_eq_color, Nat.succ_eq_add_one, Nat.reduceAdd,
+      LinearMap.coe_mk, AddHom.coe_mk, zero_add]
+    rfl
+  | ⟨0, h0⟩, ⟨0, h0'⟩ =>
+    simpa using repr_diag_zero F 0 x
+  | ⟨1, h0⟩, ⟨1, h1⟩ =>
+    simpa using repr_diag_zero F 1 x
+  | ⟨2, h0⟩, ⟨2, h1⟩ =>
+    simpa using repr_diag_zero F 2 x
+  | ⟨3, h0⟩, ⟨3, h1⟩ =>
+    simpa using repr_diag_zero F 3 x
+  | ⟨0, h0⟩, ⟨1, h1⟩ =>
+    simpa [electricField] using repr_symm F 0 1 x
+  | ⟨0, h0⟩, ⟨2, h1⟩ =>
+    simpa [electricField] using repr_symm F 0 2 x
+  | ⟨0, h0⟩, ⟨3, h1⟩ =>
+    simpa [electricField] using repr_symm F 0 3 x
+  | ⟨1, h0⟩, ⟨0, h1⟩ =>
+    simp only [Fin.isValue, Matrix.cons_val_zero, repDim_up, Nat.reduceAdd, Fin.mk_one,
+      Matrix.cons_val_one, Matrix.head_cons, Fin.zero_eta, electricField, C_eq_color,
+      Nat.succ_eq_add_one, LinearMap.coe_mk, AddHom.coe_mk, Fin.val_zero, zero_add, add_zero]
+    rfl
+  | ⟨2, h0⟩, ⟨0, h1⟩ =>
+    simp only [Fin.isValue, Matrix.cons_val_zero, repDim_up, Nat.reduceAdd, Fin.reduceFinMk,
+      Matrix.cons_val_one, Matrix.head_cons, Fin.zero_eta, electricField, C_eq_color,
+      Nat.succ_eq_add_one, Fin.mk_one, LinearMap.coe_mk, AddHom.coe_mk, Fin.val_one, add_zero]
+    rfl
+  | ⟨3, h0⟩, ⟨0, h1⟩ =>
+    simp only [Fin.isValue, Matrix.cons_val_zero, repDim_up, Nat.reduceAdd, Fin.reduceFinMk,
+      Matrix.cons_val_one, Matrix.head_cons, Fin.zero_eta, electricField, C_eq_color,
+      Nat.succ_eq_add_one, LinearMap.coe_mk, AddHom.coe_mk, Fin.val_two, add_zero]
+    rfl
+
+/-- The isomorphism between the field strength and the electric and magnetic fields. -/
+noncomputable def toElectricMagneticField : FieldStrength ≃ₗ[ℝ] ElectricField × MagneticField where
+  toFun F := ⟨electricField F, magneticField F⟩
+  invFun EM := ofElectricField EM.1 + ofMagneticField EM.2
+  map_add' F1 F2 := by simp
+  map_smul' c F := by simp
+  left_inv F := Eq.symm (eq_ofElectricField_add_ofMagneticField F)
+  right_inv EM := by
+    simp
+    rw [magneticField_ofElectricField, electricField_ofMagneticField,
+      electricField_ofElectricField, magneticField_ofMagneticField]
+    simp
 
 TODO "Define the dual field strength."
 
 end FieldStrength
 
-TODO "Define isomorphism from `ElectricField d × MagneticField d` to `FieldStrength d`."
 
 TODO "Show that the isomorphism between `ElectricField d × MagneticField d` and
   `ElectricField d × MagneticField d` is equivariant with respect to the Lorentz group."
