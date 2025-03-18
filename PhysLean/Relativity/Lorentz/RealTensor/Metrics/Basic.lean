@@ -61,7 +61,7 @@ scoped[realLorentzTensor] notation "η" => @contrMetric
 
 /-- The definitional tensor node relation for `coMetric`. -/
 lemma tensorNode_coMetric {d : ℕ} : {η' d | μ ν}ᵀ.tensor =
-  (TensorTree.constTwoNodeE (realLorentzTensor d)
+    (TensorTree.constTwoNodeE (realLorentzTensor d)
     .down .down (Lorentz.preCoMetric d)).tensor := by
   rfl
 
@@ -98,7 +98,8 @@ lemma action_contrMetric (g : LorentzGroup d) : {g •ₐ η d | μ ν}ᵀ.tenso
 -/
 
 lemma coMetric_repr_apply_eq_minkowskiMatrix {d : ℕ}
-    (b : (j : Fin (Nat.succ 0).succ) → Fin ((realLorentzTensor d).repDim (![Color.down, Color.down] j))) :
+    (b : (j : Fin (Nat.succ 0).succ) →
+      Fin ((realLorentzTensor d).repDim (![Color.down, Color.down] j))) :
     ((realLorentzTensor d).tensorBasis _).repr (coMetric d) b =
     minkowskiMatrix (finSumFinEquiv.symm (b 0)) (finSumFinEquiv.symm (b 1)) := by
   simp [coMetric]
@@ -112,24 +113,26 @@ lemma coMetric_repr_apply_eq_minkowskiMatrix {d : ℕ}
     erw [TensorSpecies.pairIsoSep_tensorBasis_repr]
     change (((Lorentz.coBasisFin d).tensorProduct (Lorentz.coBasisFin d)).repr
         ((Lorentz.coBasis d) x ⊗ₜ[ℝ] (Lorentz.coBasis d) y)) (b 0, b 1)
-    simp  [Fin.isValue, Basis.tensorProduct_repr_tmul_apply, smul_eq_mul, Lorentz.coBasisFin]
+    simp [Fin.isValue, Basis.tensorProduct_repr_tmul_apply, smul_eq_mul, Lorentz.coBasisFin]
     rw [Finsupp.single_apply, Finsupp.single_apply]
   rw [Finset.sum_eq_single (finSumFinEquiv.symm (b 0))]
   · rw [Finset.sum_eq_single (finSumFinEquiv.symm (b 1))]
     · simp
     · intro y _ hy
-      simp
+      simp only [Fin.isValue, Equiv.apply_symm_apply, ↓reduceIte, mul_one, mul_ite, mul_zero,
+        ite_eq_right_iff]
       intro hy2
       rw [← hy2] at hy
       simp at hy
     · simp
   · intro y _ hy
-    simp
+    simp only [Fin.isValue, mul_ite, mul_one, mul_zero, Finset.sum_ite_irrel, Fintype.sum_sum_type,
+      Finset.univ_unique, Fin.default_eq_zero, finSumFinEquiv_apply_left, Finset.sum_singleton,
+      finSumFinEquiv_apply_right, Finset.sum_const_zero, ite_eq_right_iff]
     intro hy2
     rw [← hy2] at hy
     simp at hy
   · simp
-
 
 lemma contrMetric_repr_apply_eq_minkowskiMatrix {d : ℕ}
     (b : (j : Fin (Nat.succ 0).succ) → Fin ((realLorentzTensor d).repDim (![.up, .up] j))) :
@@ -146,19 +149,22 @@ lemma contrMetric_repr_apply_eq_minkowskiMatrix {d : ℕ}
     erw [TensorSpecies.pairIsoSep_tensorBasis_repr]
     change (((Lorentz.contrBasisFin d).tensorProduct (Lorentz.contrBasisFin d)).repr
       ((Lorentz.contrBasis d) x ⊗ₜ[ℝ] (Lorentz.contrBasis d) y)) (b 0, b 1)
-    simp  [Fin.isValue, Basis.tensorProduct_repr_tmul_apply, smul_eq_mul, Lorentz.contrBasisFin]
+    simp [Fin.isValue, Basis.tensorProduct_repr_tmul_apply, smul_eq_mul, Lorentz.contrBasisFin]
     rw [Finsupp.single_apply, Finsupp.single_apply]
   rw [Finset.sum_eq_single (finSumFinEquiv.symm (b 0))]
   · rw [Finset.sum_eq_single (finSumFinEquiv.symm (b 1))]
     · simp
     · intro y _ hy
-      simp
+      simp only [Fin.isValue, Equiv.apply_symm_apply, ↓reduceIte, mul_one, mul_ite, mul_zero,
+        ite_eq_right_iff]
       intro hy2
       rw [← hy2] at hy
       simp at hy
     · simp
   · intro y _ hy
-    simp
+    simp only [Fin.isValue, mul_ite, mul_one, mul_zero, Finset.sum_ite_irrel, Fintype.sum_sum_type,
+      Finset.univ_unique, Fin.default_eq_zero, finSumFinEquiv_apply_left, Finset.sum_singleton,
+      finSumFinEquiv_apply_right, Finset.sum_const_zero, ite_eq_right_iff]
     intro hy2
     rw [← hy2] at hy
     simp at hy
