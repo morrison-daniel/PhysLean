@@ -54,6 +54,47 @@ lemma causalCharacter_invariant {d : ℕ} (p : Vector d)
   simp only [causalCharacter, C_eq_color, Nat.succ_eq_add_one, Nat.reduceAdd]
   rw [innerProduct_invariant]
 
+lemma timeLike_iff_norm_sq_pos {d : ℕ} (p : Vector d) :
+    causalCharacter p = CausalCharacter.timeLike ↔ 0 < ⟪p, p⟫ₘ := by
+  simp only [causalCharacter]
+  split
+  · rename_i h
+    simp only [reduceCtorEq, h, lt_self_iff_false]
+  · split
+    · rename_i h
+      simp only [h]
+    · rename_i h
+      simp only [reduceCtorEq, false_iff, not_lt]
+      linarith
+
+lemma lightLike_iff_norm_sq_zero {d : ℕ} (p : Vector d) :
+    causalCharacter p = CausalCharacter.lightLike ↔ ⟪p, p⟫ₘ = 0 := by
+  simp only [causalCharacter]
+  split
+  · rename_i h
+    simp only [reduceCtorEq, h, eq_self_iff_true]
+  · rename_i h
+    simp [h]
+    split
+    · simp
+    · simp
+
+lemma spaceLike_iff_norm_sq_neg {d : ℕ} (p : Vector d) :
+    causalCharacter p = CausalCharacter.spaceLike ↔ ⟪p, p⟫ₘ < 0 := by
+  simp only [causalCharacter]
+  split
+  · rename_i h
+    simp only [reduceCtorEq, h, lt_self_iff_false]
+  · split
+    · rename_i h
+      simp only [reduceCtorEq, false_iff, not_lt]
+      exact le_of_lt h
+    · rename_i h1 h2
+      simp only [true_iff]
+      rw [not_lt_iff_eq_or_lt] at h2
+      rw [eq_comm] at h2
+      simp_all
+
 /-- The Lorentz vector `p` and `-p` have the same causalCharacter -/
 lemma neg_causalCharacter_eq_self {d : ℕ} (p : Vector d) :
     causalCharacter (-p) = causalCharacter p := by
