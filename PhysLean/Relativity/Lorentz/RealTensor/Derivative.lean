@@ -55,10 +55,10 @@ open TensorBasis in
 lemma derivative_repr {d n m : ℕ} {cm : Fin m → (realLorentzTensor d).C}
     {cn : Fin n → (realLorentzTensor d).C} (f : ℝT(d, cm) → ℝT(d, cn))
     (y : ℝT(d, cm))
-    (b :  (j : Fin (m + n)) →
+    (b : (j : Fin (m + n)) →
       Fin ((realLorentzTensor d).repDim (((cm ⊕ᵥ cn) ∘ ⇑finSumFinEquiv.symm) j)))
     (h1 : DifferentiableAt ℝ (mapToBasis f)
-      (Finsupp.equivFunOnFinite (((realLorentzTensor d).tensorBasis cm).repr y))):
+      (Finsupp.equivFunOnFinite (((realLorentzTensor d).tensorBasis cm).repr y))) :
     ((realLorentzTensor d).tensorBasis _).repr (∂ f y) b =
     fderiv ℝ (fun y => mapToBasis f y (prodEquiv b).2)
       (((realLorentzTensor d).tensorBasis cm).repr y)

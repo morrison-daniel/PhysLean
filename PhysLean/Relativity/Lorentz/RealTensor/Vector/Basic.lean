@@ -49,20 +49,19 @@ def indexEquiv {d : ℕ} :
   e.trans finSumFinEquiv.symm
 
 /-- The coordinates of a Lorentz vector as a linear map. -/
-def toCoord {d : ℕ} : Vector d ≃ₗ[ℝ] (Fin 1 ⊕ Fin d → ℝ) :=
-  Equiv.toLinearEquiv (
-    ((realLorentzTensor d).tensorBasis ![.up]).repr.toEquiv.trans <|
-    Finsupp.equivFunOnFinite.trans <|
-    (Equiv.piCongrLeft' _ indexEquiv))
-      {
-        map_add := fun x y => by
-          simp  [ Nat.succ_eq_add_one, Nat.reduceAdd, C_eq_color, map_add]
-          rfl
-        map_smul := fun c x => by
-          simp  [ Nat.succ_eq_add_one, Nat.reduceAdd, C_eq_color, _root_.map_smul,
-            RingHom.id_apply]
-          rfl
-      }
+def toCoord {d : ℕ} : Vector d ≃ₗ[ℝ] (Fin 1 ⊕ Fin d → ℝ) := Equiv.toLinearEquiv
+  (((realLorentzTensor d).tensorBasis ![.up]).repr.toEquiv.trans <|
+  Finsupp.equivFunOnFinite.trans <|
+  (Equiv.piCongrLeft' _ indexEquiv))
+    {
+      map_add := fun x y => by
+        simp [Nat.succ_eq_add_one, Nat.reduceAdd, C_eq_color, map_add]
+        rfl
+      map_smul := fun c x => by
+        simp [Nat.succ_eq_add_one, Nat.reduceAdd, C_eq_color, _root_.map_smul,
+          RingHom.id_apply]
+        rfl
+    }
 
 lemma toCoord_apply {d : ℕ} (p : Vector d) : toCoord p =
     (Equiv.piCongrLeft' _ indexEquiv <|
@@ -73,7 +72,6 @@ lemma toCoord_injective {d : ℕ} : Function.Injective (@toCoord d) := by
   exact toCoord.toEquiv.injective
 
 instance : CoeFun (Vector d) (fun _ => Fin 1 ⊕ Fin d → ℝ) := ⟨toCoord⟩
-
 
 lemma tensorNode_repr_apply {d : ℕ} (p : Vector d)
     (b : (j : Fin (Nat.succ 0)) → Fin ((realLorentzTensor d).repDim (![Color.up] j))) :
@@ -193,7 +191,6 @@ instance : FiniteDimensional ℝ (Vector d) := by
 
 section smoothness
 
-
 instance isNormedAddCommGroup (d : ℕ) : NormedAddCommGroup (Vector d) :=
   NormedAddCommGroup.induced ↑(Vector d).V (Fin 1 ⊕ Fin d → ℝ)
   (@toCoord d) (toCoord_injective)
@@ -215,25 +212,23 @@ lemma toCoord_fderiv {d : ℕ} (x : ↑(Vector d).V) :
 /-- The coordinates of a Lorentz vector as a linear map. -/
 def toCoordFull {d : ℕ} : Vector d ≃ₗ[ℝ]
     (((j : Fin (Nat.succ 0)) → Fin ((realLorentzTensor d).repDim (![Color.up] j))) →
-    ℝ)  :=
-  Equiv.toLinearEquiv (
-    ((realLorentzTensor d).tensorBasis ![.up]).repr.toEquiv.trans <|
-    Finsupp.equivFunOnFinite)
-      {
-        map_add := fun x y => by
-          simp  [ Nat.succ_eq_add_one, Nat.reduceAdd, C_eq_color, map_add]
-          rfl
-        map_smul := fun c x => by
-          simp  [ Nat.succ_eq_add_one, Nat.reduceAdd, C_eq_color, _root_.map_smul,
-            RingHom.id_apply]
-          rfl
-      }
+    ℝ) := Equiv.toLinearEquiv
+  (((realLorentzTensor d).tensorBasis ![.up]).repr.toEquiv.trans <|
+  Finsupp.equivFunOnFinite)
+    {
+      map_add := fun x y => by
+        simp [Nat.succ_eq_add_one, Nat.reduceAdd, C_eq_color, map_add]
+        rfl
+      map_smul := fun c x => by
+        simp [Nat.succ_eq_add_one, Nat.reduceAdd, C_eq_color, _root_.map_smul,
+          RingHom.id_apply]
+        rfl
+    }
 
 def fromCoordFullContinuous {d : ℕ} :
-   (((j : Fin (Nat.succ 0)) → Fin ((realLorentzTensor d).repDim (![Color.up] j))) → ℝ) ≃L[ℝ]
-   Vector d :=
+    (((j : Fin (Nat.succ 0)) → Fin ((realLorentzTensor d).repDim (![Color.up] j))) → ℝ) ≃L[ℝ]
+    Vector d :=
   LinearEquiv.toContinuousLinearEquiv toCoordFull.symm
-
 
 open Manifold
 open Matrix

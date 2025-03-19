@@ -58,9 +58,10 @@ lemma deriv_eq_deriv_on_coord {d : ℕ} (μ : Fin (1 + d)) (f : SpaceTime d → 
       (fun y => (f (((realLorentzTensor d).tensorBasis ![Color.up]).repr.symm
             (Finsupp.equivFunOnFinite.symm y))))
       ⇑(((realLorentzTensor d).tensorBasis ![Color.up]).repr y)
-    ⇑(Finsupp.single  (fun x => Fin.cast (by simp) μ) 1) := by
-  change _ =  fderiv ℝ (f ∘ Lorentz.Vector.fromCoordFullContinuous)  ⇑(((realLorentzTensor d).tensorBasis ![Color.up]).repr y)
-    ⇑(Finsupp.single  (fun x => Fin.cast (by simp) μ) 1)
+    ⇑(Finsupp.single (fun x => Fin.cast (by simp) μ) 1) := by
+  change _ = fderiv ℝ (f ∘ Lorentz.Vector.fromCoordFullContinuous)
+    ⇑(((realLorentzTensor d).tensorBasis ![Color.up]).repr y)
+    ⇑(Finsupp.single (fun x => Fin.cast (by simp) μ) 1)
   rw [ContinuousLinearEquiv.comp_right_fderiv]
   rw [deriv_eq]
   congr

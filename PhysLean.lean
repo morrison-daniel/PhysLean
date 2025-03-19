@@ -4,6 +4,8 @@ import PhysLean.ClassicalMechanics.HarmonicOscillator.Solution
 import PhysLean.CondensedMatter.Basic
 import PhysLean.Cosmology.Basic
 import PhysLean.Electromagnetism.Basic
+import PhysLean.Electromagnetism.FieldStrength.Basic
+import PhysLean.Electromagnetism.FieldStrength.Derivative
 import PhysLean.Mathematics.Fin
 import PhysLean.Mathematics.Fin.Involutions
 import PhysLean.Mathematics.LinearMaps
