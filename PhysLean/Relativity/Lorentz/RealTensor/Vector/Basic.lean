@@ -57,7 +57,7 @@ def toCoord {d : ℕ} : Vector d →ₗ[ℝ] (Fin 1 ⊕ Fin d → ℝ) where
     simp only [Nat.succ_eq_add_one, Nat.reduceAdd, C_eq_color, map_add]
     rfl
   map_smul' x y := by
-    simp only [ Nat.succ_eq_add_one, Nat.reduceAdd, C_eq_color, _root_.map_smul,
+    simp only [Nat.succ_eq_add_one, Nat.reduceAdd, C_eq_color, _root_.map_smul,
       RingHom.id_apply]
     rfl
 

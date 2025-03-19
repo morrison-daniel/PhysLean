@@ -23,8 +23,11 @@ open Vector
 
 /-- The twin paradox assuming instantaneous acceleration. -/
 structure InstantaneousTwinParadox where
+  /-- The starting point of both twins. -/
   startPoint : SpaceTime 3
+  /-- The end point of both twins. -/
   endPoint : SpaceTime 3
+  /-- The point twin B travels to between the start point and the end point. -/
   twinBMid : SpaceTime 3
   endPoint_causallyFollows_startPoint : causallyFollows startPoint endPoint
   twinBMid_causallyFollows_startPoint : causallyFollows startPoint twinBMid
@@ -40,7 +43,7 @@ def properTimeTwinA : ℝ := SpaceTime.properTime T.startPoint T.endPoint
 
 /-- The proper time experienced by twin B travelling at constant speed
   from `T.startPoint` to `T.twinBMid`, and then from `T.twinBMid`
-  to  `T.endPoint`. -/
+  to `T.endPoint`. -/
 def properTimeTwinB : ℝ := SpaceTime.properTime T.startPoint T.twinBMid +
   SpaceTime.properTime T.twinBMid T.endPoint
 
@@ -114,7 +117,6 @@ lemma example1_ageGap : example1.ageGap = 6 := by
   norm_num
 
 end InstantaneousTwinParadox
-
 
 end SpecialRelativity
 
