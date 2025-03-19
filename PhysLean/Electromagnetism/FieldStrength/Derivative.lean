@@ -3,11 +3,8 @@ Copyright (c) 2025 Joseph Tooby-Smith. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Joseph Tooby-Smith
 -/
-import PhysLean.Relativity.SpaceTime.Basic
-import PhysLean.Relativity.Lorentz.RealTensor.Derivative
-import PhysLean.Relativity.SpaceTime.Basic
-import PhysLean.Relativity.Lorentz.PauliMatrices.Basic
 import PhysLean.Electromagnetism.FieldStrength.Basic
+import PhysLean.Relativity.Lorentz.RealTensor.Derivative
 /-!
 
 # Derivative of the field strength tensor
@@ -53,12 +50,12 @@ lemma derivative_fromElectricMagneticField_repr_diag (EM : ElectricField × Magn
     (y : SpaceTime) (j : ℕ) (hj : j < 4) :
     (realLorentzTensor.tensorBasis _).repr (∂ (fromElectricMagneticField EM).1 y)
     (fun | 0 => μ | 1 => ⟨j, hj⟩ | 2 => ⟨j, hj⟩) = 0 := by
-  simp
+  simp only [Nat.succ_eq_add_one, Nat.reduceAdd, C_eq_color, Function.comp_apply, Fin.isValue]
   have h_diff : DifferentiableAt ℝ (mapToBasis (toElectricMagneticField.symm EM).1)
       (Finsupp.equivFunOnFinite ((realLorentzTensor.tensorBasis _).repr y)) := by
       exact hdiff (Finsupp.equivFunOnFinite ((realLorentzTensor.tensorBasis ![Color.up]).repr y))
   conv_lhs => erw [derivative_repr _ _ _ h_diff]
-  simp
+  simp only [Nat.succ_eq_add_one, Nat.reduceAdd, C_eq_color, Fin.isValue]
   rw [finsupp_single_prodEquiv, mapTobasis_prodEquiv]
   trans SpaceTime.deriv μ (fun y => 0) y
   rw [SpaceTime.deriv_eq_deriv_on_coord]
@@ -76,7 +73,7 @@ lemma derivative_fromElectricMagneticField_repr_diag (EM : ElectricField × Magn
     simp
   · simp
 
-lemma derivative_fromElectricMagneticField_repr_zero_rowv(EM : ElectricField × MagneticField)
+lemma derivative_fromElectricMagneticField_repr_zero_row (EM : ElectricField × MagneticField)
     (hdiff :Differentiable ℝ (mapToBasis (toElectricMagneticField.symm EM).1))
     (y : SpaceTime) (j : ℕ) (hj : j + 1 < 4) :
     (realLorentzTensor.tensorBasis _).repr (∂ (fromElectricMagneticField EM).1 y)

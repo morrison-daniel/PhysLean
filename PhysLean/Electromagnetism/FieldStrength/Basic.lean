@@ -3,10 +3,6 @@ Copyright (c) 2025 Joseph Tooby-Smith. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Joseph Tooby-Smith
 -/
-import PhysLean.Relativity.SpaceTime.Basic
-import PhysLean.Relativity.Lorentz.RealTensor.Derivative
-import PhysLean.Relativity.SpaceTime.Basic
-import PhysLean.Relativity.Lorentz.PauliMatrices.Basic
 import PhysLean.Electromagnetism.Basic
 /-!
 
@@ -445,7 +441,8 @@ lemma fromElectricMagneticField_repr (EM : ElectricField × MagneticField) (y : 
     AddMemClass.mk_add_mk, LinearEquiv.coe_symm_mk, Pi.add_apply, map_add,
     Basis.repr_linearCombination]
   ext b
-  simp
+  simp only [Nat.succ_eq_add_one, Nat.reduceAdd, Fin.isValue, Finsupp.coe_add,
+    Finsupp.coe_equivFunOnFinite_symm, Pi.add_apply, Finsupp.equivFunOnFinite_symm_apply_toFun]
   have hb : ∃ i j, b = (fun | 0 => i | 1 => j) := by
     use (b 0), (b 1)
     funext x

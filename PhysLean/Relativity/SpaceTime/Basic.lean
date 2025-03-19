@@ -39,6 +39,13 @@ def space (x : SpaceTime d) : EuclideanSpace ℝ (Fin d) :=
 
 open realLorentzTensor
 
+/-!
+
+## Derivatives
+
+-/
+
+/-- The derivative of a function `SpaceTime d → ℝ` along the `μ` coordinte. -/
 noncomputable def deriv {d : ℕ} (μ : Fin (1 + d)) (f : SpaceTime d → ℝ) : SpaceTime d → ℝ :=
   fun y => fderiv ℝ f y ((realLorentzTensor d).tensorBasis _ (fun x => Fin.cast (by simp) μ))
 
@@ -80,6 +87,11 @@ lemma neg_deriv_apply {d : ℕ} (μ : Fin (1 + d)) (f : SpaceTime d → ℝ) (y 
     - SpaceTime.deriv μ f y = SpaceTime.deriv μ (fun y => - f y) y:= by
   rw [← SpaceTime.neg_deriv]
   rfl
+
+/-- The gradiant of a function `SpaceTime d → EuclideanSpace (Fin d) ℝ`. -/
+noncomputable def spaceGrad {d : ℕ} (f : SpaceTime d → EuclideanSpace (Fin d) ℝ) :
+    SpaceTime d → ℝ :=
+  ∑ j, SpaceTime.deriv (finSumFinEquiv (Sum.inr j)) (fun y => f y j)
 
 end SpaceTime
 

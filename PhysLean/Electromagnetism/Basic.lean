@@ -4,9 +4,6 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Joseph Tooby-Smith
 -/
 import PhysLean.Relativity.SpaceTime.Basic
-import PhysLean.Relativity.Lorentz.RealTensor.Derivative
-import PhysLean.Relativity.SpaceTime.Basic
-import PhysLean.Relativity.Lorentz.PauliMatrices.Basic
 /-!
 
 # Electromagnetism

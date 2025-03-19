@@ -200,6 +200,7 @@ instance isNormedSpace (d : ℕ) :
     NormedSpace ℝ (Vector d) :=
   NormedSpace.induced ℝ (Vector d) (Fin 1 ⊕ Fin d → ℝ) (@toCoord d)
 
+/-- The `toCoord` map as a `ContinuousLinearEquiv`. -/
 def toCoordContinuous {d : ℕ} : Vector d ≃L[ℝ] (Fin 1 ⊕ Fin d → ℝ) :=
   LinearEquiv.toContinuousLinearEquiv toCoord
 
@@ -225,6 +226,7 @@ def toCoordFull {d : ℕ} : Vector d ≃ₗ[ℝ]
         rfl
     }
 
+/-- The `toCoordFull` map as a `ContinuousLinearEquiv`. -/
 def fromCoordFullContinuous {d : ℕ} :
     (((j : Fin (Nat.succ 0)) → Fin ((realLorentzTensor d).repDim (![Color.up] j))) → ℝ) ≃L[ℝ]
     Vector d :=

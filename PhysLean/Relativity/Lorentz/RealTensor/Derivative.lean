@@ -24,6 +24,7 @@ open TensorSpecies
 namespace realLorentzTensor
 open TensorBasis
 
+/-- The map between coordinates given a map ` ℝT(d, cm) → ℝT(d, cn)`. -/
 noncomputable def mapToBasis {d n m : ℕ} {cm : Fin m → (realLorentzTensor d).C}
     {cn : Fin n → (realLorentzTensor d).C} (f : ℝT(d, cm) → ℝT(d, cn)) :
     (((j : Fin m) → Fin ((realLorentzTensor d).repDim (cm j))) → ℝ) →
@@ -49,6 +50,7 @@ noncomputable def derivative {d n m : ℕ} {cm : Fin m → (realLorentzTensor d)
   /- The `(prodEquiv b).2` component of that derivative. -/
     (prodEquiv b).2
 
+@[inherit_doc realLorentzTensor.derivative]
 scoped[realLorentzTensor] notation "∂" => realLorentzTensor.derivative
 
 open TensorBasis in
