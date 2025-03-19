@@ -25,7 +25,7 @@ noncomputable def tensorOfInt {n : ℕ} {c : Fin n → S.C}
     (f : (Π j, Fin (S.repDim (c j))) → ℤ) :
     S.F.obj (OverColor.mk c) :=
   (S.tensorBasis c).repr.symm <|
-  (Finsupp.linearEquivFunOnFinite S.k S.k ((j : Fin n) → Fin (S.repDim (c j)))).symm <|
+  (Finsupp.linearEquivFunOnFinite k k ((j : Fin n) → Fin (S.repDim (c j)))).symm <|
   (fun j => Int.cast (f j))
 
 @[simp]

@@ -33,7 +33,7 @@ variable {k : Type} [CommRing k] {S : TensorSpecies k} {c : OverColor S.C}
 def ρ (g : S.G) (p : Pure S c) : Pure S c := fun i ↦ (S.FD.obj (Discrete.mk (c.hom i))).ρ g (p i)
 
 /-- The underlying tensor of a pure tensor. -/
-def tprod (p : Pure S c) : S.F.obj c := PiTensorProduct.tprod S.k p
+def tprod (p : Pure S c) : S.F.obj c := PiTensorProduct.tprod k p
 
 /-- The map `tprod` is equivariant with respect to the group action. -/
 lemma tprod_equivariant (g : S.G) (p : Pure S c) : (ρ g p).tprod = (S.F.obj c).ρ g p.tprod := by
@@ -44,7 +44,7 @@ lemma tprod_equivariant (g : S.G) (p : Pure S c) : (ρ g p).tprod = (S.F.obj c).
 
 end Pure
 
-/-- A tensor is pure if it is `⨂[S.k] i, p i` for some `p : Pure c`. -/
+/-- A tensor is pure if it is `⨂[k] i, p i` for some `p : Pure c`. -/
 def IsPure {c : OverColor S.C} (t : S.F.obj c) : Prop := ∃ p : Pure S c, t = p.tprod
 
 /-- As long as we are dealing with tensors with at least one index, then the zero
@@ -52,9 +52,9 @@ def IsPure {c : OverColor S.C} (t : S.F.obj c) : Prop := ∃ p : Pure S c, t = p
 lemma zero_isPure {c : OverColor S.C} [h : Nonempty c.left] : @IsPure _ _ S c 0 := by
   refine ⟨fun i => 0, ?_⟩
   simp only [Pure.tprod, Functor.id_obj]
-  change 0 = PiTensorProduct.tprodCoeff S.k 1 fun i => 0
+  change 0 = PiTensorProduct.tprodCoeff k 1 fun i => 0
   symm
-  apply PiTensorProduct.zero_tprodCoeff' (1 : S.k)
+  apply PiTensorProduct.zero_tprodCoeff' (1 : k)
   rfl
   exact (Classical.inhabited_of_nonempty h).default
 

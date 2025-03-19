@@ -103,7 +103,7 @@ lemma contrMap_swap : q.contrMap = q.swap.contrMap ≫ S.F.map q.contrSwapHom :=
     have h1' : ∀ {a a' b c b' c'} (haa' : a = a')
         (_ : b = (S.FD.map (Discrete.eqToHom (by rw [haa']))).hom b')
         (_ : c = (S.FD.map (Discrete.eqToHom (by rw [haa']))).hom c'),
-        (S.contr.app a).hom (b ⊗ₜ[S.k] c) = (S.contr.app a').hom (b' ⊗ₜ[S.k] c') := by
+        (S.contr.app a).hom (b ⊗ₜ[k] c) = (S.contr.app a').hom (b' ⊗ₜ[k] c') := by
       intro a a' b c b' c' haa' hbc hcc
       subst haa'
       simp_all
