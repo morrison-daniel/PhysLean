@@ -50,11 +50,11 @@ def indexEquiv {d : ℕ} :
 
 /-- The coordinates of a Lorentz vector as a linear map. -/
 def toCoord {d : ℕ} : Vector d →ₗ[ℝ] (Fin 1 ⊕ Fin d → ℝ) where
-  toFun p :=  Equiv.piCongrLeft' _ indexEquiv <|
+  toFun p := Equiv.piCongrLeft' _ indexEquiv <|
     Finsupp.equivFunOnFinite <|
     ((realLorentzTensor d).tensorBasis _).repr p
   map_add' x y := by
-    simp only [ Nat.succ_eq_add_one, Nat.reduceAdd, C_eq_color, map_add]
+    simp only [Nat.succ_eq_add_one, Nat.reduceAdd, C_eq_color, map_add]
     rfl
   map_smul' x y := by
     simp only [ Nat.succ_eq_add_one, Nat.reduceAdd, C_eq_color, _root_.map_smul,
@@ -74,13 +74,14 @@ lemma toCoord_injective {d : ℕ} : Function.Injective (@toCoord d) := by
 
 instance : CoeFun (Vector d) (fun _ => Fin 1 ⊕ Fin d → ℝ) := ⟨toCoord⟩
 
+/-- The element of `Vector d` from coordinates. -/
 def fromCoord {d : ℕ} (f : Fin 1 ⊕ Fin d → ℝ) : Vector d :=
   ((realLorentzTensor d).tensorBasis _).repr.symm <|
   Finsupp.equivFunOnFinite.symm <|
   (Equiv.piCongrLeft' _ indexEquiv).symm f
 
 @[simp]
-lemma toCoord_fromCoord  {d : ℕ} (f : Fin 1 ⊕ Fin d → ℝ) :
+lemma toCoord_fromCoord {d : ℕ} (f : Fin 1 ⊕ Fin d → ℝ) :
     toCoord (fromCoord f) = f := by
   simp only [toCoord_apply, Nat.succ_eq_add_one, Nat.reduceAdd, C_eq_color, fromCoord,
     Basis.repr_symm_apply, Basis.repr_linearCombination, Equiv.apply_symm_apply]
@@ -202,7 +203,7 @@ section smoothness
 
 instance isNormedAddCommGroup (d : ℕ) : NormedAddCommGroup (Vector d) :=
   NormedAddCommGroup.induced ↑(Vector d).V (Fin 1 ⊕ Fin d → ℝ)
-  (@toCoord d) (toCoord_injective )
+  (@toCoord d) (toCoord_injective)
 
 instance isNormedSpace (d : ℕ) :
     haveI := isNormedAddCommGroup d
