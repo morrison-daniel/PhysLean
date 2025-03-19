@@ -47,6 +47,12 @@ lemma deriv_eq {d : ℕ} (μ : Fin (1 + d)) (f : SpaceTime d → ℝ) (y : Space
     fderiv ℝ f y ((realLorentzTensor d).tensorBasis _ (fun x => Fin.cast (by simp) μ)) := by
   rfl
 
+@[simp]
+lemma deriv_zero {d : ℕ} (μ : Fin (1 + d)) : SpaceTime.deriv μ (fun _ => 0) = 0 := by
+  ext y
+  rw [SpaceTime.deriv_eq]
+  simp
+
 lemma deriv_eq_deriv_on_coord {d : ℕ} (μ : Fin (1 + d)) (f : SpaceTime d → ℝ) (y : SpaceTime d) :
     SpaceTime.deriv μ f y = fderiv ℝ
       (fun y => (f (((realLorentzTensor d).tensorBasis ![Color.up]).repr.symm
