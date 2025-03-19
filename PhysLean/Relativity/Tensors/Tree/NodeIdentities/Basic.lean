@@ -362,8 +362,8 @@ lemma action_id {n : ℕ} {c : Fin n → S.C} (t : TensorTree S c) :
 
 lemma action_zero {c : Fin 0 → S.C} (g : S.G) (t : TensorTree S c) :
     (action g t).tensor = t.tensor := by
-  simp [action_tensor, S.F_def]
-  simp [OverColor.lift, lift.obj']
+  simp only [S.F_def, OverColor.lift, lift.obj', LaxBraidedFunctor.of_toFunctor,
+    lift.objObj'_V_carrier, mk_left, mk_hom, action_tensor]
   erw [lift.objObj'_ρ_from_fin0]
   simp
 

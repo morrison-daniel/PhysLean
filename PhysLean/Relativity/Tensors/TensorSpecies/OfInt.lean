@@ -32,7 +32,7 @@ noncomputable def tensorOfInt {n : ℕ} {c : Fin n → S.C}
 lemma tensorOfInt_tensorBasis_repr_apply {n : ℕ} {c : Fin n → S.C}
     (f : (Π j, Fin (S.repDim (c j))) → ℤ) (b : Π j, Fin (S.repDim (c j))) :
   (S.tensorBasis c).repr (S.tensorOfInt f) b = Int.cast (f b) := by
-  simp [tensorOfInt]
+  simp only [tensorOfInt, Basis.repr_symm_apply, Basis.repr_linearCombination]
   rfl
 
 lemma tensorBasis_eq_ofInt {n : ℕ} {c : Fin n → S.C}

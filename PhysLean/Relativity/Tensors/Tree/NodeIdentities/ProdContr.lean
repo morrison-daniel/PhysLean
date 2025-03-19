@@ -59,7 +59,8 @@ lemma leftContrJ_succAbove_leftContrI : (q.leftContrI n1).succAbove (q.leftContr
   all_goals
     rename_i h1 h2
     rw [Fin.lt_def] at h1 h2
-    simp_all
+    simp_all only [Fin.coe_castSucc, Fin.coe_cast, Fin.coe_castAdd, not_lt, Fin.val_succ,
+      add_right_eq_self, one_ne_zero, not_true_eq_false]
   omega
 
 lemma succAbove_leftContrJ_leftContrI_castAdd (x : Fin n) :
@@ -70,7 +71,9 @@ lemma succAbove_leftContrJ_leftContrI_castAdd (x : Fin n) :
     RelIso.coe_fn_toEquiv, Fin.castOrderIso_apply, Fin.coe_cast, Fin.coe_castAdd]
   split_ifs <;> rename_i h1 h2 h3 h4
     <;> rw [Fin.lt_def] at h1 h2 h3 h4
-    <;> simp_all [leftContrEquivSucc]
+    <;> simp_all only [Fin.coe_castSucc, Fin.coe_castAdd, leftContrEquivSucc, Nat.succ_eq_add_one,
+      RelIso.coe_fn_toEquiv, Fin.castOrderIso_apply, Fin.coe_cast, not_true_eq_false,
+      not_lt, not_false_eq_true, Fin.val_succ]
     <;> omega
 
 lemma succAbove_leftContrJ_leftContrI_natAdd (x : Fin n1) :
@@ -81,7 +84,9 @@ lemma succAbove_leftContrJ_leftContrI_natAdd (x : Fin n1) :
     RelIso.coe_fn_toEquiv, Fin.castOrderIso_apply, Fin.coe_cast, Fin.coe_natAdd]
   split_ifs <;> rename_i h1 h2
     <;> rw [Fin.lt_def] at h1 h2
-    <;> simp_all [leftContrEquivSucc]
+    <;> simp_all only [Fin.coe_castSucc, Fin.coe_natAdd, leftContrEquivSucc,
+      RelIso.coe_fn_toEquiv, Fin.castOrderIso_apply, Fin.coe_cast, Fin.coe_castAdd,
+      Fin.val_succ]
     <;> omega
 
 /-- The pair of contraction indices obtained on moving a contraction in the LHS of a product
@@ -343,7 +348,8 @@ lemma succAbove_rightContrJ_rightContrI_castAdd (x : Fin n1) :
   simp only [Fin.succAbove, rightContrJ, Nat.succ_eq_add_one, rightContrI, Fin.coe_castAdd]
   split_ifs <;> rename_i h1 h2
     <;> rw [Fin.lt_def] at h1 h2
-    <;> simp_all
+    <;> simp_all only [Fin.coe_castSucc, Fin.coe_castAdd, Fin.coe_natAdd, not_lt, Fin.val_succ,
+      add_right_eq_self, one_ne_zero]
     <;> omega
 
 lemma succAbove_rightContrJ_rightContrI_natAdd (x : Fin n) :
@@ -353,7 +359,8 @@ lemma succAbove_rightContrJ_rightContrI_natAdd (x : Fin n) :
   simp only [Fin.succAbove, rightContrJ, Nat.succ_eq_add_one, rightContrI, Fin.coe_natAdd]
   split_ifs <;> rename_i h1 h2 h3 h4
     <;> rw [Fin.lt_def] at h1 h2 h3 h4
-    <;> simp_all
+    <;> simp_all only [Fin.coe_castSucc, Fin.coe_natAdd, add_lt_add_iff_left, Fin.val_succ,
+      not_true_eq_false]
     <;> omega
 
 /-- The new pair of indices obtained on moving a contraction in the RHS of a product

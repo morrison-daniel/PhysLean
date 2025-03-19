@@ -445,7 +445,10 @@ lemma pairIsoSep_tensorBasis_repr {c c1 : S.C}
   apply TensorProduct.induction_on
   · simp [P]
   · intro x y
-    simp [P]
+    simp only [Action.instMonoidalCategory_tensorObj_V, Nat.succ_eq_add_one, Nat.reduceAdd,
+      Fin.isValue, Equivalence.symm_inverse, Action.functorCategoryEquivalence_functor,
+      Action.FunctorCategoryEquivalence.functor_obj_obj, Basis.tensorProduct_repr_tmul_apply,
+      smul_eq_mul, P]
     conv_lhs =>
       left
       right
