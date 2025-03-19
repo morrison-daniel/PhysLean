@@ -21,7 +21,7 @@ open ComplexConjugate
 open Lorentz
 open Vector
 
-/-- The twin paradox assuming instantaneous accelration -/
+/-- The twin paradox assuming instantaneous acceleration. -/
 structure InstantaneousTwinParadox where
   startPoint : SpaceTime 3
   endPoint : SpaceTime 3
