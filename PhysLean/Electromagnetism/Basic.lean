@@ -125,7 +125,7 @@ lemma repr_diag_zero {d : ℕ} (F : FieldStrength d) (i : Fin (1 + d))
   exact hl _ h1
 
 /-- The field strength from an electric field as an element of `ℝT[d, .up, .up]`. -/
-noncomputable def ofEletricFieldAux {d : ℕ} (E : ElectricField d) (x : ℝT[d, .up]) :
+noncomputable def ofElectricFieldAux {d : ℕ} (E : ElectricField d) (x : ℝT[d, .up]) :
     ℝT[d, .up, .up] := ((realLorentzTensor d).tensorBasis _).repr.symm <|
       Finsupp.equivFunOnFinite.symm <| fun b =>
     match b 0, b 1 with
@@ -140,13 +140,13 @@ noncomputable def ofEletricFieldAux {d : ℕ} (E : ElectricField d) (x : ℝT[d,
 /-- The field strength from an eletric field. -/
 noncomputable def ofElectricField {d : ℕ} : ElectricField d →ₗ[ℝ] FieldStrength d where
   toFun E := by
-    refine ⟨fun x => ofEletricFieldAux E x, ?_⟩
+    refine ⟨fun x => ofElectricFieldAux E x, ?_⟩
     simp only [C_eq_color, Nat.reduceAdd,
       Fin.isValue, Set.mem_setOf_eq]
     intro x
     apply mem_of_repr
     intro i j
-    simp only [Nat.succ_eq_add_one, Nat.reduceAdd, C_eq_color, ofEletricFieldAux, Fin.isValue,
+    simp only [Nat.succ_eq_add_one, Nat.reduceAdd, C_eq_color, ofElectricFieldAux, Fin.isValue,
       Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons, Basis.repr_symm_apply,
       Basis.repr_linearCombination, Finsupp.equivFunOnFinite_symm_apply_toFun]
     match i, j with
@@ -163,13 +163,13 @@ noncomputable def ofElectricField {d : ℕ} : ElectricField d →ₗ[ℝ] FieldS
     apply ((realLorentzTensor d).tensorBasis _).repr.injective
     apply Finsupp.equivFunOnFinite.injective
     trans Finsupp.equivFunOnFinite (((realLorentzTensor d).tensorBasis ![Color.up, Color.up]).repr
-      (ofEletricFieldAux E1 x)) + Finsupp.equivFunOnFinite
+      (ofElectricFieldAux E1 x)) + Finsupp.equivFunOnFinite
       (((realLorentzTensor d).tensorBasis ![Color.up, Color.up]).repr
-      (ofEletricFieldAux E2 x))
+      (ofElectricFieldAux E2 x))
     swap
     · simp_all only [Nat.succ_eq_add_one, Nat.reduceAdd, C_eq_color, map_add]
       rfl
-    simp only [Nat.succ_eq_add_one, Nat.reduceAdd, C_eq_color, ofEletricFieldAux, Fin.isValue,
+    simp only [Nat.succ_eq_add_one, Nat.reduceAdd, C_eq_color, ofElectricFieldAux, Fin.isValue,
       Matrix.cons_val_zero, repDim_up, Matrix.cons_val_one, Matrix.head_cons, Pi.add_apply,
       PiLp.add_apply, neg_add_rev, Basis.repr_symm_apply, Basis.repr_linearCombination,
       Equiv.apply_symm_apply]
@@ -181,7 +181,7 @@ noncomputable def ofElectricField {d : ℕ} : ElectricField d →ₗ[ℝ] FieldS
     simp only [C_eq_color, Nat.succ_eq_add_one, Nat.reduceAdd, Pi.smul_apply]
     apply ((realLorentzTensor d).tensorBasis _).repr.injective
     apply Finsupp.equivFunOnFinite.injective
-    simp only [Nat.succ_eq_add_one, Nat.reduceAdd, C_eq_color, ofEletricFieldAux, Fin.isValue,
+    simp only [Nat.succ_eq_add_one, Nat.reduceAdd, C_eq_color, ofElectricFieldAux, Fin.isValue,
       Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons, Pi.smul_apply, PiLp.smul_apply,
       smul_eq_mul, Basis.repr_symm_apply, Basis.repr_linearCombination, Equiv.apply_symm_apply,
       RingHom.id_apply, SetLike.mk_smul_mk, map_smul]
@@ -279,7 +279,7 @@ lemma electricField_ofElectricField {d : ℕ} (E : ElectricField d) :
     electricField (ofElectricField E) = E := by
   ext x j
   simp only [C_eq_color, Nat.succ_eq_add_one, Nat.reduceAdd, electricField, Fin.isValue,
-    Matrix.cons_val_zero, repDim_up, ofElectricField, ofEletricFieldAux, Matrix.cons_val_one,
+    Matrix.cons_val_zero, repDim_up, ofElectricField, ofElectricFieldAux, Matrix.cons_val_one,
     Matrix.head_cons, Basis.repr_symm_apply, LinearMap.coe_mk, AddHom.coe_mk,
     Basis.repr_linearCombination, Finsupp.equivFunOnFinite_symm_apply_toFun]
   conv_lhs=>
@@ -333,7 +333,7 @@ lemma electricField_ofMagneticField (B : MagneticField) :
 lemma magneticField_ofElectricField (E : ElectricField) :
     magneticField (ofElectricField E) = 0 := by
   simp only [C_eq_color, Nat.succ_eq_add_one, Nat.reduceAdd, magneticField, Fin.isValue,
-    ofElectricField, ofEletricFieldAux, Matrix.cons_val_zero, repDim_up, Matrix.cons_val_one,
+    ofElectricField, ofElectricFieldAux, Matrix.cons_val_zero, repDim_up, Matrix.cons_val_one,
     Matrix.head_cons, Basis.repr_symm_apply, LinearMap.coe_mk, AddHom.coe_mk,
     Basis.repr_linearCombination, Finsupp.equivFunOnFinite_symm_apply_toFun, Fin.zero_eta,
     Fin.reduceEq, imp_false, IsEmpty.forall_iff, implies_true, imp_self, one_ne_zero, Fin.one_eq_mk,
@@ -357,7 +357,7 @@ lemma eq_ofElectricField_add_ofMagneticField (F : FieldStrength) : F =
   swap
   · simp only [map_add]
     rfl
-  simp only [Nat.succ_eq_add_one, Nat.reduceAdd, C_eq_color, ofElectricField, ofEletricFieldAux,
+  simp only [Nat.succ_eq_add_one, Nat.reduceAdd, C_eq_color, ofElectricField, ofElectricFieldAux,
     Fin.isValue, Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons, Basis.repr_symm_apply,
     LinearMap.coe_mk, AddHom.coe_mk, Basis.repr_linearCombination, Equiv.apply_symm_apply,
     ofMagneticField, ofMagneticFieldAux]
@@ -450,10 +450,10 @@ def derivative_toElectricMagneticField (EM : ElectricField × MagneticField) :
   simp only [ Nat.reduceAdd, C_eq_color, Function.comp_apply, Fin.isValue,
     Basis.repr_symm_apply, Basis.repr_linearCombination]
   ext b
-  have h1 :  DifferentiableAt (realLorentzTensor 3).k (mapToBasis (toElectricMagneticField.symm EM).1 )
-      (Finsupp.equivFunOnFinite (((realLorentzTensor 3).tensorBasis _).repr y)) := by sorry
-  conv_lhs => erw [derivative_repr _ _ _ h1]
-  have h0 : (Finsupp.single (TensorSpecies.TensorBasis.prodEquiv b).1 (1 : realLorentzTensor.k)) =
+  have h_diff : DifferentiableAt ℝ (mapToBasis (toElectricMagneticField.symm EM).1)
+      (Finsupp.equivFunOnFinite ((realLorentzTensor.tensorBasis _).repr y)) := by sorry
+  conv_lhs => erw [derivative_repr _ _ _ h_diff]
+  have h0 : (Finsupp.single (TensorSpecies.TensorBasis.prodEquiv b).1 (1 : ℝ)) =
     (Finsupp.single (fun | 0 => b 0) 1) := by
     congr
     funext x
@@ -466,7 +466,8 @@ def derivative_toElectricMagneticField (EM : ElectricField × MagneticField) :
     congr
     funext x
     fin_cases x
-    rfl
+    · rfl
+    · rfl
   rw [h0, h1]
   have hb : ∃ i j k, b = (fun | 0 => i | 1 => j | 2 => k) := by
     use (b 0), (b 1), (b 2)
@@ -475,27 +476,24 @@ def derivative_toElectricMagneticField (EM : ElectricField × MagneticField) :
   obtain ⟨i, j, k, rfl⟩ := hb
   simp
   match i, j, k with
-  | μ, 0, 1 =>
-    split
-    · rename_i a1 a2 a3 a5 a6 a7
-      conv_rhs => rw [SpaceTime.neg_deriv_apply]
-      rw [SpaceTime.deriv_eq_k]
-      have hk : realLorentzTensor.k = ℝ := by rfl
-      simp only [Fin.isValue, hk, Nat.succ_eq_add_one, Nat.reduceAdd, C_eq_color,
+  | μ, ⟨0, h⟩, ⟨1, h1⟩ =>
+    simp only [Nat.succ_eq_add_one, Nat.reduceAdd, Fin.isValue, Fin.zero_eta, Fin.mk_one]
+    · conv_rhs => rw [SpaceTime.neg_deriv_apply]
+      rw [SpaceTime.deriv_eq_deriv_on_coord]
+      simp only [Fin.isValue, Nat.succ_eq_add_one, Nat.reduceAdd, C_eq_color,
         ContinuousLinearMap.neg_apply]
       congr 1
       · simp only [Fin.isValue, Basis.repr_symm_apply]
         apply congrFun
         apply congrArg
-
-        sorry
-
-      · simp
+        ext y
+        simp [mapToBasis, toElectricMagneticField,
+          ofElectricField, ofElectricFieldAux, ofMagneticField, ofMagneticFieldAux]
+      · simp only [DFunLike.coe_fn_eq]
         congr
         funext x
         fin_cases x
         rfl
-    sorry
   | μ, _, _ => sorry
 
 end FieldStrength

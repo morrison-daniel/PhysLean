@@ -26,8 +26,8 @@ open TensorBasis
 
 noncomputable def mapToBasis {d n m : ℕ} {cm : Fin m → (realLorentzTensor d).C}
     {cn : Fin n → (realLorentzTensor d).C} (f : ℝT(d, cm) → ℝT(d, cn)) :
-    (((j : Fin m) → Fin ((realLorentzTensor d).repDim (cm j))) → (realLorentzTensor d).k) →
-    ((j : Fin n) → Fin ((realLorentzTensor d).repDim (cn j))) → (realLorentzTensor d).k :=
+    (((j : Fin m) → Fin ((realLorentzTensor d).repDim (cm j))) → ℝ) →
+    ((j : Fin n) → Fin ((realLorentzTensor d).repDim (cn j))) → ℝ :=
   Finsupp.equivFunOnFinite ∘ ((realLorentzTensor d).tensorBasis cn).repr.toEquiv.toFun ∘
   f ∘ ((realLorentzTensor d).tensorBasis cm).repr.symm.toEquiv.toFun
   ∘ Finsupp.equivFunOnFinite.symm
@@ -41,11 +41,11 @@ noncomputable def derivative {d n m : ℕ} {cm : Fin m → (realLorentzTensor d)
       Finsupp.equivFunOnFinite.symm <| fun b =>
   /- The `b` componenet of the derivative of `f` evaluated at `y` is: -/
   /- The derivative of `mapToBasis f` -/
-  fderiv (realLorentzTensor d).k (mapToBasis f)
+  fderiv ℝ (mapToBasis f)
   /- evaluated at the point `y` in `ℝT(d, cm)` -/
     (Finsupp.equivFunOnFinite (((realLorentzTensor d).tensorBasis cm).repr y))
   /- In the direction of `(prodEquiv b).1` -/
-    (Finsupp.single (prodEquiv b).1 (1 : (realLorentzTensor d).k))
+    (Finsupp.single (prodEquiv b).1 (1 : ℝ))
   /- The `(prodEquiv b).2` component of that derivative. -/
     (prodEquiv b).2
 
@@ -57,12 +57,12 @@ lemma derivative_repr {d n m : ℕ} {cm : Fin m → (realLorentzTensor d).C}
     (y : ℝT(d, cm))
     (b :  (j : Fin (m + n)) →
       Fin ((realLorentzTensor d).repDim (((cm ⊕ᵥ cn) ∘ ⇑finSumFinEquiv.symm) j)))
-    (h1 : DifferentiableAt (realLorentzTensor d).k (mapToBasis f)
+    (h1 : DifferentiableAt ℝ (mapToBasis f)
       (Finsupp.equivFunOnFinite (((realLorentzTensor d).tensorBasis cm).repr y))):
     ((realLorentzTensor d).tensorBasis _).repr (∂ f y) b =
-    fderiv (realLorentzTensor d).k (fun y => mapToBasis f y (prodEquiv b).2)
+    fderiv ℝ (fun y => mapToBasis f y (prodEquiv b).2)
       (((realLorentzTensor d).tensorBasis cm).repr y)
-      (Finsupp.single (prodEquiv b).1 (1 : (realLorentzTensor d).k)) := by
+      (Finsupp.single (prodEquiv b).1 (1 : ℝ)) := by
   simp [derivative]
   rw [fderiv_pi]
   · simp

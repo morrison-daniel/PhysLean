@@ -213,9 +213,9 @@ lemma toCoord_fderiv {d : ℕ} (x : ↑(Vector d).V) :
   rfl
 
 /-- The coordinates of a Lorentz vector as a linear map. -/
-def toCoordFull {d : ℕ} : Vector d ≃ₗ[(realLorentzTensor d).k]
+def toCoordFull {d : ℕ} : Vector d ≃ₗ[ℝ]
     (((j : Fin (Nat.succ 0)) → Fin ((realLorentzTensor d).repDim (![Color.up] j))) →
-    (realLorentzTensor d).k)  :=
+    ℝ)  :=
   Equiv.toLinearEquiv (
     ((realLorentzTensor d).tensorBasis ![.up]).repr.toEquiv.trans <|
     Finsupp.equivFunOnFinite)
@@ -229,14 +229,9 @@ def toCoordFull {d : ℕ} : Vector d ≃ₗ[(realLorentzTensor d).k]
           rfl
       }
 
-instance : CompleteSpace (realLorentzTensor d).k := inferInstanceAs (CompleteSpace ℝ)
-
-instance : ContinuousSMul (realLorentzTensor d).k ↑(Vector d).V  := inferInstanceAs (ContinuousSMul ℝ _)
-
 def fromCoordFullContinuous {d : ℕ} :
-   (((j : Fin (Nat.succ 0)) → Fin ((realLorentzTensor d).repDim (![Color.up] j))) →
-    (realLorentzTensor d).k) ≃L[(realLorentzTensor d).k]
-    Vector d :=
+   (((j : Fin (Nat.succ 0)) → Fin ((realLorentzTensor d).repDim (![Color.up] j))) → ℝ) ≃L[ℝ]
+   Vector d :=
   LinearEquiv.toContinuousLinearEquiv toCoordFull.symm
 
 
