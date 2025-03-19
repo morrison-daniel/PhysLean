@@ -114,7 +114,7 @@ lemma objObj'_ρ_from_fin0 (c : Fin 0 → C) (g : G) :
   apply congrArg
   apply congrArg
   funext i
-  simp at i
+  simp only [mk_left] at i
   exact Fin.elim0 i
 
 open TensorProduct in

@@ -196,12 +196,12 @@ section smoothness
 
 instance isNormedAddCommGroup (d : ℕ) : NormedAddCommGroup (Vector d) :=
   NormedAddCommGroup.induced ↑(Vector d).V (Fin 1 ⊕ Fin d → ℝ)
-  (@toCoordLinear d) (toCoordLinear_injective d)
+  (@toCoord d) (toCoord_injective)
 
 instance isNormedSpace (d : ℕ) :
     haveI := isNormedAddCommGroup d
     NormedSpace ℝ (Vector d) :=
-  NormedSpace.induced ℝ (Vector d) (Fin 1 ⊕ Fin d → ℝ) (@toCoordLinear d)
+  NormedSpace.induced ℝ (Vector d) (Fin 1 ⊕ Fin d → ℝ) (@toCoord d)
 
 def toCoordContinuous {d : ℕ} : Vector d ≃L[ℝ] (Fin 1 ⊕ Fin d → ℝ) :=
   LinearEquiv.toContinuousLinearEquiv toCoord

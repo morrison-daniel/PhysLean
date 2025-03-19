@@ -20,7 +20,7 @@ open OverColor
 open PhysLean.RatComplexNum
 open PhysLean
 
-variable (S : TensorSpecies)
+variable {k : Type} [CommRing k] (S : TensorSpecies k)
 
 /--A complex Lorentz tensor from a map
   `(Π j, Fin (complexLorentzTensor.repDim (c j))) → RatComplexNum`. All
@@ -29,7 +29,7 @@ variable (S : TensorSpecies)
 noncomputable def ofRat {n : ℕ} {c : Fin n → complexLorentzTensor.C}
     (f : (Π j, Fin (complexLorentzTensor.repDim (c j))) → RatComplexNum) : ℂT(c) :=
   (complexLorentzTensor.tensorBasis c).repr.symm <|
-  (Finsupp.linearEquivFunOnFinite complexLorentzTensor.k complexLorentzTensor.k
+  (Finsupp.linearEquivFunOnFinite ℂ ℂ
   ((j : Fin n) → Fin (complexLorentzTensor.repDim (c j)))).symm <|
   (fun j => toComplexNum (f j))
 
@@ -162,7 +162,7 @@ lemma contr_ofRat {n : ℕ} {c : Fin (n + 1 + 1) → complexLorentzTensor.C} {i 
 
 lemma smul_nat_ofRat {c : Fin n → complexLorentzTensor.C} (n : ℕ)
     (f1 : (Π j, Fin (complexLorentzTensor.repDim (c j))) → RatComplexNum) :
-    (TensorTree.smul n (tensorNode (ofRat f1))).tensor =
+    (TensorTree.smul (n : ℂ) (tensorNode (ofRat f1))).tensor =
     (tensorNode (ofRat (fun b => n * f1 b))).tensor := by
   apply (complexLorentzTensor.tensorBasis _).repr.injective
   ext b

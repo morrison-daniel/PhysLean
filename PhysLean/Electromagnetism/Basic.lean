@@ -34,7 +34,7 @@ abbrev VectorPotential (d : ℕ := 3) := SpaceTime d → ℝT[d, .up]
 open TensorTree in
 /-- The Field strength is a tensor `F^μ^ν` which is anti-symmetric.. -/
 noncomputable abbrev FieldStrength (d : ℕ := 3) :
-    Submodule (realLorentzTensor d).k (SpaceTime d → ℝT[d, .up, .up]) where
+    Submodule ℝ (ℝT[d, .up] → ℝT[d, .up, .up]) where
   carrier F := ∀ x, {F x | μ ν = - (F x| ν μ)}ᵀ
   add_mem' {F1 F2} hF1 hF2:= by
     intro x
@@ -102,7 +102,8 @@ lemma repr_symm {d : ℕ} (F : FieldStrength d) (i j : Fin (1 + d))
     ((realLorentzTensor d).tensorBasis _).repr (F.1 x) (fun | 0 => i | 1 => j)
     = - ((realLorentzTensor d).tensorBasis _).repr (F.1 x) (fun | 0 => j | 1 => i) := by
   obtain ⟨F, hF⟩ := F
-  simp at hF
+  simp only [C_eq_color, Nat.succ_eq_add_one, Nat.reduceAdd, Submodule.mem_mk,
+    TensorTree.tensorNode_tensor, Fin.isValue, AddSubmonoid.mem_mk, AddSubsemigroup.mem_mk] at hF
   simp only [Nat.succ_eq_add_one, Nat.reduceAdd, C_eq_color]
   conv_lhs => rw [hF x]
   rw [TensorTree.perm_tensorBasis_repr_apply]
@@ -145,7 +146,9 @@ noncomputable def ofElectricField {d : ℕ} : ElectricField d →ₗ[ℝ] FieldS
     intro x
     apply mem_of_repr
     intro i j
-    simp [ofEletricFieldAux]
+    simp only [Nat.succ_eq_add_one, Nat.reduceAdd, C_eq_color, ofEletricFieldAux, Fin.isValue,
+      Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons, Basis.repr_symm_apply,
+      Basis.repr_linearCombination, Finsupp.equivFunOnFinite_symm_apply_toFun]
     match i, j with
     | 0, 0 => simp
     | ⟨0, h0⟩, ⟨j + 1, hj⟩ =>
@@ -178,7 +181,10 @@ noncomputable def ofElectricField {d : ℕ} : ElectricField d →ₗ[ℝ] FieldS
     simp only [C_eq_color, Nat.succ_eq_add_one, Nat.reduceAdd, Pi.smul_apply]
     apply ((realLorentzTensor d).tensorBasis _).repr.injective
     apply Finsupp.equivFunOnFinite.injective
-    simp [ofEletricFieldAux]
+    simp only [Nat.succ_eq_add_one, Nat.reduceAdd, C_eq_color, ofEletricFieldAux, Fin.isValue,
+      Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons, Pi.smul_apply, PiLp.smul_apply,
+      smul_eq_mul, Basis.repr_symm_apply, Basis.repr_linearCombination, Equiv.apply_symm_apply,
+      RingHom.id_apply, SetLike.mk_smul_mk, map_smul]
     ext x_1 : 1
     simp only [Fin.isValue, Finsupp.equivFunOnFinite_apply, Finsupp.coe_smul,
       Finsupp.coe_equivFunOnFinite_symm, Pi.smul_apply, smul_eq_mul]
@@ -212,7 +218,9 @@ noncomputable def ofMagneticField : MagneticField →ₗ[ℝ] FieldStrength wher
       Fin.isValue, Set.mem_setOf_eq]
     apply mem_of_repr
     intro i j
-    simp [ofMagneticFieldAux]
+    simp only [Nat.succ_eq_add_one, Nat.reduceAdd, C_eq_color, ofMagneticFieldAux, Fin.isValue,
+      Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons, Basis.repr_symm_apply,
+      Basis.repr_linearCombination, Finsupp.equivFunOnFinite_symm_apply_toFun]
     fin_cases i <;> fin_cases j <;> simp
   map_add' B1 B2 := by
     ext x
@@ -258,10 +266,12 @@ noncomputable def electricField {d : ℕ} : FieldStrength d →ₗ[ℝ] Electric
   toFun F := fun x j =>
     ((realLorentzTensor d).tensorBasis _).repr (F.1 x) (fun | 0 => ⟨j + 1, by simp; omega⟩ | 1 => 0)
   map_add' F1 F2 := by
-    simp
+    simp only [C_eq_color, Nat.succ_eq_add_one, Nat.reduceAdd, Submodule.coe_add, Pi.add_apply,
+      map_add, Fin.isValue, Matrix.cons_val_zero, Finsupp.coe_add]
     rfl
   map_smul' c F := by
-    simp
+    simp only [C_eq_color, Nat.succ_eq_add_one, Nat.reduceAdd, SetLike.val_smul, Pi.smul_apply,
+      map_smul, Fin.isValue, Matrix.cons_val_zero, Finsupp.coe_smul, smul_eq_mul, RingHom.id_apply]
     rfl
 
 @[simp]
@@ -304,7 +314,7 @@ lemma magneticField_ofMagneticField (B : MagneticField) :
   simp only [magneticField, ofMagneticField, ofMagneticFieldAux, C_eq_color,
     TensorTree.tensorNode_tensor, Fin.isValue, Set.mem_setOf_eq, mem_of_repr,
     Basis.repr_symm_apply, Basis.repr_linearCombination, Finsupp.equivFunOnFinite_symm_apply_toFun]
-  fin_cases j <;> simp
+  fin_cases j <;> simp only [LinearMap.coe_mk, AddHom.coe_mk, Basis.repr_linearCombination]
   · rfl
   · rfl
   · rfl
@@ -347,7 +357,10 @@ lemma eq_ofElectricField_add_ofMagneticField (F : FieldStrength) : F =
   swap
   · simp only [map_add]
     rfl
-  simp [ofElectricField, ofMagneticField, ofMagneticFieldAux, ofEletricFieldAux]
+  simp only [Nat.succ_eq_add_one, Nat.reduceAdd, C_eq_color, ofElectricField, ofEletricFieldAux,
+    Fin.isValue, Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons, Basis.repr_symm_apply,
+    LinearMap.coe_mk, AddHom.coe_mk, Basis.repr_linearCombination, Equiv.apply_symm_apply,
+    ofMagneticField, ofMagneticFieldAux]
   funext b
   simp only [Finsupp.equivFunOnFinite_apply, Fin.isValue, Pi.add_apply]
   have h1 : ∃ i j, b = (fun | 0 => i | 1 => j) := by
