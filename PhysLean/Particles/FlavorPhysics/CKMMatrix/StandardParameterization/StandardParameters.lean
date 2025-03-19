@@ -91,7 +91,7 @@ lemma S₁₂_leq_one (V : Quotient CKMMatrixSetoid) : S₁₂ V ≤ 1 := by
   · have h3 : 0 < √(VudAbs V ^ 2 + VusAbs V ^ 2) := by
       have h2 := le_iff_eq_or_lt.mp (Real.sqrt_nonneg (VudAbs V ^ 2 + VusAbs V ^ 2))
       cases' h2 with h2 h2
-      simp_all
+      simp_all only [VudAbs, VusAbs, not_true_eq_false]
       exact h2
     left
     simp_all only [VudAbs, VusAbs, or_true, Real.sqrt_pos, true_and]
@@ -115,10 +115,10 @@ lemma S₂₃_leq_one (V : Quotient CKMMatrixSetoid) : S₂₃ V ≤ 1 := by
     · have h2 := le_iff_eq_or_lt.mp (Real.sqrt_nonneg (VudAbs V ^ 2 + VusAbs V ^ 2))
       have h3 : 0 < √(VudAbs V ^ 2 + VusAbs V ^ 2) := by
         cases' h2 with h2 h2
-        simp_all
+        simp_all only [VubAbs, VudAbs, VusAbs, not_true_eq_false]
         exact h2
       apply Or.inl
-      simp_all
+      simp_all only [VubAbs, VudAbs, VusAbs, or_true, Real.sqrt_pos, VcbAbs, true_and]
       rw [Real.le_sqrt (VAbs_ge_zero 1 2 V) (le_of_lt h3)]
       rw [VudAbs_sq_add_VusAbs_sq, ← VcbAbs_sq_add_VtbAbs_sq]
       simp only [Fin.isValue, VcbAbs, VtbAbs, le_add_iff_nonneg_right]

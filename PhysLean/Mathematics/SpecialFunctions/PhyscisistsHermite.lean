@@ -240,7 +240,10 @@ lemma deriv_gaussian_eq_physHermite_mul_gaussian (n : ℕ) (x : ℝ) :
   · replace ih : deriv^[n] _ = _ := _root_.funext ih
     have deriv_gaussian :
       deriv (fun y => Real.exp (-(y ^ 2))) x = -2 * x * Real.exp (-(x ^ 2)) := by
-      rw [deriv_exp (by simp)]; simp; ring
+      rw [deriv_exp (by simp)]
+      simp only [deriv.neg', differentiableAt_id', deriv_pow'', cast_ofNat, Nat.add_one_sub_one,
+        pow_one, deriv_id'', mul_one, mul_neg, neg_mul, neg_inj]
+      ring
     rw [Function.iterate_succ_apply', ih, deriv_const_mul_field, deriv_mul, pow_succ (-1 : ℝ),
       deriv_gaussian, physHermite_succ]
     · rw [derivative_physHermite,]
@@ -297,7 +300,7 @@ lemma guassian_integrable_polynomial_cons {b c : ℝ} (hb : 0 < b) (P : Polynomi
   have h2 : (fun a => P.coeff i • (c * a) ^ i * Real.exp (-b * a ^ 2)) =
       (c ^ i * P.coeff i : ℝ) • (fun x => (x ^ (i : ℝ) * Real.exp (-b * x ^ 2))) := by
     funext x
-    simp [mul_assoc]
+    simp only [zsmul_eq_mul, neg_mul, mul_assoc, Real.rpow_natCast, Pi.smul_apply, smul_eq_mul]
     ring
   refine h2 ▸ MeasureTheory.Integrable.smul (c ^ i * P.coeff i : ℝ) ?_
   apply integrable_rpow_mul_exp_neg_mul_sq (s := i)
@@ -346,7 +349,7 @@ lemma integral_physHermite_mul_physHermite_eq_integral_deriv_exp (n m : ℕ) :
       rw [physHermite_eq_deriv_gaussian']
     rw [mul_assoc, mul_assoc, ← Real.exp_add, add_neg_cancel, Real.exp_zero, mul_one]
     ring
-  simp [h1]
+  simp only [h1]
   exact MeasureTheory.integral_mul_left ((-1) ^ m) fun a =>
       physHermite n a * deriv^[m] (fun x => Real.exp (-x ^ 2)) a
 
@@ -530,7 +533,7 @@ lemma cos_mem_physHermite_span_topologicalClosure (c : ℝ) :
   change (fun (x : ℝ) => Real.cos (c * x)) ∈
     closure (Submodule.span ℝ (Set.range (fun n => (physHermite n : ℝ → ℝ))))
   have h1 := Real.hasSum_cos
-  simp [HasSum] at h1
+  simp only [HasSum] at h1
   have h1 : Filter.Tendsto
       (fun s => fun y => ∑ x ∈ s, (-1) ^ x * (c * y) ^ (2 * x) / ((2 * x)! : ℝ))
     Filter.atTop (nhds (fun x => Real.cos (c * x))) := by
