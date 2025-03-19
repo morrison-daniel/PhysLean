@@ -68,9 +68,7 @@ lemma toCoord_apply {d : ℕ} (p : Vector d) : toCoord p =
 
 lemma toCoord_injective {d : ℕ} : Function.Injective (@toCoord d) := by
   intros x y h
-  simp [toCoord] at h
-  erw [Equiv.apply_eq_iff_eq] at h
-  simpa using h
+  simpa [toCoord] using h
 
 instance : CoeFun (Vector d) (fun _ => Fin 1 ⊕ Fin d → ℝ) := ⟨toCoord⟩
 

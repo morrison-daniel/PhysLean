@@ -19,7 +19,7 @@ noncomputable section
 
 namespace TensorSpecies
 open TensorTree
-variable (S : TensorSpecies)
+variable {k : Type} [CommRing k] (S : TensorSpecies k)
 
 /-- The morphism from `S.FD.obj (Discrete.mk c)` to `S.FD.obj (Discrete.mk (S.τ c))`
   defined by contracting with the metric. -/

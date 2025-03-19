@@ -34,19 +34,17 @@ noncomputable def derivative {d n m : ℕ} {cm : Fin m → (realLorentzTensor d)
       f ∘ ((realLorentzTensor d).tensorBasis cm).repr.symm.toEquiv.toFun
       ∘ Finsupp.equivFunOnFinite.symm
   let df' :=
-    haveI : NontriviallyNormedField (realLorentzTensor d).k :=
-      inferInstanceAs (NontriviallyNormedField ℝ)
-    @fderiv (realLorentzTensor d).k _
-    (((j : Fin m) → Fin ((realLorentzTensor d).repDim (cm j))) → (realLorentzTensor d).k)
-    _ _ _ (((j : Fin n) → Fin ((realLorentzTensor d).repDim (cn j))) → (realLorentzTensor d).k)
+    @fderiv ℝ _
+    (((j : Fin m) → Fin ((realLorentzTensor d).repDim (cm j))) → ℝ)
+    _ _ _ (((j : Fin n) → Fin ((realLorentzTensor d).repDim (cn j))) → ℝ)
     _ _ _ f'
   let df := (df' ∘ Finsupp.equivFunOnFinite ∘
     ((realLorentzTensor d).tensorBasis cm).repr.toEquiv.toFun) y
   let g1 : ((j : Fin m) → Fin ((realLorentzTensor d).repDim (cm j))) :=
     fun j => Fin.cast (by simp) (g (finSumFinEquiv (Sum.inl j)))
   let g1Fun : ((j : Fin m) → Fin ((realLorentzTensor d).repDim (cm j))) →
-    (realLorentzTensor d).k := Finsupp.equivFunOnFinite
-    (Finsupp.single g1 (1 : (realLorentzTensor d).k))
+    ℝ := Finsupp.equivFunOnFinite
+    (Finsupp.single g1 (1 : ℝ))
   df g1Fun fun j => Fin.cast (by simp) (g (finSumFinEquiv (Sum.inr j)))
 
 end realLorentzTensor

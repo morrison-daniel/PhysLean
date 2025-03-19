@@ -33,7 +33,7 @@ abbrev VectorPotential (d : ℕ := 3) := ℝT[d, .up] → ℝT[d, .up]
 open TensorTree in
 /-- The Field strength is a tensor `F^μ^ν` which is anti-symmetric.. -/
 noncomputable abbrev FieldStrength (d : ℕ := 3) :
-    Submodule (realLorentzTensor d).k (ℝT[d, .up] → ℝT[d, .up, .up]) where
+    Submodule ℝ (ℝT[d, .up] → ℝT[d, .up, .up]) where
   carrier F := ∀ x, {F x | μ ν = - (F x| ν μ)}ᵀ
   add_mem' {F1 F2} hF1 hF2:= by
     intro x

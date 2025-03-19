@@ -18,7 +18,7 @@ open PhysLean.Fin
 
 namespace TensorTree
 
-variable {S : TensorSpecies}
+variable {k : Type} [CommRing k] {S : TensorSpecies k}
 
 namespace ContrPair
 variable {n n1 : ℕ} {c : Fin n.succ.succ → S.C} {c1 : Fin n1 → S.C} (q : ContrPair c)
@@ -193,13 +193,13 @@ lemma contrMap_prod_tprod (p : (i : (𝟭 Type).obj (OverColor.mk c).left) →
     (S.F.map (equivToIso finSumFinEquiv).hom).hom
     ((Functor.LaxMonoidal.μ S.F
     (OverColor.mk (c ∘ q.i.succAbove ∘ q.j.succAbove)) (OverColor.mk c1)).hom
-    ((q.contrMap.hom (PiTensorProduct.tprod S.k p)) ⊗ₜ[S.k] (PiTensorProduct.tprod S.k) q'))
+    ((q.contrMap.hom (PiTensorProduct.tprod k p)) ⊗ₜ[k] (PiTensorProduct.tprod k) q'))
     = (S.F.map (mkIso (by exact leftContr_map_eq q)).hom).hom
     (q.leftContr.contrMap.hom
     ((S.F.map (equivToIso (@leftContrEquivSuccSucc n n1)).hom).hom
     ((S.F.map (equivToIso finSumFinEquiv).hom).hom
     ((Functor.LaxMonoidal.μ S.F (OverColor.mk c) (OverColor.mk c1)).hom
-    ((PiTensorProduct.tprod S.k) p ⊗ₜ[S.k] (PiTensorProduct.tprod S.k) q'))))) := by
+    ((PiTensorProduct.tprod k) p ⊗ₜ[k] (PiTensorProduct.tprod k) q'))))) := by
   conv_lhs => rw [contrMap, TensorSpecies.contrMap_tprod]
   simp only [TensorSpecies.F_def]
   conv_rhs => rw [lift.obj_μ_tprod_tmul]
@@ -209,16 +209,16 @@ lemma contrMap_prod_tprod (p : (i : (𝟭 Type).obj (OverColor.mk c).left) →
     (q.leftContr.contrMap.hom
       (((lift.obj S.FD).map (equivToIso leftContrEquivSuccSucc).hom).hom
         (((lift.obj S.FD).map (equivToIso finSumFinEquiv).hom).hom
-          ((PiTensorProduct.tprod S.k) _))))
+          ((PiTensorProduct.tprod k) _))))
   conv_rhs => rw [lift.map_tprod]
   change _ = ((lift.obj S.FD).map (mkIso _).hom).hom
     (q.leftContr.contrMap.hom
     (((lift.obj S.FD).map (equivToIso leftContrEquivSuccSucc).hom).hom
-    (((PiTensorProduct.tprod S.k) _))))
+    (((PiTensorProduct.tprod k) _))))
   conv_rhs => rw [lift.map_tprod]
   change _ = ((lift.obj S.FD).map (mkIso _).hom).hom
     (q.leftContr.contrMap.hom
-      ((PiTensorProduct.tprod S.k) _))
+      ((PiTensorProduct.tprod k) _))
   conv_rhs => rw [contrMap, TensorSpecies.contrMap_tprod]
   simp only [TensorProduct.smul_tmul, TensorProduct.tmul_smul, map_smul]
   congr 1
@@ -233,7 +233,7 @@ lemma contrMap_prod_tprod (p : (i : (𝟭 Type).obj (OverColor.mk c).left) →
     have h1' : ∀ {a a' b c b' c'} (haa' : a = a')
         (_ : b = (S.FD.map (Discrete.eqToHom (by rw [haa']))).hom b')
         (_ : c = (S.FD.map (Discrete.eqToHom (by rw [haa']))).hom c'),
-        (S.contr.app a).hom (b ⊗ₜ[S.k] c) = (S.contr.app a').hom (b' ⊗ₜ[S.k] c') := by
+        (S.contr.app a).hom (b ⊗ₜ[k] c) = (S.contr.app a').hom (b' ⊗ₜ[k] c') := by
       intro a a' b c b' c' haa' hbc hcc
       subst haa'
       simp_all
@@ -300,7 +300,7 @@ lemma contr_prod
   simp only [contr_tensor, perm_tensor, prod_tensor]
   change ((q.contrMap ▷ S.F.obj (OverColor.mk c1)) ≫
     (Functor.LaxMonoidal.μ S.F _ ((OverColor.mk c1))) ≫
-    S.F.map (OverColor.equivToIso finSumFinEquiv).hom).hom (t.tensor ⊗ₜ[S.k] t1.tensor) = _
+    S.F.map (OverColor.equivToIso finSumFinEquiv).hom).hom (t.tensor ⊗ₜ[k] t1.tensor) = _
   rw [contrMap_prod]
   simp only [Nat.succ_eq_add_one, Functor.id_obj, mk_hom, Action.instMonoidalCategory_tensorObj_V,
     Functor.const_obj_obj, Equiv.toFun_as_coe, Action.comp_hom, Equivalence.symm_inverse,
@@ -420,12 +420,12 @@ lemma prod_contrMap_tprod (p : (i : (𝟭 Type).obj (OverColor.mk c1).left) →
     (S.F.map (equivToIso finSumFinEquiv).hom).hom
     ((Functor.LaxMonoidal.μ S.F (OverColor.mk c1)
     (OverColor.mk (c ∘ q.i.succAbove ∘ q.j.succAbove))).hom
-    ((PiTensorProduct.tprod S.k) p ⊗ₜ[S.k] (q.contrMap.hom (PiTensorProduct.tprod S.k q')))) =
+    ((PiTensorProduct.tprod k) p ⊗ₜ[k] (q.contrMap.hom (PiTensorProduct.tprod k q')))) =
     (S.F.map (mkIso (by exact (rightContr_map_eq q))).hom).hom
     (q.rightContr.contrMap.hom
     (((S.F.map (equivToIso finSumFinEquiv).hom).hom
     ((Functor.LaxMonoidal.μ S.F (OverColor.mk c1) (OverColor.mk c)).hom
-    ((PiTensorProduct.tprod S.k) p ⊗ₜ[S.k] (PiTensorProduct.tprod S.k) q'))))) := by
+    ((PiTensorProduct.tprod k) p ⊗ₜ[k] (PiTensorProduct.tprod k) q'))))) := by
   conv_lhs => rw [contrMap, TensorSpecies.contrMap_tprod]
   simp only [TensorSpecies.F_def]
   conv_rhs => rw [lift.obj_μ_tprod_tmul]
@@ -454,7 +454,7 @@ lemma prod_contrMap_tprod (p : (i : (𝟭 Type).obj (OverColor.mk c1).left) →
     have h1' : ∀ {a a' b c b' c'} (haa' : a = a')
         (_ : b = (S.FD.map (Discrete.eqToHom (by rw [haa']))).hom b')
         (_ : c = (S.FD.map (Discrete.eqToHom (by rw [haa']))).hom c'),
-        (S.contr.app a).hom (b ⊗ₜ[S.k] c) = (S.contr.app a').hom (b' ⊗ₜ[S.k] c') := by
+        (S.contr.app a).hom (b ⊗ₜ[k] c) = (S.contr.app a').hom (b' ⊗ₜ[k] c') := by
       intro a a' b c b' c' haa' hbc hcc
       subst haa'
       simp_all
@@ -556,7 +556,7 @@ lemma prod_contr (t1 : TensorTree S c1) (t : TensorTree S c) :
   simp only [contr_tensor, perm_tensor, prod_tensor]
   change ((S.F.obj (OverColor.mk c1) ◁ q.contrMap) ≫
     (Functor.LaxMonoidal.μ S.F ((OverColor.mk c1)) _) ≫
-    S.F.map (OverColor.equivToIso finSumFinEquiv).hom).hom (t1.tensor ⊗ₜ[S.k] t.tensor) = _
+    S.F.map (OverColor.equivToIso finSumFinEquiv).hom).hom (t1.tensor ⊗ₜ[k] t.tensor) = _
   rw [prod_contrMap]
   simp only [Nat.succ_eq_add_one, Functor.id_obj, mk_hom, Action.instMonoidalCategory_tensorObj_V,
     Functor.const_obj_obj, Equiv.toFun_as_coe, Action.comp_hom, Equivalence.symm_inverse,

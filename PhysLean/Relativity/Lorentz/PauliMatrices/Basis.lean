@@ -118,7 +118,7 @@ lemma pauliContr_ofRat : pauliContr = ofRat (fun b =>
     head_cons]
   repeat rw [tensorBasis_eq_ofRat]
   simp [Nat.succ_eq_add_one, Nat.reduceAdd, map_sub, Finsupp.coe_sub, Pi.sub_apply,
-    ofRat_tensorBasis_repr_apply, k_instSub, Fin.isValue, cons_val_zero, cons_val_one, head_cons]
+    ofRat_tensorBasis_repr_apply, Fin.isValue, cons_val_zero, cons_val_one, head_cons]
   simp only [Fin.isValue, ← map_add, ← map_sub]
   apply (Function.Injective.eq_iff PhysLean.RatComplexNum.toComplexNum_injective).mpr
   revert b
