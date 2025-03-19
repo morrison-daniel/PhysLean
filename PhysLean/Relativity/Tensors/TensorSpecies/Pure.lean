@@ -20,14 +20,14 @@ open MonoidalCategory
 noncomputable section
 
 namespace TensorSpecies
-variable (S : TensorSpecies)
+variable {k : Type} [CommRing k] (S : TensorSpecies k)
 
 /-- The type of tensors specified by a map to colors `c : OverColor S.C`. -/
 def Pure (c : OverColor S.C) : Type := (i : c.left) → S.FD.obj (Discrete.mk (c.hom i))
 
 namespace Pure
 
-variable {S : TensorSpecies} {c : OverColor S.C}
+variable {k : Type} [CommRing k] {S : TensorSpecies k} {c : OverColor S.C}
 
 /-- The group action on a pure tensor. -/
 def ρ (g : S.G) (p : Pure S c) : Pure S c := fun i ↦ (S.FD.obj (Discrete.mk (c.hom i))).ρ g (p i)
@@ -49,7 +49,7 @@ def IsPure {c : OverColor S.C} (t : S.F.obj c) : Prop := ∃ p : Pure S c, t = p
 
 /-- As long as we are dealing with tensors with at least one index, then the zero
   tensor is pure. -/
-lemma zero_isPure {c : OverColor S.C} [h : Nonempty c.left] : @IsPure S c 0 := by
+lemma zero_isPure {c : OverColor S.C} [h : Nonempty c.left] : @IsPure _ _ S c 0 := by
   refine ⟨fun i => 0, ?_⟩
   simp only [Pure.tprod, Functor.id_obj]
   change 0 = PiTensorProduct.tprodCoeff S.k 1 fun i => 0

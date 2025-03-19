@@ -17,7 +17,7 @@ open MonoidalCategory
 namespace TensorSpecies
 open OverColor
 
-variable (S : TensorSpecies)
+variable {k : Type} [CommRing k] (S : TensorSpecies k)
 
 /-- A tensor from a `(Π j, Fin (S.repDim (c j))) → ℤ`. All tensors
   which have integer coefficents with respect to `tensorBasis` are of this form. -/

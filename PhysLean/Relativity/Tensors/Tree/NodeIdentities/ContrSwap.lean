@@ -20,7 +20,7 @@ open PhysLean.Fin
 
 namespace TensorTree
 
-variable {S : TensorSpecies}
+variable {k : Type} [CommRing k] {S : TensorSpecies k}
 
 namespace ContrPair
 variable {n : ℕ} {c : Fin n.succ.succ → S.C} (q : ContrPair c)

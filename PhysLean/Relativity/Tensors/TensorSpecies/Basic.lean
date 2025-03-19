@@ -23,12 +23,7 @@ open MonoidalCategory
 /-- The structure `TensorSpecies` contains the necessary structure needed to define
   a system of tensors with index notation. Examples of `TensorSpecies` include real Lorentz tensors,
   complex Lorentz tensors, and ordinary Euclidean tensors. -/
-structure TensorSpecies where
-  /-- The commutative ring over which we want to consider the tensors to live in,
-    usually `ℝ` or `ℂ`. -/
-  k : Type
-  /-- An instance of `k` as a commutative ring. -/
-  k_commRing : CommRing k
+structure TensorSpecies (k : Type) [CommRing k] where
   /-- The symmetry group acting on these tensor e.g. the Lorentz group or SL(2,ℂ). -/
   G : Type
   /-- An instance of `G` as a group. -/
@@ -92,10 +87,9 @@ noncomputable section
 namespace TensorSpecies
 open OverColor
 
-variable (S : TensorSpecies)
+abbrev k {k' : Type} [CommRing k'] (_ : TensorSpecies k') := k'
 
-/-- The field `k` of a `TensorSpecies` has the instance of a commutative ring. -/
-instance : CommRing S.k := S.k_commRing
+variable {k : Type} [CommRing k] (S : TensorSpecies k)
 
 /-- The field `G` of a `TensorSpecies` has the instance of a group. -/
 instance : Group S.G := S.G_group
@@ -341,7 +335,7 @@ def liftTensor {n : ℕ} {c : Fin n → S.C} {E : Type} [AddCommMonoid E] [Modul
 
 /-- The number of indices `n` from a tensor. -/
 @[nolint unusedArguments]
-def numIndices {S : TensorSpecies} {n : ℕ} {c : Fin n → S.C} (_ : S.F.obj (OverColor.mk c)) : ℕ := n
+def numIndices {S : TensorSpecies k} {n : ℕ} {c : Fin n → S.C} (_ : S.F.obj (OverColor.mk c)) : ℕ := n
 
 end TensorSpecies
 

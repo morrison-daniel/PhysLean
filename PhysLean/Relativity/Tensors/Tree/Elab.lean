@@ -491,7 +491,7 @@ elab_rules (kind:=tensorExprSyntax) : term
 -/
 
 /-
-variable {S : TensorSpecies} {c : Fin (Nat.succ (Nat.succ 0)) → S.C} {t : S.F.obj (OverColor.mk c)}
+variable {k : Type} [CommRing k] {S : TensorSpecies k} {c : Fin (Nat.succ (Nat.succ 0)) → S.C} {t : S.F.obj (OverColor.mk c)}
 
 #check {t | α β}ᵀ
 -/

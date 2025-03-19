@@ -28,7 +28,7 @@ open MonoidalCategory
 noncomputable section
 
 /-- A syntax tree for tensor expressions. -/
-inductive TensorTree (S : TensorSpecies) : {n : ℕ} → (Fin n → S.C) → Type where
+inductive TensorTree {k : Type} [CommRing k] (S : TensorSpecies k) : {n : ℕ} → (Fin n → S.C) → Type where
   /-- A general tensor node. -/
   | tensorNode {n : ℕ} {c : Fin n → S.C} (T : S.F.obj (OverColor.mk c)) : TensorTree S c
   /-- A node corresponding to the scalar multiple of a tensor by a element of the field. -/
@@ -55,7 +55,7 @@ inductive TensorTree (S : TensorSpecies) : {n : ℕ} → (Fin n → S.C) → Typ
 
 namespace TensorTree
 
-variable {S : TensorSpecies} {n : ℕ} {c : Fin n → S.C} (T : TensorTree S c)
+variable {k : Type} [CommRing k] {S : TensorSpecies k} {n : ℕ} {c : Fin n → S.C} (T : TensorTree S c)
 
 open MonoidalCategory
 open TensorProduct
@@ -73,7 +73,7 @@ def vecNode {c : S.C} (v : S.FD.obj (Discrete.mk c)) : TensorTree S ![c] :=
   (tensorNode ((OverColor.forgetLiftApp S.FD c).symm.hom.hom v))
 
 /-- The node `vecNode` of a tensor tree, with all arguments explicit. -/
-abbrev vecNodeE (S : TensorSpecies) (c1 : S.C)
+abbrev vecNodeE (S : TensorSpecies k) (c1 : S.C)
     (v : (S.FD.obj (Discrete.mk c1)).V) :
     TensorTree S ![c1] := vecNode v
 
@@ -84,7 +84,7 @@ def twoNode {c1 c2 : S.C} (t : (S.FD.obj (Discrete.mk c1) ⊗
   (tensorNode ((OverColor.Discrete.pairIsoSep S.FD).hom.hom t))
 
 /-- The node `twoNode` of a tensor tree, with all arguments explicit. -/
-abbrev twoNodeE (S : TensorSpecies) (c1 c2 : S.C)
+abbrev twoNodeE (S : TensorSpecies k) (c1 c2 : S.C)
     (v : (S.FD.obj (Discrete.mk c1) ⊗ S.FD.obj (Discrete.mk c2)).V) :
     TensorTree S ![c1, c2] := twoNode v
 
@@ -95,7 +95,7 @@ def threeNode {c1 c2 c3 : S.C} (t : (S.FD.obj (Discrete.mk c1) ⊗
   (tensorNode ((OverColor.Discrete.tripleIsoSep S.FD).hom.hom t))
 
 /-- The node `threeNode` of a tensor tree, with all arguments explicit. -/
-abbrev threeNodeE (S : TensorSpecies) (c1 c2 c3 : S.C)
+abbrev threeNodeE (S : TensorSpecies k) (c1 c2 c3 : S.C)
     (v : (S.FD.obj (Discrete.mk c1) ⊗ S.FD.obj (Discrete.mk c2) ⊗
     S.FD.obj (Discrete.mk c3)).V) :
     TensorTree S ![c1, c2, c3] := threeNode v
@@ -114,7 +114,7 @@ def constTwoNode {c1 c2 : S.C}
     TensorTree S ![c1, c2] := twoNode (v.hom (1 : S.k))
 
 /-- The node `constTwoNode` of a tensor tree, with all arguments explicit. -/
-abbrev constTwoNodeE (S : TensorSpecies) (c1 c2 : S.C)
+abbrev constTwoNodeE (S : TensorSpecies k) (c1 c2 : S.C)
     (v : 𝟙_ (Rep S.k S.G) ⟶ S.FD.obj (Discrete.mk c1) ⊗ S.FD.obj (Discrete.mk c2)) :
     TensorTree S ![c1, c2] := constTwoNode v
 
@@ -125,7 +125,7 @@ def constThreeNode {c1 c2 c3 : S.C}
   threeNode (v.hom (1 : S.k))
 
 /-- The node `constThreeNode` of a tensor tree, with all arguments explicit. -/
-abbrev constThreeNodeE (S : TensorSpecies) (c1 c2 c3 : S.C)
+abbrev constThreeNodeE (S : TensorSpecies k) (c1 c2 c3 : S.C)
     (v : 𝟙_ (Rep S.k S.G) ⟶ S.FD.obj (Discrete.mk c1) ⊗ S.FD.obj (Discrete.mk c2) ⊗
     S.FD.obj (Discrete.mk c3)) : TensorTree S ![c1, c2, c3] :=
   constThreeNode v

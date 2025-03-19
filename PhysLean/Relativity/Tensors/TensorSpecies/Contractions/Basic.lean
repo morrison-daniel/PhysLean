@@ -21,7 +21,7 @@ noncomputable section
 
 namespace TensorSpecies
 open TensorTree
-variable (S : TensorSpecies)
+variable {k : Type} [CommRing k] (S : TensorSpecies k)
 
 /-- The equivariant map from ` S.FD.obj (Discrete.mk c) ⊗ S.FD.obj (Discrete.mk c)` to
   the underlying field obtained by contracting. -/
@@ -33,7 +33,7 @@ open TensorProduct
 
 /-- The contraction of two vectors in a tensor species of the same color, as a linear
   map to the underlying field. -/
-def contractSelfField {S : TensorSpecies} {c : S.C} :
+def contractSelfField {S : TensorSpecies k} {c : S.C} :
     S.FD.obj (Discrete.mk c) ⊗[S.k] S.FD.obj (Discrete.mk c) →ₗ[S.k] S.k :=
   (S.contractSelfHom c).hom.hom
 
@@ -42,7 +42,7 @@ scoped[TensorSpecies] notation "⟪" ψ "," φ "⟫ₜₛ" => contractSelfField 
 
 /-- The map `contractSelfField` is equivariant with respect to the group action. -/
 @[simp]
-lemma contractSelfField_equivariant {S : TensorSpecies} {c : S.C} {g : S.G}
+lemma contractSelfField_equivariant {S : TensorSpecies k} {c : S.C} {g : S.G}
     (ψ : S.FD.obj (Discrete.mk c)) (φ : S.FD.obj (Discrete.mk c)) :
     ⟪(S.FD.obj (Discrete.mk c)).ρ g ψ, (S.FD.obj (Discrete.mk c)).ρ g φ⟫ₜₛ = ⟪ψ, φ⟫ₜₛ := by
   simpa using congrFun (congrArg (fun x => x.hom.toFun)
@@ -88,7 +88,7 @@ def IsNormZero {c : S.C} (ψ : S.FD.obj (Discrete.mk c)) : Prop := ⟪ψ, ψ⟫�
 
 /-- The zero vector has norm equal to zero. -/
 @[simp]
-lemma zero_isNormZero {c : S.C} : @IsNormZero S c 0 := by
+lemma zero_isNormZero {c : S.C} : @IsNormZero _ _ S c 0 := by
   simp only [IsNormZero, tmul_zero, map_zero]
 
 /-- If a vector is norm-zero, then any scalar multiple of that vector is also norm-zero. -/

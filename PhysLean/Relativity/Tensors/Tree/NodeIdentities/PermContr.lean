@@ -22,7 +22,7 @@ open PhysLean.Fin
 namespace TensorSpecies
 noncomputable section
 
-variable (S : TensorSpecies)
+variable {k : Type} [CommRing k] (S : TensorSpecies k)
 
 lemma contrFin1Fin1_naturality {n : ℕ} {c c1 : Fin n.succ.succ → S.C}
     {i : Fin n.succ.succ} {j : Fin n.succ} (h : c1 (i.succAbove j) = S.τ (c1 i))
@@ -247,7 +247,7 @@ end TensorSpecies
 
 namespace TensorTree
 
-variable {S : TensorSpecies}
+variable {k : Type} [CommRing k] {S : TensorSpecies k}
 
 /-- Permuting indices, and then contracting is equivalent to contracting and then permuting,
   once care is taking about ensuring one is contracting the same indices. -/

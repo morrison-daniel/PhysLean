@@ -18,7 +18,7 @@ open MonoidalCategory
 namespace TensorSpecies
 open OverColor
 
-variable (S : TensorSpecies)
+variable {k : Type} [CommRing k] (S : TensorSpecies k)
 noncomputable section
 
 /--
@@ -187,7 +187,7 @@ end
 
 namespace TensorBasis
 
-variable {S : TensorSpecies}
+variable {k : Type} [CommRing k] {S : TensorSpecies k}
 
 lemma tensorBasis_repr_tprod {n : ℕ} {c : Fin n → S.C}
     (x : (i : Fin n) → S.FD.obj (Discrete.mk (c i)))

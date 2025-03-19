@@ -25,10 +25,10 @@ noncomputable section
 namespace TensorSpecies
 
 /-- The unit of a tensor species in a `PiTensorProduct`. -/
-def unitTensor (S : TensorSpecies) (c : S.C) : S.F.obj (OverColor.mk ![S.τ c, c]) :=
+def unitTensor {k : Type} [CommRing k] (S : TensorSpecies k) (c : S.C) : S.F.obj (OverColor.mk ![S.τ c, c]) :=
   (OverColor.Discrete.pairIsoSep S.FD).hom.hom ((S.unit.app (Discrete.mk c)).hom (1 : S.k))
 
-variable {S : TensorSpecies}
+variable {k : Type} [CommRing k] {S : TensorSpecies k}
 open TensorTree
 
 /-- The relation between two units of colors which are equal. -/

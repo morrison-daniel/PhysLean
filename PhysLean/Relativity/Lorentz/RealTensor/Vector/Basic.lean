@@ -57,7 +57,7 @@ def toCoord {d : ℕ} : Vector d →ₗ[ℝ] (Fin 1 ⊕ Fin d → ℝ) where
     simp only [Nat.succ_eq_add_one, Nat.reduceAdd, C_eq_color, map_add]
     rfl
   map_smul' x y := by
-    simp only [ Nat.succ_eq_add_one, Nat.reduceAdd, C_eq_color, _root_.map_smul,
+    simp only [Nat.succ_eq_add_one, Nat.reduceAdd, C_eq_color, _root_.map_smul,
       RingHom.id_apply]
     rfl
 
@@ -68,9 +68,7 @@ lemma toCoord_apply {d : ℕ} (p : Vector d) : toCoord p =
 
 lemma toCoord_injective {d : ℕ} : Function.Injective (@toCoord d) := by
   intros x y h
-  simp [toCoord] at h
-  erw [Equiv.apply_eq_iff_eq] at h
-  simpa using h
+  simpa [toCoord] using h
 
 instance : CoeFun (Vector d) (fun _ => Fin 1 ⊕ Fin d → ℝ) := ⟨toCoord⟩
 
