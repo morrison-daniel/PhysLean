@@ -4,6 +4,8 @@ import PhysLean.ClassicalMechanics.HarmonicOscillator.Solution
 import PhysLean.CondensedMatter.Basic
 import PhysLean.Cosmology.Basic
 import PhysLean.Electromagnetism.Basic
+import PhysLean.Electromagnetism.FieldStrength.Basic
+import PhysLean.Electromagnetism.FieldStrength.Derivative
 import PhysLean.Mathematics.Fin
 import PhysLean.Mathematics.Fin.Involutions
 import PhysLean.Mathematics.LinearMaps
@@ -14,7 +16,7 @@ import PhysLean.Mathematics.PiTensorProduct
 import PhysLean.Mathematics.RatComplexNum
 import PhysLean.Mathematics.SO3.Basic
 import PhysLean.Mathematics.SchurTriangulation
-import PhysLean.Mathematics.SpecialFunctions.PhyscisistsHermite
+import PhysLean.Mathematics.SpecialFunctions.PhysHermite
 import PhysLean.Meta.AllFilePaths
 import PhysLean.Meta.Basic
 import PhysLean.Meta.Informal.Basic

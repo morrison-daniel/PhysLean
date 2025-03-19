@@ -278,14 +278,18 @@ lemma tensorBasis_prod {n m : ℕ} {c : Fin n → S.C} {c1 : Fin m → S.C}
   erw [lift.objMap'_tprod]
   congr
   funext i
-  simp [lift.discreteFunctorMapEqIso]
+  simp only [Function.comp_apply, mk_left, Functor.id_obj, mk_hom, equivToIso_homToEquiv,
+    lift.discreteFunctorMapEqIso, eqToIso_refl, Functor.mapIso_refl, Iso.refl_hom, Action.id_hom,
+    ModuleCat.hom_id, Iso.refl_inv, prodEquiv_apply_fst, prodEquiv_apply_snd,
+    LinearEquiv.ofLinear_apply, LinearMap.id_coe, id_eq]
   have hj (j : Fin n ⊕ Fin m) (hj : finSumFinEquiv.symm i = j) : (S.basis (Sum.elim c c1 j)) (b i) =
     (lift.discreteSumEquiv' S.FD j)
     (PhysLean.PiTensorProduct.elimPureTensor (fun i => (S.basis (c i)) ((prodEquiv b).1 i))
       (fun i => (S.basis (c1 i)) ((prodEquiv b).2 i)) j) := by
     match j with
     | Sum.inl j =>
-      simp [PhysLean.PiTensorProduct.elimPureTensor, lift.discreteSumEquiv']
+      simp only [Sum.elim_inl, lift.discreteSumEquiv', PhysLean.PiTensorProduct.elimPureTensor,
+        prodEquiv_apply_fst, LinearEquiv.refl_apply]
       have hi : i = finSumFinEquiv (Sum.inl j) :=
         (Equiv.symm_apply_eq finSumFinEquiv).mp hj
       subst hi
@@ -296,7 +300,8 @@ lemma tensorBasis_prod {n m : ℕ} {c : Fin n → S.C} {c1 : Fin m → S.C}
       refine Nat.mod_eq_of_lt ?_
       simpa using (b (Fin.castAdd m j)).2
     | Sum.inr j =>
-      simp [PhysLean.PiTensorProduct.elimPureTensor, lift.discreteSumEquiv']
+      simp only [Sum.elim_inr, lift.discreteSumEquiv', PhysLean.PiTensorProduct.elimPureTensor,
+        prodEquiv_apply_snd, LinearEquiv.refl_apply]
       have hi : i = finSumFinEquiv (Sum.inr j) :=
         (Equiv.symm_apply_eq finSumFinEquiv).mp hj
       subst hi
@@ -407,7 +412,8 @@ def contrSectionEquiv {n : ℕ} {c : Fin n.succ.succ → S.C}
   invFun x := ⟨liftToContrSection b x, liftToContrSection_mem_ContrSection b x⟩
   left_inv b' := by
     ext y
-    simp [liftToContrSection]
+    simp only [liftToContrSection, Nat.succ_eq_add_one, Function.comp_apply,
+      Fin.insertNthEquiv_apply]
     rcases Fin.eq_self_or_eq_succAbove i y with rfl | h
     · simp
     · obtain ⟨y, rfl⟩ := h

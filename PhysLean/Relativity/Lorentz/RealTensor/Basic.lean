@@ -161,7 +161,6 @@ lemma repDim_eq_one_plus_dim {d : ℕ} {c : (realLorentzTensor d).C} :
   cases c
   · rfl
   · rfl
-
 /-!
 
 ## Simplification of contractions with respect to basis

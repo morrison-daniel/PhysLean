@@ -14,10 +14,8 @@ noncomputable section
 
 namespace SpecialRelativity
 
-open Manifold
 open Matrix
 open Real
-open ComplexConjugate
 open Lorentz
 open Vector
 
@@ -65,10 +63,10 @@ TODO "Find the conditions for which the age gap for the twin paradox is zero."
   `[7.5, 6, 0, 0]` and then at (different) constant speed to `[15, 0, 0, 0]`. -/
 def example1 : InstantaneousTwinParadox where
   startPoint := 0
-  endPoint := fromCoord (fun
+  endPoint := toCoord.symm (fun
     | Sum.inl 0 => 15
     | Sum.inr i => 0)
-  twinBMid := fromCoord (fun
+  twinBMid := toCoord.symm (fun
     | Sum.inl 0 => 7.5
     | Sum.inr 0 => 6
     | Sum.inr i => 0)
@@ -105,8 +103,8 @@ lemma example1_properTimeTwinA : example1.properTimeTwinA = 15 := by
 @[simp]
 lemma example1_properTimeTwinB : example1.properTimeTwinB = 9 := by
   simp only [properTimeTwinB, properTime, example1, sub_zero, innerProduct_toCoord, Fin.isValue,
-    toCoord_fromCoord, Fin.sum_univ_three, mul_zero, add_zero, map_sub, Pi.sub_apply, zero_sub,
-    mul_neg, neg_mul, neg_neg]
+    LinearEquiv.apply_symm_apply, Fin.sum_univ_three, mul_zero, add_zero, map_sub, Pi.sub_apply,
+    zero_sub, mul_neg, neg_mul, neg_neg]
   rw [show √(7.5 * 7.5 - 6 * 6) = √20.25 by norm_num]
   rw [show √((15 - 7.5) * (15 - 7.5) - 6 * 6) = √20.25 by norm_num]
   rw [show √20.25 = 4.5 from sqrt_eq_cases.mpr (by norm_num)]
