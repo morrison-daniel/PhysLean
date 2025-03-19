@@ -48,45 +48,38 @@ def indexEquiv {d : ℕ} :
     right_inv := fun x => by rfl}
   e.trans finSumFinEquiv.symm
 
-/-- The coordinates of a Lorentz vector -/
-def toCoord {d : ℕ} (p : Vector d) : Fin 1 ⊕ Fin d → ℝ :=
-  Equiv.piCongrLeft' _ indexEquiv
-  (Finsupp.equivFunOnFinite
-  (((realLorentzTensor d).tensorBasis _).repr p))
+/-- The coordinates of a Lorentz vector as a linear map. -/
+def toCoord {d : ℕ} : Vector d ≃ₗ[ℝ] (Fin 1 ⊕ Fin d → ℝ) :=
+  Equiv.toLinearEquiv (
+    ((realLorentzTensor d).tensorBasis ![.up]).repr.toEquiv.trans <|
+    Finsupp.equivFunOnFinite.trans <|
+    (Equiv.piCongrLeft' _ indexEquiv))
+      {
+        map_add := fun x y => by
+          simp  [ Nat.succ_eq_add_one, Nat.reduceAdd, C_eq_color, map_add]
+          rfl
+        map_smul := fun c x => by
+          simp  [ Nat.succ_eq_add_one, Nat.reduceAdd, C_eq_color, _root_.map_smul,
+            RingHom.id_apply]
+          rfl
+      }
+
+lemma toCoord_apply {d : ℕ} (p : Vector d) : toCoord p =
+    (Equiv.piCongrLeft' _ indexEquiv <|
+    Finsupp.equivFunOnFinite <|
+    ((realLorentzTensor d).tensorBasis _).repr p) := rfl
 
 lemma toCoord_injective {d : ℕ} : Function.Injective (@toCoord d) := by
-  intros x y h
-  simp [toCoord] at h
-  erw [Equiv.apply_eq_iff_eq] at h
-  simpa using h
-
-/-- The coordinates of a Lorentz vector as a linear map. -/
-def toCoordLinear {d : ℕ} : Vector d →ₗ[ℝ] (Fin 1 ⊕ Fin d → ℝ) where
-  toFun := toCoord
-  map_add' x y := by
-    simp only [toCoord, Nat.succ_eq_add_one, Nat.reduceAdd, C_eq_color, map_add]
-    rfl
-  map_smul' x y := by
-    simp only [toCoord, Nat.succ_eq_add_one, Nat.reduceAdd, C_eq_color, _root_.map_smul,
-      RingHom.id_apply]
-    rfl
-
-@[simp]
-lemma toCoordLinear_apply {d : ℕ} (p : Vector d) :
-    toCoordLinear p = toCoord p := by rfl
-
-lemma toCoordLinear_injective (d : ℕ) : Function.Injective (@toCoordLinear d) := by
-  intros x y h
-  simp at h
-  exact toCoord_injective h
+  exact toCoord.toEquiv.injective
 
 instance : CoeFun (Vector d) (fun _ => Fin 1 ⊕ Fin d → ℝ) := ⟨toCoord⟩
+
 
 lemma tensorNode_repr_apply {d : ℕ} (p : Vector d)
     (b : (j : Fin (Nat.succ 0)) → Fin ((realLorentzTensor d).repDim (![Color.up] j))) :
     ((realLorentzTensor d).tensorBasis _).repr p b =
     p (finSumFinEquiv.symm (b 0)) := by
-  simp [toCoord, indexEquiv]
+  simp [toCoord_apply, indexEquiv]
   congr
   ext j
   fin_cases j
@@ -119,11 +112,11 @@ lemma innerProduct_toCoord {d : ℕ} (p q : Vector d) :
     Function.comp_apply, Fin.zero_succAbove, Fin.succ_zero_eq_one, Fin.cast_eq_self,
     Fin.succ_one_eq_two, tensorNode_tensor]
   conv_lhs =>
-    enter [2, x, 2, 2]
+    enter [2, x, 2, 3]
     simp only [Fin.isValue]
     change finSumFinEquiv.symm x
   conv_lhs =>
-    enter [2, x, 1, 2, y, 2, 2]
+    enter [2, x, 1, 2, y, 2, 3]
     change finSumFinEquiv.symm y
   conv_lhs =>
     enter [2, x, 1, 2, y, 1]
@@ -189,6 +182,9 @@ lemma innerProduct_invariant {d : ℕ} (p q : Vector d) (Λ : LorentzGroup d) :
     action_field]
   rw [innerProduct]
 
+instance : FiniteDimensional ℝ (Vector d) := by
+  apply FiniteDimensional.of_fintype_basis ((realLorentzTensor d).tensorBasis _)
+
 /-!
 
 ## Smoothness
@@ -196,6 +192,7 @@ lemma innerProduct_invariant {d : ℕ} (p q : Vector d) (Λ : LorentzGroup d) :
 -/
 
 section smoothness
+
 
 instance isNormedAddCommGroup (d : ℕ) : NormedAddCommGroup (Vector d) :=
   NormedAddCommGroup.induced ↑(Vector d).V (Fin 1 ⊕ Fin d → ℝ)
@@ -205,6 +202,43 @@ instance isNormedSpace (d : ℕ) :
     haveI := isNormedAddCommGroup d
     NormedSpace ℝ (Vector d) :=
   NormedSpace.induced ℝ (Vector d) (Fin 1 ⊕ Fin d → ℝ) (@toCoordLinear d)
+
+def toCoordContinuous {d : ℕ} : Vector d ≃L[ℝ] (Fin 1 ⊕ Fin d → ℝ) :=
+  LinearEquiv.toContinuousLinearEquiv toCoord
+
+lemma toCoord_fderiv {d : ℕ} (x : ↑(Vector d).V) :
+    (fderiv ℝ (@toCoord d) x).toLinearMap = toCoord.toLinearMap := by
+  change (fderiv ℝ toCoordContinuous x).toLinearMap = toCoord.toLinearMap
+  rw [ContinuousLinearEquiv.fderiv]
+  rfl
+
+/-- The coordinates of a Lorentz vector as a linear map. -/
+def toCoordFull {d : ℕ} : Vector d ≃ₗ[(realLorentzTensor d).k]
+    (((j : Fin (Nat.succ 0)) → Fin ((realLorentzTensor d).repDim (![Color.up] j))) →
+    (realLorentzTensor d).k)  :=
+  Equiv.toLinearEquiv (
+    ((realLorentzTensor d).tensorBasis ![.up]).repr.toEquiv.trans <|
+    Finsupp.equivFunOnFinite)
+      {
+        map_add := fun x y => by
+          simp  [ Nat.succ_eq_add_one, Nat.reduceAdd, C_eq_color, map_add]
+          rfl
+        map_smul := fun c x => by
+          simp  [ Nat.succ_eq_add_one, Nat.reduceAdd, C_eq_color, _root_.map_smul,
+            RingHom.id_apply]
+          rfl
+      }
+
+instance : CompleteSpace (realLorentzTensor d).k := inferInstanceAs (CompleteSpace ℝ)
+
+instance : ContinuousSMul (realLorentzTensor d).k ↑(Vector d).V  := inferInstanceAs (ContinuousSMul ℝ _)
+
+def fromCoordFullContinuous {d : ℕ} :
+   (((j : Fin (Nat.succ 0)) → Fin ((realLorentzTensor d).repDim (![Color.up] j))) →
+    (realLorentzTensor d).k) ≃L[(realLorentzTensor d).k]
+    Vector d :=
+  LinearEquiv.toContinuousLinearEquiv toCoordFull.symm
+
 
 open Manifold
 open Matrix

@@ -4,7 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Joseph Tooby-Smith
 -/
 import PhysLean.Relativity.SpaceTime.Basic
-import PhysLean.Relativity.Lorentz.RealTensor.Basic
+import PhysLean.Relativity.Lorentz.RealTensor.Derivative
+import PhysLean.Relativity.SpaceTime.Basic
 import PhysLean.Relativity.Lorentz.PauliMatrices.Basic
 /-!
 
@@ -18,22 +19,22 @@ namespace Electromagnetism
 
 /-- The electric field is a map from `d`+1 dimensional spacetime to the vector space
   `ℝ^d`. -/
-abbrev ElectricField (d : ℕ := 3) := ℝT[d, .up] → EuclideanSpace ℝ (Fin d)
+abbrev ElectricField (d : ℕ := 3) := SpaceTime d → EuclideanSpace ℝ (Fin d)
 
 /-- The magnetic field is a map from `d+1` dimensional spacetime to the vector space
   `ℝ^d`. -/
-abbrev MagneticField (d : ℕ := 3) := ℝT[d, .up] → EuclideanSpace ℝ (Fin d)
+abbrev MagneticField (d : ℕ := 3) := SpaceTime d → EuclideanSpace ℝ (Fin d)
 
 open IndexNotation
 open realLorentzTensor
 
 /-- The vector potential of an electromagnetic field-/
-abbrev VectorPotential (d : ℕ := 3) := ℝT[d, .up] → ℝT[d, .up]
+abbrev VectorPotential (d : ℕ := 3) := SpaceTime d → ℝT[d, .up]
 
 open TensorTree in
 /-- The Field strength is a tensor `F^μ^ν` which is anti-symmetric.. -/
 noncomputable abbrev FieldStrength (d : ℕ := 3) :
-    Submodule (realLorentzTensor d).k (ℝT[d, .up] → ℝT[d, .up, .up]) where
+    Submodule (realLorentzTensor d).k (SpaceTime d → ℝT[d, .up, .up]) where
   carrier F := ∀ x, {F x | μ ν = - (F x| ν μ)}ᵀ
   add_mem' {F1 F2} hF1 hF2:= by
     intro x
@@ -418,6 +419,71 @@ noncomputable def toElectricMagneticField : FieldStrength ≃ₗ[ℝ] ElectricFi
     simp
 
 TODO "Define the dual field strength."
+
+/-!
+
+## Derivative of the field strength
+
+-/
+
+def derivative_toElectricMagneticField (EM : ElectricField × MagneticField) :
+    ∂ (toElectricMagneticField.symm EM).1 = fun (y : SpaceTime) =>
+      ((realLorentzTensor 3).tensorBasis  _).repr.symm <| Finsupp.equivFunOnFinite.symm fun b =>
+      match b 0, b 1, b 2 with
+      | μ, 0, 1 =>  - SpaceTime.deriv μ (fun y => EM.1 y 0) y
+      | μ, _, _ => sorry := by
+  funext y
+  apply (realLorentzTensor.tensorBasis _).repr.injective
+  simp only [ Nat.reduceAdd, C_eq_color, Function.comp_apply, Fin.isValue,
+    Basis.repr_symm_apply, Basis.repr_linearCombination]
+  ext b
+  have h1 :  DifferentiableAt (realLorentzTensor 3).k (mapToBasis (toElectricMagneticField.symm EM).1 )
+      (Finsupp.equivFunOnFinite (((realLorentzTensor 3).tensorBasis _).repr y)) := by sorry
+  conv_lhs => erw [derivative_repr _ _ _ h1]
+  have h0 : (Finsupp.single (TensorSpecies.TensorBasis.prodEquiv b).1 (1 : realLorentzTensor.k)) =
+    (Finsupp.single (fun | 0 => b 0) 1) := by
+    congr
+    funext x
+    fin_cases x
+    rfl
+  have h1 :  (fun y => mapToBasis (↑(toElectricMagneticField.symm EM)) y (TensorSpecies.TensorBasis.prodEquiv b).2)
+    = (fun y => mapToBasis ((toElectricMagneticField.symm EM).1) y
+      (fun | (0 : Fin 2) => Fin.cast (by simp) (b 1) | (1 : Fin 2) => Fin.cast (by simp) (b 2))) := by
+    ext y
+    congr
+    funext x
+    fin_cases x
+    rfl
+  rw [h0, h1]
+  have hb : ∃ i j k, b = (fun | 0 => i | 1 => j | 2 => k) := by
+    use (b 0), (b 1), (b 2)
+    funext x
+    fin_cases x <;> rfl
+  obtain ⟨i, j, k, rfl⟩ := hb
+  simp
+  match i, j, k with
+  | μ, 0, 1 =>
+    split
+    · rename_i a1 a2 a3 a5 a6 a7
+      conv_rhs => rw [SpaceTime.neg_deriv_apply]
+      rw [SpaceTime.deriv_eq_k]
+      have hk : realLorentzTensor.k = ℝ := by rfl
+      simp only [Fin.isValue, hk, Nat.succ_eq_add_one, Nat.reduceAdd, C_eq_color,
+        ContinuousLinearMap.neg_apply]
+      congr 1
+      · simp only [Fin.isValue, Basis.repr_symm_apply]
+        apply congrFun
+        apply congrArg
+
+        sorry
+
+      · simp
+        congr
+        funext x
+        fin_cases x
+        rfl
+    sorry
+  | μ, _, _ => sorry
 
 end FieldStrength
 

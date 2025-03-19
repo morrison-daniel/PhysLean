@@ -164,6 +164,8 @@ lemma repDim_eq_one_plus_dim {d : ℕ} {c : (realLorentzTensor d).C} :
   · rfl
   · rfl
 
+noncomputable instance : NontriviallyNormedField (realLorentzTensor d).k :=
+      inferInstanceAs (NontriviallyNormedField ℝ)
 /-!
 
 ## Simplification of contractions with respect to basis
