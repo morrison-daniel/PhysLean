@@ -27,4 +27,5 @@ open realLorentzTensor
 
 /-- The vector potential of an electromagnetic field-/
 abbrev VectorPotential (d : ℕ := 3) := SpaceTime d → ℝT[d, .up]
+
 end Electromagnetism

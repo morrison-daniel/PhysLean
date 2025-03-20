@@ -13,6 +13,8 @@ import PhysLean.Relativity.SpaceTime.Basic
 
 namespace Electromagnetism
 
+/-- An electromagnetic system consists of charge density, a current density,
+  the speed ofl light and the electric permittivity. -/
 structure EMSystem where
   /-- The charge density. -/
   ρ : SpaceTime → ℝ
@@ -48,7 +50,7 @@ def GaussLawMagnetic (B : MagneticField) : Prop :=
 
 /-- Faraday's law. -/
 def FaradayLaw (E : ElectricField) (B : MagneticField) : Prop :=
-  ∀ x : SpaceTime, ∇× B x =  μ₀ • (J x + ε₀ • ∂ₜ E x )
+  ∀ x : SpaceTime, ∇× B x = μ₀ • (J x + ε₀ • ∂ₜ E x)
 
 /-- Ampère's law. -/
 def AmpereLaw (E : ElectricField) (B : MagneticField) : Prop :=
@@ -57,7 +59,7 @@ def AmpereLaw (E : ElectricField) (B : MagneticField) : Prop :=
 /-- Maxwell's equations. -/
 def MaxwellEquations (E : ElectricField) (B : MagneticField) : Prop :=
   𝓔.GaussLawElectric E ∧ GaussLawMagnetic B ∧
-  𝓔.FaradayLaw  E B ∧ AmpereLaw E B
+  𝓔.FaradayLaw E B ∧ AmpereLaw E B
 
 end EMSystem
 end Electromagnetism

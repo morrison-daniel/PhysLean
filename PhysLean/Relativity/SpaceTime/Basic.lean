@@ -83,7 +83,9 @@ noncomputable def deriv {M : Type} [AddCommGroup M] [Module ℝ M] [TopologicalS
 @[inherit_doc deriv]
 scoped notation "∂_" => deriv
 
+/-- The derivative with respect to time. -/
 scoped notation "∂ₜ" => deriv 0
+
 lemma deriv_eq {d : ℕ} (μ : Fin (1 + d)) (f : SpaceTime d → ℝ) (y : SpaceTime d) :
     SpaceTime.deriv μ f y =
     fderiv ℝ f y ((realLorentzTensor d).tensorBasis _ (fun x => Fin.cast (by simp) μ)) := by

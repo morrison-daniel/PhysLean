@@ -33,7 +33,8 @@ noncomputable def mapToBasis {d n m : ℕ} {cm : Fin m → (realLorentzTensor d)
     `ℝT(d, cm) → ℝT(d, (Sum.elim cm cn) ∘ finSumFinEquiv.symm)`. -/
 noncomputable def derivative {d n m : ℕ} {cm : Fin m → (realLorentzTensor d).C}
     {cn : Fin n → (realLorentzTensor d).C} (f : ℝT(d, cm) → ℝT(d, cn)) :
-    ℝT(d, cm) → ℝT(d, (Sum.elim (fun i => (realLorentzTensor d).τ (cm i)) cn) ∘ finSumFinEquiv.symm) := fun y =>
+    ℝT(d, cm) → ℝT(d, (Sum.elim (fun i => (realLorentzTensor d).τ (cm i)) cn) ∘
+      finSumFinEquiv.symm) := fun y =>
       ((realLorentzTensor d).tensorBasis _).repr.toEquiv.symm <|
       Finsupp.equivFunOnFinite.symm <| fun b =>
   /- The `b` componenet of the derivative of `f` evaluated at `y` is: -/
@@ -54,7 +55,8 @@ lemma derivative_repr {d n m : ℕ} {cm : Fin m → (realLorentzTensor d).C}
     {cn : Fin n → (realLorentzTensor d).C} (f : ℝT(d, cm) → ℝT(d, cn))
     (y : ℝT(d, cm))
     (b : (j : Fin (m + n)) →
-      Fin ((realLorentzTensor d).repDim ((((fun i => (realLorentzTensor d).τ (cm i)) ⊕ᵥ cn) ∘ ⇑finSumFinEquiv.symm) j)))
+      Fin ((realLorentzTensor d).repDim
+      ((((fun i => (realLorentzTensor d).τ (cm i)) ⊕ᵥ cn) ∘ ⇑finSumFinEquiv.symm) j)))
     (h1 : DifferentiableAt ℝ (mapToBasis f)
       (Finsupp.equivFunOnFinite (((realLorentzTensor d).tensorBasis cm).repr y))) :
     ((realLorentzTensor d).tensorBasis _).repr (∂ f y) b =
