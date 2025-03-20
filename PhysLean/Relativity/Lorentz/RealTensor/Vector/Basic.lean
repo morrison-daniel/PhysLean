@@ -203,6 +203,11 @@ instance isNormedSpace (d : ℕ) :
 def toCoordContinuous {d : ℕ} : Vector d ≃L[ℝ] (Fin 1 ⊕ Fin d → ℝ) :=
   LinearEquiv.toContinuousLinearEquiv toCoord
 
+@[fun_prop]
+lemma toCoord_differentiable {d : ℕ} :
+    Differentiable ℝ (@toCoord d) := by
+  exact toCoordContinuous.differentiable
+
 lemma toCoord_fderiv {d : ℕ} (x : ↑(Vector d).V) :
     (fderiv ℝ (@toCoord d) x).toLinearMap = toCoord.toLinearMap := by
   change (fderiv ℝ toCoordContinuous x).toLinearMap = toCoord.toLinearMap
@@ -211,8 +216,8 @@ lemma toCoord_fderiv {d : ℕ} (x : ↑(Vector d).V) :
 
 /-- The coordinates of a Lorentz vector as a linear map. -/
 def toCoordFull {d : ℕ} : Vector d ≃ₗ[ℝ]
-    (((j : Fin (Nat.succ 0)) → Fin ((realLorentzTensor d).repDim (![Color.up] j))) →
-    ℝ) := Equiv.toLinearEquiv
+    (((j : Fin (Nat.succ 0)) → Fin ((realLorentzTensor d).repDim (![Color.up] j))) → ℝ) :=
+  Equiv.toLinearEquiv
   (((realLorentzTensor d).tensorBasis ![.up]).repr.toEquiv.trans <|
   Finsupp.equivFunOnFinite)
     {
@@ -224,6 +229,10 @@ def toCoordFull {d : ℕ} : Vector d ≃ₗ[ℝ]
           RingHom.id_apply]
         rfl
     }
+
+lemma toCoord_apply_eq_toCoordFull_apply {d : ℕ} (p : Vector d) :
+    toCoord p = (Equiv.piCongrLeft' _ indexEquiv) (toCoordFull p) := by
+  rfl
 
 /-- The `toCoordFull` map as a `ContinuousLinearEquiv`. -/
 def fromCoordFullContinuous {d : ℕ} :

@@ -34,7 +34,40 @@ open ComplexConjugate
 def space (x : SpaceTime d) : EuclideanSpace ℝ (Fin d) :=
   fun i => x (Sum.inr i)
 
+/-- For a given `μ : Fin (1 + d)` `coord μ p` is the coordinate of
+  `p` in the direction `μ`.
+
+  This is denoted `𝔁 μ p`, where `𝔁` is typed with `\MCx`. -/
+def coord {d : ℕ} (μ : Fin (1 + d)) : SpaceTime d →ₗ[ℝ] ℝ where
+  toFun := flip (Lorentz.Vector.toCoord (d := d)) (finSumFinEquiv.symm μ)
+  map_add' x1 x2 := by
+    simp [flip]
+  map_smul' c x := by
+    simp [flip]
+
+@[inherit_doc coord]
+scoped notation "𝔁" => coord
+
+lemma coord_apply {d : ℕ} (μ : Fin (1 + d)) (y : SpaceTime d) :
+    𝔁 μ y = y (finSumFinEquiv.symm μ) := by
+  rfl
+
 open realLorentzTensor
+
+lemma coord_on_repr {d : ℕ} (μ : Fin (1 + d))
+    (y : ((j : Fin (Nat.succ 0)) → Fin ((realLorentzTensor d).repDim (![Color.up] j))) → ℝ) :
+    𝔁 μ (((realLorentzTensor d).tensorBasis ![Color.up]).repr.symm
+      (Finsupp.equivFunOnFinite.symm y)) =
+    y (fun _ => Fin.cast (by simp) μ) := by
+  change 𝔁 μ (Lorentz.Vector.toCoordFull.symm y) = _
+  rw [coord_apply]
+  rw [Lorentz.Vector.toCoord_apply_eq_toCoordFull_apply]
+  simp only [Nat.succ_eq_add_one, Nat.reduceAdd, LinearEquiv.apply_symm_apply,
+    Equiv.piCongrLeft'_apply]
+  congr
+  funext x
+  fin_cases x
+  simp [Lorentz.Vector.indexEquiv]
 
 /-!
 
@@ -84,6 +117,97 @@ lemma neg_deriv_apply {d : ℕ} (μ : Fin (1 + d)) (f : SpaceTime d → ℝ) (y 
     - SpaceTime.deriv μ f y = SpaceTime.deriv μ (fun y => - f y) y:= by
   rw [← SpaceTime.neg_deriv]
   rfl
+
+@[fun_prop]
+lemma coord_differentiable {d : ℕ} (μ : Fin (1 + d)) :
+    Differentiable ℝ (𝔁 μ) := by
+  let φ : (Fin 1 ⊕ Fin d) → (↑(SpaceTime d).V) → ℝ := fun b y => y b
+  change Differentiable ℝ (fun y => φ _ _)
+  have h : Differentiable ℝ (flip φ) := by
+    change Differentiable ℝ Lorentz.Vector.toCoord
+    fun_prop
+  rw [differentiable_pi] at h
+  exact h (finSumFinEquiv.symm μ)
+
+lemma deriv_coord_same {d : ℕ} (μ : Fin (1 + d)) (y : SpaceTime d) :
+    SpaceTime.deriv μ (𝔁 μ) y = 1 := by
+  rw [SpaceTime.deriv_eq_deriv_on_coord]
+  let φ : ((x : Fin (Nat.succ 0)) → Fin ((realLorentzTensor d).repDim (![Color.up] x)))
+    → (((j : Fin (Nat.succ 0)) → Fin ((realLorentzTensor d).repDim (![Color.up] j))) → ℝ)
+    → ℝ := fun b y => y b
+  conv_lhs =>
+    enter [1, 2, y]
+    rw [coord_on_repr]
+    change φ _ y
+  have h1 : (fun y => fun i => φ i y) = id := by rfl
+  have h2 (x) : fderiv ℝ (fun y => fun i => φ i y) x = ContinuousLinearMap.id _ _ := by
+    rw [h1]
+    simp
+  have h3 (x) : ∀ (i), DifferentiableAt ℝ (φ i) x := by
+    have h3' : DifferentiableAt ℝ (flip φ) x := by
+      change DifferentiableAt ℝ ((fun y => fun i => φ i y)) x
+      rw [h1]
+      exact differentiableAt_id
+    rw [differentiableAt_pi] at h3'
+    intro i
+    have h3'' := h3' i
+    exact h3''
+  conv at h2 =>
+    enter [x]
+    rw [fderiv_pi (h3 x)]
+  have h2' := h2 (((realLorentzTensor d).tensorBasis ![Color.up]).repr y)
+  change (ContinuousLinearMap.pi fun i =>
+    fderiv ℝ (φ i) ⇑(((realLorentzTensor d).tensorBasis ![Color.up]).repr y))
+    ((Finsupp.single (fun x => Fin.cast (by simp) μ) 1)) (fun _ => Fin.cast (by simp) μ) = _
+  rw [h2']
+  simp
+
+lemma deriv_coord_diff {d : ℕ} (μ ν : Fin (1 + d)) (h : μ ≠ ν) (y : SpaceTime d) :
+    SpaceTime.deriv μ (𝔁 ν) y = 0 := by
+  rw [SpaceTime.deriv_eq_deriv_on_coord]
+  let φ : ((x : Fin (Nat.succ 0)) → Fin ((realLorentzTensor d).repDim (![Color.up] x)))
+    → (((j : Fin (Nat.succ 0)) → Fin ((realLorentzTensor d).repDim (![Color.up] j))) → ℝ)
+    → ℝ := fun b y => y b
+  conv_lhs =>
+    enter [1, 2, y]
+    rw [coord_on_repr]
+    change φ _ y
+  have h1 : (fun y => fun i => φ i y) = id := by rfl
+  have h2 (x) : fderiv ℝ (fun y => fun i => φ i y) x = ContinuousLinearMap.id _ _ := by
+    rw [h1]
+    simp
+  have h3 (x) : ∀ (i), DifferentiableAt ℝ (φ i) x := by
+    have h3' : DifferentiableAt ℝ (flip φ) x := by
+      change DifferentiableAt ℝ ((fun y => fun i => φ i y)) x
+      rw [h1]
+      exact differentiableAt_id
+    rw [differentiableAt_pi] at h3'
+    intro i
+    have h3'' := h3' i
+    exact h3''
+  conv at h2 =>
+    enter [x]
+    rw [fderiv_pi (h3 x)]
+  have h2' := h2 (((realLorentzTensor d).tensorBasis ![Color.up]).repr y)
+  change (ContinuousLinearMap.pi fun i => fderiv ℝ (φ i)
+    ⇑(((realLorentzTensor d).tensorBasis ![Color.up]).repr y))
+    ((Finsupp.single (fun x => Fin.cast (by simp) μ) 1)) (fun _ => Fin.cast (by simp) ν) = _
+  rw [h2']
+  simp only [Nat.succ_eq_add_one, Nat.reduceAdd, ContinuousLinearMap.coe_id', id_eq]
+  rw [Finsupp.single_apply]
+  simp only [ite_eq_right_iff, one_ne_zero, imp_false]
+  intro hn
+  have hnx := congrFun hn 0
+  simp at hnx
+  omega
+
+lemma deriv_coord_eq_if {d : ℕ} (μ ν : Fin (1 + d)) (y : SpaceTime d) :
+    SpaceTime.deriv μ (𝔁 ν) y = if μ = ν then 1 else 0 := by
+  by_cases h : μ = ν
+  · simp only [h, ↓reduceIte]
+    exact SpaceTime.deriv_coord_same ν y
+  · rw [if_neg h]
+    exact SpaceTime.deriv_coord_diff μ ν h y
 
 /-- The gradiant of a function `SpaceTime d → EuclideanSpace (Fin d) ℝ`. -/
 noncomputable def spaceGrad {d : ℕ} (f : SpaceTime d → EuclideanSpace (Fin d) ℝ) :
