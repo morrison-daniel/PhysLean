@@ -22,10 +22,14 @@ open IndexNotation
 
 -/
 
+open TensorSpecies.TensorBasis in
 private lemma finsupp_single_prodEquiv (b : (j : Fin (Nat.succ 0 + (Nat.succ 0).succ)) →
       Fin (realLorentzTensor.repDim
-        ((Sum.elim ![Color.up] ![Color.up, Color.up] ∘ ⇑finSumFinEquiv.symm) j))) :
-      (Finsupp.single (TensorSpecies.TensorBasis.prodEquiv b).1 (1 : ℝ)) =
+        ((Sum.elim (fun (i : Fin 1) => realLorentzTensor.τ (![Color.up] i))
+          ![Color.up, Color.up] ∘ ⇑finSumFinEquiv.symm) j))) :
+      (Finsupp.single (fun i => Fin.cast
+        (by simp : realLorentzTensor.repDim (realLorentzTensor.τ (![Color.up] i)) =
+        realLorentzTensor.repDim (![Color.up] i)) ((prodEquiv b).1 i)) (1 : ℝ)) =
       (Finsupp.single (fun | 0 => b 0) 1) := by
   congr
   funext x
@@ -34,7 +38,8 @@ private lemma finsupp_single_prodEquiv (b : (j : Fin (Nat.succ 0 + (Nat.succ 0).
 
 private lemma mapTobasis_prodEquiv (b : (j : Fin (Nat.succ 0 + (Nat.succ 0).succ)) →
     Fin (realLorentzTensor.repDim
-      ((Sum.elim ![Color.up] ![Color.up, Color.up] ∘ ⇑finSumFinEquiv.symm) j))) :
+      ((Sum.elim (fun (i : Fin 1) => realLorentzTensor.τ (![Color.up] i))
+        ![Color.up, Color.up] ∘ ⇑finSumFinEquiv.symm) j))) :
     (fun y => mapToBasis (↑(toElectricMagneticField.symm EM)) y
       (TensorSpecies.TensorBasis.prodEquiv b).2)
     = (fun y => mapToBasis ((toElectricMagneticField.symm EM).1) y
@@ -45,18 +50,20 @@ private lemma mapTobasis_prodEquiv (b : (j : Fin (Nat.succ 0 + (Nat.succ 0).succ
   fin_cases x
   · rfl
   · rfl
+
 lemma derivative_fromElectricMagneticField_repr_diag (EM : ElectricField × MagneticField)
     (hdiff :Differentiable ℝ (mapToBasis (toElectricMagneticField.symm EM).1))
     (y : SpaceTime) (j : ℕ) (hj : j < 4) :
     (realLorentzTensor.tensorBasis _).repr (∂ (fromElectricMagneticField EM).1 y)
     (fun | 0 => μ | 1 => ⟨j, hj⟩ | 2 => ⟨j, hj⟩) = 0 := by
-  simp only [Nat.succ_eq_add_one, Nat.reduceAdd, C_eq_color, Function.comp_apply, Fin.isValue]
+  simp only [Nat.reduceAdd, C_eq_color, Function.comp_apply, Fin.isValue]
   have h_diff : DifferentiableAt ℝ (mapToBasis (toElectricMagneticField.symm EM).1)
       (Finsupp.equivFunOnFinite ((realLorentzTensor.tensorBasis _).repr y)) := by
       exact hdiff (Finsupp.equivFunOnFinite ((realLorentzTensor.tensorBasis ![Color.up]).repr y))
   conv_lhs => erw [derivative_repr _ _ _ h_diff]
-  simp only [Nat.succ_eq_add_one, Nat.reduceAdd, C_eq_color, Fin.isValue]
-  rw [finsupp_single_prodEquiv, mapTobasis_prodEquiv]
+  simp only [Nat.reduceAdd, C_eq_color, Fin.isValue]
+  rw [finsupp_single_prodEquiv]
+  rw [mapTobasis_prodEquiv]
   trans SpaceTime.deriv μ (fun y => 0) y
   rw [SpaceTime.deriv_eq_deriv_on_coord]
   congr 1
@@ -74,7 +81,7 @@ lemma derivative_fromElectricMagneticField_repr_diag (EM : ElectricField × Magn
   · simp
 
 lemma derivative_fromElectricMagneticField_repr_zero_row (EM : ElectricField × MagneticField)
-    (hdiff :Differentiable ℝ (mapToBasis (toElectricMagneticField.symm EM).1))
+    (hdiff : Differentiable ℝ (mapToBasis (toElectricMagneticField.symm EM).1))
     (y : SpaceTime) (j : ℕ) (hj : j + 1 < 4) :
     (realLorentzTensor.tensorBasis _).repr (∂ (fromElectricMagneticField EM).1 y)
     (fun | 0 => μ| 1 => ⟨0, by simp⟩ | 2 => ⟨j + 1, hj⟩) =
@@ -133,7 +140,7 @@ lemma derivative_fromElectricMagneticField_repr_zero_col (EM : ElectricField × 
     simp
 
 lemma derivative_fromElectricMagneticField_repr_one_two (EM : ElectricField × MagneticField)
-    (hdiff :Differentiable ℝ (mapToBasis (toElectricMagneticField.symm EM).1))
+    (hdiff : Differentiable ℝ (mapToBasis (toElectricMagneticField.symm EM).1))
     (y : SpaceTime) :
     (realLorentzTensor.tensorBasis _).repr (∂ (fromElectricMagneticField EM).1 y)
     (fun | 0 => μ | 1 => ⟨1, by simp⟩ | 2 => ⟨2, by simp⟩) =

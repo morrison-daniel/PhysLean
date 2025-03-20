@@ -76,8 +76,15 @@ lemma coord_on_repr {d : ℕ} (μ : Fin (1 + d))
 -/
 
 /-- The derivative of a function `SpaceTime d → ℝ` along the `μ` coordinte. -/
-noncomputable def deriv {d : ℕ} (μ : Fin (1 + d)) (f : SpaceTime d → ℝ) : SpaceTime d → ℝ :=
+noncomputable def deriv {M : Type} [AddCommGroup M] [Module ℝ M] [TopologicalSpace M]
+    {d : ℕ} (μ : Fin (1 + d)) (f : SpaceTime d → M) : SpaceTime d → M :=
   fun y => fderiv ℝ f y ((realLorentzTensor d).tensorBasis _ (fun x => Fin.cast (by simp) μ))
+
+@[inherit_doc deriv]
+scoped notation "∂_" => deriv
+
+/-- The derivative with respect to time. -/
+scoped notation "∂ₜ" => deriv 0
 
 lemma deriv_eq {d : ℕ} (μ : Fin (1 + d)) (f : SpaceTime d → ℝ) (y : SpaceTime d) :
     SpaceTime.deriv μ f y =
@@ -85,7 +92,7 @@ lemma deriv_eq {d : ℕ} (μ : Fin (1 + d)) (f : SpaceTime d → ℝ) (y : Space
   rfl
 
 @[simp]
-lemma deriv_zero {d : ℕ} (μ : Fin (1 + d)) : SpaceTime.deriv μ (fun _ => 0) = 0 := by
+lemma deriv_zero {d : ℕ} (μ : Fin (1 + d)) : SpaceTime.deriv μ (fun _ => (0 : ℝ)) = 0 := by
   ext y
   rw [SpaceTime.deriv_eq]
   simp
@@ -209,10 +216,24 @@ lemma deriv_coord_eq_if {d : ℕ} (μ ν : Fin (1 + d)) (y : SpaceTime d) :
   · rw [if_neg h]
     exact SpaceTime.deriv_coord_diff μ ν h y
 
-/-- The gradiant of a function `SpaceTime d → EuclideanSpace (Fin d) ℝ`. -/
-noncomputable def spaceGrad {d : ℕ} (f : SpaceTime d → EuclideanSpace (Fin d) ℝ) :
+/-- The divergence of a function `SpaceTime d → EuclideanSpace ℝ (Fin d)`. -/
+noncomputable def spaceDiv {d : ℕ} (f : SpaceTime d → EuclideanSpace ℝ (Fin d)) :
     SpaceTime d → ℝ :=
   ∑ j, SpaceTime.deriv (finSumFinEquiv (Sum.inr j)) (fun y => f y j)
+
+@[inherit_doc spaceDiv]
+scoped[SpaceTime] notation "∇⬝" E => spaceDiv E
+
+/-- The curl of a function `SpaceTime → EuclideanSpace ℝ (Fin 3)`. -/
+def spaceCurl (f : SpaceTime → EuclideanSpace ℝ (Fin 3)) :
+    SpaceTime → EuclideanSpace ℝ (Fin 3) := fun x j =>
+  match j with
+  | 0 => deriv 1 (fun y => f y 2) x - deriv 2 (fun y => f y 1) x
+  | 1 => deriv 2 (fun y => f y 0) x - deriv 0 (fun y => f y 2) x
+  | 2 => deriv 0 (fun y => f y 1) x - deriv 1 (fun y => f y 0) x
+
+@[inherit_doc spaceCurl]
+scoped[SpaceTime] notation "∇×" => spaceCurl
 
 end SpaceTime
 
