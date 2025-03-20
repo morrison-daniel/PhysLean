@@ -5,7 +5,6 @@ Authors: Joseph Tooby-Smith
 -/
 import PhysLean.Relativity.Tensors.Tree.NodeIdentities.PermContr
 import PhysLean.Relativity.Lorentz.RealTensor.Basic
-import PhysLean.Relativity.Tensors.Tree.NodeIdentities.Basic
 /-!
 
 ## Metrics as real Lorentz tensors

@@ -3,11 +3,7 @@ Copyright (c) 2025 Joseph Tooby-Smith. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Joseph Tooby-Smith
 -/
-import PhysLean.Relativity.Tensors.Tree.Dot
-import PhysLean.Relativity.Lorentz.Weyl.Metric
 import PhysLean.Relativity.Lorentz.RealTensor.Basic
-import PhysLean.Relativity.Lorentz.RealTensor.Vector.Pre.Basic
-import PhysLean.Relativity.Lorentz.PauliMatrices.AsTensor
 /-!
 
 ## Derivative of Real Lorentz tensors
