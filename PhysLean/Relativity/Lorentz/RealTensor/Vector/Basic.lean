@@ -5,7 +5,6 @@ Authors: Matteo Cipollina, Joseph Tooby-Smith
 -/
 import PhysLean.Relativity.Lorentz.RealTensor.Metrics.Basic
 import Mathlib.Geometry.Manifold.IsManifold.Basic
-import Mathlib.Analysis.InnerProductSpace.PiL2
 /-!
 
 ## Metrics as real Lorentz tensors
