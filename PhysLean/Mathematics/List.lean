@@ -63,10 +63,10 @@ lemma dropWile_eraseIdx {I : Type} (P : I → Prop) [DecidablePred P] :
   | [], _, h => by
     simp
   | a :: [], 0, h => by
-    simp only [List.dropWhile, nonpos_iff_eq_zero, List.length_eq_zero, List.takeWhile_eq_nil_iff,
-      List.length_singleton, zero_lt_one, Fin.zero_eta, Fin.isValue, List.get_eq_getElem,
-      Fin.val_eq_zero, List.getElem_cons_zero, decide_eq_true_eq, forall_const, zero_le,
-      Nat.sub_eq_zero_of_le, List.eraseIdx_zero, ite_not, List.nil_eq]
+    simp only [List.eraseIdx_zero, nonpos_iff_eq_zero, List.length_eq_zero_iff,
+      List.takeWhile_eq_nil_iff, List.length_singleton, zero_lt_one, Fin.zero_eta, Fin.isValue,
+      List.get_eq_getElem, Fin.val_eq_zero, List.getElem_cons_zero, decide_eq_true_eq, forall_const,
+      List.dropWhile, zero_le, Nat.sub_eq_zero_of_le, ite_not]
     simp_all only [List.length_cons, List.length_nil, List.get_eq_getElem, Fin.val_eq_zero,
       List.getElem_cons_zero, implies_true, List.tail_cons, List.dropWhile_nil, decide_true,
       decide_false, ite_self]
@@ -86,17 +86,17 @@ lemma dropWile_eraseIdx {I : Type} (P : I → Prop) [DecidablePred P] :
         zero_le, ↓reduceIte, tsub_zero, List.eraseIdx_cons_succ, List.eraseIdx_nil]
     exact Nat.le_add_left [a].length n
   | a :: b :: l, 0, h => by
-    simp only [List.dropWhile, List.takeWhile, nonpos_iff_eq_zero, List.length_eq_zero, zero_le,
+    simp only [List.dropWhile, List.takeWhile, nonpos_iff_eq_zero, List.length_eq_zero_iff, zero_le,
       Nat.sub_eq_zero_of_le, List.eraseIdx_zero]
     by_cases hPb : P b
     · have hPa : P a := by
         simpa using h ⟨0, by simp⟩ ⟨1, by simp⟩ (by simp [Fin.lt_def]) (by simpa using hPb)
       simp [hPb, hPa]
-    · simp only [hPb, decide_false, nonpos_iff_eq_zero, List.length_eq_zero]
+    · simp only [hPb, decide_false, nonpos_iff_eq_zero, List.length_eq_zero_iff]
       simp_all only [List.length_cons, List.get_eq_getElem]
       simp_rw [decide_false]
       simp_all only [List.tail_cons, decide_false, Bool.false_eq_true, not_false_eq_true,
-        List.dropWhile_cons_of_neg, nonpos_iff_eq_zero, List.length_eq_zero]
+        List.dropWhile_cons_of_neg, nonpos_iff_eq_zero, List.length_eq_zero_iff]
       split
       next x heq =>
         simp_all only [decide_eq_true_eq, List.length_singleton, nonpos_iff_eq_zero, one_ne_zero,
@@ -579,7 +579,7 @@ lemma orderedInsert_eq_insertIdx_orderedInsertPos {I : Type} (le1 : I → I → 
       erw [List.getElem_insertIdx_of_lt]
       exact hn'
     · simp only [hn', ↓reduceIte]
-      rw [List.getElem_insertIdx_of_ge]
+      rw [List.getElem_insertIdx_of_gt]
       · rfl
       · omega
 
