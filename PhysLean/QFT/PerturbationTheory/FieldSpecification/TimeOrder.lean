@@ -293,7 +293,7 @@ lemma orderedInsert_swap_eq_time {φ ψ : 𝓕.CrAnFieldOp}
     List.takeWhile_cons_of_neg, List.append_nil, List.append_cancel_left_eq, List.cons.injEq,
     true_and]
   rw [List.dropWhile_append]
-  simp only [List.isEmpty_eq_true, List.dropWhile_eq_nil_iff, Bool.not_eq_eq_eq_not, Bool.not_true,
+  simp only [List.isEmpty_iff, List.dropWhile_eq_nil_iff, Bool.not_eq_eq_eq_not, Bool.not_true,
     decide_eq_false_iff_not, crAnTimeOrderRel_refl, decide_true, Bool.false_eq_true,
     not_false_eq_true, List.dropWhile_cons_of_neg, ite_eq_left_iff, not_forall, Classical.not_imp,
     Decidable.not_not, List.append_left_eq_self, forall_exists_index, and_imp]
