@@ -33,7 +33,7 @@ noncomputable def mapToBasis {d n m : ℕ} {cm : Fin m → (realLorentzTensor d)
     `ℝT(d, cm) → ℝT(d, (Sum.elim cm cn) ∘ finSumFinEquiv.symm)`. -/
 noncomputable def derivative {d n m : ℕ} {cm : Fin m → (realLorentzTensor d).C}
     {cn : Fin n → (realLorentzTensor d).C} (f : ℝT(d, cm) → ℝT(d, cn)) :
-    ℝT(d, cm) → ℝT(d, (Sum.elim cm cn) ∘ finSumFinEquiv.symm) := fun y =>
+    ℝT(d, cm) → ℝT(d, (Sum.elim (fun i => (realLorentzTensor d).τ (cm i)) cn) ∘ finSumFinEquiv.symm) := fun y =>
       ((realLorentzTensor d).tensorBasis _).repr.toEquiv.symm <|
       Finsupp.equivFunOnFinite.symm <| fun b =>
   /- The `b` componenet of the derivative of `f` evaluated at `y` is: -/
@@ -42,7 +42,7 @@ noncomputable def derivative {d n m : ℕ} {cm : Fin m → (realLorentzTensor d)
   /- evaluated at the point `y` in `ℝT(d, cm)` -/
     (Finsupp.equivFunOnFinite (((realLorentzTensor d).tensorBasis cm).repr y))
   /- In the direction of `(prodEquiv b).1` -/
-    (Finsupp.single (prodEquiv b).1 (1 : ℝ))
+    (Finsupp.single (fun i => Fin.cast (by simp) ((prodEquiv b).1 i)) (1 : ℝ))
   /- The `(prodEquiv b).2` component of that derivative. -/
     (prodEquiv b).2
 
@@ -54,18 +54,21 @@ lemma derivative_repr {d n m : ℕ} {cm : Fin m → (realLorentzTensor d).C}
     {cn : Fin n → (realLorentzTensor d).C} (f : ℝT(d, cm) → ℝT(d, cn))
     (y : ℝT(d, cm))
     (b : (j : Fin (m + n)) →
-      Fin ((realLorentzTensor d).repDim (((cm ⊕ᵥ cn) ∘ ⇑finSumFinEquiv.symm) j)))
+      Fin ((realLorentzTensor d).repDim ((((fun i => (realLorentzTensor d).τ (cm i)) ⊕ᵥ cn) ∘ ⇑finSumFinEquiv.symm) j)))
     (h1 : DifferentiableAt ℝ (mapToBasis f)
       (Finsupp.equivFunOnFinite (((realLorentzTensor d).tensorBasis cm).repr y))) :
     ((realLorentzTensor d).tensorBasis _).repr (∂ f y) b =
     fderiv ℝ (fun y => mapToBasis f y (prodEquiv b).2)
       (((realLorentzTensor d).tensorBasis cm).repr y)
-      (Finsupp.single (prodEquiv b).1 (1 : ℝ)) := by
+      (Finsupp.single (fun i => Fin.cast (by simp) ((prodEquiv b).1 i)) (1 : ℝ)) := by
   simp [derivative]
   rw [fderiv_pi]
   · simp
     rfl
   · rw [← differentiableAt_pi]
     exact h1
+
+TODO "Prove that the derivative obeys the correct equivariant with respect to the
+  Lorentz group."
 
 end realLorentzTensor
