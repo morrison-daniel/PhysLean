@@ -82,9 +82,11 @@ lemma toCoord_tprod {d : ℕ} (p : (i : Fin 1) →
       ((Lorentz.contrBasisFin d).repr (p 0))
       (indexEquiv.symm i 0) := by
   rw [toCoord_apply]
-  simp
+  simp only [Nat.succ_eq_add_one, Nat.reduceAdd, C_eq_color, OverColor.mk_left, Functor.id_obj,
+    OverColor.mk_hom, Equiv.piCongrLeft'_apply, Finsupp.equivFunOnFinite_apply, Fin.isValue]
   erw [TensorSpecies.TensorBasis.tensorBasis_repr_tprod]
-  simp
+  simp only [Finset.univ_unique, Fin.default_eq_zero, Fin.isValue, C_eq_color,
+    Finset.prod_singleton, cons_val_zero]
   rfl
 
 lemma tensorNode_repr_apply {d : ℕ} (p : Vector d)
@@ -294,7 +296,6 @@ lemma action_apply_eq_sum (i : Fin 1 ⊕ Fin d) (Λ : LorentzGroup d) (p : Vecto
     rw [← mul_assoc, mul_comm _ r, mul_assoc]
   rw [← Finset.mul_sum]
   congr
-  have hl : (𝟭 Type).obj (OverColor.mk ![Color.up]).left = Fin 1 := by rfl
   simp_all only [Nat.succ_eq_add_one, OverColor.mk_left, _root_.zero_add, Functor.id_obj,
     C_eq_color, OverColor.mk_hom]
   erw [toCoord_tprod]

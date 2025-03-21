@@ -54,7 +54,7 @@ lemma contrBasisFin_toFin1dℝ {d : ℕ} (i : Fin (1 + d)) :
   simp only [contrBasisFin, Basis.reindex_apply, contrBasis_toFin1dℝ, Basis.coe_ofEquivFun]
 
 lemma contrBasisFin_repr_apply {d : ℕ} (p : Contr d) (i : Fin (1 + d)) :
-  (contrBasisFin d).repr p i = p.val (finSumFinEquiv.symm i) := by rfl
+    (contrBasisFin d).repr p i = p.val (finSumFinEquiv.symm i) := by rfl
 
 /-- The representation of contravariant Lorentz vectors forms a topological space, induced
   by its equivalence to `Fin 1 ⊕ Fin d → ℝ`. -/

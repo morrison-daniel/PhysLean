@@ -4,10 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Joseph Tooby-Smith
 -/
 import PhysLean.Relativity.SpaceTime.Basic
-import Mathlib.Tactic.Polyrith
 import Mathlib.Geometry.Manifold.VectorBundle.SmoothSection
 import Mathlib.Geometry.Manifold.Instances.Real
-import PhysLean.Meta.Informal.Basic
 /-!
 
 # The Higgs field
