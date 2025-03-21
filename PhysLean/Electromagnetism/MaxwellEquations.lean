@@ -60,5 +60,8 @@ def MaxwellEquations (E : ElectricField) (B : MagneticField) : Prop :=
   𝓔.GaussLawElectric E ∧ GaussLawMagnetic B ∧
   FaradayLaw E B ∧ 𝓔.AmpereLaw E B
 
+TODO "Show that if the charge density is spherically symmetric,
+  then the electric field is also spherically symmetric."
+
 end EMSystem
 end Electromagnetism
