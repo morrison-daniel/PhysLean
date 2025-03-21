@@ -42,17 +42,18 @@ where
     simp only [Fintype.sum_sum_type, Finset.univ_unique, Fin.default_eq_zero, Fin.isValue,
       Finset.sum_singleton]
     rw [minkowskiMatrix.inl_0_inl_0]
-    simp
+    simp only [Fin.isValue, and_true, one_div, reduceCtorEq, and_false, ↓reduceIte, neg_mul,
+      mul_ite, mul_neg, mul_one, mul_zero, ite_mul, zero_mul, Sum.inr.injEq]
     conv_lhs =>
       enter [2, 2, x]
       rw [minkowskiMatrix.inr_i_inr_i]
-    simp
+    simp only [Fin.isValue, mul_neg, mul_one, neg_mul, neg_neg]
     have hb1 : √(1 - β ^ 2) ^ 2 = 1 - β ^ 2 := by
       refine Real.sq_sqrt ?_
-      simp
+      simp only [sub_nonneg, sq_le_one_iff_abs_le_one]
       exact le_of_lt hβ
     have hb2 : 1 - β ^ 2 ≠ 0 := by
-      simp [sub_ne_zero, hb1]
+      simp only [ne_eq, sub_ne_zero]
       by_contra h
       have hl : 1 ^ 2 = β ^ 2 := by
         rw [← h]
@@ -62,20 +63,22 @@ where
       simp at hβ
     by_cases hj : j = Sum.inl 0
     · subst hj
-      simp [minkowskiMatrix.inl_0_inl_0]
+      simp only [Fin.isValue, ↓reduceIte, minkowskiMatrix.inl_0_inl_0, one_mul, true_and,
+        reduceCtorEq, false_and]
       rw [Finset.sum_eq_single i]
       · simp
         by_cases hk : k = Sum.inl 0
         · subst hk
-          simp
+          simp only [Fin.isValue, ↓reduceIte, one_apply_eq]
           ring_nf
           field_simp [hb1, hb2]
           ring
-        · simp [hk]
+        · simp only [Fin.isValue, hk, ↓reduceIte]
           by_cases hk' : k = Sum.inr i
-          · simp [hk']
+          · simp only [hk', ↓reduceIte, Fin.isValue, ne_eq, reduceCtorEq, not_false_eq_true,
+            one_apply_ne]
             ring
-          · simp [hk', hk]
+          · simp only [hk', ↓reduceIte, Fin.isValue]
             rw [one_apply_ne fun a => hk (id (Eq.symm a))]
             rw [if_neg (by exact fun a => hk (id (Eq.symm a)))]
             rw [if_neg (by exact fun a => hk' (id (Eq.symm a)))]
@@ -86,8 +89,7 @@ where
     · match j with
       | Sum.inl 0 => simp at hj
       | Sum.inr j =>
-      rw [minkowskiMatrix.inr_i_inr_i]
-      rw [Finset.sum_eq_single j]
+      rw [minkowskiMatrix.inr_i_inr_i, Finset.sum_eq_single j]
       · by_cases hj' : j = i
         · subst hj'
           conv_lhs =>
@@ -98,25 +100,27 @@ where
             simp only [Fin.isValue]
           match k with
           | Sum.inl 0 =>
-            simp
+            simp only [Fin.isValue, ↓reduceIte, reduceCtorEq, neg_mul, one_mul, neg_neg, and_self,
+              and_true, ne_eq, not_false_eq_true, one_apply_ne]
             ring
           | Sum.inr k =>
           by_cases hk : k = j
           · subst hk
-            simp
+            simp only [Fin.isValue, reduceCtorEq, ↓reduceIte, neg_mul, one_mul, neg_neg, and_true,
+              and_self, one_apply_eq]
             ring_nf
             field_simp [hb1, hb2]
             ring
           · rw [one_apply]
-            simp [hk]
+            simp only [Fin.isValue, reduceCtorEq, ↓reduceIte, Sum.inr.injEq, hk, and_true, and_self,
+              neg_mul, one_mul, neg_neg, zero_add]
             rw [if_neg (fun a => hk (id (Eq.symm a))), if_neg (fun a => hk (id (Eq.symm a)))]
         · conv_lhs =>
             enter [1, 1, 2]
-            simp [hj']
+            simp only [Fin.isValue]
           conv_lhs =>
             enter [2, 1, 1, 2]
-            simp [hj']
-          simp
+            simp only [Fin.isValue]
           rw [one_apply]
           simp [hj']
       · intro b _ hb
@@ -125,14 +129,15 @@ where
           zero_mul, mul_one]
         match k with
         | Sum.inl 0 =>
-          simp
+          simp only [Fin.isValue, true_and, neg_neg, reduceCtorEq, false_and, ↓reduceIte,
+            ite_eq_right_iff, neg_eq_zero, mul_eq_zero, inv_eq_zero, or_self_left, and_imp]
           intro h1 h2
           subst h1 h2
           simp at hb
         | Sum.inr k =>
-        simp
+        simp only [Fin.isValue, reduceCtorEq, false_and, ↓reduceIte, Sum.inr.injEq, neg_neg]
         by_cases hb' : b = i
-        · simp [hb']
+        · simp only [hb', and_true]
           subst hb'
           simp [Ne.symm hb]
         · simp [hb']
@@ -164,9 +169,10 @@ lemma boost_transpose_matrix_eq_self (i : Fin d) {β : ℝ} (hβ : |β| < 1) :
   rw [← transpose_val, boost_transpose_eq_self]
 
 @[simp]
-lemma boost_zero_eq_id (i : Fin d) : boost i (β := 0) (by simp) = 1 := by
+lemma boost_zero_eq_id (i : Fin d) : boost i 0 (by simp) = 1 := by
   ext j k
-  simp [boost]
+  simp only [boost, Fin.isValue, ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, zero_pow, sub_zero,
+    Real.sqrt_one, one_ne_zero, div_self, mul_zero, lorentzGroupIsGroup_one_coe]
   match j, k with
   | Sum.inl 0, Sum.inl 0 => rfl
   | Sum.inl 0, Sum.inr k =>
@@ -185,7 +191,7 @@ lemma boost_inverse (i : Fin d) {β : ℝ} (hβ : |β| < 1) :
     (boost i β hβ)⁻¹ = boost i (-β) (by simpa using hβ) := by
   rw [lorentzGroupIsGroup_inv]
   ext j k
-  simp
+  simp only
   rw [minkowskiMatrix.dual_apply]
   match j, k with
   | Sum.inl 0, Sum.inl 0 =>
@@ -193,7 +199,9 @@ lemma boost_inverse (i : Fin d) {β : ℝ} (hβ : |β| < 1) :
     simp [boost]
   | Sum.inl 0, Sum.inr k =>
     rw [minkowskiMatrix.inl_0_inl_0, minkowskiMatrix.inr_i_inr_i]
-    simp [boost]
+    simp only [boost, Fin.isValue, one_div, neg_mul, reduceCtorEq, and_false, ↓reduceIte,
+      Sum.inr.injEq, true_and, and_self, false_and, mul_ite, mul_neg, one_mul, mul_zero, mul_one,
+      even_two, Even.neg_pow, neg_neg, and_true]
     split
     · simp
     · simp
@@ -202,7 +210,9 @@ lemma boost_inverse (i : Fin d) {β : ℝ} (hβ : |β| < 1) :
     simp [boost]
   | Sum.inr j, Sum.inr k =>
     rw [minkowskiMatrix.inr_i_inr_i, minkowskiMatrix.inr_i_inr_i]
-    simp [boost]
+    simp only [boost, Fin.isValue, one_div, neg_mul, reduceCtorEq, and_self, ↓reduceIte,
+      Sum.inr.injEq, false_and, and_false, mul_ite, one_mul, mul_one, mul_zero, mul_neg, even_two,
+      Even.neg_pow, neg_neg]
     split
     · simp
       rw [if_pos]
