@@ -180,7 +180,8 @@ import PhysLean.Relativity.Lorentz.ComplexVector.Modules
 import PhysLean.Relativity.Lorentz.ComplexVector.Two
 import PhysLean.Relativity.Lorentz.ComplexVector.Unit
 import PhysLean.Relativity.Lorentz.Group.Basic
-import PhysLean.Relativity.Lorentz.Group.Boosts
+import PhysLean.Relativity.Lorentz.Group.Boosts.Basic
+import PhysLean.Relativity.Lorentz.Group.Boosts.Generalized
 import PhysLean.Relativity.Lorentz.Group.Orthochronous
 import PhysLean.Relativity.Lorentz.Group.Proper
 import PhysLean.Relativity.Lorentz.Group.Restricted
