@@ -98,11 +98,6 @@ name = "redundent_imports"
 supportInterpreter = true
 srcDir = "scripts/MetaPrograms"
 
-[[lean_exe]]
-name = "Spelling"
-supportInterpreter = true
-srcDir = "scripts/MetaPrograms"
-
 # -- Optional inclusion of openAI_doc_check. Needs `llm` above.
 #[[lean_exe]]
 #name = "openAI_doc_check"

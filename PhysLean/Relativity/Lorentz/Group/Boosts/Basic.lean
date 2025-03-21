@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2024 Joseph Tooby-Smith. All rights reserved.
+Copyright (c) 2025 Joseph Tooby-Smith. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Joseph Tooby-Smith
 -/
@@ -21,15 +21,30 @@ namespace LorentzGroup
 variable {d : ℕ}
 variable (Λ : LorentzGroup d)
 
+/-- The Lorentz factor (aka gamma factor or Lorentz term). -/
+def γ (β : ℝ) : ℝ := 1 / Real.sqrt (1 - β^2)
+
+lemma γ_sq (β : ℝ) (hβ : |β| < 1) : (γ β)^2 = 1 / (1 - β^2) := by
+  simp only [γ, one_div, inv_pow, _root_.inv_inj]
+  refine Real.sq_sqrt ?_
+  simp only [sub_nonneg, sq_le_one_iff_abs_le_one]
+  exact le_of_lt hβ
+
+@[simp]
+lemma γ_zero : γ 0 = 1 := by simp [γ]
+
+@[simp]
+lemma γ_neg (β : ℝ) : γ (-β) = γ β := by simp [γ]
+
 /-- The Lorentz boost with in the space direction `i` with speed `β` with
   `|β| < 1`. -/
 def boost (i : Fin d) (β : ℝ) (hβ : |β| < 1) : LorentzGroup d :=
-  ⟨let γ := 1 / Real.sqrt (1 - β^2)
+  ⟨
   fun j k =>
-    if k = Sum.inl 0 ∧ j = Sum.inl 0 then γ
-    else if k = Sum.inl 0 ∧ j = Sum.inr i then - γ * β
-    else if k = Sum.inr i ∧ j = Sum.inl 0 then - γ * β
-    else if k = Sum.inr i ∧ j = Sum.inr i then γ else
+    if k = Sum.inl 0 ∧ j = Sum.inl 0 then γ β
+    else if k = Sum.inl 0 ∧ j = Sum.inr i then - γ β * β
+    else if k = Sum.inr i ∧ j = Sum.inl 0 then - γ β * β
+    else if k = Sum.inr i ∧ j = Sum.inr i then γ β else
     if j = k then 1 else 0, h⟩
 where
   h := by
@@ -66,13 +81,12 @@ where
       simp only [Fin.isValue, ↓reduceIte, minkowskiMatrix.inl_0_inl_0, one_mul, true_and,
         reduceCtorEq, false_and]
       rw [Finset.sum_eq_single i]
-      · simp
+      · simp only [Fin.isValue, and_true, ↓reduceIte]
         by_cases hk : k = Sum.inl 0
         · subst hk
           simp only [Fin.isValue, ↓reduceIte, one_apply_eq]
           ring_nf
-          field_simp [hb1, hb2]
-          ring
+          field_simp [γ, hb1, hb2]
         · simp only [Fin.isValue, hk, ↓reduceIte]
           by_cases hk' : k = Sum.inr i
           · simp only [hk', ↓reduceIte, Fin.isValue, ne_eq, reduceCtorEq, not_false_eq_true,
@@ -109,8 +123,7 @@ where
             simp only [Fin.isValue, reduceCtorEq, ↓reduceIte, neg_mul, one_mul, neg_neg, and_true,
               and_self, one_apply_eq]
             ring_nf
-            field_simp [hb1, hb2]
-            ring
+            field_simp [γ, hb1, hb2]
           · rw [one_apply]
             simp only [Fin.isValue, reduceCtorEq, ↓reduceIte, Sum.inr.injEq, hk, and_true, and_self,
               neg_mul, one_mul, neg_neg, zero_add]
@@ -174,7 +187,7 @@ lemma boost_zero_eq_id (i : Fin d) : boost i 0 (by simp) = 1 := by
   simp only [boost, Fin.isValue, ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, zero_pow, sub_zero,
     Real.sqrt_one, one_ne_zero, div_self, mul_zero, lorentzGroupIsGroup_one_coe]
   match j, k with
-  | Sum.inl 0, Sum.inl 0 => rfl
+  | Sum.inl 0, Sum.inl 0 => simp [γ]
   | Sum.inl 0, Sum.inr k =>
     simp
   | Sum.inr i, Sum.inl 0 =>
@@ -227,6 +240,55 @@ lemma boost_inverse (i : Fin d) {β : ℝ} (hβ : |β| < 1) :
       · rename_i h2
         rw [if_neg (fun a => h2 (Eq.symm a))]
         simp
+
+@[simp]
+lemma boost_inl_0_inl_0 (i : Fin d) {β : ℝ} (hβ : |β| < 1) :
+    (boost i β hβ).1 (Sum.inl 0) (Sum.inl 0) = γ β := by
+  simp [boost]
+
+@[simp]
+lemma boost_inr_self_inr_self (i : Fin d) {β : ℝ} (hβ : |β| < 1) :
+    (boost i β hβ).1 (Sum.inr i) (Sum.inr i) = γ β := by
+  simp [boost]
+
+@[simp]
+lemma boost_inl_0_inr_self (i : Fin d) {β : ℝ} (hβ : |β| < 1) :
+    (boost i β hβ).1 (Sum.inl 0) (Sum.inr i) = - γ β * β := by
+  simp [boost]
+
+@[simp]
+lemma boost_inr_self_inl_0 (i : Fin d) {β : ℝ} (hβ : |β| < 1) :
+    (boost i β hβ).1 (Sum.inr i) (Sum.inl 0) = - γ β * β := by
+  simp [boost]
+
+lemma boost_inl_0_inr_other {i j : Fin d} {β : ℝ} (hβ : |β| < 1) (hij : j ≠ i) :
+    (boost i β hβ).1 (Sum.inl 0) (Sum.inr j) = 0 := by
+  simp [boost, hij]
+
+lemma boost_inr_other_inl_0 {i j : Fin d} {β : ℝ} (hβ : |β| < 1) (hij : j ≠ i) :
+    (boost i β hβ).1 (Sum.inr j) (Sum.inl 0) = 0 := by
+  simp [boost, hij]
+
+lemma boost_inr_self_inr_other {i j : Fin d} {β : ℝ} (hβ : |β| < 1) (hij : j ≠ i) :
+    (boost i β hβ).1 (Sum.inr i) (Sum.inr j) = 0 := by
+  simp only [boost, Fin.isValue, neg_mul, reduceCtorEq, and_self, ↓reduceIte, and_true,
+    Sum.inr.injEq, hij, ite_eq_right_iff, one_ne_zero, imp_false]
+  exact id (Ne.symm hij)
+
+lemma boost_inr_other_inr_self {i j : Fin d} {β : ℝ} (hβ : |β| < 1) (hij : j ≠ i) :
+    (boost i β hβ).1 (Sum.inr j) (Sum.inr i) = 0 := by
+  simp [boost, hij]
+
+lemma boost_inr_other_inr {i j k : Fin d} {β : ℝ} (hβ : |β| < 1) (hij : j ≠ i) :
+    (boost i β hβ).1 (Sum.inr j) (Sum.inr k) = if j = k then 1 else 0:= by
+  simp [boost, hij]
+
+lemma boost_inr_inr_other {i j k : Fin d} {β : ℝ} (hβ : |β| < 1) (hij : j ≠ i) :
+    (boost i β hβ).1 (Sum.inr k) (Sum.inr j) = if j = k then 1 else 0:= by
+  rw [← boost_transpose_eq_self]
+  simp only [transpose, transpose_apply]
+  rw [boost_inr_other_inr]
+  exact hij
 
 end LorentzGroup
 
