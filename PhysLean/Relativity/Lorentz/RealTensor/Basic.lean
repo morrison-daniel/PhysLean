@@ -147,6 +147,12 @@ instance (d : ℕ) : DecidableEq (realLorentzTensor d).C := realLorentzTensor.in
 @[simp]
 lemma C_eq_color {d : ℕ} : (realLorentzTensor d).C = Color := rfl
 
+/-!
+
+## Simplyfing repDim
+
+-/
+
 lemma repDim_up {d : ℕ} : (realLorentzTensor d).repDim Color.up = 1 + d := rfl
 
 lemma repDim_down {d : ℕ} : (realLorentzTensor d).repDim Color.down = 1 + d := rfl
@@ -157,6 +163,19 @@ lemma repDim_eq_one_plus_dim {d : ℕ} {c : (realLorentzTensor d).C} :
   cases c
   · rfl
   · rfl
+
+/-!
+
+## Simplyfing τ
+
+-/
+
+@[simp]
+lemma τ_up_eq_down {d : ℕ} : (realLorentzTensor d).τ Color.up = Color.down := rfl
+
+@[simp]
+lemma τ_down_eq_up {d : ℕ} : (realLorentzTensor d).τ Color.down = Color.up := rfl
+
 /-!
 
 ## Simplification of contractions with respect to basis
