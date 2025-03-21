@@ -45,8 +45,8 @@ name = "type_former_lint"
 srcDir = "scripts"
 
 [[lean_exe]]
-name = "hepLean_style_lint"
-srcDir = "scripts"
+name = "style_lint"
+srcDir = "scripts/MetaPrograms"
 
 [[lean_exe]]
 name = "find_TODOs"
