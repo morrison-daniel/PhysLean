@@ -48,18 +48,18 @@ def GaussLawElectric (E : ElectricField) : Prop :=
 def GaussLawMagnetic (B : MagneticField) : Prop :=
   ∀ x : SpaceTime, (∇⬝ B) x = 0
 
-/-- Faraday's law. -/
-def FaradayLaw (E : ElectricField) (B : MagneticField) : Prop :=
-  ∀ x : SpaceTime, ∇× B x = μ₀ • (J x + ε₀ • ∂ₜ E x)
-
 /-- Ampère's law. -/
 def AmpereLaw (E : ElectricField) (B : MagneticField) : Prop :=
+  ∀ x : SpaceTime, ∇× B x = μ₀ • (J x + ε₀ • ∂ₜ E x)
+
+/-- Faraday's law. -/
+def FaradayLaw (E : ElectricField) (B : MagneticField) : Prop :=
   ∀ x : SpaceTime, ∇× E x = - ∂ₜ B x
 
 /-- Maxwell's equations. -/
 def MaxwellEquations (E : ElectricField) (B : MagneticField) : Prop :=
   𝓔.GaussLawElectric E ∧ GaussLawMagnetic B ∧
-  𝓔.FaradayLaw E B ∧ AmpereLaw E B
+  FaradayLaw E B ∧ 𝓔.AmpereLaw E B
 
 end EMSystem
 end Electromagnetism
