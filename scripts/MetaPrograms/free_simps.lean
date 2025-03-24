@@ -77,7 +77,7 @@ unsafe def processFileArray (files : Array FilePath) : IO Unit := do
   if files.toList.length = 0 then
     return ()
   if files.toList.length = 1 then
-    let path? := files.get? 0
+    let path? := files[0]?
     match path? with
     | some path =>
       transverseTactics path visitTacticInfo

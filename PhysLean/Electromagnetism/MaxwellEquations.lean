@@ -15,14 +15,21 @@ namespace Electromagnetism
 /-- An electromagnetic system consists of charge density, a current density,
   the speed ofl light and the electric permittivity. -/
 structure EMSystem where
-  /-- The charge density. -/
-  ρ : SpaceTime → ℝ
-  /-- The current density. -/
-  J : SpaceTime → EuclideanSpace ℝ (Fin 3)
   /-- The speed of light. -/
   c : ℝ
   /-- The permittivity. -/
   ε₀ : ℝ
+
+TODO "Charge density and current desnity should be generalized to signed measures, in such a way
+  that they are still easy to work with and can be integrated with with tensor notation.
+  See here:
+  https://leanprover.zulipchat.com/#narrow/channel/479953-PhysLean/topic/Maxwell's.20Equations"
+
+/-- The charge density. -/
+abbrev ChargeDensity := SpaceTime → ℝ
+
+/-- Current density. -/
+abbrev CurrentDensity := SpaceTime → EuclideanSpace ℝ (Fin 3)
 
 namespace EMSystem
 variable (𝓔 : EMSystem)
@@ -34,10 +41,13 @@ noncomputable def μ₀ : ℝ := 1/(𝓔.c^2 * 𝓔.ε₀)
 /-- Coulomb's constant. -/
 noncomputable def coulombConstant : ℝ := 1/(4 * Real.pi * 𝓔.ε₀)
 
+end EMSystem
+
+variable (𝓔 : EMSystem) (ρ : ChargeDensity) (J : CurrentDensity)
+open SpaceTime
+
 local notation "ε₀" => 𝓔.ε₀
 local notation "μ₀" => 𝓔.μ₀
-local notation "J" => 𝓔.J
-local notation "ρ" => 𝓔.ρ
 
 /-- Gauss's law for the Electric field. -/
 def GaussLawElectric (E : ElectricField) : Prop :=
@@ -57,11 +67,10 @@ def FaradayLaw (E : ElectricField) (B : MagneticField) : Prop :=
 
 /-- Maxwell's equations. -/
 def MaxwellEquations (E : ElectricField) (B : MagneticField) : Prop :=
-  𝓔.GaussLawElectric E ∧ GaussLawMagnetic B ∧
-  FaradayLaw E B ∧ 𝓔.AmpereLaw E B
+  GaussLawElectric 𝓔 ρ E ∧ GaussLawMagnetic B ∧
+  FaradayLaw E B ∧ AmpereLaw 𝓔 J E B
 
 TODO "Show that if the charge density is spherically symmetric,
   then the electric field is also spherically symmetric."
 
-end EMSystem
 end Electromagnetism
