@@ -158,7 +158,7 @@ lemma succAbove_succAbove_predAboveI (i : Fin n.succ.succ) (j : Fin n.succ) (x :
 
 /-- The equivalence between `Fin n.succ` and `Fin 1 ⊕ Fin n` extracting the
   `i`th component. -/
-def finExtractOne {n : ℕ} (i : Fin n.succ) : Fin n.succ ≃ Fin 1 ⊕ Fin n :=
+def finExtractOne {n : ℕ} (i : Fin (n + 1)) : Fin (n + 1) ≃ Fin 1 ⊕ Fin n :=
   (finCongr (by omega : n.succ = i + 1 + (n - i))).trans <|
   finSumFinEquiv.symm.trans <|
   (Equiv.sumCongr (finSumFinEquiv.symm.trans (Equiv.sumComm (Fin i) (Fin 1)))
@@ -231,7 +231,7 @@ lemma finExtractOne_symm_inl_apply {n : ℕ} (i : Fin n.succ) :
     (finExtractOne i).symm (Sum.inl 0) = i := by
   rfl
 
-lemma finExtractOne_apply_neq {n : ℕ} (i j : Fin n.succ.succ) (hij : i ≠ j) :
+lemma finExtractOne_apply_neq {n : ℕ} (i j : Fin (n + 1 + 1)) (hij : i ≠ j) :
     finExtractOne i j = Sum.inr (predAboveI i j) := by
   symm
   apply (Equiv.symm_apply_eq _).mp ?_

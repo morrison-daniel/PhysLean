@@ -66,6 +66,7 @@ lemma contrOneTwoLeft_add_right {c1 c2 : S.C} (x : S.F.obj (OverColor.mk ![c1]))
   simp only [contrOneTwoLeft]
   simp [map_add, add_tmul, tmul_add]
 
+@[simp]
 lemma contrOneTwoLeft_tprod_eq {c1 c2 : S.C}
     (fx : (i : (𝟭 Type).obj (OverColor.mk ![c1]).left) →
       (S.FD.obj { as := (OverColor.mk ![c1]).hom i }))
@@ -110,7 +111,7 @@ lemma contr_one_two_left_eq_contrOneTwoLeft_tprod {c1 c2 : S.C} (x : S.F.obj (Ov
   subst hx
   subst hy
   conv_rhs =>
-    rw [contrOneTwoLeft_tprod_eq]
+    erw [contrOneTwoLeft_tprod_eq]
     rw [tensorToVec_inv_apply_expand]
   simp only [Nat.succ_eq_add_one, Nat.reduceAdd, Fin.isValue, Fin.succAbove_zero, mk_left,
     Functor.id_obj, mk_hom, contr_tensor, prod_tensor, Action.instMonoidalCategory_tensorObj_V,
@@ -191,7 +192,8 @@ lemma contr_one_two_left_eq_contrOneTwoLeft {c1 c2 : S.C} (x : S.F.obj (OverColo
   rw [contrOneTwoLeft_smul_left]
   simp only [smul_tmul, tmul_smul, LinearMapClass.map_smul]
   apply congrArg
-  simpa using contr_one_two_left_eq_contrOneTwoLeft_tprod (PiTensorProduct.tprod k fx)
+  simpa [OverColor.mk_hom] using
+    contr_one_two_left_eq_contrOneTwoLeft_tprod (PiTensorProduct.tprod k fx)
     (PiTensorProduct.tprod k fy) fx fy
 
 /-- Expanding `contrOneTwoLeft` as a tensor tree. -/
@@ -230,7 +232,7 @@ lemma contr_two_two_inner_tprod (c : S.C) (x : S.F.obj (OverColor.mk ![c, c]))
     (OverColor.Discrete.pairIsoSep S.FD).inv.hom y))))))) := by
   subst hx
   subst hy
-  rw [Discrete.pairIsoSep_inv_tprod S.FD fx, Discrete.pairIsoSep_inv_tprod S.FD fy]
+  erw [Discrete.pairIsoSep_inv_tprod S.FD fx, Discrete.pairIsoSep_inv_tprod S.FD fy]
   change _ = (S.F.map (OverColor.mkIso _).hom).hom ((OverColor.Discrete.pairIsoSep S.FD).hom.hom
     ((fx (0 : Fin 2) ⊗ₜ[k] (λ_ (S.FD.obj { as := S.τ c }).V).hom
       ((S.contr.app { as := c }).hom (fx (1 : Fin 2)

@@ -54,7 +54,7 @@ lemma contrFin1Fin1_inv_tmul {n : ℕ} (c : Fin n.succ.succ → S.C)
     (S.contrFin1Fin1 c i j h).inv.hom (x ⊗ₜ[k] y) =
     PiTensorProduct.tprod k (fun k =>
     match k with | Sum.inl 0 => x | Sum.inr 0 => (S.FD.map
-    (eqToHom (by simp [h]))).hom y) := by
+    (eqToHom (by simp [h, mk_hom]))).hom y) := by
   simp only [Nat.succ_eq_add_one, contrFin1Fin1, Functor.comp_obj, Discrete.functor_obj_eq_as,
     Function.comp_apply, Iso.trans_symm, Iso.symm_symm_eq, Iso.trans_inv, tensorIso_inv,
     Iso.symm_inv, Functor.mapIso_hom, tensor_comp, Functor.Monoidal.μIso_hom,
@@ -116,7 +116,7 @@ lemma contrFin1Fin1_hom_hom_tprod {n : ℕ} (c : Fin n.succ.succ → S.C)
     (x : (k : Fin 1 ⊕ Fin 1) → (S.FD.obj
       { as := (OverColor.mk ((c ∘ ⇑(PhysLean.Fin.finExtractTwo i j).symm) ∘ Sum.inl)).hom k })) :
     (S.contrFin1Fin1 c i j h).hom.hom (PiTensorProduct.tprod k x) =
-    x (Sum.inl 0) ⊗ₜ[k] ((S.FD.map (eqToHom (by simp [h]))).hom (x (Sum.inr 0))) := by
+    x (Sum.inl 0) ⊗ₜ[k] ((S.FD.map (eqToHom (by simp [h, mk_hom]))).hom (x (Sum.inr 0))) := by
   change ((Action.forget _ _).mapIso (S.contrFin1Fin1 c i j h)).hom _ = _
   trans ((Action.forget _ _).mapIso (S.contrFin1Fin1 c i j h)).toLinearEquiv
     (PiTensorProduct.tprod k x)

@@ -344,7 +344,7 @@ lemma prod_tensorBasis_repr_apply {n m : ℕ} {c : Fin n → S.C} {c1 : Fin m �
         (TensorBasis.prodEquiv.symm (b1, b2))) b
       · congr 2
         rw [TensorBasis.tensorBasis_prod]
-        simp
+        simp [OverColor.mk_hom]
       simp only [Function.comp_apply, Basis.repr_self, Pt, P]
       rw [MonoidAlgebra.single_apply, MonoidAlgebra.single_apply, MonoidAlgebra.single_apply]
       obtain ⟨b, rfl⟩ := TensorBasis.prodEquiv.symm.surjective b
@@ -546,7 +546,7 @@ lemma field_eq_repr {c : Fin 0 → S.C} (t : TensorTree S c) :
         LinearEquiv.trans_apply, Finsupp.linearEquivFunOnFinite_single, LinearEquiv.coe_coe]
         change (PiTensorProduct.isEmptyEquiv (Fin 0)) (S.fromCoordinates c
           (Pi.single _ 1)) = _
-        simp [fromCoordinates, basisVector]
+        simp [fromCoordinates, basisVector, OverColor.mk_hom, OverColor.mk_left]
     · simp only [Fin.default_eq_zero, mul_one]
       congr
       funext j

@@ -32,7 +32,7 @@ lemma contrContrToMatrixRe_symm_expand_tmul (M : Matrix (Fin 1 ⊕ Fin d) (Fin 1
   simp only [contrContrToMatrixRe, LinearEquiv.trans_symm,
     LinearEquiv.trans_apply, Basis.repr_symm_apply]
   rw [Finsupp.linearCombination_apply_of_mem_supported ℝ (s := Finset.univ)]
-  · erw [Finset.sum_product]
+  · rw [Fintype.sum_prod_type]
     refine Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ => ?_))
     erw [Basis.tensorProduct_apply (contrBasis d) (contrBasis d) i j]
     rfl
@@ -51,7 +51,7 @@ lemma coCoToMatrixRe_symm_expand_tmul (M : Matrix (Fin 1 ⊕ Fin d) (Fin 1 ⊕ F
   simp only [Action.instMonoidalCategory_tensorObj_V, coCoToMatrixRe, LinearEquiv.trans_symm,
     LinearEquiv.trans_apply, Basis.repr_symm_apply]
   rw [Finsupp.linearCombination_apply_of_mem_supported ℝ (s := Finset.univ)]
-  · erw [Finset.sum_product]
+  · rw [Fintype.sum_prod_type]
     refine Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ => ?_))
     erw [Basis.tensorProduct_apply (coBasis d) (coBasis d) i j]
     rfl
@@ -70,7 +70,7 @@ lemma contrCoToMatrixRe_symm_expand_tmul (M : Matrix (Fin 1 ⊕ Fin d) (Fin 1 �
   simp only [contrCoToMatrixRe, LinearEquiv.trans_symm,
     LinearEquiv.trans_apply, Basis.repr_symm_apply]
   rw [Finsupp.linearCombination_apply_of_mem_supported ℝ (s := Finset.univ)]
-  · erw [Finset.sum_product]
+  · rw [Fintype.sum_prod_type]
     refine Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ => ?_))
     erw [Basis.tensorProduct_apply _ _ i j]
     rfl
@@ -89,7 +89,7 @@ lemma coContrToMatrixRe_symm_expand_tmul (M : Matrix (Fin 1 ⊕ Fin d) (Fin 1 �
   simp only [Action.instMonoidalCategory_tensorObj_V, coContrToMatrixRe, LinearEquiv.trans_symm,
     LinearEquiv.trans_apply, Basis.repr_symm_apply]
   rw [Finsupp.linearCombination_apply_of_mem_supported ℝ (s := Finset.univ)]
-  · erw [Finset.sum_product]
+  · rw [Fintype.sum_prod_type]
     refine Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ => ?_))
     erw [Basis.tensorProduct_apply _ _ i j]
     rfl
@@ -124,7 +124,7 @@ lemma contrContrToMatrixRe_ρ {d : ℕ} (v : (Contr d ⊗ Contr d).V) (M : Loren
         ((LinearMap.toMatrix (contrBasis d) (contrBasis d)) ((Contr d).ρ M))
         ((LinearMap.toMatrix (contrBasis d) (contrBasis d)) ((Contr d).ρ M)) (i, j) k)
         * contrContrToMatrixRe v k.1 k.2) = _
-  erw [Finset.sum_product]
+  rw [Fintype.sum_prod_type]
   simp_rw [kroneckerMap_apply, Matrix.mul_apply, Matrix.transpose_apply]
   conv_rhs =>
     enter [2, x]
@@ -160,7 +160,7 @@ lemma coCoToMatrixRe_ρ {d : ℕ} (v : ((Co d) ⊗ (Co d)).V) (M : LorentzGroup 
         ((LinearMap.toMatrix (coBasis d) (coBasis d)) ((Co d).ρ M))
         ((LinearMap.toMatrix (coBasis d) (coBasis d)) ((Co d).ρ M)) (i, j) k)
         * coCoToMatrixRe v k.1 k.2) = _
-  erw [Finset.sum_product]
+  rw [Fintype.sum_prod_type]
   simp_rw [kroneckerMap_apply, Matrix.mul_apply, Matrix.transpose_apply]
   conv_rhs =>
     enter [2, x]
@@ -197,7 +197,7 @@ lemma contrCoToMatrixRe_ρ {d : ℕ} (v : ((Contr d) ⊗ (Co d)).V) (M : Lorentz
         ((LinearMap.toMatrix (contrBasis d) (contrBasis d)) ((Contr d).ρ M))
         ((LinearMap.toMatrix (coBasis d) (coBasis d)) ((Co d).ρ M)) (i, j) k)
         * contrCoToMatrixRe v k.1 k.2) = _
-  erw [Finset.sum_product]
+  rw [Fintype.sum_prod_type]
   simp_rw [kroneckerMap_apply, Matrix.mul_apply]
   conv_rhs =>
     enter [2, x]
@@ -234,7 +234,7 @@ lemma coContrToMatrixRe_ρ {d : ℕ} (v : ((Co d) ⊗ (Contr d)).V) (M : Lorentz
         ((LinearMap.toMatrix (coBasis d) (coBasis d)) ((Co d).ρ M))
         ((LinearMap.toMatrix (contrBasis d) (contrBasis d)) ((Contr d).ρ M)) (i, j) k)
         * coContrToMatrixRe v k.1 k.2) = _
-  erw [Finset.sum_product]
+  rw [Fintype.sum_prod_type]
   simp_rw [kroneckerMap_apply, Matrix.mul_apply, Matrix.transpose_apply]
   conv_rhs =>
     enter [2, x]
