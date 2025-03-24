@@ -145,7 +145,7 @@ lemma contr_ofRat {n : ℕ} {c : Fin (n + 1 + 1) → complexLorentzTensor.C} {i 
   congr
   funext b
   rw [← (contrSectionEquiv b).symm.sum_comp]
-  erw [Finset.sum_product]
+  rw [Fintype.sum_prod_type]
   congr
   funext x
   rw [Finset.sum_eq_single (Fin.cast (by simp [h]) x)]

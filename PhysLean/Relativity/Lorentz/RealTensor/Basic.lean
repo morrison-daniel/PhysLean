@@ -242,7 +242,7 @@ lemma contr_tensorBasis_repr_apply_eq_fin {n d: ℕ} {c : Fin (n + 1 + 1) → (r
     (liftToContrSection b ⟨Fin.cast (by simp) x, Fin.cast (by simp) x⟩)) := by
   rw [contr_tensorBasis_repr_apply_eq_contrSection]
   rw [← (contrSectionEquiv b).symm.sum_comp]
-  erw [Finset.sum_product]
+  rw [Fintype.sum_prod_type]
   let e : Fin ((realLorentzTensor d).repDim (c i)) ≃ Fin (1 + d) :=
     (Fin.castOrderIso (by simp)).toEquiv
   rw [← e.symm.sum_comp]
