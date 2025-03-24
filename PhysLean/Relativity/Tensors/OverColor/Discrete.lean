@@ -67,7 +67,8 @@ def pairIsoSep {c1 c2 : C} : F.obj (Discrete.mk c1) ⊗ F.obj (Discrete.mk c2) �
     rfl
 
 lemma pairIsoSep_tmul {c1 c2 : C} (x : F.obj (Discrete.mk c1)) (y : F.obj (Discrete.mk c2)) :
-    ((pairIsoSep F).hom.hom : (F.obj (Discrete.mk c1)).V ⊗ (F.obj (Discrete.mk c2)).V ⟶  _ ) (x ⊗ₜ[k] y) =
+    ((pairIsoSep F).hom.hom :
+      (F.obj (Discrete.mk c1)).V ⊗ (F.obj (Discrete.mk c2)).V ⟶  _ ) (x ⊗ₜ[k] y) =
     PiTensorProduct.tprod k (Fin.cases x (Fin.cases y (fun i => Fin.elim0 i))) := by
   conv_lhs =>
     simp only [Action.instMonoidalCategory_tensorObj_V, Nat.succ_eq_add_one, Nat.reduceAdd,
