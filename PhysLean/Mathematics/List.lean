@@ -344,7 +344,7 @@ lemma orderedInsert_eraseIdx_orderedInsertPos_le {I : Type} (le1 : I → I → P
 /-- The equivalence between `Fin (r0 :: r).length` and `Fin (List.orderedInsert le1 r0 r).length`
   according to where the elements map, i.e. `0` is taken to `orderedInsertPos le1 r r0`. -/
 def orderedInsertEquiv {I : Type} (le1 : I → I → Prop) [DecidableRel le1] (r : List I) (r0 : I) :
-    Fin (r0 :: r).length ≃ Fin (List.orderedInsert le1 r0 r).length := by
+    Fin (r.length + 1) ≃ Fin (List.orderedInsert le1 r0 r).length := by
   let e2 : Fin (List.orderedInsert le1 r0 r).length ≃ Fin (r0 :: r).length :=
     (Fin.castOrderIso (List.orderedInsert_length le1 r r0)).toEquiv
   let e3 : Fin (r0 :: r).length ≃ Fin 1 ⊕ Fin (r).length := finExtractOne 0
@@ -352,8 +352,9 @@ def orderedInsertEquiv {I : Type} (le1 : I → I → Prop) [DecidableRel le1] (r
     finExtractOne ⟨orderedInsertPos le1 r r0, orderedInsertPos_lt_length le1 r r0⟩
   exact e3.trans (e4.symm.trans e2.symm)
 
+@[simp]
 lemma orderedInsertEquiv_zero {I : Type} (le1 : I → I → Prop) [DecidableRel le1] (r : List I)
-    (r0 : I) : orderedInsertEquiv le1 r r0 ⟨0, by simp⟩ = orderedInsertPos le1 r r0 := by
+    (r0 : I) : orderedInsertEquiv le1 r r0 0 = orderedInsertPos le1 r r0 := by
   simp [orderedInsertEquiv]
 
 lemma orderedInsertEquiv_succ {I : Type} (le1 : I → I → Prop) [DecidableRel le1] (r : List I)
@@ -368,7 +369,8 @@ lemma orderedInsertEquiv_succ {I : Type} (le1 : I → I → Prop) [DecidableRel 
   | [] =>
     simp
   | r1 :: r =>
-    erw [finExtractOne_apply_neq]
+    simp only [List.orderedInsert.eq_2, List.length_cons, Fin.cast_inj]
+    rw [finExtractOne_apply_neq]
     simp only [List.orderedInsert.eq_2, List.length_cons, orderedInsertPos, decide_not,
       Nat.succ_eq_add_one, finExtractOne_symm_inr_apply]
     rfl
@@ -384,9 +386,12 @@ lemma orderedInsertEquiv_fin_succ {I : Type} (le1 : I → I → Prop) [Decidable
   | [] =>
     simp
   | r1 :: r =>
-    erw [finExtractOne_apply_neq]
-    simp only [List.orderedInsert.eq_2, List.length_cons, orderedInsertPos, decide_not,
-      Nat.succ_eq_add_one, finExtractOne_symm_inr_apply]
+    simp only [List.orderedInsert.eq_2, List.length_cons, OrderIso.toEquiv_symm,
+      Fin.symm_castOrderIso, Nat.succ_eq_add_one, RelIso.coe_fn_toEquiv, Fin.castOrderIso_apply,
+      Fin.eta, Fin.cast_inj]
+    rw [finExtractOne_apply_neq]
+    simp only [orderedInsertPos, List.orderedInsert.eq_2, decide_not, Nat.succ_eq_add_one,
+      finExtractOne_symm_inr_apply]
     rfl
     exact ne_of_beq_false rfl
 
@@ -413,14 +418,11 @@ lemma get_eq_orderedInsertEquiv {I : Type} (le1 : I → I → Prop) [DecidableRe
   funext x
   match x with
   | ⟨0, h⟩ =>
-    simp only [List.length_cons, Fin.zero_eta, List.get_eq_getElem, Fin.val_zero,
-      List.getElem_cons_zero, Function.comp_apply]
-    erw [orderedInsertEquiv_zero]
     simp
   | ⟨Nat.succ n, h⟩ =>
     simp only [List.length_cons, Nat.succ_eq_add_one, List.get_eq_getElem, List.getElem_cons_succ,
       Function.comp_apply]
-    erw [orderedInsertEquiv_succ]
+    rw [orderedInsertEquiv_succ]
     simp only [Fin.succAbove, Fin.castSucc_mk, Fin.mk_lt_mk, Fin.succ_mk, Fin.coe_cast]
     by_cases hn : n < ↑(orderedInsertPos le1 r r0)
     · simp [hn, orderedInsert_get_lt]
@@ -501,7 +503,7 @@ lemma orderedInsertEquiv_sigma {I : Type} {f : I → Type}
   | ⟨0, h0⟩ =>
     simp only [List.length_cons, Fin.zero_eta, Equiv.trans_apply, RelIso.coe_fn_toEquiv,
       Fin.castOrderIso_apply, Fin.cast_zero, Fin.coe_cast]
-    erw [orderedInsertEquiv_zero, orderedInsertEquiv_zero]
+    rw [orderedInsertEquiv_zero, orderedInsertEquiv_zero]
     simp [orderedInsertPos_sigma]
   | ⟨Nat.succ n, h0⟩ =>
     simp only [List.length_cons, Nat.succ_eq_add_one, Equiv.trans_apply, RelIso.coe_fn_toEquiv,

@@ -80,13 +80,14 @@ def coordinateMultiLinear {n : ℕ} (c : Fin n → S.C) :
 /-- The linear map from tensors to coordinates. -/
 def coordinate {n : ℕ} (c : Fin n → S.C) :
     S.F.obj (OverColor.mk c) →ₗ[k] ((Π j, Fin (S.repDim (c j))) → k) :=
-  (S.liftTensor (c := c)).toFun (S.coordinateMultiLinear c)
+  PiTensorProduct.lift (S.coordinateMultiLinear c)
 
+@[simp]
 lemma coordinate_tprod {n : ℕ} (c : Fin n → S.C) (x : (i : Fin n) → S.FD.obj (Discrete.mk (c i))) :
     S.coordinate c (PiTensorProduct.tprod k x) = S.coordinateMultiLinear c x := by
-  simp only [coordinate, liftTensor, AddHom.toFun_eq_coe, LinearMap.coe_toAddHom,
-    LinearEquiv.coe_coe, mk_left, Functor.id_obj, mk_hom]
+  rw [coordinate]
   erw [PiTensorProduct.lift.tprod]
+  rfl
 
 /-- The basis vector of tensors given a `b : Π j, Fin (S.repDim (c j))` . -/
 def basisVector {n : ℕ} (c : Fin n → S.C) (b : Π j, Fin (S.repDim (c j))) :
