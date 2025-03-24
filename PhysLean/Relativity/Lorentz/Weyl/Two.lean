@@ -40,7 +40,9 @@ lemma leftLeftToMatrix_symm_expand_tmul (M : Matrix (Fin 2) (Fin 2) ℂ) :
   rw [Finsupp.linearCombination_apply_of_mem_supported ℂ (s := Finset.univ)]
   · rw [Fintype.sum_prod_type]
     refine Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ => ?_))
-    erw [Basis.tensorProduct_apply leftBasis leftBasis i j]
+    conv_lhs =>
+      enter [2]
+      erw [Basis.tensorProduct_apply leftBasis leftBasis i j]
     rfl
   · simp
 

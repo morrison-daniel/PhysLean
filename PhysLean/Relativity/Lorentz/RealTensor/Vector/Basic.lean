@@ -287,7 +287,7 @@ lemma action_apply_eq_sum (i : Fin 1 ⊕ Fin d) (Λ : LorentzGroup d) (p : Vecto
     simp [mul_add, Finset.sum_add_distrib]
     ring)
   intro r p
-  simp only [C_eq_color, TensorSpecies.F_def, Nat.succ_eq_add_one, Nat.reduceAdd, OverColor.mk_left,
+  simp only [C_eq_color, TensorSpecies.F_def, Nat.reduceAdd, OverColor.mk_left,
     Functor.id_obj, OverColor.mk_hom, PiTensorProduct.tprodCoeff_eq_smul_tprod, _root_.map_smul,
     Pi.smul_apply, smul_eq_mul]
   erw [OverColor.lift.objObj'_ρ_tprod]
