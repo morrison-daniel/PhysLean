@@ -12,8 +12,6 @@ import PhysLean.Meta.TODO.Basic
 
 open System
 
-TODO "Make this definition more functional in style. In other words, remove the for loop."
-
 /-- The recursive function underlying `allFilePaths`. -/
 partial def allFilePaths.go (prev : Array FilePath)
   (root : String) (path : FilePath) : IO (Array FilePath) := do
