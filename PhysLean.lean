@@ -236,6 +236,7 @@ import PhysLean.Relativity.Tensors.TensorSpecies.UnitTensor
 import PhysLean.Relativity.Tensors.Tree.Basic
 import PhysLean.Relativity.Tensors.Tree.Dot
 import PhysLean.Relativity.Tensors.Tree.Elab
+import PhysLean.Relativity.Tensors.Tree.EuivalenceClass.Basic
 import PhysLean.Relativity.Tensors.Tree.NodeIdentities.Assoc
 import PhysLean.Relativity.Tensors.Tree.NodeIdentities.Basic
 import PhysLean.Relativity.Tensors.Tree.NodeIdentities.Congr

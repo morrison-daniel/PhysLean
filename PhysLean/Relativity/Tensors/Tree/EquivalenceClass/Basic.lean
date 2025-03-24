@@ -25,6 +25,8 @@ namespace TensorTree
 
 variable {k : Type} [CommRing k] {S : TensorSpecies k}
 
+/-- The relation `tensorRel` on `TensorTree S c` is defined such that `tensorRel t1 t2` is true
+  if `t1` and `t2` have the same underlying tensors. -/
 def tensorRel {n} {c : Fin n → S.C} (t1 t2 : TensorTree S c) : Prop := t1.tensor = t2.tensor
 
 lemma tensorRel_refl {n} {c : Fin n → S.C} (t : TensorTree S c) : tensorRel t t := rfl
@@ -45,11 +47,13 @@ lemma tensorRel_equivalence {n} (c : Fin n → S.C) :
 instance tensorTreeSetoid {n} (c : Fin n → S.C) : Setoid (TensorTree S c) :=
   Setoid.mk (tensorRel (c := c) (S := S)) (tensorRel_equivalence c)
 
+/-- The equivalence classes of `TensorTree` under the relation `tensorRel`. -/
 def _root_.TensorSpecies.TensorTreeQuot (S : TensorSpecies k) {n} (c : Fin n → S.C) : Type :=
     Quot (tensorRel (c := c))
 
 namespace TensorTreeQuot
 
+/-- The projection from `TensorTree` down to `TensorTreeQuot`. -/
 def ι {n} {c : Fin n → S.C} (t : TensorTree S c) : S.TensorTreeQuot c := Quot.mk _ t
 
 lemma ι_surjective {n} {c : Fin n → S.C} : Function.Surjective (ι (c := c)) := by
@@ -72,6 +76,7 @@ lemma ι_apply_eq_iff_tensor_apply_eq {n} {c : Fin n → S.C} {t1 t2 : TensorTre
 
 -/
 
+/-- The addition of two equivalence classes of tensor trees. -/
 def addQuot {n} {c : Fin n → S.C} :
     S.TensorTreeQuot c → S.TensorTreeQuot c → S.TensorTreeQuot c := by
   refine Quot.lift₂ (fun t1 t2 => ι (t1.add t2)) ?_ ?_
@@ -89,6 +94,7 @@ def addQuot {n} {c : Fin n → S.C} :
 lemma ι_add_eq_addQuot {n} {c : Fin n → S.C} (t1 t2 : TensorTree S c) :
     ι (t1.add t2) = addQuot (ι t1) (ι t2) := rfl
 
+/-- The scalar multiplication of an equivalence classes of tensor trees. -/
 def smulQuot {n} {c : Fin n → S.C} (r : k) :
     S.TensorTreeQuot c → S.TensorTreeQuot c := by
   refine Quot.lift (fun t => ι (smul r t)) ?_
@@ -144,7 +150,8 @@ noncomputable instance {n} (c : Fin n → S.C) : AddCommMonoid (S.TensorTreeQuot
     obtain ⟨t, rfl⟩ := ι_surjective t
     simp only [Nat.cast_add, Nat.cast_one]
     change smulQuot ((n: k) + 1) (ι t) = addQuot (smulQuot (n : k) (ι t)) (ι t)
-    rw [← ι_smul_eq_smulQuot, ← ι_smul_eq_smulQuot, ← ι_add_eq_addQuot, ι_apply_eq_iff_tensor_apply_eq]
+    rw [← ι_smul_eq_smulQuot, ← ι_smul_eq_smulQuot, ← ι_add_eq_addQuot,
+      ι_apply_eq_iff_tensor_apply_eq]
     simp only [smul_tensor, add_tensor]
     rw [add_smul]
     simp
@@ -160,13 +167,15 @@ instance {n} {c : Fin n → S.C} : Module k (S.TensorTreeQuot c) where
   mul_smul r s t := by
     obtain ⟨t, rfl⟩ := ι_surjective t
     change smulQuot (r * s) (ι t) = smulQuot r (smulQuot s (ι t))
-    rw [← ι_smul_eq_smulQuot, ← ι_smul_eq_smulQuot,  ← ι_smul_eq_smulQuot,  ι_apply_eq_iff_tensor_apply_eq]
+    rw [← ι_smul_eq_smulQuot, ← ι_smul_eq_smulQuot,  ← ι_smul_eq_smulQuot,
+      ι_apply_eq_iff_tensor_apply_eq]
     simp [smul_tensor, mul_smul]
   smul_add r t1 t2 := by
     obtain ⟨t1, rfl⟩ := ι_surjective t1
     obtain ⟨t2, rfl⟩ := ι_surjective t2
     change smulQuot r (addQuot (ι t1) (ι t2)) = addQuot (smulQuot r (ι t1)) (smulQuot r (ι t2))
-    rw [← ι_smul_eq_smulQuot, ← ι_smul_eq_smulQuot,  ← ι_add_eq_addQuot, ← ι_add_eq_addQuot,  ← ι_smul_eq_smulQuot, ι_apply_eq_iff_tensor_apply_eq]
+    rw [← ι_smul_eq_smulQuot, ← ι_smul_eq_smulQuot,  ← ι_add_eq_addQuot, ← ι_add_eq_addQuot,
+      ← ι_smul_eq_smulQuot, ι_apply_eq_iff_tensor_apply_eq]
     simp [smul_tensor, add_tensor]
   smul_zero a := by
     change smulQuot (a : k) (ι zeroTree) = ι zeroTree
@@ -176,7 +185,8 @@ instance {n} {c : Fin n → S.C} : Module k (S.TensorTreeQuot c) where
   add_smul r s t := by
     obtain ⟨t, rfl⟩ := ι_surjective t
     change smulQuot (r + s) (ι t)  = addQuot (smulQuot r (ι t)) (smulQuot s (ι t))
-    rw [← ι_smul_eq_smulQuot, ← ι_smul_eq_smulQuot,    ← ι_smul_eq_smulQuot, ← ι_add_eq_addQuot, ι_apply_eq_iff_tensor_apply_eq]
+    rw [← ι_smul_eq_smulQuot, ← ι_smul_eq_smulQuot,    ← ι_smul_eq_smulQuot,
+      ← ι_add_eq_addQuot, ι_apply_eq_iff_tensor_apply_eq]
     simp [smul_tensor, add_tensor, add_smul]
   zero_smul t := by
     obtain ⟨t, rfl⟩ := ι_surjective t
@@ -199,13 +209,13 @@ lemma smul_eq_smulQuot {n} {c : Fin n → S.C} (r : k) (t : S.TensorTreeQuot c) 
 lemma ι_smul_eq_smul {n} {c : Fin n → S.C} (r : k) (t : TensorTree S c) :
     ι (smul r t) = r • (ι t) := rfl
 
-
 /-!
 
 ## The group action
 
 -/
 
+/-- The group action on an equivalence classes of tensor trees. -/
 def actionQuot {n} {c : Fin n → S.C} (g : S.G) :
     S.TensorTreeQuot c → S.TensorTreeQuot c := by
   refine Quot.lift (fun t => ι (action g t)) ?_
@@ -229,7 +239,8 @@ noncomputable instance {n} {c : Fin n → S.C} : MulAction S.G (S.TensorTreeQuot
   mul_smul g h t := by
     obtain ⟨t, rfl⟩ := ι_surjective t
     change actionQuot (g * h) (ι t) = actionQuot g (actionQuot h (ι t))
-    rw [← ι_action_eq_actionQuot, ← ι_action_eq_actionQuot,  ← ι_action_eq_actionQuot, ι_apply_eq_iff_tensor_apply_eq]
+    rw [← ι_action_eq_actionQuot, ← ι_action_eq_actionQuot,
+      ← ι_action_eq_actionQuot, ι_apply_eq_iff_tensor_apply_eq]
     simp [action_tensor]
 
 @[simp]
@@ -242,6 +253,7 @@ lemma ι_action_eq_mulAction {n} {c : Fin n → S.C} (g : S.G) (t : TensorTree S
 
 -/
 
+/-- The underlying tensor for an equivalence class of tensor trees. -/
 noncomputable def tensorQuot {n} {c : Fin n → S.C} :
     S.TensorTreeQuot c →ₗ[k] S.F.obj (OverColor.mk c) where
   toFun := by
@@ -271,7 +283,6 @@ lemma tensorQuot_surjective {n} {c : Fin n → S.C} : Function.Surjective (tenso
   use ι (tensorNode t)
   rw [← tensor_eq_tensorQuot_apply]
   simp
-
 
 end TensorTreeQuot
 

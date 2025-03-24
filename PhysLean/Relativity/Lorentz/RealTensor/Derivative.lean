@@ -72,7 +72,7 @@ lemma derivative_repr {d n m : ℕ} {cm : Fin m → (realLorentzTensor d).C}
 
 TODO "Prove that the derivative obeys the following equivariant
   property with respect to the Lorentz group.
-  For a function `f :  ℝT(d, cm) → ℝT(d, cn)` then
+  For a function `f : ℝT(d, cm) → ℝT(d, cn)` then
   `Λ • (∂ f (x)) = ∂ (fun x => Λ • f (Λ⁻¹ • x)) (Λ • x)`."
 
 end realLorentzTensor
