@@ -141,10 +141,12 @@ lemma unitTensor_contr_vec_eq_self {c1 : S.C} (x : S.F.obj (OverColor.mk ![S.τ 
     perm (OverColor.equivToHomEq (Equiv.refl _) (fun x => by fin_cases x; rfl))).tensor := by
   conv_lhs =>
     rw [contr_tensor_eq <| prod_comm _ _ _ _]
-    rw [perm_contr_congr 2 0 (by simp; decide) (by simp; decide)]
+    rw [perm_contr_congr 2 0 (by simp [mk_hom, mk_left]; decide)
+      (by simp [mk_hom, mk_left]; decide)]
     rw [perm_tensor_eq <| contr_tensor_eq <| prod_tensor_eq_snd <| unitTensor_eq_dual_perm _]
     rw [perm_tensor_eq <| contr_tensor_eq <| prod_perm_right _ _ _ _]
-    rw [perm_tensor_eq <| perm_contr_congr 1 0 (by simp; decide) (by simp; decide)]
+    rw [perm_tensor_eq <| perm_contr_congr 1 0 (by simp [mk_hom, mk_left]; decide)
+      (by simp [mk_hom, mk_left]; decide)]
     rw [perm_perm]
     rw [perm_tensor_eq <| contr_swap _ _]
     rw [perm_perm]

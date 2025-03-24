@@ -192,7 +192,8 @@ lemma contr_one_two_left_eq_contrOneTwoLeft {c1 c2 : S.C} (x : S.F.obj (OverColo
   rw [contrOneTwoLeft_smul_left]
   simp only [smul_tmul, tmul_smul, LinearMapClass.map_smul]
   apply congrArg
-  simpa using contr_one_two_left_eq_contrOneTwoLeft_tprod (PiTensorProduct.tprod k fx)
+  simpa [OverColor.mk_hom] using
+    contr_one_two_left_eq_contrOneTwoLeft_tprod (PiTensorProduct.tprod k fx)
     (PiTensorProduct.tprod k fy) fx fy
 
 /-- Expanding `contrOneTwoLeft` as a tensor tree. -/

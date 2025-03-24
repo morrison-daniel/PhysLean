@@ -76,7 +76,7 @@ def contrSwapHom : (OverColor.mk (c ∘ q.swap.i.succAbove ∘ q.swap.j.succAbov
 
 @[simp]
 lemma contrSwapHom_toEquiv : Hom.toEquiv q.contrSwapHom = Equiv.refl (Fin n) := by
-  simp [contrSwapHom]
+  simp [contrSwapHom, OverColor.mk_left]
 
 @[simp]
 lemma contrSwapHom_hom_left_apply (x : Fin n) : q.contrSwapHom.hom.left x = x := by

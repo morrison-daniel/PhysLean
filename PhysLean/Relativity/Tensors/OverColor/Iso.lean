@@ -278,7 +278,7 @@ lemma extractTwo_finExtractTwo_succ {n : ℕ} (i : Fin n.succ.succ.succ) (j : Fi
   simp only [Nat.succ_eq_add_one, Equiv.apply_symm_apply]
   match k with
   | Sum.inl (Sum.inl 0) =>
-    simp [-OverColor.mk_left]
+    simp
   | Sum.inl (Sum.inr 0) =>
     simp only [Fin.isValue, finExtractTwo_symm_inl_inr_apply, Sum.map_inl, id_eq]
     have h1 : ((Hom.toEquiv σ) (Fin.succAbove
