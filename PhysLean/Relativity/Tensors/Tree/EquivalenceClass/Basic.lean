@@ -141,7 +141,7 @@ noncomputable instance {n} (c : Fin n → S.C) : AddCommMonoid (S.TensorTreeQuot
     rw [add_comm]
   nsmul_zero t := by
     obtain ⟨t, rfl⟩ := ι_surjective t
-    simp
+    simp only [Nat.cast_zero]
     change smulQuot ((0 : k)) (ι t) = ι zeroTree
     rw [← ι_smul_eq_smulQuot]
     rw [ι_apply_eq_iff_tensor_apply_eq]
