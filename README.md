@@ -27,23 +27,23 @@ into Lean 4.
 ## Some parts of PhysLean
 PhysLean _currently_ includes, but is not limited to, the following parts:
 
-__Lorentz [🗂️](https://heplean.github.io/HepLean/docs/HepLean/Lorentz/Group/Basic.html):__  The Lorentz group, Lorentz algebra, Weyl fermions, Real Lorentz vectors, complex Lorentz vectors, complex Lorentz tensors, bispinors, Pauli matrices, etc.
+__Lorentz [🗂️](https://physlean.com/docs/PhysLean/Relativity/Lorentz/Group/Basic.html):__  The Lorentz group, Lorentz algebra, Weyl fermions, Real Lorentz vectors, complex Lorentz vectors, complex Lorentz tensors, bispinors, Pauli matrices, etc.
 
-__Index notation [🗂️](https://heplean.github.io/HepLean/docs/HepLean/Tensors/OverColor/Basic.html) [📄](https://arxiv.org/abs/2411.07667):__  Formalization of index notation using category theory allowing commands like
+__Index notation [🗂️](https://physlean.com/docs/PhysLean/Relativity/Tensors/OverColor/Basic.html) [📄](https://arxiv.org/abs/2411.07667):__  Formalization of index notation using category theory allowing commands like
 
 ```Lean
 {A | μ ν ⊗ S | μ ν = - A | μ ν ⊗ S | μ ν}ᵀ
 ```
 
-__Anomaly cancellation [🗂️](https://heplean.github.io/HepLean/docs/HepLean/AnomalyCancellation/Basic.html):__  Results related to solutions to the anomaly cancellation conditions of several theories.
+__Anomaly cancellation [🗂️](https://physlean.com/docs/PhysLean/QFT/AnomalyCancellation/Basic.html):__  Results related to solutions to the anomaly cancellation conditions of several theories.
 
-__Standard Model physics [🗂️](https://heplean.github.io/HepLean/docs/HepLean/StandardModel/Basic.html):__ Properties of the Higgs potential.
+__Standard Model physics [🗂️](https://physlean.com/docs/PhysLean/Particles/StandardModel/Basic.html):__ Properties of the Higgs potential.
 
-__BSM physics [🗂️](https://heplean.github.io/HepLean/docs/HepLean/BeyondTheStandardModel/TwoHDM/Basic.html):__ Starts to: Georgi Glashow model, Pati-Salam, Spin(10), Two Higgs doublet model.
+__BSM physics [🗂️](https://physlean.com/docs/PhysLean/Particles/BeyondTheStandardModel/TwoHDM/Basic.html):__ Starts to: Georgi Glashow model, Pati-Salam, Spin(10), Two Higgs doublet model.
 
-__Flavor physics [🗂️](https://heplean.github.io/HepLean/docs/HepLean/FlavorPhysics/CKMMatrix/Basic.html):__ Properties of the CKM matrix.
+__Flavor physics [🗂️](https://physlean.com/docs/PhysLean/Particles/FlavorPhysics/CKMMatrix/Basic.html):__ Properties of the CKM matrix.
 
-__Perturbation Theory [🗂️](https://heplean.github.io/HepLean/docs/HepLean/PerturbationTheory/FieldOpAlgebra/WicksTheorem.html):__ Time-dependent version of Wick's theorem for both fermions and bosons.
+__Perturbation Theory [🗂️](https://physlean.com/docs/PhysLean/QFT/PerturbationTheory/WickContraction/Basic.html):__ Time-dependent version of Wick's theorem for both fermions and bosons.
 
 ## Associated media and publications
 - [📄](https://arxiv.org/abs/2405.08863) Joseph Tooby-Smith,
