@@ -43,14 +43,6 @@ instance instZero : Zero (E →ᵘₗ[𝕜] F) where
 
 theorem zero_apply (x : E) : (0 : E →ᵇₗ[𝕜] F) x = 0 := rfl
 
-@[to_additive]
-instance : AddMonoidHomClass (E →ᵇₗ[𝕜] F) E F where
-  map_add f := by
-    intro x y
-    simp only [eq_toLinearMap, map_add]
-  map_zero f := by
-    simp only [eq_toLinearMap, map_zero]
-
 /- Following Quantum Theory for Mathematicians - Hall, Chapter 9 -/
 
 -- bounded operators are also unbounded
