@@ -11,13 +11,14 @@ variable {F : Type*} [NormedAddCommGroup F] [InnerProductSpace 𝕜 F] -- [Compl
 
 def IsBounded (f : E →ₗ[𝕜] F) := ∃ (M : ℝ), ∀ (x : E), ‖f x‖ ≤ M * ‖x‖
 
-section
 variable (𝕜 E F)
 
 structure BoundedLinearMap extends E →ₗ[𝕜] F where
   bounded : ∃ (M : ℝ), 0 ≤ M ∧ ∀ (x : E), ‖toFun x‖ ≤ M * ‖x‖
 
 notation E "→ᵇₗ[" 𝕜 "]" F => BoundedLinearMap 𝕜 E F
+
+namespace BoundedLinearMap
 
 instance instFunLike : FunLike (BoundedLinearMap 𝕜 E F) E F where
   coe f := f.toFun
@@ -31,11 +32,6 @@ instance instFunLike : FunLike (BoundedLinearMap 𝕜 E F) E F where
 @[ext]
 theorem ext {f g : E →ᵇₗ[𝕜] F} (h : ∀ x, f x = g x) : f = g :=
   DFunLike.ext f g h
-
-def toLinearMap (f : E →ᵇₗ[𝕜] F) : E →ₗ[𝕜] F where
-  toFun := f.toFun
-  map_add' := f.map_add'
-  map_smul' := f.map_smul'
 
 def eq_toLinearMap (f : E →ᵇₗ[𝕜] F) (x : E) : f x = f.toLinearMap x := rfl
 
@@ -59,10 +55,7 @@ instance : AddMonoidHomClass (E →ᵇₗ[𝕜] F) E F where
   map_zero f := by
     simp only [eq_toLinearMap, map_zero]
 
-
-end
-
-namespace BoundedLinearMap
+variable {𝕜 E F}
 
 noncomputable def opNorm (f : E →ᵇₗ[𝕜] F) :=
   sInf {c : ℝ | 0 ≤ c ∧ ∀ (x : E), ‖f x‖ ≤ c * ‖x‖}
@@ -143,5 +136,51 @@ theorem continuous_of_bounded {f : E →ᵇₗ[𝕜] F} : Continuous f := by
       rw [← mul_div_cancel₀ ε (ne_of_gt hnorm), ← map_sub]
       apply lt_of_le_of_lt (le_opNorm f _)
       apply mul_lt_mul_of_pos_left hxy (gt_iff_lt.mp hnorm)
+
+
+theorem bounded_of_continuous_at_zero {f : E →ₗ[𝕜] F} (hf : ContinuousAt f 0) :
+    ∃ M, 0 ≤ M ∧ ∀ (x : E), ‖f x‖ ≤ M * ‖x‖ := by
+  rw [Metric.continuousAt_iff] at hf
+  specialize hf 1
+  simp only [gt_iff_lt, zero_lt_one, dist_zero_right, map_zero, forall_const] at hf
+  obtain ⟨δ, δpos, hδ⟩ := hf
+  use 2/δ
+  constructor
+  · simp only [Nat.ofNat_pos, div_pos_iff_of_pos_left, δpos, le_of_lt]
+  · intro x
+    by_cases h : x = 0
+    · simp only [h, map_zero, norm_zero, mul_zero, le_refl]
+    · have normx : ‖x‖ ≠ 0 := by simp only [ne_eq, norm_eq_zero]; exact h
+      have scalex : ‖(δ / (2 * ‖x‖) : 𝕜) • x‖ = δ / 2 := by
+        rw [norm_smul]
+        simp only [norm_mul, norm_div, norm_algebraMap', Real.norm_eq_abs,
+          RCLike.norm_ofNat, norm_norm, abs_norm]
+        rw [abs_of_pos δpos, ← div_div, div_mul_cancel₀ _ normx]
+      have scalepos : δ / (2 * ‖x‖) > 0 := by
+        rw [gt_iff_lt, div_pos_iff]
+        left
+        exact ⟨δpos, by linarith [norm_pos_iff.mpr h]⟩
+      have simp : (2 * ‖x‖) / δ * ‖f ((δ / (2 * ‖x‖) : 𝕜) • x)‖ = ‖f x‖ := by
+        rw [map_smul, norm_smul]
+        simp only [norm_div, norm_algebraMap', Real.norm_eq_abs, abs_of_pos δpos, norm_mul,
+          RCLike.norm_ofNat, abs_norm]
+        ring_nf
+        rw [mul_inv_cancel_right₀ (ne_of_gt δpos), mul_inv_cancel₀ normx, one_mul]
+      rw [← simp, ← mul_one (2 / δ * ‖x‖)]
+      apply mul_le_mul
+      · apply le_of_eq
+        ring
+      · apply le_of_lt
+        apply hδ
+        linarith [scalex]
+      · exact norm_nonneg _
+      · simp only [Nat.ofNat_pos, div_pos_iff_of_pos_left, δpos, mul_nonneg_iff_of_pos_left,
+        norm_nonneg]
+
+def ofContinuousLinearMap {f : E →ₗ[𝕜] F} (hf : Continuous f) : E →ᵇₗ[𝕜] F where
+  toFun := f.toFun
+  map_add' := f.map_add'
+  map_smul' := f.map_smul'
+  bounded := bounded_of_continuous_at_zero hf.continuousAt
 
 end BoundedLinearMap
