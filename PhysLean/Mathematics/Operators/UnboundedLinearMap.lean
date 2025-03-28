@@ -41,7 +41,7 @@ def _root_.LinearMap.toUnbounded (f : E →ₗ[𝕜] F) : E →ᵘₗ[𝕜] F wh
 instance instZero : Zero (E →ᵘₗ[𝕜] F) where
   zero := (0 : E →ₗ[𝕜] F).toUnbounded
 
-theorem zero_apply (x : E) : (0 : E →ᵇₗ[𝕜] F) x = 0 := rfl
+theorem zero_apply (x : E) : (0 : E →ᵘₗ[𝕜] F) x = 0 := rfl
 
 /- Following Quantum Theory for Mathematicians - Hall, Chapter 9 -/
 
