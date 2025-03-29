@@ -9,7 +9,7 @@ variable {𝕜 : Type*} [RCLike 𝕜]
 variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace 𝕜 E] -- [CompleteSpace E]
 variable {F : Type*} [NormedAddCommGroup F] [InnerProductSpace 𝕜 F] -- [CompleteSpace F]
 
-def IsBounded (f : E →ₗ[𝕜] F) := ∃ (M : ℝ), ∀ (x : E), ‖f x‖ ≤ M * ‖x‖
+-- def IsBounded (f : E →ₗ[𝕜] F) := ∃ (M : ℝ), ∀ (x : E), ‖f x‖ ≤ M * ‖x‖
 
 variable (𝕜 E F)
 
