@@ -32,7 +32,7 @@ abbrev Vector (d : ℕ := 3) := ℝT[d, .up]
 namespace Vector
 
 set_option quotPrecheck false in
-/-- The actoin of the Lorentz group on a Lorentz vector. -/
+/-- The action of the Lorentz group on a Lorentz vector. -/
 scoped infixl:60 "•" => ((realLorentzTensor _).F.obj (OverColor.mk ![Color.up])).ρ
 
 /-- The equivalence between the type of indices of a Lorentz vector and
@@ -294,7 +294,7 @@ lemma action_apply_eq_sum (i : Fin 1 ⊕ Fin d) (Λ : LorentzGroup d) (p : Vecto
     enter [2, 2]
     simp only [C_eq_color, OverColor.lift, OverColor.lift.obj', LaxBraidedFunctor.of_toFunctor,
       Nat.succ_eq_add_one, Nat.reduceAdd]
-    /- I beleive this erw is needed becuase of (realLorentzTensor d).G and
+    /- I believe this erw is needed becuase of (realLorentzTensor d).G and
       LorentzGroup d are different. -/
     erw [OverColor.lift.objObj'_ρ_tprod]
   conv_rhs =>

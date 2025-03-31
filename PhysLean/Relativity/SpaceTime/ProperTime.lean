@@ -8,7 +8,7 @@ import PhysLean.Relativity.Lorentz.RealTensor.Vector.Causality
 /-!
 # Proper Time
 
-This file introduce 4d Minkowski spacetime.
+This file introduces 4d Minkowski spacetime.
 
 -/
 
@@ -24,7 +24,7 @@ open Lorentz
 open Vector
 
 /-- The proper time from `q` to `p`. Defaults to zero if `p` and `q`
-  have a space-like speration. -/
+  have a space-like separation. -/
 def properTime {d : ℕ} (q p : SpaceTime d) : ℝ :=
   √⟪p - q, p - q⟫ₘ
 
