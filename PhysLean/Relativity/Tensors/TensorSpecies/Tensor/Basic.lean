@@ -96,6 +96,14 @@ lemma update_same {n : ℕ} {c : Fin n → S.C} [inst : DecidableEq (Fin n)] (p 
   simp [update]
 
 @[simp]
+lemma update_succAbove_apply {n : ℕ} {c : Fin (n + 1) → S.C} [inst : DecidableEq (Fin (n + 1))]
+    (p : Pure S c) (i : Fin (n + 1)) (j : Fin n) (x : S.FD.obj (Discrete.mk (c (i.succAbove j)))) :
+    update p (i.succAbove j) x i = p i := by
+  simp only [update]
+  rw [Function.update_of_ne]
+  exact Fin.ne_succAbove i j
+
+@[simp]
 lemma toTensor_update_add {n : ℕ} {c : Fin n → S.C} [inst : DecidableEq (Fin n)] (p : Pure S c)
     (i : Fin n) (x y : S.FD.obj (Discrete.mk (c i))) :
     (update p i (x + y)).toTensor = (update p i x).toTensor + (update p i y).toTensor := by
