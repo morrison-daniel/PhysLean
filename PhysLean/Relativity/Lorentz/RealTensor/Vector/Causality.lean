@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Matteo Cipollina, Joseph Tooby-Smith
 -/
 import PhysLean.Relativity.Lorentz.RealTensor.Vector.Basic
+
 /-!
 
 ## Causality of Lorentz vectors
@@ -128,7 +129,8 @@ def futureLightConeBoundary {d : ℕ} (p : Vector d) : Set (Vector d) :=
 def pastLightConeBoundary {d : ℕ} (p : Vector d) : Set (Vector d) :=
   {q | causalCharacter (q - p) = .lightLike ∧ (q - p) (Sum.inl 0) ≤ 0}
 
-/-- Any point `p` lies on its own light cone boundary, as `p - p = 0` has zero Minkowski norm squared. -/
+/-- Any point `p` lies on its own light cone boundary, as `p - p = 0` has
+    zero Minkowski norm squared. -/
 lemma self_mem_lightConeBoundary {d : ℕ} (p : Vector d) : p ∈ lightConeBoundary p := by
   simp [lightConeBoundary]
   have : p - p = 0 := by simp
@@ -160,7 +162,8 @@ def causalDiamond {d : ℕ} (p q : Vector d) : Set (Vector d) :=
 
 -- Zero vector has zero Minkowski norm squared
 @[simp]
-lemma causalCharacter_zero {d : ℕ} : causalCharacter (0 : Vector d) = CausalCharacter.lightLike := by
+lemma causalCharacter_zero {d : ℕ} : causalCharacter (0 : Vector d) =
+  CausalCharacter.lightLike := by
   simp  [causalCharacter, lightLike_iff_norm_sq_zero]
 
 /-- Causally preceding is reflexive -/
@@ -179,8 +182,45 @@ lemma timelike_time_dominates_space {d : ℕ} {v : Vector d}
   simp at hv
   linarith
 
-/-- Cauchy-Schwarz inequality for the spatial components of Lorentz vectors -/
+/-- For two lightlike vectors with equal time components, their spatial parts
+    have equal Euclidean norms -/
 @[simp]
+lemma lightlike_equal_time_eq_spatial_norm {d : ℕ} {v w : Vector d}
+    (hv : causalCharacter v = .lightLike) (hw : causalCharacter w = .lightLike)
+    (h_time : v (Sum.inl 0) = w (Sum.inl 0)) :
+    ∑ i, v (Sum.inr i) * v (Sum.inr i) = ∑ i, w (Sum.inr i) * w (Sum.inr i) := by
+  rw [lightLike_iff_norm_sq_zero, innerProduct_toCoord] at hv hw
+  have hv_eq : v (Sum.inl 0) * v (Sum.inl 0) = ∑ i, v (Sum.inr i) * v (Sum.inr i) := by
+    dsimp only [Fin.isValue]; linarith
+  have hw_eq : w (Sum.inl 0) * w (Sum.inl 0) = ∑ i, w (Sum.inr i) * w (Sum.inr i) := by
+    dsimp only [Fin.isValue];linarith
+  have h_time_sq : v (Sum.inl 0) * v (Sum.inl 0) = w (Sum.inl 0) * w (Sum.inl 0) := by
+    rw [h_time]
+  rw [← hv_eq, ← hw_eq, h_time_sq]
+
+/-- The Cauchy-Schwarz inequality for vectors in ℝⁿ -/
+@[simp]
+lemma cauchy_schwarz {d : ℕ} (v w : EuclideanSpace ℝ (Fin d)) :
+    (∑ i, v i * w i)^2 ≤ (∑ i, v i * v i) * (∑ i, w i * w i) :=
+  Finset.sum_sq_le_sum_mul_sum_of_sq_eq_mul Finset.univ
+    (fun i _ => mul_self_nonneg (v i))
+    (fun i _ => mul_self_nonneg (w i))
+    (fun i _ => by ring)
+
+-- Define spatial part extractors
+/-- Extract spatial components from a Lorentz vector,
+    returning them as a vector in Euclidean space. -/
+def spatialPart {d : ℕ} (v : Vector d) : EuclideanSpace ℝ (Fin d) :=
+  fun i => v (Sum.inr i)
+
+-- Alternative version using sum notation instead of inner product
+lemma spatial_cauchy_schwarz_sum {d : ℕ} (v w : Vector d) :
+    (∑ i, (spatialPart v) i * (spatialPart w) i)^2 ≤
+    (∑ i, (spatialPart v) i * (spatialPart v) i) * (∑ i,
+    (spatialPart w) i * (spatialPart w) i) := by
+      exact cauchy_schwarz (spatialPart v) (spatialPart w)
+
+/-- Cauchy-Schwarz inequality for the spatial components of Lorentz vectors -/
 lemma spatial_cauchy_schwarz {d : ℕ} (v w : Vector d) :
     (∑ i, v (Sum.inr i) * w (Sum.inr i))^2 ≤
     (∑ i, v (Sum.inr i) * v (Sum.inr i)) * (∑ i, w (Sum.inr i) * w (Sum.inr i)) := by
@@ -208,11 +248,12 @@ lemma time_component_ne_zero_of_timelike {d : ℕ} {v : Vector d}
 @[simp]
 lemma time_squared_pos_of_timelike {d : ℕ} {v : Vector d}
     (hv : causalCharacter v = .timeLike) :
-    v (Sum.inl 0) ≠ 0 :=
-  time_component_ne_zero_of_timelike hv
+    0 < (v (Sum.inl 0))^2 := by
+  have h_nonzero : v (Sum.inl 0) ≠ 0 := time_component_ne_zero_of_timelike hv
+  exact pow_two_pos_of_ne_zero h_nonzero
 
 /-- If a vector has zero norm, then all its components are zero -/
-lemma vector_zero_of_sum_sq_zero {d : ℕ} {v : Fin d → ℝ}
+lemma vector_zero_of_sum_sq_zero {d : ℕ} {v : EuclideanSpace ℝ (Fin d)}
     (h : ∑ i, v i * v i = 0) : ∀ i, v i = 0 := by
   intro i
   have h_each_zero : v i * v i = 0 := by
@@ -226,14 +267,18 @@ lemma vector_zero_of_sum_sq_zero {d : ℕ} {v : Fin d → ℝ}
 
 /-- The zero vector is proportional to any vector -/
 @[simp]
-lemma zero_parallel_to_any {d : ℕ} {v : Fin d → ℝ} :
-    ∃ (r : ℝ), ∀ i, r = 0 ∨ v i = 0 := by
-  use 0; intro i; left; rfl
+lemma zero_parallel_to_any {d : ℕ} {v : Vector d} :
+    ∃ (r : ℝ), (∀ (a : Fin 1), r = 0 ∨ v (Sum.inl a) = 0) ∧
+    ∀ (b : Fin d), r = 0 ∨ v (Sum.inr b) = 0 := by
+  use 0
+  constructor
+  · intro a; left; rfl
+  · intro b; left; rfl
 
 /-- For Cauchy-Schwarz equality, if one vector has zero norm squared,
     then the vectors are proportional -/
 @[simp]
-lemma parallel_of_cauchy_eq_of_zero_norm {d : ℕ} {v w : Fin d → ℝ}
+lemma parallel_of_cauchy_eq_of_zero_norm {d : ℕ} {v w : EuclideanSpace ℝ (Fin d)}
     (h_v_zero : ∑ i, v i * v i = 0) :
     ∃ (r : ℝ), ∀ i, v i = r * w i := by
   have h_v_comp_zero : ∀ i, v i = 0 := vector_zero_of_sum_sq_zero h_v_zero
@@ -242,7 +287,7 @@ lemma parallel_of_cauchy_eq_of_zero_norm {d : ℕ} {v w : Fin d → ℝ}
 /- For Cauchy-Schwarz equality with non-zero vectors, there's a specific relationship
    between the vectors' inner product and their norms -/
 @[simp]
-lemma scalar_ratio_of_cauchy_eq {d : ℕ} {v w : Fin d → ℝ}
+lemma scalar_ratio_of_cauchy_eq {d : ℕ} {v w : EuclideanSpace ℝ (Fin d)}
     (h_eq : (∑ i, v i * w i)^2 = (∑ i, v i * v i) * (∑ i, w i * w i))
     (h_w_nonzero : ∑ i, w i * w i ≠ 0) :
     let r := (∑ i, v i * w i) / (∑ i, w i * w i)
@@ -252,7 +297,8 @@ lemma scalar_ratio_of_cauchy_eq {d : ℕ} {v w : Fin d → ℝ}
     _ = ∑ i, v i * v i - 2 * r * ∑ i, v i * w i + r^2 * ∑ i, w i * w i := by
       simp_rw [sub_mul, mul_sub]
       simp_rw [Finset.sum_sub_distrib]
-      have : ∑ i, v i * v i - ∑ i, v i * (r * w i) - (∑ i, r * w i * v i - ∑ i, r * w i * (r * w i)) =
+      have : ∑ i, v i * v i - ∑ i, v i * (r * w i) -
+            (∑ i, r * w i * v i - ∑ i, r * w i * (r * w i)) =
              ∑ i, v i * v i - 2 * r * ∑ i, v i * w i + r^2 * ∑ i, w i * w i := by
         have h1 : ∑ i, v i * (r * w i) = r * ∑ i, v i * w i := by
           have : ∀ i, v i * (r * w i) = r * (v i * w i) := by
@@ -260,7 +306,8 @@ lemma scalar_ratio_of_cauchy_eq {d : ℕ} {v w : Fin d → ℝ}
           simp_rw [this]
           exact Eq.symm (Finset.mul_sum Finset.univ (fun i => v i * w i) r)
         have h2 : ∑ i, r * w i * v i = r * ∑ i, w i * v i := by
-          rw [Finset.mul_sum]; apply Finset.sum_congr rfl; intro i _; rw [mul_comm (w i) (v i)]; ring
+          rw [Finset.mul_sum]; apply Finset.sum_congr rfl; intro i _; rw [mul_comm (w i) (v i)];
+          ring
         have h3 : ∑ i, r * w i * (r * w i) = r^2 * ∑ i, w i * w i := by
           have : ∀ i, r * w i * (r * w i) = r^2 * (w i * w i) := by
             intro i; ring
@@ -291,7 +338,7 @@ lemma scalar_ratio_of_cauchy_eq {d : ℕ} {v w : Fin d → ℝ}
 /-- For Cauchy-Schwarz equality with non-zero second vector,
     the first vector is proportional to the second -/
 @[simp]
-lemma parallel_of_cauchy_eq_second_nonzero {d : ℕ} {v w : Fin d → ℝ}
+lemma parallel_of_cauchy_eq_second_nonzero {d : ℕ} {v w : EuclideanSpace ℝ (Fin d)}
     (h_eq : (∑ i, v i * w i)^2 = (∑ i, v i * v i) * (∑ i, w i * w i))
     (h_w_nonzero : ∑ i, w i * w i ≠ 0) :
     ∃ (r : ℝ), ∀ i, v i = r * w i := by
@@ -303,7 +350,7 @@ lemma parallel_of_cauchy_eq_second_nonzero {d : ℕ} {v w : Fin d → ℝ}
 
 /-- When vectors aren't parallel, the Cauchy-Schwarz inequality is strict -/
 @[simp]
-lemma cauchy_schwarz_eq_iff_parallel_of_nonzero {d : ℕ} {v w : Fin d → ℝ}
+lemma cauchy_schwarz_eq_iff_parallel_of_nonzero {d : ℕ} {v w : EuclideanSpace ℝ (Fin d)}
     (hw : ∑ i, w i * w i ≠ 0) :
     (∑ i, v i * w i)^2 = (∑ i, v i * v i) * (∑ i, w i * w i) ↔
     ∃ (r : ℝ), ∀ i, v i = r * w i := by
@@ -327,3 +374,117 @@ lemma cauchy_schwarz_eq_iff_parallel_of_nonzero {d : ℕ} {v w : Fin d → ℝ}
       _ = r^2 * (∑ i, w i * w i)^2 := by ring
       _ = (r^2 * ∑ i, w i * w i) * (∑ i, w i * w i) := by ring
       _ = (∑ i, v i * v i) * (∑ i, w i * w i) := by rw [h_right]
+
+/-- If one vector is a scalar multiple of another, they are parallel -/
+@[simp]
+lemma parallel_of_scalar_multiple {d : ℕ} {v w : EuclideanSpace ℝ (Fin d)} {r : ℝ}
+    (h : ∀ i, v i = r * w i) : ∃ (s : ℝ), ∀ i, v i = s * w i := by
+  exists r
+
+/-- For orthogonal vectors (inner product zero), Cauchy-Schwarz is an equality
+    iff one of them is zero -/
+@[simp]
+lemma cauchy_schwarz_eq_of_orthogonal {d : ℕ} {v w : EuclideanSpace ℝ (Fin d)}
+    (h_ortho : ∑ i, v i * w i = 0) :
+    (∑ i, v i * w i)^2 = (∑ i, v i * v i) * (∑ i, w i * w i) ↔
+    (∑ i, v i * v i = 0) ∨ (∑ i, w i * w i = 0) := by
+  rw [h_ortho, pow_two, zero_mul]
+  constructor
+  · intro h
+    rw [eq_comm] at h
+    exact mul_eq_zero.mp h
+  · intro h
+    rw [eq_comm]
+    exact mul_eq_zero.mpr h
+
+/-- For non-parallel vectors, the Cauchy-Schwarz inequality is strict -/
+@[simp]
+lemma strict_cauchy_schwarz_of_not_parallel {d : ℕ} {v w : EuclideanSpace ℝ (Fin d)}
+    (h_not_parallel : ¬∃ (r : ℝ), ∀ i, v i = r * w i)
+    (h_w_nonzero : ∑ i, w i * w i ≠ 0) :
+    (∑ i, v i * w i)^2 < (∑ i, v i * v i) * (∑ i, w i * w i) := by
+  have h_cs := cauchy_schwarz v w
+  by_contra h
+  push_neg at h
+  rw [←not_lt] at h
+  have h_eq : (∑ i, v i * w i)^2 = (∑ i, v i * v i) * (∑ i, w i * w i) := by
+    apply le_antisymm
+    · exact h_cs
+    · exact le_of_not_lt h
+  have h_parallel := parallel_of_cauchy_eq_second_nonzero h_eq h_w_nonzero
+  exact h_not_parallel h_parallel
+
+/-- If two lightlike vectors have parallel spatial components, their temporal components
+must also be proportional, which implies the entire vectors are proportional -/
+@[simp]
+lemma lightlike_spatial_parallel_implies_proportional {d : ℕ} {v w : Vector d}
+    (hv : causalCharacter v = .lightLike) (hw : causalCharacter w = .lightLike)
+    (h_spatial_parallel : ∃ (r : ℝ), ∀ i, v (Sum.inr i) = r * w (Sum.inr i)) :
+    ∃ (r : ℝ), |v (Sum.inl 0)| = |r| * |w (Sum.inl 0)| := by
+  rcases h_spatial_parallel with ⟨r, hr⟩
+  rw [lightLike_iff_norm_sq_zero] at hv hw
+  rw [innerProduct_toCoord] at hv hw
+  have hv_eq : v (Sum.inl 0) * v (Sum.inl 0) = ∑ i, v (Sum.inr i) * v (Sum.inr i) := by
+    simp_all only [Fin.isValue]
+    linarith
+  have hw_eq : w (Sum.inl 0) * w (Sum.inl 0) = ∑ i, w (Sum.inr i) * w (Sum.inr i) := by
+    simp_all only [Fin.isValue, sub_self]
+    linarith
+  have h_spatial_sum : ∑ i, v (Sum.inr i) * v (Sum.inr i) =
+      r^2 * ∑ i, w (Sum.inr i) * w (Sum.inr i) := by
+    calc ∑ i, v (Sum.inr i) * v (Sum.inr i)
+      _ = ∑ i, (r * w (Sum.inr i)) * (r * w (Sum.inr i)) := by
+          simp_rw [hr]
+      _ = ∑ i, r^2 * (w (Sum.inr i) * w (Sum.inr i)) := by
+          apply Finset.sum_congr rfl; intro i _; ring
+      _ = r^2 * ∑ i, w (Sum.inr i) * w (Sum.inr i) := by
+          rw [Finset.mul_sum]
+  have h_time_sq : v (Sum.inl 0) * v (Sum.inl 0) = r^2 * (w (Sum.inl 0) * w (Sum.inl 0)) := by
+    rw [hv_eq, h_spatial_sum, hw_eq]
+  have h_abs : |v (Sum.inl 0)| * |v (Sum.inl 0)| = |r|^2 * (|w (Sum.inl 0)| *
+      |w (Sum.inl 0)|) := by
+    have h2 : |w (Sum.inl 0)|^2 = |w (Sum.inl 0)| * |w (Sum.inl 0)| := by ring
+    have h3 : |v (Sum.inl 0)|^2 = |v (Sum.inl 0) * v (Sum.inl 0)| := by rw [pow_two, ← abs_mul]
+    have h4 : |w (Sum.inl 0)|^2 = |w (Sum.inl 0) * w (Sum.inl 0)| := by rw [pow_two, ← abs_mul]
+    have h5 : |v (Sum.inl 0) * v (Sum.inl 0)| = |r^2 * (w (Sum.inl 0) * w (Sum.inl 0))| := by
+      rw [h_time_sq]
+    have h6 : |r^2 * (w (Sum.inl 0) * w (Sum.inl 0))| =
+      |r^2| * |w (Sum.inl 0) * w (Sum.inl 0)| := by rw [abs_mul]
+    have h7 : |r^2| = |r|^2 := by rw [abs_pow]
+    calc |v (Sum.inl 0)| * |v (Sum.inl 0)|
+      _ = |v (Sum.inl 0)|^2 := by rw [pow_two]
+      _ = |v (Sum.inl 0) * v (Sum.inl 0)| := h3
+      _ = |r^2 * (w (Sum.inl 0) * w (Sum.inl 0))| := h5
+      _ = |r^2| * |w (Sum.inl 0) * w (Sum.inl 0)| := h6
+      _ = |r|^2 * |w (Sum.inl 0) * w (Sum.inl 0)| := by rw [h7]
+      _ = |r|^2 * |w (Sum.inl 0) * w (Sum.inl 0)| := by rfl
+      _ = |r|^2 * |w (Sum.inl 0)|^2 := by rw [← h4]
+      _ = |r|^2 * (|w (Sum.inl 0)| * |w (Sum.inl 0)|) := by
+        rw [pow_two]; exact congrArg (HMul.hMul (|r| * |r|)) h2
+  have h_abs_eq : |v (Sum.inl 0)| = |r| * |w (Sum.inl 0)| := by
+    have h_sq : |v (Sum.inl 0)|^2 = (|r| * |w (Sum.inl 0)|)^2 := by
+      calc |v (Sum.inl 0)|^2
+        _ = |v (Sum.inl 0)| * |v (Sum.inl 0)| := by rw [pow_two]
+        _ = |r|^2 * (|w (Sum.inl 0)| * |w (Sum.inl 0)|) := by exact h_abs
+        _ = |r|^2 * |w (Sum.inl 0)|^2 := by rw [← pow_two]
+        _ = (|r| * |w (Sum.inl 0)|)^2 := by ring
+    have h_both_nonneg : |v (Sum.inl 0)| ≥ 0 ∧ |r| * |w (Sum.inl 0)| ≥ 0 := by
+      constructor
+      · exact abs_nonneg (v (Sum.inl 0))
+      · exact mul_nonneg (abs_nonneg r) (abs_nonneg (w (Sum.inl 0)))
+    have h_sqrt : ∀ (a b : ℝ), a ≥ 0 → b ≥ 0 → a^2 = b^2 → a = b := by
+      intros a b ha hb h_eq
+      apply le_antisymm
+      · by_contra h_not_le
+        push_neg at h_not_le
+        have : a^2 > b^2 := by
+          exact (sq_lt_sq₀ hb ha).mpr h_not_le
+        linarith
+      · by_contra h_not_ge
+        push_neg at h_not_ge
+        have : a^2 < b^2 := by
+          exact (sq_lt_sq₀ ha hb).mpr h_not_ge
+        linarith
+    exact h_sqrt |v (Sum.inl 0)| (|r| * |w (Sum.inl 0)|)
+      h_both_nonneg.1 h_both_nonneg.2 h_sq
+  use r
