@@ -141,7 +141,7 @@ semiformal_result "6YB2U" force_is_linear (x : ℝ → ℝ) :
 
 /-- The definition of the equation of motion for the classical harmonic oscillator
   defined through the Euler-Lagrange equations.  -/
-semiformal_result"6YBEI" EquationOfMotion (x : ℝ → ℝ) : Prop
+semiformal_result"6ZTP5" EquationOfMotion (x : ℝ → ℝ) : Prop
 
 /- This variable should be removed once the above `semiformal_result` is implemented. -/
 variable (EquationOfMotion : (x : ℝ → ℝ)  → Prop )
@@ -149,7 +149,7 @@ variable (EquationOfMotion : (x : ℝ → ℝ)  → Prop )
 /-- The definition of the equation of motion for the classical harmonic oscillator
   defined through the Euler-Lagrange equations.  -/
 semiformal_result "6YBEI" equationOfMotion_iff_newtons_second_law (x : ℝ → ℝ) :
-    EquationOfMotion x ↔ ∀ t, deriv x t = S.m * force S x t
+    EquationOfMotion x ↔ ∀ t, force S x t = S.m * deriv (fun t' => deriv x t') t
 
 /-- The proposition on a trajectory which is true if that trajectory is an extrema of the
   action.
