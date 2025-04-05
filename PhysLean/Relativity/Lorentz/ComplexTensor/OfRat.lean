@@ -5,6 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 import PhysLean.Relativity.Lorentz.ComplexTensor.Basic
 import PhysLean.Mathematics.RatComplexNum
+import PhysLean.Relativity.Tensors.Tree.Elab
 /-!
 
 # Basis for tensors in a tensor species
@@ -20,7 +21,7 @@ open OverColor
 open PhysLean.RatComplexNum
 open PhysLean
 
-variable {k : Type} [CommRing k] (S : TensorSpecies k)
+variable {k : Type} [CommRing k] {G : Type} [Group G] (S : TensorSpecies k G)
 
 /--A complex Lorentz tensor from a map
   `(Π j, Fin (complexLorentzTensor.repDim (c j))) → RatComplexNum`. All

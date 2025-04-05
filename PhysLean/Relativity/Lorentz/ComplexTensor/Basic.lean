@@ -3,10 +3,9 @@ Copyright (c) 2024 Joseph Tooby-Smith. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Joseph Tooby-Smith
 -/
-import PhysLean.Relativity.Tensors.Tree.Dot
-import PhysLean.Relativity.Lorentz.Weyl.Metric
 import PhysLean.Relativity.Lorentz.ComplexVector.Metric
-import PhysLean.Relativity.Lorentz.PauliMatrices.AsTensor
+import PhysLean.Relativity.Lorentz.Weyl.Metric
+import PhysLean.Relativity.Tensors.TensorSpecies.Basic
 /-!
 
 ## Complex Lorentz tensors
@@ -83,10 +82,8 @@ end complexLorentzTensor
 noncomputable section
 open complexLorentzTensor in
 /-- The tensor structure for complex Lorentz tensors. -/
-def complexLorentzTensor : TensorSpecies ℂ where
+def complexLorentzTensor : TensorSpecies ℂ SL(2, ℂ) where
   C := complexLorentzTensor.Color
-  G := SL(2, ℂ)
-  G_group := inferInstance
   FD := Discrete.functor fun c =>
     match c with
     | Color.upL => Fermion.leftHanded
@@ -293,7 +290,7 @@ instance {n m : ℕ} {c : Fin n → complexLorentzTensor.C}
     Decidable (σ = σ') :=
   decidable_of_iff _ (OverColor.Hom.ext_iff σ σ')
 
-TODO "The lemma `repDim_τ` should hold for any Tensor Species not just complex Lorentz
+TODO "6V2BK" "The lemma `repDim_τ` should hold for any Tensor Species not just complex Lorentz
   tensors."
 @[simp]
 lemma repDim_τ {c : complexLorentzTensor.C} :

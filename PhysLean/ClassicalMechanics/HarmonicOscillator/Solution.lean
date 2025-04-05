@@ -4,9 +4,10 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Joseph Tooby-Smith
 -/
 import PhysLean.ClassicalMechanics.HarmonicOscillator.Basic
+import PhysLean.Meta.Informal.SemiFormal
 /-!
 
-# The Classical Harmonic Oscillator
+# Solutions to the classical harmonic oscillator
 
 -/
 
@@ -31,7 +32,12 @@ structure InitialConditions where
   /-- The initial velocity of the harmonic oscillator. -/
   v₀ : ℝ
 
-TODO "Implement other initial conditions for the harmonic oscillator."
+TODO "6VZME" "Implement other initial condtions. For example:
+- initial conditions at a given time.
+- Two positions at different times.
+- Two velocities at different times.
+And convert them into the type `InitialConditions` above (which may need generalzing a bit
+to make this possible)."
 
 @[ext]
 lemma InitialConditions.ext {IC₁ IC₂ : InitialConditions} (h1 : IC₁.x₀ = IC₂.x₀)
@@ -163,6 +169,8 @@ lemma sol_eq_amplitude_mul_cos_phase (IC : InitialConditions) :
     field_simp
   · ring
 
+/-- For any time the position of the harmonic oscillator is less then the
+  amplitude. -/
 lemma abs_sol_le_amplitude (IC : InitialConditions) (t : ℝ) :
     abs (S.sol IC t) ≤ S.amplitude IC := by
   rw [sol_eq_amplitude_mul_cos_phase]
@@ -175,10 +183,13 @@ lemma abs_sol_le_amplitude (IC : InitialConditions) (t : ℝ) :
       (amplitude_nonneg S IC) (zero_le_one' ℝ)
   · simp
 
+/-- For a set of initial conditions `IC` the position of the solution at time `0` is
+  `IC.x₀`. -/
 @[simp]
 lemma sol_t_zero (IC : InitialConditions) : S.sol IC 0 = IC.x₀ := by
   simp [sol]
 
+/-- The solutions are differentiable. -/
 @[fun_prop]
 lemma sol_differentiable (IC : InitialConditions) : Differentiable ℝ (S.sol IC) := by
   rw [sol_eq]
@@ -285,15 +296,38 @@ lemma sol_action (IC : InitialConditions) (t1 t2 : ℝ) :
       · field_simp
         ring
 
-TODO "For the classical harmonic oscillator find the time for which it returns to
+/-!
+
+## Some semi-formal results
+
+-/
+
+/- This variable should be removed once the the corresponding `semiformal_result`
+  is implemented. -/
+variable (EquationOfMotion : (x : ℝ → ℝ) → Prop)
+
+TODO "6VZI3" "For the classical harmonic oscillator find the time for which it returns to
   it's initial position and velocity."
 
-TODO "For the classical harmonic oscillator find the times for which it passes through zero."
+TODO "6VZJB" "For the classical harmonic oscillator find the times for
+  which it passes through zero."
 
-TODO "For the classical harmonic oscillator find the velocity when it passes through
+TODO "6VZJH" "For the classical harmonic oscillator find the velocity when it passes through
   zero."
 
-TODO "Show uniqueness of the solution for the classical harmonic oscillator."
+/-- The solutions for any initial condition solve the equation of motion. -/
+semiformal_result "6YATB" sol_equationOfMotion (IC : InitialConditions) :
+    EquationOfMotion (S.sol IC)
+
+/-- The solutions to the equation of motion for a given set of initial conditions
+  are unique.
+
+  Semiformal implmentation:
+  - One may needed the added condition of smoothness on `x` here.
+  - `EquationOfMotion` needs defining before this can be proved. -/
+semiformal_result "6VZJO" sol_unique (IC : InitialConditions) (x : ℝ → ℝ) :
+    EquationOfMotion x ∧ x 0 = IC.x₀ ∧ deriv x 0 = IC.v₀ →
+    x = S.sol IC
 
 end HarmonicOscillator
 
