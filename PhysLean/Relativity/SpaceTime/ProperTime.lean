@@ -40,7 +40,7 @@ lemma properTime_zero_ofLightLike {d : ℕ} (q p : SpaceTime d)
     properTime q p = 0 := by
   rw [properTime]
   rw [lightLike_iff_norm_sq_zero] at h
-  simp [h]
+  simp only [h, sqrt_zero]
 
 lemma properTime_zero_ofSpaceLike {d : ℕ} (q p : SpaceTime d)
     (h : causalCharacter (p - q) = .spaceLike) :
