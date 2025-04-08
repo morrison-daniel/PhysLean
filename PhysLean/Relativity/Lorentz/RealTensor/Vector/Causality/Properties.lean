@@ -10,6 +10,7 @@ import PhysLean.Relativity.Lorentz.RealTensor.Vector.Causality.Basic
 ## Properties of Causality of Lorentz vectors
 
 -/
+
 open IndexNotation
 open CategoryTheory
 open MonoidalCategory
@@ -22,11 +23,9 @@ open CategoryTheory
 open TensorTree
 open OverColor.Discrete
 noncomputable section
-
 namespace Lorentz
 open realLorentzTensor
 open InnerProductSpace
-
 namespace Vector
 
 -- Zero vector has zero Minkowski norm squared
@@ -100,7 +99,7 @@ lemma timelike_time_dominates_space {d : ℕ} {v : Vector d}
   simp only [PiLp.inner_apply, RCLike.inner_apply, conj_trivial, Fin.isValue]
   have h_spatial_sum : ∑ x, spatialPart v x * spatialPart v x =
                      ∑ i, toCoord v (Sum.inr i) * toCoord v (Sum.inr i) := by
-    simp only [spatialPart]
+      simp only [spatialPart]
   have h_time : timeComponent v = toCoord v (Sum.inl 0) := rfl
   rw [h_spatial_sum, h_time]
   have h_norm_pos : 0 < toCoord v (Sum.inl 0) * toCoord v (Sum.inl 0) -

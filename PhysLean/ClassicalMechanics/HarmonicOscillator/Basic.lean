@@ -39,7 +39,7 @@ lemma m_neq_zero : S.m ≠ 0 := Ne.symm (ne_of_lt S.m_pos)
   as `√(k/m)`. -/
 noncomputable def ω : ℝ := √(S.k / S.m)
 
-/-- The angular frequence of the classical harmonic oscilator is positive. -/
+/-- The angular frequence of the classical harmonic oscillator is positive. -/
 @[simp]
 lemma ω_pos : 0 < S.ω := sqrt_pos.mpr (div_pos S.k_pos S.m_pos)
 
@@ -94,7 +94,7 @@ lemma lagrangian_parity (x : ℝ → ℝ) (hx : Differentiable ℝ x) :
 
 TODO "Derive the force from the lagrangian of the classical harmonic oscillator"
 
-TODO "Derive the Euler-Lagraange equation for the classical harmonic oscillator
+TODO "Derive the Euler-Lagrange equation for the classical harmonic oscillator
   from the lagrangian."
 
 TODO "Include damping into the classical harmonic oscillator."

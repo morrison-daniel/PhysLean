@@ -127,6 +127,8 @@ lemma mul_power_integrable (f : ℝ → ℂ) (hf : MemHS f) (r : ℕ) :
     simp only [isUnit_iff_ne_zero, ne_eq, pow_eq_zero_iff', Complex.ofReal_eq_zero, not_and,
       Decidable.not_not]
     simp
+    have : Q.ξ ≠ 0 := by exact Q.ξ_pos.ne'
+    exact fun a => False.elim (this a)
   · simp only [ne_eq, Decidable.not_not] at hr
     subst hr
     simpa using Q.mul_physHermite_integrable f hf 0
