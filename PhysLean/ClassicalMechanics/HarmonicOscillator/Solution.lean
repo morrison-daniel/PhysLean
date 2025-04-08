@@ -205,7 +205,6 @@ lemma sol_velocity (IC : InitialConditions) : deriv (S.sol IC) =
   field_simp [S.ω_neq_zero]
   ring_nf
 
-
 lemma sol_velocity_amplitude_phase (IC : InitialConditions) : deriv (S.sol IC) =
     fun t => - S.amplitude IC * S.ω * sin (S.ω * t + S.phase IC) := by
   funext t

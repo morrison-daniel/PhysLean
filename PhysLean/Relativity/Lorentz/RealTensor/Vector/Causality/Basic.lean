@@ -10,17 +10,7 @@ import PhysLean.Relativity.Lorentz.RealTensor.Vector.Basic
 ## Causality of Lorentz vectors
 
 -/
-open IndexNotation
-open CategoryTheory
-open MonoidalCategory
-open Matrix
-open MatrixGroups
-open Complex
-open TensorProduct
-open IndexNotation
-open CategoryTheory
-open TensorTree
-open OverColor.Discrete
+
 noncomputable section
 
 namespace Lorentz
@@ -55,30 +45,6 @@ lemma causalCharacter_invariant {d : ℕ} (p : Vector d)
     causalCharacter (((realLorentzTensor d).F.obj _).ρ Λ p) = causalCharacter p := by
   simp only [causalCharacter, C_eq_color, Nat.succ_eq_add_one, Nat.reduceAdd]
   rw [innerProduct_invariant]
-
-lemma timeLike_iff_norm_sq_pos {d : ℕ} (p : Vector d) :
-    causalCharacter p = CausalCharacter.timeLike ↔ 0 < ⟪p, p⟫ₘ := by
-  simp only [causalCharacter]
-  split
-  · rename_i h
-    simp_all
-  · split
-    · rename_i h
-      simp [h]
-    · rename_i h
-      simp_all
-
-lemma lightLike_iff_norm_sq_zero {d : ℕ} (p : Vector d) :
-    causalCharacter p = CausalCharacter.lightLike ↔ ⟪p, p⟫ₘ = 0 := by
-  simp only [causalCharacter]
-  split
-  · rename_i h
-    simp only [reduceCtorEq, h, eq_self_iff_true]
-  · rename_i h
-    simp only [h, iff_false]
-    split
-    · simp only [reduceCtorEq, not_false_eq_true]
-    · simp only [reduceCtorEq, not_false_eq_true]
 
 lemma spaceLike_iff_norm_sq_neg {d : ℕ} (p : Vector d) :
     causalCharacter p = CausalCharacter.spaceLike ↔ ⟪p, p⟫ₘ < 0 := by
@@ -162,21 +128,15 @@ def causallyUnrelated {d : ℕ} (p q : Vector d) : Prop :=
 def causalDiamond {d : ℕ} (p q : Vector d) : Set (Vector d) :=
   {r | causallyFollows p r ∧ causallyFollows r q}
 
-/-- Extract spatial components from a Lorentz vector,
-    returning them as a vector in Euclidean space. -/
-def spatialPart {d : ℕ} (v : Vector d) : EuclideanSpace ℝ (Fin d) :=
-  fun i => v (Sum.inr i)
-
-/-- Extract time component from a Lorentz vector -/
-def timeComponent {d : ℕ} (v : Vector d) : ℝ :=
-  v (Sum.inl 0)
-
-/-- In Minkowski spacetime with (+---) signature, we can define future-directed timelike vectors
+/-- In Minkowski spacetime with (+---) signature, we can define future-directed vectors
     as having positive time components (by convention) -/
 def isFutureDirected {d : ℕ} (v : Vector d) : Prop :=
-  v (Sum.inl 0) > 0
+    0 < timeComponent v
 
-/-- In Minkowski spacetime with (+---) signature, we can define past-directed timelike vectors
+/-- In Minkowski spacetime with (+---) signature, we can define past-directed vectors
     as having negative time components (by convention) -/
 def isPastDirected {d : ℕ} (v : Vector d) : Prop :=
-  v (Sum.inl 0) < 0
+  timeComponent v < 0
+
+end Vector
+end Lorentz
