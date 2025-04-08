@@ -205,7 +205,9 @@ import PhysLean.Relativity.Lorentz.RealTensor.Metrics.Pre
 import PhysLean.Relativity.Lorentz.RealTensor.Units.Pre
 import PhysLean.Relativity.Lorentz.RealTensor.Vector.Basic
 import PhysLean.Relativity.Lorentz.RealTensor.Vector.Boosts
-import PhysLean.Relativity.Lorentz.RealTensor.Vector.Causality
+import PhysLean.Relativity.Lorentz.RealTensor.Vector.Causality.Basic
+import PhysLean.Relativity.Lorentz.RealTensor.Vector.Causality.LightLike
+import PhysLean.Relativity.Lorentz.RealTensor.Vector.Causality.TimeLike
 import PhysLean.Relativity.Lorentz.RealTensor.Vector.Pre.Basic
 import PhysLean.Relativity.Lorentz.RealTensor.Vector.Pre.Contraction
 import PhysLean.Relativity.Lorentz.RealTensor.Vector.Pre.Modules

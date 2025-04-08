@@ -32,7 +32,7 @@ abbrev Vector (d : ℕ := 3) := ℝT[d, .up]
 namespace Vector
 
 set_option quotPrecheck false in
-/-- The actoin of the Lorentz group on a Lorentz vector. -/
+/-- The action of the Lorentz group on a Lorentz vector. -/
 scoped infixl:60 "•" => ((realLorentzTensor _).F.obj (OverColor.mk ![Color.up])).ρ
 
 /-- The equivalence between the type of indices of a Lorentz vector and
@@ -329,6 +329,15 @@ lemma action_toCoord_eq_mulVec {d} (Λ : LorentzGroup d) (p : Vector d) :
   rw [action_apply_eq_sum, mulVec_eq_sum]
   simp only [op_smul_eq_smul, Finset.sum_apply, Pi.smul_apply, transpose_apply, smul_eq_mul,
     mul_comm]
+
+/-- Extract spatial components from a Lorentz vector,
+    returning them as a vector in Euclidean space. -/
+abbrev spatialPart {d : ℕ} (v : Vector d) : EuclideanSpace ℝ (Fin d) :=
+  fun i => v (Sum.inr i)
+
+/-- Extract time component from a Lorentz vector -/
+abbrev timeComponent {d : ℕ} (v : Vector d) : ℝ :=
+  v (Sum.inl 0)
 
 end Vector
 
