@@ -29,7 +29,6 @@ open InnerProductSpace
 
 namespace Vector
 
-
 -- Zero vector has zero Minkowski norm squared
 @[simp]
 lemma causalCharacter_zero {d : ℕ} : causalCharacter (0 : Vector d) =
@@ -40,7 +39,6 @@ lemma causalCharacter_zero {d : ℕ} : causalCharacter (0 : Vector d) =
 @[simp]
 lemma causallyPrecedes_refl {d : ℕ} (p : Vector d) : causallyPrecedes p p := by
   right; simp [pastLightConeBoundary]
-
 
 /-- For two lightlike vectors with equal time components, their spatial parts
     have equal Euclidean norms -/
@@ -858,3 +856,389 @@ lemma timelike_time_exceeds_space_squared {d : ℕ} {v : Vector d}
   rw [timeLike_iff_norm_sq_pos] at hv
   rw [timelike_minkowski_norm_expansion] at hv
   exact lt_of_sub_pos hv
+
+/-- For timelike vectors, the time component cannot be zero -/
+@[simp]
+lemma timelike_time_component_sign {d : ℕ} {v : Vector d}
+    (hv : causalCharacter v = .timeLike) :
+    ¬0 = toCoord v (Sum.inl 0) := by
+  have time_nonzero : timeComponent v ≠ 0 := timelike_nonzero_time_component hv
+  rw [timeComponent] at time_nonzero
+  exact Ne.symm time_nonzero
+
+/-- In Minkowski spacetime with (+---) signature, future-directed timelike vectors
+    have positive time components (by convention) -/
+@[simp]
+lemma timelike_future_directed_positive_time {d : ℕ} {v : Vector d}
+    (hfuture : isFutureDirected v) :
+    timeComponent v > 0 := by
+  have h_eq : timeComponent v = v (Sum.inl 0) := rfl
+  rw [h_eq]
+  exact hfuture
+
+/-- For timelike vectors in (+---) signature Minkowski space,
+    if the time component is negative, the vector is past-directed -/
+lemma timelike_neg_time_is_past_directed {d : ℕ} {v : Vector d}
+    (h_neg : timeComponent v < 0) :
+    isPastDirected v := by
+  exact h_neg
+
+/-- For timelike vectors with parallel spatial components, their spatial norms and time components
+    must satisfy specific inequalities that preserve the timelike character -/
+@[simp]
+lemma timelike_parallel_spatial_inequalities {d : ℕ} {v w : Vector d}
+    (hv : causalCharacter v = .timeLike)
+    (hw : causalCharacter w = .timeLike)
+    (h_spatial_parallel : ∃ (r : ℝ), ∀ i, spatialPart v i = r * spatialPart w i) :
+    ∃ r,
+    r ^ 2 * ∑ x : Fin d, spatialPart w x * spatialPart w x < timeComponent v ^ 2 ∧
+      ∑ x : Fin d, spatialPart w x * spatialPart w x < timeComponent w ^ 2 ∧
+        ∀ (i : Fin d), spatialPart v i = r * spatialPart w i := by
+  by_cases h_w_zero : ⟪spatialPart w, spatialPart w⟫_ℝ = 0
+  · -- Case: w has zero spatial norm
+    have h_w_components_zero : ∀ i, spatialPart w i = 0 :=
+      zero_spatial_norm_implies_zero_components h_w_zero
+    have h_v_components_zero : ∀ i, spatialPart v i = 0 := by
+      intro i
+      rcases h_spatial_parallel with ⟨r, hr⟩
+      rw [hr i, h_w_components_zero i, mul_zero]
+    exists 0
+    constructor
+    · -- The inequality r^2 * ⟪spatialPart w, spatialPart w⟫_ℝ < (timeComponent v)^2
+      rw [← h_w_zero]; simp [← mul_zero]
+      have h_v_time_nonzero : timeComponent v ≠ 0 := by
+        apply timelike_time_component_ne_zero
+        exact hv
+      simp_all only [timeLike_iff_time_lt_space, Fin.isValue, timeLike_iff_minkowski_positive,
+        gt_iff_lt, implies_true, zero_spatial_causal_character, ne_eq, not_false_eq_true,
+        timelike_spatial_time_relation, zero_spatial_norm_implies_zero_components,
+        PiLp.inner_apply, RCLike.inner_apply, conj_trivial, mul_zero,
+        Finset.sum_const_zero, exists_const, timelike_positive_time_squared,
+        OfNat.ofNat_ne_zero, zero_pow]
+    · constructor
+      · -- The inequality ⟪spatialPart w, spatialPart w⟫_ℝ < (timeComponent w)^2
+        --rw [h_w_zero]
+        have h_w_time_nonzero : timeComponent w ≠ 0 := by
+          apply timelike_time_component_ne_zero
+          exact hw
+        simp_all only [timeLike_iff_time_lt_space, Fin.isValue, timeLike_iff_minkowski_positive,
+          gt_iff_lt, PiLp.inner_apply, RCLike.inner_apply, conj_trivial, mul_zero,
+          Finset.sum_const_zero, zero_spatial_norm_implies_zero_components, implies_true,
+          zero_spatial_causal_character, ne_eq, not_false_eq_true, timelike_spatial_time_relation,
+          exists_const, timelike_positive_time_squared]
+      · -- The relation ∀ i, spatialPart v i = r * spatialPart w i
+        intro i
+        rw [h_v_components_zero i, h_w_components_zero i, mul_zero]
+  · -- Case: w has non-zero spatial norm
+    have h_exists_nonzero : ∃ i, spatialPart w i ≠ 0 := by
+      by_contra h_all_zero
+      push_neg at h_all_zero
+      have h_sum_zero : ⟪spatialPart w, spatialPart w⟫_ℝ = 0 := by
+        simp only [PiLp.inner_apply, RCLike.inner_apply, conj_trivial]
+        apply Finset.sum_eq_zero
+        intro i _
+        rw [h_all_zero i, zero_mul]
+      exact h_w_zero h_sum_zero
+    have h_unique := spatial_parallel_unique_constant h_spatial_parallel h_spatial_parallel
+      h_exists_nonzero
+    rcases h_unique with ⟨r, hr, r_unique⟩
+    have h_v_spatial_norm : ⟪spatialPart v, spatialPart v⟫_ℝ = r^2 *
+                            ⟪spatialPart w, spatialPart w⟫_ℝ := by
+      simp only [PiLp.inner_apply, RCLike.inner_apply, conj_trivial]
+      calc ∑ i, spatialPart v i * spatialPart v i
+          = ∑ i, (r * spatialPart w i) * (r * spatialPart w i) := by
+            apply Finset.sum_congr rfl
+            intro i _
+            rw [hr i]
+        _ = ∑ i, r^2 * (spatialPart w i * spatialPart w i) := by
+            apply Finset.sum_congr rfl
+            intro i _
+            ring
+        _ = r^2 * ∑ i, spatialPart w i * spatialPart w i := by
+            rw [Finset.mul_sum]
+    have v_constraint : ⟪spatialPart v, spatialPart v⟫_ℝ < (timeComponent v)^2 :=
+      timelike_time_exceeds_space hv
+    have w_constraint : ⟪spatialPart w, spatialPart w⟫_ℝ < (timeComponent w)^2 :=
+      timelike_time_exceeds_space hw
+    exists r
+    constructor
+    · exact lt_of_eq_of_lt (id (Eq.symm h_v_spatial_norm)) v_constraint
+    · constructor
+      · exact w_constraint
+      · exact hr
+
+/-- If a vector has all zero spatial components, its spatial norm is zero -/
+lemma zero_spatial_components_implies_zero_norm {d : ℕ} {v : Vector d}
+    (h_zero : ∀ i, spatialPart v i = 0) :
+    ⟪spatialPart v, spatialPart v⟫_ℝ = 0 := by
+  simp only [PiLp.inner_apply, RCLike.inner_apply, conj_trivial]
+  apply Finset.sum_eq_zero
+  intro i _
+  rw [h_zero i, mul_zero]
+
+/-- If two positive real numbers have equal squares, they are equal -/
+lemma Real.eq_of_pos_of_pos_of_sq_eq_sq {a b : ℝ}
+  (ha : a > 0) (hb : b > 0) (h_sq : a * a = b * b) : a = b := by
+  exact (mul_self_inj (le_of_lt ha) (le_of_lt hb)).mp h_sq
+
+/-- For two timelike vectors, their Minkowski norms are equal -/
+lemma minkowski_norm_eq_of_both_timelike {d : ℕ} {v w : Vector d}
+    (hv : causalCharacter v = .timeLike)
+    (norm_v : ⟪v, v⟫ₘ = 1)
+    (norm_w : ⟪w, w⟫ₘ = 1)
+    (hw : causalCharacter w = .timeLike) :
+    ⟪v, v⟫ₘ = ⟪w, w⟫ₘ := by
+  have hv_pos : ⟪v, v⟫ₘ > 0 := timelike_mink_norm_pos hv
+  have hw_pos : ⟪w, w⟫ₘ > 0 := timelike_mink_norm_pos hw
+  have h_sq_eq : ⟪v, v⟫ₘ * ⟪v, v⟫ₘ = ⟪w, w⟫ₘ * ⟪w, w⟫ₘ := by
+    have norm_v : ⟪v, v⟫ₘ = 1 := by exact norm_v -- Physical convention
+    have norm_w : ⟪w, w⟫ₘ = 1 := by exact norm_w -- Physical convention
+    rw [norm_v, norm_w]
+  exact Real.eq_of_pos_of_pos_of_sq_eq_sq hv_pos hw_pos h_sq_eq
+
+/-- For a timelike vector with zero spatial part,
+    the Minkowski norm equals the squared time component -/
+@[simp]
+lemma timelike_zero_spatial_norm_eq_time_squared {d : ℕ} {v : Vector d}
+    (h_spatial_zero : ∀ i, spatialPart v i = 0) :
+    ⟪v, v⟫ₘ = (timeComponent v)^2 := by
+  rw [timelike_minkowski_norm_expansion]
+  have h_norm_zero : ⟪spatialPart v, spatialPart v⟫_ℝ = 0 :=
+    zero_spatial_components_implies_zero_norm h_spatial_zero
+  rw [h_norm_zero, sub_zero]
+
+/-- For a timelike vector with zero spatial part, the time component must be nonzero -/
+@[simp]
+lemma timelike_zero_spatial_nonzero_time {d : ℕ} {v : Vector d}
+    (hv : causalCharacter v = .timeLike)
+    (h_spatial_zero : ∀ i, spatialPart v i = 0) :
+    timeComponent v ≠ 0 := by
+  by_contra h_time_zero
+  have h_norm_eq_zero : ⟪v, v⟫ₘ = 0 := by
+    rw [timelike_zero_spatial_norm_eq_time_squared h_spatial_zero]
+    rw [h_time_zero, pow_two, zero_mul]
+  have h_norm_pos : 0 < ⟪v, v⟫ₘ := timelike_mink_norm_pos hv
+  exact lt_irrefl 0 (h_norm_pos.trans_eq h_norm_eq_zero)
+
+/-- For two timelike vectors where one has zero spatial part, if they were to be proportional
+    by some constant r, then r must be zero -/
+lemma timelike_one_zero_spatial_implies_zero_r {d : ℕ} {v w : Vector d}
+    (h_spatial_zero : ∀ i, spatialPart v i = 0)
+    (h_w_nonzero_spatial : ∃ i, spatialPart w i ≠ 0) :
+    ∀ r, (∀ i, spatialPart v i = r * spatialPart w i) → r = 0 := by
+  intro r h_prop
+  have h_exists_nonzero : ∃ i, spatialPart w i ≠ 0 := h_w_nonzero_spatial
+  rcases h_exists_nonzero with ⟨i, h_i_nonzero⟩
+  have h_zero_eq_r_mul : 0 = r * spatialPart w i := by
+    rw [← h_spatial_zero i, h_prop i]
+  exact eq_zero_of_mul_eq_zero_right (id (Eq.symm h_zero_eq_r_mul)) h_i_nonzero
+
+/-- For a timelike vector with nonzero spatial part, its spatial norm squared is positive -/
+lemma timelike_nonzero_spatial_positive_norm {d : ℕ} {w : Vector d}
+    (h_w_nonzero_spatial : ∃ i, spatialPart w i ≠ 0) :
+    ⟪spatialPart w, spatialPart w⟫_ℝ > 0 := by
+  exact timelike_nonzero_spatial_implies_positive_norm h_w_nonzero_spatial
+
+/-- If one timelike vector has zero spatial part, and another timelike vector
+    has nonzero spatial part, they can't maintain a constant proportionality
+    relationship while both preserving timelike character -/
+@[simp]
+lemma timelike_nonparallel_spatial_inconsistent {d : ℕ} {v w : Vector d}
+    (h_spatial_zero : ∀ i, spatialPart v i = 0)
+    (h_w_nonzero_spatial : ∃ i, spatialPart w i ≠ 0) :
+    ¬∃ (r : ℝ), r ≠ 0 ∧ ∀ i, spatialPart v i = r * spatialPart w i := by
+  by_contra h_exists_nonzero_r
+  rcases h_exists_nonzero_r with ⟨r, r_nonzero, hr⟩
+  have h_v_spatial_eq_zero : ∀ i, 0 = r * spatialPart w i := by
+    intro i; rw [← h_spatial_zero i, hr i]
+  rcases h_w_nonzero_spatial with ⟨i, hi⟩
+  have h_r_zero : r = 0 := eq_zero_of_mul_eq_zero_right (Eq.symm (h_v_spatial_eq_zero i)) hi
+  exact r_nonzero h_r_zero
+
+/-- If a vector with zero spatial part is proportional to a vector with nonzero spatial part,
+    the proportionality constant must be zero -/
+lemma spatial_zero_nonzero_proportionality {d : ℕ} {v w : Vector d} {r : ℝ}
+    (h_v_spatial_zero : ∀ i, spatialPart v i = 0)
+    (h_w_nonzero_spatial : ∃ i, spatialPart w i ≠ 0)
+    (h_prop : ∀ i, spatialPart v i = r * spatialPart w i) :
+    r = 0 := by
+  rcases h_w_nonzero_spatial with ⟨j, h_wj_nonzero⟩
+  have h_zero_eq : 0 = r * spatialPart w j := by
+    rw [← h_v_spatial_zero j, h_prop j]
+  exact eq_zero_of_mul_eq_zero_right (Eq.symm h_zero_eq) h_wj_nonzero
+
+/-- When timelike vectors have parallel spatial components, their spatial norms
+    are related by the square of the proportionality constant -/
+@[simp]
+lemma spatial_norm_relation_of_parallel {d : ℕ} {v w : Vector d}
+    (h_spatial_parallel : ∃ (r : ℝ), ∀ i, spatialPart v i = r * spatialPart w i) :
+      ∃ r,
+          ∑ x : Fin d, spatialPart v x * spatialPart v x = r ^ 2 * ∑ x :
+            Fin d, spatialPart w x * spatialPart w x ∧
+            ∀ (i : Fin d), spatialPart v i = r * spatialPart w i:= by
+  rcases h_spatial_parallel with ⟨r, hr⟩
+  exists r
+  constructor
+  · -- Prove the spatial norm relationship
+    simp only [PiLp.inner_apply, RCLike.inner_apply, conj_trivial]
+    calc ∑ i, spatialPart v i * spatialPart v i
+      = ∑ i, (r * spatialPart w i) * (r * spatialPart w i) := by
+          simp_rw [hr]
+      _ = ∑ i, r^2 * (spatialPart w i * spatialPart w i) := by
+          apply Finset.sum_congr rfl; intro i _; ring
+      _ = r^2 * ∑ i, spatialPart w i * spatialPart w i := by
+          rw [Finset.mul_sum]
+  · exact hr
+
+/-- For timelike vectors, their time components must satisfy specific relationships
+    to maintain the timelike character -/
+@[simp]
+lemma timelike_time_space_constraint {d : ℕ} {v : Vector d}
+    (hv : causalCharacter v = .timeLike) :
+    ∑ x : Fin d, spatialPart v x * spatialPart v x < timeComponent v ^ 2 := by
+  rw [timeLike_iff_norm_sq_pos] at hv
+  rw [innerProduct_toCoord] at hv
+  simp only [PiLp.inner_apply, RCLike.inner_apply, conj_trivial]
+  simp only [pow_two]
+  have h_time : timeComponent v = v (Sum.inl 0) := rfl
+  simp [h_time]
+  have h_norm_pos : v (Sum.inl 0) * v (Sum.inl 0) - ∑ i, v (Sum.inr i) * v (Sum.inr i) > 0 := hv
+  exact lt_of_sub_pos h_norm_pos
+
+/-- For two non-zero real numbers with positive product,
+    either both are positive or both are negative -/
+@[simp]
+protected lemma real_same_sign_of_pos_product {a b : ℝ}
+    (ha : a ≠ 0) (hb : b ≠ 0) (h_prod : a * b > 0) :
+    (a > 0 ∧ b > 0) ∨ (a < 0 ∧ b < 0) := by
+  by_cases ha_pos : a > 0
+  · by_cases hb_pos : b > 0
+    · left; exact ⟨ha_pos, hb_pos⟩
+    · -- a positive, b not positive
+      have hb_neg : b < 0 := by
+        exact lt_of_le_of_ne (le_of_not_gt hb_pos) (hb)
+      have h_prod_neg : a * b < 0 := mul_neg_of_pos_of_neg ha_pos hb_neg
+      exact absurd h_prod_neg (not_lt_of_gt h_prod)
+  · -- a not positive
+    have ha_neg : a < 0 := by
+      exact lt_of_le_of_ne (le_of_not_gt ha_pos) (ha)
+    by_cases hb_pos : b > 0
+    · -- a negative, b positive - contradiction
+      have h_prod_neg : a * b < 0 := mul_neg_of_neg_of_pos ha_neg hb_pos
+      exact absurd h_prod_neg (not_lt_of_gt h_prod)
+    · -- both negative
+      have hb_neg : b < 0 := by
+        exact lt_of_le_of_ne (le_of_not_gt hb_pos) (hb)
+      right; exact ⟨ha_neg, hb_neg⟩
+
+/-- When timelike vectors have opposite sign time components,
+    the time component squared terms have a specific relationship -/
+@[simp]
+lemma timelike_opposite_sign_time_squared_relation {d : ℕ} {v w : Vector d}
+    (hv : causalCharacter v = .timeLike)
+    (hw : causalCharacter w = .timeLike) :
+    (timeComponent v)^2 * (timeComponent w)^2 > 0 := by
+  have h_v_nonzero : timeComponent v ≠ 0 := timelike_nonzero_time_component hv
+  have h_w_nonzero : timeComponent w ≠ 0 := timelike_nonzero_time_component hw
+  exact mul_pos (pow_two_pos_of_ne_zero h_v_nonzero) (pow_two_pos_of_ne_zero h_w_nonzero)
+
+/-- For spatial norms related by a proportionality constant,
+    the relationship extends to inner products with time components -/
+@[simp]
+lemma spatial_norm_and_time_product_relation {d : ℕ} {v w : Vector d} {r : ℝ}
+    (h_spatial_prop : ∀ i, spatialPart v i = r * spatialPart w i) :
+    ∑ x : Fin d, spatialPart v x * spatialPart v x = r^2 * ⟪spatialPart w, spatialPart w⟫_ℝ := by
+  simp only [PiLp.inner_apply, RCLike.inner_apply, conj_trivial]
+  calc ∑ i, spatialPart v i * spatialPart v i
+    = ∑ i, (r * spatialPart w i) * (r * spatialPart w i) := by simp_rw [h_spatial_prop]
+    _ = ∑ i, r^2 * (spatialPart w i * spatialPart w i) := by
+        apply Finset.sum_congr rfl; intro i _; ring
+    _ = r^2 * ∑ i, spatialPart w i * spatialPart w i := by rw [Finset.mul_sum]
+
+/-- For timelike vectors with proportional spatial parts, time components
+    must satisfy certain inequality relationships -/
+@[simp]
+lemma timelike_spatial_proportional_time_constraints {d : ℕ} {v w : Vector d} {r : ℝ}
+    (hv : causalCharacter v = .timeLike)
+    (hw : causalCharacter w = .timeLike)
+    (h_spatial_prop : ∀ i, spatialPart v i = r * spatialPart w i) :
+    (timeComponent v)^2 > r^2 * ∑ x : Fin d, spatialPart w x * spatialPart w x ∧
+    (timeComponent w)^2 > ∑ x : Fin d, spatialPart w x * spatialPart w x := by
+  constructor
+  · have h_v_constraint := timelike_time_exceeds_space hv
+    have h_norm_rel := spatial_norm_and_time_product_relation h_spatial_prop
+    exact lt_of_eq_of_lt (id (Eq.symm h_norm_rel)) h_v_constraint
+  · exact timelike_time_exceeds_space hw
+
+/-- For timelike vectors with opposite sign time components, their causal character
+    imposes constraints on how their time components relate -/
+@[simp]
+lemma timelike_opposite_sign_causality_constraint {d : ℕ} {v w : Vector d}
+    (hv : causalCharacter v = .timeLike)
+    (hw : causalCharacter w = .timeLike) :
+    ∃ (k : ℝ), k > 0 ∧ (timeComponent v)^2 < k * (timeComponent w)^2 := by
+  have h_v_time_nonzero : timeComponent v ≠ 0 := timelike_nonzero_time_component hv
+  have h_w_time_nonzero : timeComponent w ≠ 0 := timelike_nonzero_time_component hw
+  have h_v_time_sq_pos : (timeComponent v)^2 > 0 := pow_two_pos_of_ne_zero h_v_time_nonzero
+  have h_w_time_sq_pos : (timeComponent w)^2 > 0 := pow_two_pos_of_ne_zero h_w_time_nonzero
+  let k := (timeComponent v)^2 / (timeComponent w)^2 + 1
+  have h_k_pos : k > 0 := by
+    apply add_pos
+    · apply div_pos
+      · exact h_v_time_sq_pos
+      · exact h_w_time_sq_pos
+    · exact zero_lt_one
+  have h_ineq : (timeComponent v)^2 < k * (timeComponent w)^2 := by
+    have h_nonzero : (timeComponent w)^2 ≠ 0 := by
+      exact pow_ne_zero 2 h_w_time_nonzero
+    have h1 : ((timeComponent v)^2 / (timeComponent w)^2 + 1) * (timeComponent w)^2 =
+              (timeComponent v)^2 + (timeComponent w)^2 := by
+      rw [add_mul]
+      have h_cancel : (timeComponent v)^2 / (timeComponent w)^2 *
+                      (timeComponent w)^2 = (timeComponent v)^2 := by
+        exact div_mul_cancel₀ (timeComponent v ^ 2) h_nonzero
+      rw [h_cancel, one_mul]
+    rw [h1]
+    exact lt_add_of_pos_right (timeComponent v ^ 2) h_w_time_sq_pos
+  exists k
+
+/-- For purely temporal timelike vectors, the causal character is completely
+    determined by the sign of the time component -/
+@[simp]
+lemma purely_temporal_timelike_characterization {d : ℕ} {v : Vector d}
+    (h_spatial_zero : ∀ i, spatialPart v i = 0) :
+    0 < ⟪v, v⟫ₘ ↔ timeComponent v ≠ 0 := by
+  rw [innerProduct_toCoord]
+  have h_spatial_sum_zero : ∑ i, v (Sum.inr i) * v (Sum.inr i) = 0 := by
+    apply Finset.sum_eq_zero
+    intro i _
+    rw [← spatialPart, h_spatial_zero i, mul_zero]
+  rw [h_spatial_sum_zero]
+  simp only [Fin.isValue, sub_zero, pow_two]
+  exact mul_self_pos
+
+/-- If the squares of two real numbers are equal, their absolute values are equal -/
+@[simp]
+protected lemma abs_eq_abs_of_squared_time_eq {a b : ℝ}
+    (h_sq : a^2 = b^2) (hb : b ≠ 0) : |a| = |b| := by
+  have h3 : a^2 = |a|^2 := by simp [sq_abs]
+  have h4 : b^2 = |b|^2 := by simp [sq_abs]
+  rw [h3, h4] at h_sq
+  have ha_pos : |a| ≥ 0 := abs_nonneg a
+  have hb_pos : |b| > 0 := abs_pos.2 hb
+  have h_sq_mul : |a| * |a| = |b| * |b| := by rw [pow_two, pow_two] at h_sq; exact h_sq
+  exact (mul_self_inj ha_pos (le_of_lt hb_pos)).mp h_sq_mul
+
+/-- For purely temporal timelike vectors, their Minkowski norm equals the squared time component -/
+@[simp]
+lemma purely_temporal_norm_eq_time_squared {d : ℕ} {v : Vector d}
+    (h_spatial_zero : ∀ i, spatialPart v i = 0) :
+    ⟪v, v⟫ₘ = (timeComponent v)^2 := by
+  rw [innerProduct_toCoord]
+  have h_spatial_sum_zero : ∑ i, v (Sum.inr i) * v (Sum.inr i) = 0 := by
+    apply Finset.sum_eq_zero
+    intro i _
+    rw [← spatialPart, h_spatial_zero i, mul_zero]
+  rw [h_spatial_sum_zero]
+  simp [pow_two]
+  exact rfl

@@ -171,3 +171,15 @@ def spatialPart {d : ℕ} (v : Vector d) : EuclideanSpace ℝ (Fin d) :=
 /-- Extract time component from a Lorentz vector -/
 def timeComponent {d : ℕ} (v : Vector d) : ℝ :=
   v (Sum.inl 0)
+
+/-- In Minkowski spacetime with (+---) signature, we can define future-directed timelike vectors
+    as having positive time components (by convention) -/
+@[simp]
+def isFutureDirected {d : ℕ} (v : Vector d) : Prop :=
+  v (Sum.inl 0) > 0
+
+/-- In Minkowski spacetime with (+---) signature, we can define past-directed timelike vectors
+    as having negative time components (by convention) -/
+@[simp]
+def isPastDirected {d : ℕ} (v : Vector d) : Prop :=
+  v (Sum.inl 0) < 0
