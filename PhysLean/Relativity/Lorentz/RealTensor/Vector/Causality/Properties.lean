@@ -31,7 +31,7 @@ namespace Vector
 -- Zero vector has zero Minkowski norm squared
 @[simp]
 lemma causalCharacter_zero {d : ℕ} : causalCharacter (0 : Vector d) =
-  CausalCharacter.lightLike := by
+    CausalCharacter.lightLike := by
   simp  [causalCharacter, lightLike_iff_norm_sq_zero]
 
 /-- Causally preceding is reflexive -/
@@ -112,10 +112,11 @@ lemma timelike_time_dominates_space {d : ℕ} {v : Vector d}
 
 /-- Cauchy-Schwarz inequality for the spatial components of Lorentz vectors -/
 lemma spatial_cauchy_schwarz_sum {d : ℕ} (v w : Vector d) :
-    (∑ i, (spatialPart v) i * (spatialPart w) i)^2 ≤
-    (∑ i, (spatialPart v) i * (spatialPart v) i) * (∑ i,
-    (spatialPart w) i * (spatialPart w) i) := by
-      exact cauchy_schwarz_inner (spatialPart v) (spatialPart w)
+    (∑ i, spatialPart v i * spatialPart w i)^2 ≤
+        (∑ i, spatialPart v i * spatialPart v i) *
+        (∑ i, spatialPart w i * spatialPart w i) := by
+  simp only [PiLp.inner_apply, RCLike.inner_apply, conj_trivial]
+  exact cauchy_schwarz_inner (spatialPart v) (spatialPart w)
 
 /-- For nonzero timelike vectors, the time component is nonzero -/
 @[simp]
@@ -142,16 +143,16 @@ lemma time_squared_pos_of_timelike {d : ℕ} {v : Vector d}
 
 /-- For vectors with zero norm, then all components are zero -/
 lemma vector_zero_of_sum_sq_zero {d : ℕ} {v : EuclideanSpace ℝ (Fin d)}
-     (h : ∑ i, v i * v i = 0) : ∀ i, v i = 0 := by
-   intro i
-   have h_each_zero : v i * v i = 0 := by
-     have h_all_nonneg : ∀ j ∈ Finset.univ, 0 ≤ v j * v j :=
-       fun j _ => mul_self_nonneg (v j)
-     have h_all_zero : ∀ j ∈ Finset.univ, v j * v j = 0 := by
-       apply (Finset.sum_eq_zero_iff_of_nonneg h_all_nonneg).mp
-       exact h
-     exact h_all_zero i (Finset.mem_univ i)
-   exact zero_eq_mul_self.mp (id (Eq.symm h_each_zero))
+    (h : ∑ i, v i * v i = 0) : ∀ i, v i = 0 := by
+  intro i
+  have h_each_zero : v i * v i = 0 := by
+    have h_all_nonneg : ∀ j ∈ Finset.univ, 0 ≤ v j * v j :=
+      fun j _ => mul_self_nonneg (v j)
+    have h_all_zero : ∀ j ∈ Finset.univ, v j * v j = 0 := by
+      apply (Finset.sum_eq_zero_iff_of_nonneg h_all_nonneg).mp
+      exact h
+    exact h_all_zero i (Finset.mem_univ i)
+  exact zero_eq_mul_self.mp (id (Eq.symm h_each_zero))
 
 /-- The zero vector is proportional to any vector -/
 lemma zero_parallel_to_any {d : ℕ} {v : Vector d} :
@@ -267,24 +268,24 @@ lemma cauchy_schwarz_eq_iff_parallel_of_nonzero {d : ℕ}
 /-- If one vector is a scalar multiple of another, they are parallel -/
 @[simp]
 lemma parallel_of_scalar_multiple {d : ℕ}
-  {v w : EuclideanSpace ℝ (Fin d)} {r : ℝ}
-  (h : ∀ i, v i = r * w i) : ∃ (s : ℝ), ∀ i, v i = s * w i := by
-    exists r
+    {v w : EuclideanSpace ℝ (Fin d)} {r : ℝ}
+    (h : ∀ i, v i = r * w i) : ∃ (s : ℝ), ∀ i, v i = s * w i := by
+  exists r
 
 /-- For orthogonal vectors (inner product zero), Cauchy-Schwarz is an equality
     iff one of them is zero -/
 @[simp]
 lemma cauchy_schwarz_eq_of_orthogonal {d : ℕ}
-  {v w : EuclideanSpace ℝ (Fin d)}
-  (h_ortho : ∑ i, v i * w i = 0) :
-  (∑ i, v i * w i)^2 = (∑ i, v i * v i) * (∑ i, w i * w i) ↔
-  (∑ i, v i * v i = 0) ∨ (∑ i, w i * w i = 0) := by
-    rw [h_ortho, pow_two, zero_mul]
-    constructor
-    · intro h; rw [eq_comm] at h; exact mul_eq_zero.mp h
-    · intro h; cases h with
-      | inl h_v => rw [h_v, zero_mul]
-      | inr h_w => rw [h_w, mul_zero]
+    {v w : EuclideanSpace ℝ (Fin d)}
+    (h_ortho : ∑ i, v i * w i = 0) :
+    (∑ i, v i * w i)^2 = (∑ i, v i * v i) * (∑ i, w i * w i) ↔
+    (∑ i, v i * v i = 0) ∨ (∑ i, w i * w i = 0) := by
+  rw [h_ortho, pow_two, zero_mul]
+  constructor
+  · intro h; rw [eq_comm] at h; exact mul_eq_zero.mp h
+  · intro h; cases h with
+    | inl h_v => rw [h_v, zero_mul]
+    | inr h_w => rw [h_w, mul_zero]
 
 /-- For non-parallel vectors, the Cauchy-Schwarz inequality is strict -/
 @[simp]
@@ -296,7 +297,7 @@ lemma strict_cauchy_schwarz_of_not_parallel {d : ℕ}
   have h_cs := cauchy_schwarz_inner v w
   by_contra h
   push_neg at h
-  rw [←not_lt] at h
+  rw [← not_lt] at h
   have h_eq : (∑ i, v i * w i)^2 = (∑ i, v i * v i) * (∑ i, w i * w i) := by
     apply le_antisymm
     · exact h_cs
@@ -977,7 +978,7 @@ lemma zero_spatial_components_implies_zero_norm {d : ℕ} {v : Vector d}
 
 /-- If two positive real numbers have equal squares, they are equal -/
 lemma Real.eq_of_pos_of_pos_of_sq_eq_sq {a b : ℝ}
-  (ha : a > 0) (hb : b > 0) (h_sq : a * a = b * b) : a = b := by
+    (ha : a > 0) (hb : b > 0) (h_sq : a * a = b * b) : a = b := by
   exact (mul_self_inj (le_of_lt ha) (le_of_lt hb)).mp h_sq
 
 /-- For two timelike vectors, their Minkowski norms are equal -/
