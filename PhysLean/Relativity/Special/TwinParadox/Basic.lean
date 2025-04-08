@@ -77,7 +77,7 @@ def example1 : InstantaneousTwinParadox where
     rw [innerProduct_toCoord]
     simp
   twinBMid_causallyFollows_startPoint := by
-    simp [causallyFollows]
+    simp only [causallyFollows]
     left
     simp [interiorFutureLightCone]
     norm_num

@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Matteo Cipollina, Joseph Tooby-Smith
 -/
 import PhysLean.Relativity.SpaceTime.Basic
-import PhysLean.Relativity.Lorentz.RealTensor.Vector.Causality.Basic
+import PhysLean.Relativity.Lorentz.RealTensor.Vector.Causality.Properties --TODO import Properties2
 /-!
 # Proper Time
 

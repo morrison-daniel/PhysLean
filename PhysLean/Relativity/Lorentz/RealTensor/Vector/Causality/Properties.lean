@@ -41,7 +41,6 @@ lemma causallyPrecedes_refl {d : ℕ} (p : Vector d) : causallyPrecedes p p := b
 
 /-- For two lightlike vectors with equal time components, their spatial parts
     have equal Euclidean norms -/
-@[simp]
 lemma lightlike_equal_time_eq_spatial_norm {d : ℕ} {v w : Vector d}
     (hv : causalCharacter v = .lightLike) (hw : causalCharacter w = .lightLike)
     (h_time : v (Sum.inl 0) = w (Sum.inl 0)) :
@@ -161,7 +160,6 @@ lemma zero_parallel_to_any {d : ℕ} {v : Vector d} :
 
 /-- For vectors, if one vector has zero norm squared,
     then it is proportional to any other vector (with r=0) -/
-@[simp]
 lemma parallel_of_cauchy_eq_of_zero_norm {d : ℕ}
     {v w : EuclideanSpace ℝ (Fin d)}
       (h_v_zero : ∑ i, v i * v i = 0) :
@@ -174,7 +172,6 @@ lemma parallel_of_cauchy_eq_of_zero_norm {d : ℕ}
 
 /- For Cauchy-Schwarz equality with non-zero vectors, there's a specific relationship
    between the vectors' inner product and their norms -/
-@[simp]
 lemma scalar_ratio_of_cauchy_eq {d : ℕ} {v w : EuclideanSpace ℝ (Fin d)}
     (h_eq : (∑ i, v i * w i)^2 = (∑ i, v i * v i) * (∑ i, w i * w i))
     (h_w_nonzero : ∑ i, w i * w i ≠ 0) :
@@ -225,7 +222,6 @@ lemma scalar_ratio_of_cauchy_eq {d : ℕ} {v w : EuclideanSpace ℝ (Fin d)}
 
 /-- For Cauchy-Schwarz equality with non-zero second vector,
     the first vector is proportional to the second -/
-@[simp]
 lemma parallel_of_cauchy_eq_second_nonzero {d : ℕ}
     {v w : EuclideanSpace ℝ (Fin d)}
     (h_eq : (∑ i, v i * w i)^2 = (∑ i, v i * v i) * (∑ i, w i * w i))
@@ -238,7 +234,6 @@ lemma parallel_of_cauchy_eq_second_nonzero {d : ℕ}
   use r; intro i; exact eq_of_sub_eq_zero (h_each_zero i)
 
 /-- When vectors aren't parallel, the Cauchy-Schwarz inequality is strict -/
-@[simp]
 lemma cauchy_schwarz_eq_iff_parallel_of_nonzero {d : ℕ}
     {v w : EuclideanSpace ℝ (Fin d)}
     (hw : ∑ i, w i * w i ≠ 0) :
@@ -266,7 +261,6 @@ lemma cauchy_schwarz_eq_iff_parallel_of_nonzero {d : ℕ}
         _ = (∑ i, v i * v i) * (∑ i, w i * w i) := by rw [h_right]
 
 /-- If one vector is a scalar multiple of another, they are parallel -/
-@[simp]
 lemma parallel_of_scalar_multiple {d : ℕ}
     {v w : EuclideanSpace ℝ (Fin d)} {r : ℝ}
     (h : ∀ i, v i = r * w i) : ∃ (s : ℝ), ∀ i, v i = s * w i := by
@@ -307,7 +301,6 @@ lemma strict_cauchy_schwarz_of_not_parallel {d : ℕ}
 
 /-- If two lightlike vectors have parallel spatial components, their temporal components
 must also be proportional, which implies the entire vectors are proportional -/
-@[simp]
 lemma lightlike_spatial_parallel_implies_proportional {d : ℕ} {v w : Vector d}
     (hv : causalCharacter v = .lightLike) (hw : causalCharacter w = .lightLike)
     (h_spatial_parallel : ∃ (r : ℝ), ∀ i, v (Sum.inr i) = r * w (Sum.inr i)) :
@@ -390,7 +383,6 @@ lemma timelike_neg_time_component_product {d : ℕ} (v w : Vector d)
 
 /-- Cauchy-Schwarz inequality for the spatial components of vectors,
     adapted to work with our specific inner product form -/
-@[simp]
 lemma timelike_spatial_cauchy_bound {d : ℕ} (v w : Vector d) :
     ∑ i, v (Sum.inr i) * w (Sum.inr i) ≤ √((∑ i, v (Sum.inr i) * v (Sum.inr i)) *
     (∑ i, w (Sum.inr i) * w (Sum.inr i))) := by
@@ -446,7 +438,6 @@ lemma spatial_sum_squares {d : ℕ} (v w : Vector d) :
         rw [← Finset.mul_sum];
 
 /-- Expansion of time component squared for sum of vectors -/
-@[simp]
 lemma time_sum_squares {d : ℕ} (v w : Vector d) :
     (toCoord v (Sum.inl 0) + toCoord w (Sum.inl 0)) * (toCoord v (Sum.inl 0) +
     toCoord w (Sum.inl 0)) =
@@ -456,7 +447,6 @@ lemma time_sum_squares {d : ℕ} (v w : Vector d) :
   ring
 
 /-- The square root of product of squared components equals product of absolute values -/
-@[simp]
 lemma abs_product_eq {d : ℕ} (v w : Vector d) :
     √((v (Sum.inl 0) * v (Sum.inl 0)) * (w (Sum.inl 0) * w (Sum.inl 0))) =
     |v (Sum.inl 0)| * |w (Sum.inl 0)| := by
@@ -471,7 +461,6 @@ lemma abs_product_eq {d : ℕ} (v w : Vector d) :
 
 /-- For timelike vectors, the spatial norm squared is strictly less
      than the time component squared -/
-@[simp]
 lemma timelike_spatial_lt_time_squared {d : ℕ} {v : Vector d}
     (hv : causalCharacter v = .timeLike) :
     ∑ x, spatialPart v x * spatialPart v x < (timeComponent v)^2 := by
@@ -492,7 +481,6 @@ lemma timelike_time_component_ne_zero {d : ℕ} {v : Vector d}
 
 /-- A vector is timelike if and only if its time component squared is less than
     the sum of its spatial components squared -/
-@[simp]
 lemma timeLike_iff_time_lt_space {d : ℕ} {v : Vector d} :
     causalCharacter v = .timeLike ↔
     ∑ i, v (Sum.inr i) * v (Sum.inr i) < v (Sum.inl 0) * v (Sum.inl 0) := by
@@ -504,7 +492,6 @@ lemma timeLike_iff_time_lt_space {d : ℕ} {v : Vector d} :
     simp only [Fin.isValue, sub_pos]; exact h_time_lt_space
 
 /-- Minkowski inner product equals time component squared when spatial part is zero -/
-@[simp]
 lemma minkowski_norm_eq_time_sq_of_zero_spatial {d : ℕ} {v : Vector d}
     (h_spatial_zero : ∑ i, v (Sum.inr i) * v (Sum.inr i) = 0) :
     ⟪v, v⟫ₘ = v (Sum.inl 0) * v (Sum.inl 0) := by
@@ -512,7 +499,6 @@ lemma minkowski_norm_eq_time_sq_of_zero_spatial {d : ℕ} {v : Vector d}
   simp only [h_spatial_zero, sub_zero]
 
 /-- For timelike vectors, the Minkowski inner product is positive -/
-@[simp]
 lemma timelike_mink_norm_pos {d : ℕ} {v : Vector d}
     (hv : causalCharacter v = .timeLike) :
     0 < ⟪v, v⟫ₘ := by
@@ -532,14 +518,12 @@ lemma timelike_zero_spatial_implies_time_pos {d : ℕ} {v : Vector d}
   exact h_norm_pos
 
 /-- Timelike vectors must have spatial part satisfying inequality with time component -/
-@[simp]
 lemma timelike_spatial_time_relation {d : ℕ} {v : Vector d}
     (hv : causalCharacter v = .timeLike) :
     0 < ⟪v, v⟫ₘ := by
   exact timelike_mink_norm_pos hv
 
 /-- For timelike vectors, the time component cannot be zero -/
-@[simp]
 lemma timelike_time_component_nonzero {d : ℕ} {v : Vector d}
     (hv : causalCharacter v = .timeLike) :
     timeComponent v ≠ 0 := by
@@ -570,8 +554,7 @@ lemma timeLike_iff_minkowski_positive {d : ℕ} (v : Vector d) :
 /-- If all elements in a finite set satisfy a non-negative property,
     and at least one element satisfies a strict positivity property,
     then the sum over the finite set is strictly positive. -/
-@[simp]
-lemma Finset.sum_pos_of_exists_pos {α : Type*} {s : Finset α} {f : α → ℝ} [DecidableEq α]
+protected lemma Finset.sum_pos_of_exists_pos {α : Type*} {s : Finset α} {f : α → ℝ} [DecidableEq α]
     (h_nonneg : ∀ a ∈ s, 0 ≤ f a)
     (h_exists_pos : ∃ a ∈ s, 0 < f a) :
     0 < ∑ x ∈ s, f x := by
@@ -595,7 +578,6 @@ lemma eq_zero_of_mul_eq_zero_right {a b : ℝ} (h_prod : a * b = 0) (h_b_nonzero
   | inr h_b_zero => exact absurd h_b_zero h_b_nonzero
 
 /-- If the square of a real number is positive, then the number is non-zero -/
-@[simp]
 lemma ne_of_sq_pos {x : ℝ} (h : x * x > 0) : x ≠ 0 := by
   by_contra h_eq; rw [h_eq, zero_mul] at h; exact lt_irrefl 0 h
 
@@ -638,7 +620,6 @@ lemma timelike_nonzero_spatial_implies_positive_norm {d : ℕ} {v : Vector d}
 
 /-- When the spatial components of vectors are parallel,
     their spatial norms are related by the square of the proportionality constant -/
-@[simp]
 lemma spatial_parallel_norm_relation {d : ℕ} {v w : Vector d}
     (h_spatial_parallel : ∃ (r : ℝ), ∀ i, spatialPart v i = r * spatialPart w i) :
     ∃ (r : ℝ), ∑ x : Fin d, spatialPart v x * spatialPart v x = r^2 * ∑ x :
@@ -659,7 +640,6 @@ lemma spatial_parallel_norm_relation {d : ℕ} {v w : Vector d}
         rw [Finset.mul_sum]
 
 /-- For timelike vectors, the time component squared exceeds the spatial norm squared -/
-@[simp]
 lemma timelike_time_exceeds_space {d : ℕ} {v : Vector d}
     (hv : causalCharacter v = .timeLike) :
     ∑ x : Fin d, spatialPart v x * spatialPart v x < timeComponent v ^ 2 := by
@@ -667,14 +647,13 @@ lemma timelike_time_exceeds_space {d : ℕ} {v : Vector d}
   rw [innerProduct_toCoord] at hv
   simp only [PiLp.inner_apply, RCLike.inner_apply, conj_trivial]
   have h_time : timeComponent v = v (Sum.inl 0) := rfl
-  simp [h_time, pow_two]
+  simp only [h_time, Fin.isValue, pow_two, gt_iff_lt]
   have h_norm_pos : v (Sum.inl 0) * v (Sum.inl 0) - ∑ i, v (Sum.inr i) *
                                     v (Sum.inr i) > 0 := hv
   exact lt_of_sub_pos h_norm_pos
 
 /-- For parallel spatial components of timelike vectors, the time components
     must satisfy a proportionality relationship that preserves the timelike property -/
-@[simp]
 lemma timelike_parallel_spatial_time_relation {d : ℕ} {v w : Vector d}
     (hv : causalCharacter v = .timeLike)
     (hw : causalCharacter w = .timeLike)
@@ -704,7 +683,6 @@ lemma timelike_parallel_spatial_time_relation {d : ℕ} {v w : Vector d}
 
 /-- For timelike vectors with parallel spatial components, the time components
     must satisfy a specific relationship to maintain timelike character -/
-@[simp]
 lemma timelike_parallel_spatial_time_constraints {d : ℕ} {v w : Vector d}
     (hv : causalCharacter v = .timeLike)
     (hw : causalCharacter w = .timeLike)
@@ -735,7 +713,6 @@ lemma timelike_parallel_spatial_time_constraints {d : ℕ} {v w : Vector d}
 
 /-- For timelike vectors with non-zero time components, having the same sign ensures
     their product is positive -/
-@[simp]
 lemma same_sign_time_components_product_pos {d : ℕ} {v w : Vector d}
     (hv_nonzero : timeComponent v ≠ 0)
     (hw_nonzero : timeComponent w ≠ 0)
@@ -761,7 +738,6 @@ lemma same_sign_time_components_product_pos {d : ℕ} {v w : Vector d}
       contradiction
 
 /-- For timelike vectors, their time component is non-zero -/
-@[simp]
 lemma timelike_nonzero_time_component {d : ℕ} {v : Vector d}
     (hv : causalCharacter v = .timeLike) :
     timeComponent v ≠ 0 := by
@@ -770,14 +746,13 @@ lemma timelike_nonzero_time_component {d : ℕ} {v : Vector d}
   rw [innerProduct_toCoord] at hv
   have h_time_zero : v (Sum.inl 0) = 0 := h
   rw [h_time_zero] at hv
-  simp at hv
+  simp only [mul_zero, zero_sub, Left.neg_pos_iff] at hv
   have h_spatial_nonneg : 0 ≤ ∑ i, v (Sum.inr i) * v (Sum.inr i) :=
     Finset.sum_nonneg (fun i _ => mul_self_nonneg (v (Sum.inr i)))
   exact lt_irrefl 0 (h_spatial_nonneg.trans_lt hv)
 
 /-- When two vectors have parallel spatial components with a non-zero component,
     the proportionality constant is unique -/
-@[simp]
 lemma spatial_parallel_unique_constant {d : ℕ} {v w : Vector d}
     (h1 : ∃ (r : ℝ), ∀ i, spatialPart v i = r * spatialPart w i)
     (h2 : ∃ (r : ℝ), ∀ i, spatialPart v i = r * spatialPart w i)
@@ -800,7 +775,6 @@ lemma spatial_parallel_unique_constant {d : ℕ} {v w : Vector d}
     simp_all only [mul_eq_mul_right_iff, ne_eq, or_false]
 
 /-- For vectors with zero spatial norm, all spatial components are zero -/
-@[simp]
 lemma zero_spatial_norm_implies_zero_components {d : ℕ} {v : Vector d}
     (h_zero : ⟪spatialPart v, spatialPart v⟫_ℝ = 0) :
     ∀ i, spatialPart v i = 0 := by
@@ -810,7 +784,6 @@ lemma zero_spatial_norm_implies_zero_components {d : ℕ} {v : Vector d}
 
 /-- When a vector has all zero spatial components, any vector with zero spatial components
     has parallel spatial components to it -/
-@[simp]
 lemma zero_spatial_any_parallel {d : ℕ} {w : Vector d}
     (h_zero : ∀ i, spatialPart w i = 0) (v : Vector d)
     (h_v_zero : ∀ i, spatialPart v i = 0) :
@@ -819,7 +792,6 @@ lemma zero_spatial_any_parallel {d : ℕ} {w : Vector d}
 
 /-- For vectors with zero spatial norm, the proportionality constant for parallel spatial parts
     is 0 if the other vector has any non-zero spatial component -/
-@[simp]
 lemma zero_spatial_norm_parallel_constant {d : ℕ} {v w : Vector d}
     (h_w_zero : ⟪spatialPart w, spatialPart w⟫_ℝ = 0)
     (h_v_nonzero : ∃ i, spatialPart v i ≠ 0)
@@ -834,7 +806,6 @@ lemma zero_spatial_norm_parallel_constant {d : ℕ} {v w : Vector d}
   contradiction
 
 /-- For timelike vectors, the time component squared is positive -/
-@[simp]
 lemma timelike_positive_time_squared {d : ℕ} {v : Vector d}
     (hv : causalCharacter v = .timeLike) :
     0 < (timeComponent v)^2 := by
@@ -849,7 +820,6 @@ lemma timelike_minkowski_norm_expansion {d : ℕ} {v : Vector d} :
   simp only [PiLp.inner_apply, RCLike.inner_apply, conj_trivial, pow_two]; rfl
 
 /-- For timelike vectors, the time component squared exceeds the spatial norm squared -/
-@[simp]
 lemma timelike_time_exceeds_space_squared {d : ℕ} {v : Vector d}
     (hv : causalCharacter v = .timeLike) :
     ∑ x : Fin d, spatialPart v x * spatialPart v x < timeComponent v ^ 2 := by
@@ -858,7 +828,6 @@ lemma timelike_time_exceeds_space_squared {d : ℕ} {v : Vector d}
   exact lt_of_sub_pos hv
 
 /-- For timelike vectors, the time component cannot be zero -/
-@[simp]
 lemma timelike_time_component_sign {d : ℕ} {v : Vector d}
     (hv : causalCharacter v = .timeLike) :
     ¬0 = toCoord v (Sum.inl 0) := by
@@ -868,7 +837,6 @@ lemma timelike_time_component_sign {d : ℕ} {v : Vector d}
 
 /-- In Minkowski spacetime with (+---) signature, future-directed timelike vectors
     have positive time components (by convention) -/
-@[simp]
 lemma timelike_future_directed_positive_time {d : ℕ} {v : Vector d}
     (hfuture : isFutureDirected v) :
     timeComponent v > 0 := by
@@ -885,7 +853,6 @@ lemma timelike_neg_time_is_past_directed {d : ℕ} {v : Vector d}
 
 /-- For timelike vectors with parallel spatial components, their spatial norms and time components
     must satisfy specific inequalities that preserve the timelike character -/
-@[simp]
 lemma timelike_parallel_spatial_inequalities {d : ℕ} {v w : Vector d}
     (hv : causalCharacter v = .timeLike)
     (hw : causalCharacter w = .timeLike)
@@ -998,7 +965,6 @@ lemma minkowski_norm_eq_of_both_timelike {d : ℕ} {v w : Vector d}
 
 /-- For a timelike vector with zero spatial part,
     the Minkowski norm equals the squared time component -/
-@[simp]
 lemma timelike_zero_spatial_norm_eq_time_squared {d : ℕ} {v : Vector d}
     (h_spatial_zero : ∀ i, spatialPart v i = 0) :
     ⟪v, v⟫ₘ = (timeComponent v)^2 := by
@@ -1008,7 +974,6 @@ lemma timelike_zero_spatial_norm_eq_time_squared {d : ℕ} {v : Vector d}
   rw [h_norm_zero, sub_zero]
 
 /-- For a timelike vector with zero spatial part, the time component must be nonzero -/
-@[simp]
 lemma timelike_zero_spatial_nonzero_time {d : ℕ} {v : Vector d}
     (hv : causalCharacter v = .timeLike)
     (h_spatial_zero : ∀ i, spatialPart v i = 0) :
@@ -1042,7 +1007,6 @@ lemma timelike_nonzero_spatial_positive_norm {d : ℕ} {w : Vector d}
 /-- If one timelike vector has zero spatial part, and another timelike vector
     has nonzero spatial part, they can't maintain a constant proportionality
     relationship while both preserving timelike character -/
-@[simp]
 lemma timelike_nonparallel_spatial_inconsistent {d : ℕ} {v w : Vector d}
     (h_spatial_zero : ∀ i, spatialPart v i = 0)
     (h_w_nonzero_spatial : ∃ i, spatialPart w i ≠ 0) :
@@ -1069,7 +1033,6 @@ lemma spatial_zero_nonzero_proportionality {d : ℕ} {v w : Vector d} {r : ℝ}
 
 /-- When timelike vectors have parallel spatial components, their spatial norms
     are related by the square of the proportionality constant -/
-@[simp]
 lemma spatial_norm_relation_of_parallel {d : ℕ} {v w : Vector d}
     (h_spatial_parallel : ∃ (r : ℝ), ∀ i, spatialPart v i = r * spatialPart w i) :
       ∃ r,
@@ -1092,7 +1055,6 @@ lemma spatial_norm_relation_of_parallel {d : ℕ} {v w : Vector d}
 
 /-- For timelike vectors, their time components must satisfy specific relationships
     to maintain the timelike character -/
-@[simp]
 lemma timelike_time_space_constraint {d : ℕ} {v : Vector d}
     (hv : causalCharacter v = .timeLike) :
     ∑ x : Fin d, spatialPart v x * spatialPart v x < timeComponent v ^ 2 := by
@@ -1107,8 +1069,7 @@ lemma timelike_time_space_constraint {d : ℕ} {v : Vector d}
 
 /-- For two non-zero real numbers with positive product,
     either both are positive or both are negative -/
-@[simp]
-protected lemma real_same_sign_of_pos_product {a b : ℝ}
+lemma real_same_sign_of_pos_product {a b : ℝ}
     (ha : a ≠ 0) (hb : b ≠ 0) (h_prod : a * b > 0) :
     (a > 0 ∧ b > 0) ∨ (a < 0 ∧ b < 0) := by
   by_cases ha_pos : a > 0
@@ -1133,7 +1094,6 @@ protected lemma real_same_sign_of_pos_product {a b : ℝ}
 
 /-- When timelike vectors have opposite sign time components,
     the time component squared terms have a specific relationship -/
-@[simp]
 lemma timelike_opposite_sign_time_squared_relation {d : ℕ} {v w : Vector d}
     (hv : causalCharacter v = .timeLike)
     (hw : causalCharacter w = .timeLike) :
@@ -1144,7 +1104,6 @@ lemma timelike_opposite_sign_time_squared_relation {d : ℕ} {v w : Vector d}
 
 /-- For spatial norms related by a proportionality constant,
     the relationship extends to inner products with time components -/
-@[simp]
 lemma spatial_norm_and_time_product_relation {d : ℕ} {v w : Vector d} {r : ℝ}
     (h_spatial_prop : ∀ i, spatialPart v i = r * spatialPart w i) :
     ∑ x : Fin d, spatialPart v x * spatialPart v x = r^2 * ⟪spatialPart w, spatialPart w⟫_ℝ := by
@@ -1157,7 +1116,6 @@ lemma spatial_norm_and_time_product_relation {d : ℕ} {v w : Vector d} {r : ℝ
 
 /-- For timelike vectors with proportional spatial parts, time components
     must satisfy certain inequality relationships -/
-@[simp]
 lemma timelike_spatial_proportional_time_constraints {d : ℕ} {v w : Vector d} {r : ℝ}
     (hv : causalCharacter v = .timeLike)
     (hw : causalCharacter w = .timeLike)
@@ -1172,7 +1130,6 @@ lemma timelike_spatial_proportional_time_constraints {d : ℕ} {v w : Vector d} 
 
 /-- For timelike vectors with opposite sign time components, their causal character
     imposes constraints on how their time components relate -/
-@[simp]
 lemma timelike_opposite_sign_causality_constraint {d : ℕ} {v w : Vector d}
     (hv : causalCharacter v = .timeLike)
     (hw : causalCharacter w = .timeLike) :
@@ -1204,7 +1161,6 @@ lemma timelike_opposite_sign_causality_constraint {d : ℕ} {v w : Vector d}
 
 /-- For purely temporal timelike vectors, the causal character is completely
     determined by the sign of the time component -/
-@[simp]
 lemma purely_temporal_timelike_characterization {d : ℕ} {v : Vector d}
     (h_spatial_zero : ∀ i, spatialPart v i = 0) :
     0 < ⟪v, v⟫ₘ ↔ timeComponent v ≠ 0 := by
@@ -1218,8 +1174,7 @@ lemma purely_temporal_timelike_characterization {d : ℕ} {v : Vector d}
   exact mul_self_pos
 
 /-- If the squares of two real numbers are equal, their absolute values are equal -/
-@[simp]
-protected lemma abs_eq_abs_of_squared_time_eq {a b : ℝ}
+lemma abs_eq_abs_of_squared_time_eq {a b : ℝ}
     (h_sq : a^2 = b^2) (hb : b ≠ 0) : |a| = |b| := by
   have h3 : a^2 = |a|^2 := by simp [sq_abs]
   have h4 : b^2 = |b|^2 := by simp [sq_abs]
@@ -1230,7 +1185,6 @@ protected lemma abs_eq_abs_of_squared_time_eq {a b : ℝ}
   exact (mul_self_inj ha_pos (le_of_lt hb_pos)).mp h_sq_mul
 
 /-- For purely temporal timelike vectors, their Minkowski norm equals the squared time component -/
-@[simp]
 lemma purely_temporal_norm_eq_time_squared {d : ℕ} {v : Vector d}
     (h_spatial_zero : ∀ i, spatialPart v i = 0) :
     ⟪v, v⟫ₘ = (timeComponent v)^2 := by

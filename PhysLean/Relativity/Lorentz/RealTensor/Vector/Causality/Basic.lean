@@ -61,13 +61,12 @@ lemma timeLike_iff_norm_sq_pos {d : ℕ} (p : Vector d) :
   simp only [causalCharacter]
   split
   · rename_i h
-    simp only [reduceCtorEq, h, lt_self_iff_false]
+    simp_all
   · split
     · rename_i h
-      simp only [h]
+      simp [h]
     · rename_i h
-      simp only [reduceCtorEq, false_iff, not_lt]
-      linarith
+      simp_all
 
 lemma lightLike_iff_norm_sq_zero {d : ℕ} (p : Vector d) :
     causalCharacter p = CausalCharacter.lightLike ↔ ⟪p, p⟫ₘ = 0 := by
@@ -174,12 +173,10 @@ def timeComponent {d : ℕ} (v : Vector d) : ℝ :=
 
 /-- In Minkowski spacetime with (+---) signature, we can define future-directed timelike vectors
     as having positive time components (by convention) -/
-@[simp]
 def isFutureDirected {d : ℕ} (v : Vector d) : Prop :=
   v (Sum.inl 0) > 0
 
 /-- In Minkowski spacetime with (+---) signature, we can define past-directed timelike vectors
     as having negative time components (by convention) -/
-@[simp]
 def isPastDirected {d : ℕ} (v : Vector d) : Prop :=
   v (Sum.inl 0) < 0
