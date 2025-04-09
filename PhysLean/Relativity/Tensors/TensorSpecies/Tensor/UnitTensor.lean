@@ -48,7 +48,7 @@ lemma unitTensor_eq_permT_dual (c : S.C) :
     (unitTensor (S.τ c)) := by
   rw [unitTensor, unit_app_eq_dual_unit_app, ← Category.assoc]
   rw [fromConstPair_whiskerLeft, fromConstPair_braid]
-  simp
+  simp only [Nat.succ_eq_add_one, Nat.reduceAdd, Fin.isValue, permT_permT, CompTriple.comp_eq]
   rfl
 
 lemma dual_unitTensor_eq_permT_unitTensor (c : S.C) :
@@ -100,5 +100,10 @@ lemma contrT_unitTensor_dual_single {c : S.C} (x : Tensor S ![S.τ c]) :
     fin_cases i
     rfl
   · rfl
+
+@[simp]
+lemma unitTensor_invariant {c : S.C} (g : G) :
+    g • unitTensor c = unitTensor c := by
+  rw [unitTensor, actionT_fromConstPair]
 
 end TensorSpecies

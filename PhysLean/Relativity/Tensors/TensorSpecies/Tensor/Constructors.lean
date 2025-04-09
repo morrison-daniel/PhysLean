@@ -120,7 +120,8 @@ lemma contrT_fromSingleT_fromSingleT {c : S.C} (x : S.FD.obj {as := c})
         (fun | (0 : Fin 1) => y) (finSumFinEquiv (Sum.inl 0))
       · rfl
       · rw [Pure.prodP_apply_finSumFinEquiv]
-        simp
+        simp only [Nat.reduceAdd, Fin.isValue, Function.comp_apply, Matrix.cons_val_zero,
+          eqToHom_refl, Discrete.functor_map_id]
         rfl
     · trans (ConcreteCategory.hom
         (𝟙 (S.FD.obj { as := Sum.elim ![c] ![S.τ c] (finSumFinEquiv.symm 1) })))
@@ -128,7 +129,8 @@ lemma contrT_fromSingleT_fromSingleT {c : S.C} (x : S.FD.obj {as := c})
         (fun | (0 : Fin 1) => y) (finSumFinEquiv (Sum.inr 0)))
       · rfl
       · rw [Pure.prodP_apply_finSumFinEquiv]
-        simp
+        simp only [Nat.succ_eq_add_one, Nat.reduceAdd, Fin.isValue, Matrix.cons_val_zero,
+          Function.comp_apply, eqToHom_refl, Discrete.functor_map_id, ConcreteCategory.id_apply]
         rfl
   · congr 1
     ext i
@@ -493,6 +495,72 @@ lemma fromPairT_contr_fromPairT_eq_fromPairTContr (c c1 c2 : S.C)
     rw [← hx, ← hy]
     simp
 
+lemma fromPairT_basis_repr {c c1 : S.C}
+    (x : (S.FD.obj (Discrete.mk c)).V ⊗[k] (S.FD.obj (Discrete.mk c1)).V)
+    (b : ComponentIdx ![c, c1]) :
+    (basis ![c, c1]).repr (fromPairT x) b =
+    (Basis.tensorProduct (S.basis c) (S.basis c1)).repr x (b 0, b 1) := by
+  let P (x : ((S.FD.obj { as := c } ⊗ S.FD.obj { as := c1 }).V)) :=
+    (basis ![c, c1]).repr
+    (fromPairT x) b =
+    (Basis.tensorProduct (S.basis c) (S.basis c1)).repr x (b 0, b 1)
+  change P x
+  apply TensorProduct.induction_on
+  · simp [P]
+  · intro x y
+    simp only [Action.instMonoidalCategory_tensorObj_V, Nat.succ_eq_add_one, Nat.reduceAdd,
+      Fin.isValue, Equivalence.symm_inverse, Action.functorCategoryEquivalence_functor,
+      Action.FunctorCategoryEquivalence.functor_obj_obj, Basis.tensorProduct_repr_tmul_apply,
+      smul_eq_mul, P]
+    conv_lhs =>
+      left
+      right
+      rw [fromPairT_tmul]
+    rw [fromSingleT_eq_pureT, fromSingleT_eq_pureT]
+    rw [prodT_pure, permT_pure]
+    rw [basis_repr_pure]
+    simp [Pure.component]
+    rw [mul_comm]
+    congr
+    · simp [Pure.permP]
+      conv_lhs =>
+        enter [2]
+        change Pure.prodP (fun | (0 : Fin 1) => x)
+          (fun | (0 : Fin 1) => y) (finSumFinEquiv (Sum.inr 0))
+      rw [Pure.prodP_apply_finSumFinEquiv]
+      simp
+      rfl
+    · simp [Pure.permP]
+      conv_lhs =>
+        enter [2]
+        change Pure.prodP (fun | (0 : Fin 1) => x)
+          (fun | (0 : Fin 1) => y) (finSumFinEquiv (Sum.inl 0))
+      rw [Pure.prodP_apply_finSumFinEquiv]
+      simp
+      rfl
+  · intro x y hx hy
+    simp_all [P]
+
+lemma fromPairT_apply_basis_repr {c c1 : S.C}
+    (b0 : Fin (S.repDim c)) (b1 : Fin (S.repDim c1)) :
+    fromPairT (S.basis c b0 ⊗ₜ[k] S.basis c1 b1) =
+    Tensor.basis ![c, c1] (fun | 0 => b0 | 1 => b1) := by
+  apply (Tensor.basis _).repr.injective
+  simp only [Nat.succ_eq_add_one, Nat.reduceAdd, Basis.repr_self]
+  ext b
+  rw [fromPairT_basis_repr]
+  simp [Finsupp.single_apply]
+  conv_rhs =>
+    enter [1]
+    rw [funext_iff]
+    rw [Fin.forall_fin_two]
+    simp
+  split
+  next h =>
+    subst h
+    simp_all only [Fin.isValue, true_and]
+  next h => simp_all only [Fin.isValue, false_and, ↓reduceIte]
+
 /-!
 
 ## fromConstPair
@@ -546,6 +614,197 @@ lemma fromConstPair_braid {c1 c2 : S.C}
 
 /-!
 
+## fromTripleT
+
+-/
+
+/-- The construction of a tensor with two indices from the tensor product
+  `(S.FD.obj (Discrete.mk c1)).V ⊗[k] (S.FD.obj (Discrete.mk c2)).V ` defined
+  categorically. -/
+noncomputable def fromTripleT {c1 c2 c3 : S.C} :
+    (S.FD.obj (Discrete.mk c1)).V ⊗[k] (S.FD.obj (Discrete.mk c2)).V
+    ⊗[k] (S.FD.obj (Discrete.mk c3)).V →ₗ[k] S.Tensor ![c1, c2, c3] where
+  toFun x :=
+    let x1 : S.Tensor ![c1] ⊗[k] S.Tensor ![c2] ⊗[k] S.Tensor ![c3] :=
+      TensorProduct.map (fromSingleT (c := c1))
+        (TensorProduct.map (fromSingleT (c := c2)) (fromSingleT (c := c3))) x
+    let x2 :=
+      TensorProduct.lift prodT (TensorProduct.map LinearMap.id (TensorProduct.lift prodT) x1)
+    permT id (And.intro Function.bijective_id (fun i => by fin_cases i <;> rfl)) x2
+  map_add' x y := by
+    simp
+  map_smul' r x := by
+    simp
+
+lemma fromTripleT_tmul {c1 c2 c3 : S.C} (x : S.FD.obj (Discrete.mk c1))
+    (y : S.FD.obj (Discrete.mk c2)) (z : S.FD.obj (Discrete.mk c3)) :
+    fromTripleT (x ⊗ₜ[k] y ⊗ₜ[k] z) =
+    permT id (And.intro Function.bijective_id (fun i => by fin_cases i <;> rfl))
+      (prodT (fromSingleT x) (prodT (fromSingleT y) (fromSingleT z))) := by
+  rfl
+
+lemma actionT_fromTripleT {c1 c2 c3 : S.C}
+    (x : (S.FD.obj (Discrete.mk c1)).V ⊗[k] (S.FD.obj (Discrete.mk c2)).V
+      ⊗[k] (S.FD.obj (Discrete.mk c3)).V) (g : G) :
+    g • fromTripleT x = fromTripleT (TensorProduct.map ((S.FD.obj (Discrete.mk c1)).ρ g)
+      (TensorProduct.map ((S.FD.obj (Discrete.mk c2)).ρ g)
+      ((S.FD.obj (Discrete.mk c3)).ρ g)) x) := by
+  let P (x : (S.FD.obj (Discrete.mk c1)).V ⊗[k] (S.FD.obj (Discrete.mk c2)).V
+      ⊗[k] (S.FD.obj (Discrete.mk c3)).V) : Prop :=
+      g • fromTripleT x = fromTripleT (TensorProduct.map ((S.FD.obj (Discrete.mk c1)).ρ g)
+      (TensorProduct.map ((S.FD.obj (Discrete.mk c2)).ρ g) ((S.FD.obj (Discrete.mk c3)).ρ g)) x)
+  change P x
+  apply TensorProduct.induction_on
+  · simp [P]
+  · intro x y
+    let P1 (y : (S.FD.obj (Discrete.mk c2)).V ⊗[k] (S.FD.obj (Discrete.mk c3)).V) : Prop :=
+      P (x ⊗ₜ[k] y)
+    change P1 y
+    apply TensorProduct.induction_on
+    · simp [P1, P]
+    · intro y z
+      simp [P1, P]
+      rw [fromTripleT_tmul, fromTripleT_tmul]
+      rw [← permT_equivariant]
+      congr
+      rw [← prodT_equivariant]
+      congr
+      · exact actionT_fromSingleT x g
+      · rw [← prodT_equivariant]
+        congr
+        · exact actionT_fromSingleT y g
+        · exact actionT_fromSingleT z g
+    · intro x y hx hy
+      simp [P1, P, hx, hy, tmul_add]
+  · intro x y hx hy
+    simp [P, hx, hy]
+
+lemma fromTripleT_basis_repr {c c1 c2 : S.C}
+    (x : (S.FD.obj (Discrete.mk c)).V ⊗[k] (S.FD.obj (Discrete.mk c1)).V
+      ⊗[k] (S.FD.obj (Discrete.mk c2)).V)
+    (b : ComponentIdx ![c, c1, c2]) :
+    (basis ![c, c1, c2]).repr (fromTripleT x) b =
+    (Basis.tensorProduct (S.basis c) (Basis.tensorProduct (S.basis c1) (S.basis c2))).repr x
+    (b 0, b 1, b 2) := by
+  let P (x : (S.FD.obj (Discrete.mk c)).V ⊗[k] (S.FD.obj (Discrete.mk c1)).V
+      ⊗[k] (S.FD.obj (Discrete.mk c2)).V) := (basis ![c, c1, c2]).repr (fromTripleT x) b =
+    (Basis.tensorProduct (S.basis c) (Basis.tensorProduct (S.basis c1) (S.basis c2))).repr x
+    (b 0, b 1, b 2)
+  change P x
+  apply TensorProduct.induction_on
+  · simp [P]
+  · intro x y
+    let P1 (y : (S.FD.obj (Discrete.mk c1)).V ⊗[k] (S.FD.obj (Discrete.mk c2)).V) : Prop :=
+      P (x ⊗ₜ[k] y)
+    change P1 y
+    apply TensorProduct.induction_on
+    · simp [P1, P]
+    · intro y z
+      simp [P1, P]
+      rw [fromTripleT_tmul]
+      rw [fromSingleT_eq_pureT, fromSingleT_eq_pureT, fromSingleT_eq_pureT]
+      rw [prodT_pure, prodT_pure, permT_pure]
+      rw [basis_repr_pure]
+      simp [Pure.component, Fin.prod_univ_three]
+      conv_rhs =>
+        rw [mul_assoc, mul_comm]
+        enter [1]
+        rw [mul_comm]
+      congr 2
+      · simp [Pure.permP]
+        conv_lhs =>
+          enter [1, 2, 2]
+          change Pure.prodP _ _ (finSumFinEquiv (Sum.inl 0))
+        rw [Pure.prodP_apply_finSumFinEquiv]
+        simp
+        rfl
+      · simp [Pure.permP]
+        conv_lhs =>
+          enter [1, 2, 2]
+          change Pure.prodP _ _ (finSumFinEquiv (Sum.inr 0))
+          rw [Pure.prodP_apply_finSumFinEquiv]
+        simp only [Fin.isValue, Function.comp_apply, Nat.succ_eq_add_one, Nat.reduceAdd,
+          eqToHom_refl, Discrete.functor_map_id, P, P1]
+        conv_lhs =>
+          enter [1, 2, 2, 2]
+          change Pure.prodP _ _ (finSumFinEquiv (Sum.inl 0))
+          rw [Pure.prodP_apply_finSumFinEquiv]
+        simp
+        rfl
+      · simp [Pure.permP]
+        conv_lhs =>
+          enter [2, 2]
+          change Pure.prodP _ _ (finSumFinEquiv (Sum.inr 1))
+          rw [Pure.prodP_apply_finSumFinEquiv]
+        simp only [Fin.isValue, Function.comp_apply, Nat.succ_eq_add_one, Nat.reduceAdd,
+          eqToHom_refl, Discrete.functor_map_id, P, P1]
+        conv_lhs =>
+          enter [2, 2, 2]
+          change Pure.prodP _ _ (finSumFinEquiv (Sum.inr 0))
+          rw [Pure.prodP_apply_finSumFinEquiv]
+        simp
+        rfl
+    · intro y1 y2 hx hy
+      simp [P1, P] at hx hy
+      simp [P1, P, tmul_add, add_mul]
+      rw [hx, hy]
+  · intro x y hx hy
+    simp_all [P]
+
+lemma fromTripleT_apply_basis {c c1 c2 : S.C}
+    (b0 : Fin (S.repDim c)) (b1 : Fin (S.repDim c1))
+    (b2 : Fin (S.repDim c2)) :
+    fromTripleT (S.basis c b0 ⊗ₜ[k] S.basis c1 b1 ⊗ₜ[k] S.basis c2 b2) =
+    Tensor.basis ![c, c1, c2] (fun | 0 => b0 | 1 => b1 | 2 => b2) := by
+  apply (Tensor.basis _).repr.injective
+  simp only [Nat.succ_eq_add_one, Nat.reduceAdd, Basis.repr_self]
+  ext b
+  rw [fromTripleT_basis_repr]
+  simp [Finsupp.single_apply]
+  conv_rhs =>
+    enter [1]
+    rw [funext_iff]
+    rw [Fin.forall_fin_succ, Fin.forall_fin_two]
+    simp
+  split
+  next h =>
+    subst h
+    simp_all only [Fin.isValue, true_and]
+    split
+    next h =>
+      subst h
+      simp_all only [Fin.isValue, true_and]
+    next h => simp_all only [Fin.isValue, false_and, ↓reduceIte]
+  next h => simp_all only [Fin.isValue, false_and, ↓reduceIte]
+
+/-!
+
+## fromConstTriple
+
+-/
+
+/-- A constant three tensor (e.g. the Pauli matrices). -/
+noncomputable def fromConstTriple {c1 c2 c3 : S.C}
+    (v : 𝟙_ (Rep k G) ⟶ S.FD.obj (Discrete.mk c1) ⊗ S.FD.obj (Discrete.mk c2) ⊗
+      S.FD.obj (Discrete.mk c3)) :
+  S.Tensor ![c1, c2, c3] := fromTripleT (v.hom (1 : k))
+
+/-- Tensors formed by `fromConstPair` are invariant under the group action. -/
+@[simp]
+lemma actionT_fromConstTriple {c1 c2 c3 : S.C}
+    (v : 𝟙_ (Rep k G) ⟶ S.FD.obj (Discrete.mk c1) ⊗ S.FD.obj (Discrete.mk c2) ⊗
+      S.FD.obj (Discrete.mk c3))
+    (g : G) : g • fromConstTriple v = fromConstTriple v := by
+  rw [fromConstTriple, actionT_fromTripleT]
+  congr 1
+  change ((v.hom ≫
+    ModuleCat.ofHom ((S.FD.obj { as := c1 } ⊗ S.FD.obj { as := c2 } ⊗
+      S.FD.obj { as := c3 }).ρ g))) _ = _
+  erw [← v.comm g]
+  simp
+
+/-!
+
 ## Tensors with more indices
 
 -/
@@ -553,12 +812,6 @@ lemma fromConstPair_braid {c1 c2 : S.C}
 /-- A general constant node. -/
 def fromConst {n : ℕ} {c : Fin n → S.C} (T : 𝟙_ (Rep k G) ⟶ S.F.obj (OverColor.mk c)) :
     Tensor S c := (T.hom (1 : k))
-
-/-- A constant three tensor (e.g. the Pauli matrices). -/
-noncomputable def fromConstTriple {c1 c2 c3 : S.C}
-    (v : 𝟙_ (Rep k G) ⟶ S.FD.obj (Discrete.mk c1) ⊗ S.FD.obj (Discrete.mk c2) ⊗
-      S.FD.obj (Discrete.mk c3)) :
-    S.Tensor ![c1, c2, c3] := (OverColor.Discrete.tripleIsoSep S.FD).hom.hom (v.hom (1 : k))
 
 /-!
 
@@ -578,22 +831,6 @@ lemma actionT_fromConst {n : ℕ} {c : Fin n → S.C} (T : 𝟙_ (Rep k G) ⟶ S
   change ((T.hom ≫ ModuleCat.ofHom ((S.F.obj _).ρ g))) _ = _
   erw [← T.comm g]
   simp [fromConst]
-
-/-- An `action` node on a `constThreeNode` leaves the tensor invariant. -/
-@[simp]
-lemma action_fromConstTriple {c1 c2 c3 : S.C}
-    (v : 𝟙_ (Rep k G) ⟶ S.FD.obj (Discrete.mk c1) ⊗ S.FD.obj (Discrete.mk c2) ⊗
-      S.FD.obj (Discrete.mk c3))
-    (g : G) : g • fromConstTriple v = fromConstTriple v := by
-  simp only [Nat.succ_eq_add_one, Nat.reduceAdd, actionT_eq, fromConstTriple,
-    Action.instMonoidalCategory_tensorObj_V, Action.instMonoidalCategory_tensorUnit_V]
-  change ((Discrete.tripleIsoSep S.FD).hom.hom ≫
-    ModuleCat.ofHom ((S.F.obj (OverColor.mk ![c1, c2, c3])).ρ g)) (v.hom _) = _
-  erw [← (Discrete.tripleIsoSep S.FD).hom.comm g]
-  change ((v.hom ≫ ModuleCat.ofHom ((S.FD.obj { as := c1 } ⊗ S.FD.obj { as := c2 } ⊗
-    S.FD.obj { as := c3 }).ρ g)) ≫ (Discrete.tripleIsoSep S.FD).hom.hom) _ = _
-  erw [← v.comm g]
-  simp
 
 end Tensor
 
