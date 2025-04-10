@@ -41,14 +41,14 @@ scoped notation "𝔁" => coord
 
 /-- Given a function `f : Space d → M` the derivative of `f` in direction `μ`. -/
 noncomputable def deriv [AddCommGroup M] [Module ℝ M] [TopologicalSpace M]
-(μ : Fin d) (f : Space d → M) : Space d → M :=
+    (μ : Fin d) (f : Space d → M) : Space d → M :=
   (fun x => fderiv ℝ f x (EuclideanSpace.single μ (1:ℝ)))
 
 macro "∂[" i:term "]" : term => `(fun f => deriv $i f)
 
 /-- The theorem that derivatives on space commute with one another. -/
 lemma deriv_commute [NormedAddCommGroup M] [NormedSpace ℝ M]
-(f : Space d → M) (hf : ContDiff ℝ ⊤ f) : ∂[u] (∂[v] f) = ∂[v] (∂[u] f) := by
+    (f : Space d → M) (hf : ContDiff ℝ ⊤ f) : ∂[u] (∂[v] f) = ∂[v] (∂[u] f) := by
   have hf' : ContDiff ℝ (⊤ : ℕ∞) f := hf.of_le le_top
   rw [contDiff_infty_iff_fderiv] at hf'
   simp only
