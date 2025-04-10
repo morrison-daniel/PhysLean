@@ -19,16 +19,19 @@ abbrev Space (d : ℕ := 3) := EuclideanSpace ℝ (Fin d)
 namespace Space
 
 /-- The standard basis of Space based on `Fin d`. -/
-informal_definition basis where
-  deps := []
-  tag := "7MSR5"
+noncomputable
+def basis (μ : Fin d) : Space :=
+  EuclideanSpace.single μ 1
 
 /-- The standard coordinate functions of Space based on `Fin d`.
 
 The notation `𝔁 μ p` can be used for this. -/
-informal_definition coord where
-  deps := []
-  tag := "7MSR5"
+noncomputable
+def coord (μ : Fin d) (p : Space): ℝ :=
+  inner p (basis μ)
+
+@[inherit_doc coord]
+scoped notation "𝔁" => coord
 
 /-!
 
