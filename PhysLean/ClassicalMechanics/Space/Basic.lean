@@ -5,6 +5,8 @@ Authors: Joseph Tooby-Smith
 -/
 import Mathlib.Analysis.InnerProductSpace.PiL2
 import PhysLean.Meta.Informal.Basic
+import Mathlib.Analysis.Calculus.FDeriv.Symmetric
+
 /-!
 # Space
 
@@ -19,8 +21,8 @@ abbrev Space (d : ℕ := 3) := EuclideanSpace ℝ (Fin d)
 namespace Space
 
 /-- The standard basis of Space based on `Fin d`. -/
-noncomputable def basis (μ : Fin d) : Space d :=
-  EuclideanSpace.single μ 1
+noncomputable def basis : OrthonormalBasis (Fin d) ℝ (Space d) :=
+  EuclideanSpace.basisFun (Fin d) ℝ
 
 /-- The standard coordinate functions of Space based on `Fin d`.
 
@@ -38,28 +40,64 @@ scoped notation "𝔁" => coord
 -/
 
 /-- Given a function `f : Space d → M` the derivative of `f` in direction `μ`. -/
-informal_definition deriv where
-  deps := []
-  tag := "7MTGT"
+noncomputable def deriv [AddCommGroup M] [Module ℝ M] [TopologicalSpace M] (μ : Fin d) (f : Space d → M) : Space d → M :=
+  (fun x => fderiv ℝ f x (EuclideanSpace.single μ (1:ℝ)))
+
+macro "∂[" i:term "]" : term => `(fun f => deriv $i f)
 
 /-- The theorem that derivatives on space commute with one another. -/
-informal_lemma deriv_comm where
-  deps := []
-  tag := "7MTIX"
+lemma deriv_commute [NormedAddCommGroup M] [NormedSpace ℝ M] (f : Space d → M) (hf : ContDiff ℝ ⊤ f) : ∂[u] (∂[v] f) = ∂[v] (∂[u] f) := by
+  have hf' : ContDiff ℝ (⊤ : ℕ∞) f := hf.of_le le_top
+  rw [contDiff_infty_iff_fderiv] at hf'
+  simp
+  unfold deriv
+  ext x
+  rw [fderiv_clm_apply, fderiv_clm_apply]
+  simp
+  rw [IsSymmSndFDerivAt.eq]
+  apply ContDiffAt.isSymmSndFDerivAt_of_omega
+  apply hf.contDiffAt
+  repeat
+    apply hf'.right.contDiffAt.differentiableAt
+    simp
+    apply differentiableAt_const
 
 /-- The vector calculus operator `grad`. -/
-informal_definition grad where
-  deps := []
-  tag := "7MTI6"
+noncomputable def grad (f : Space d → ℝ) :
+  Space d → Space d := fun x i =>
+    ∂[i] f x
+
+@[inherit_doc grad]
+scoped[Space] notation "∇" => grad
 
 /-- The vector calculus operator `curl`. -/
-informal_definition curl where
-  deps := []
-  tag := "7MTJ4"
+noncomputable def curl (f : Space → Space) :
+    Space → Space := fun x =>
+  -- get i-th component of `f`
+  let fi i x := coord i (f x)
+  -- derivative of i-th component in j-th coordinate
+  -- ∂fᵢ/∂xⱼ
+  let df i j := ∂[j] (fi i) x
+  fun i =>
+    match i with
+    | 0 => df 2 1 - df 1 2
+    | 1 => df 0 2 - df 2 0
+    | 2 => df 1 0 - df 0 1
+
+@[inherit_doc curl]
+scoped[Space] notation "∇×" => curl
 
 /-- The vector calculus operator `div`. -/
-informal_definition div where
-  deps := []
-  tag := "7MTKF"
+noncomputable def div (f : Space d → Space d) :
+  Space d → ℝ := fun x =>
+  -- get i-th component of `f`
+  let fi i x := coord i (f x)
+  -- derivative of i-th component in j-th coordinate
+  -- ∂fᵢ/∂xⱼ
+  let df i x := ∂[i] (fi i) x
+  ∑ i, df i x
+
+@[inherit_doc div]
+scoped[Space] notation "∇⬝" => div
 
 end Space
