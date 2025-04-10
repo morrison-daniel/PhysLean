@@ -8,17 +8,36 @@ import PhysLean.Relativity.Lorentz.Weyl.Basic
 import PhysLean.Relativity.Lorentz.ComplexTensor.Vector.Pre.Basic
 /-!
 
-# Over color category.
+# Color
 
-## Color
+In the context of tensors `Color` is defined as the type of indices of a tensor.
+For example if `A_μ^ν` is a real Lorentz tensors, we say it has indicies of color `[down, up]`.
+For complex Lorentz Tensors there are six different colors, corresponding to the
+up and down indices of the Lorentz group, the dotted and undotted Weyl fermion indices.
 
-The notion of color will plays a critical role of the formalisation of index notation used here.
-The way to describe color is through examples.
-Indices of real Lorentz tensors can either be up-colored or down-colored.
-On the other hand, indices of Einstein tensors can just down-colored.
-In the case of complex Lorentz tensors, indices can take one of six different colors,
-corresponding to up and down, dotted and undotted weyl fermion indices and up and down
-Lorentz indices.
+_Note if you only want to work with tensors, and not understand their implementation
+you can safely ignore these files._
+
+## Overview of directory
+
+**This file**
+
+Let `C` be the type of colors for a given species of tensor.
+In this file we define the category `OverColor C`. The objects of `OverColor C`
+correspond to allowed colorings of indices represented as a map `X → C` from a type `X` to `C`.
+Usually `X` will be `Fin n` for some `n : ℕ`.
+The morphisms of `OverColor C` correspond to color-preserving permutaitons of indices.
+
+We also define here a symmetric-monoidal structure on `OverColor C`.
+
+**Discrete**
+
+The file `Discrete` contains some basic properties of the category `Discrete C`.
+
+**Lift**
+
+The file `Lift` we define the lift of a functor `F : Discrete C ⥤ Rep k G` to
+a symmetric monodial functor `OverColor C ⥤ Rep k G`, given by taking tensor products.
 
 ## References
 - *Formalization of physics index notation in Lean 4*, Tooby-Smith.
@@ -36,6 +55,20 @@ def OverColor (C : Type) := CategoryTheory.Core (CategoryTheory.Over C)
 instance (C : Type) : Groupoid (OverColor C) := coreCategory
 
 namespace OverColor
+
+/-- Make an object of `OverColor C` from a map `X → C`. -/
+def mk (f : X → C) : OverColor C := Over.mk f
+
+lemma mk_hom (f : X → C) : (mk f).hom = f := rfl
+open MonoidalCategory
+
+lemma mk_left (f : X → C) : (mk f).left = X := rfl
+
+/-!
+
+## Morphisms in the OverColor category.
+
+-/
 
 namespace Hom
 
@@ -268,14 +301,6 @@ instance (C : Type) : SymmetricCategory (OverColor C) where
 
 end monoidal
 
-/-- Make an object of `OverColor C` from a map `X → C`. -/
-def mk (f : X → C) : OverColor C := Over.mk f
-
-lemma mk_hom (f : X → C) : (mk f).hom = f := rfl
-open MonoidalCategory
-
-lemma mk_left (f : X → C) : (mk f).left = X := rfl
-
 lemma Hom.fin_ext {n : ℕ} {f g : Fin n → C} (σ σ' : OverColor.mk f ⟶ OverColor.mk g)
     (h : ∀ (i : Fin n), σ.hom.left i = σ'.hom.left i) : σ = σ' := by
   apply Hom.ext
@@ -317,6 +342,102 @@ lemma α_hom_toEquiv (f : X → C) (g : Y → C) (h : Z → C) :
 lemma α_inv_toEquiv (f : X → C) (g : Y → C) (h : Z → C) :
     Hom.toEquiv (α_ (OverColor.mk f) (OverColor.mk g) (OverColor.mk h)).inv =
     (Equiv.sumAssoc X Y Z).symm := by
+  rfl
+
+/-!
+
+## Isomorphisms.
+
+-/
+
+/-- The isomorphism between `c : X → C` and `c ∘ e.symm` as objects in `OverColor C` for an
+  equivalence `e`. -/
+def equivToIso {c : X → C} (e : X ≃ Y) : mk c ≅ mk (c ∘ e.symm) :=
+  Hom.toIso (Over.isoMk e.toIso ((Iso.eq_inv_comp e.toIso).mp rfl))
+
+@[simp]
+lemma equivToIso_homToEquiv {c : X → C} (e : X ≃ Y) :
+    Hom.toEquiv (equivToIso (c := c) e).hom = e := by
+  rfl
+
+@[simp]
+lemma equivToIso_inv_homToEquiv {c : X → C} (e : X ≃ Y) :
+    Hom.toEquiv (equivToIso (c := c) e).inv = e.symm := by
+  rfl
+
+/-- The homomorphism between `c : X → C` and `c ∘ e.symm` as objects in `OverColor C` for an
+  equivalence `e`. -/
+def equivToHom {c : X → C} (e : X ≃ Y) : mk c ⟶ mk (c ∘ e.symm) :=
+  (equivToIso e).hom
+
+/-- Given a map `X ⊕ Y → C`, the isomorphism `mk c ≅ mk (c ∘ Sum.inl) ⊗ mk (c ∘ Sum.inr)`. -/
+def mkSum (c : X ⊕ Y → C) : mk c ≅ mk (c ∘ Sum.inl) ⊗ mk (c ∘ Sum.inr) :=
+  Hom.toIso (Over.isoMk (Equiv.refl _).toIso (by
+    ext x
+    match x with
+    | Sum.inl x => rfl
+    | Sum.inr x => rfl))
+
+@[simp]
+lemma mkSum_homToEquiv {c : X ⊕ Y → C}:
+    Hom.toEquiv (mkSum c).hom = (Equiv.refl _) := by
+  rfl
+
+@[simp]
+lemma mkSum_inv_homToEquiv {c : X ⊕ Y → C}:
+    Hom.toEquiv (mkSum c).inv = (Equiv.refl _) := by
+  rfl
+
+/-- The isomorphism between objects in `OverColor C` given equality of maps. -/
+def mkIso {c1 c2 : X → C} (h : c1 = c2) : mk c1 ≅ mk c2 :=
+  Hom.toIso (Over.isoMk (Equiv.refl _).toIso (by
+    subst h
+    rfl))
+
+lemma mkIso_refl_hom {c : X → C} : (mkIso (by rfl : c =c)).hom = 𝟙 _ := by
+  rw [mkIso]
+  rfl
+
+lemma mkIso_hom_hom_left {c1 c2 : X → C} (h : c1 = c2) : (mkIso h).hom.hom.left =
+    (Equiv.refl X).toFun := by
+  rw [mkIso]
+  rfl
+
+@[simp]
+lemma mkIso_hom_hom_left_apply {c1 c2 : X → C} (h : c1 = c2) (x : X) :
+    (mkIso h).hom.hom.left x = x := by
+  rw [mkIso_hom_hom_left]
+  rfl
+
+@[simp]
+lemma equivToIso_mkIso_hom {c1 c2 : X → C} (h : c1 = c2) :
+    Hom.toEquiv (mkIso h).hom = Equiv.refl _ := by
+  rfl
+
+@[simp]
+lemma equivToIso_mkIso_inv {c1 c2 : X → C} (h : c1 = c2) :
+    Hom.toEquiv (mkIso h).inv = Equiv.refl _ := by
+  rfl
+
+TODO "6VZTR" "In the definition equivToHomEq the tactic `try {simp; decide}; try decide`
+  can probably be made more efficent."
+
+/-- The morphism from `mk c` to `mk c1` obtained by an equivalence and
+  an equality lemma. -/
+def equivToHomEq {c : X → C} {c1 : Y → C} (e : X ≃ Y)
+    (h : ∀ x, c1 x = (c ∘ e.symm) x := by try {simp; decide}; try decide) : mk c ⟶ mk c1 :=
+  (equivToHom e).trans (mkIso (funext fun x => (h x).symm)).hom
+
+@[simp]
+lemma equivToHomEq_hom_left {c : X → C} {c1 : Y → C} (e : X ≃ Y)
+    (h : ∀ x, c1 x = (c ∘ e.symm) x) : (equivToHomEq e h).hom.left =
+    e.toFun := by
+  rfl
+
+@[simp]
+lemma equivToHomEq_toEquiv {c : X → C} {c1 : Y → C} (e : X ≃ Y)
+    (h : ∀ x, c1 x = (c ∘ e.symm) x) :
+    Hom.toEquiv (equivToHomEq e h) = e := by
   rfl
 
 end OverColor
