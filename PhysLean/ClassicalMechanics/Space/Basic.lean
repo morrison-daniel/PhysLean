@@ -20,14 +20,14 @@ namespace Space
 
 /-- The standard basis of Space based on `Fin d`. -/
 noncomputable
-def basis (μ : Fin d) : Space :=
+def basis (μ : Fin d) : Space d :=
   EuclideanSpace.single μ 1
 
 /-- The standard coordinate functions of Space based on `Fin d`.
 
 The notation `𝔁 μ p` can be used for this. -/
 noncomputable
-def coord (μ : Fin d) (p : Space): ℝ :=
+def coord (μ : Fin d) (p : Space d): ℝ :=
   inner p (basis μ)
 
 @[inherit_doc coord]
