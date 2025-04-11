@@ -44,6 +44,7 @@ noncomputable def deriv [AddCommGroup M] [Module ℝ M] [TopologicalSpace M]
     (μ : Fin d) (f : Space d → M) : Space d → M :=
   (fun x => fderiv ℝ f x (EuclideanSpace.single μ (1:ℝ)))
 
+@[inherit_doc deriv]
 macro "∂[" i:term "]" : term => `(fun f => deriv $i f)
 
 /-- The theorem that derivatives on space commute with one another. -/
