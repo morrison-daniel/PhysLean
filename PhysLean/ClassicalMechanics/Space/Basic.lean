@@ -67,15 +67,15 @@ lemma deriv_commute [NormedAddCommGroup M] [NormedSpace ℝ M]
 
 /-- The vector calculus operator `grad`. -/
 noncomputable def grad (f : Space d → ℝ) :
-  Space d → Space d := fun x i =>
+  Space d → EuclideanSpace ℝ (Fin d) := fun x i =>
     ∂[i] f x
 
 @[inherit_doc grad]
 scoped[Space] notation "∇" => grad
 
 /-- The vector calculus operator `curl`. -/
-noncomputable def curl (f : Space → Space) :
-    Space → Space := fun x =>
+noncomputable def curl (f : Space → EuclideanSpace ℝ (Fin 3)) :
+    Space → EuclideanSpace ℝ (Fin 3) := fun x =>
   -- get i-th component of `f`
   let fi i x := coord i (f x)
   -- derivative of i-th component in j-th coordinate
@@ -91,7 +91,7 @@ noncomputable def curl (f : Space → Space) :
 scoped[Space] notation "∇×" => curl
 
 /-- The vector calculus operator `div`. -/
-noncomputable def div (f : Space d → Space d) :
+noncomputable def div (f : Space d → EuclideanSpace ℝ (Fin d)) :
   Space d → ℝ := fun x =>
   -- get i-th component of `f`
   let fi i x := coord i (f x)
