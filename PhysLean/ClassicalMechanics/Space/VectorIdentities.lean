@@ -1,3 +1,8 @@
+/-
+Copyright (c) 2025 Zhi Kai Pong. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Zhi Kai Pong
+-/
 import PhysLean.ClassicalMechanics.Space.Basic
 import Mathlib.Analysis.InnerProductSpace.Calculus
 
@@ -18,7 +23,7 @@ In this file we define common vector calculus identities based on `Space`.
 section
 
 variable
-  {𝕜} [RCLike 𝕜]
+  {𝕜} [NontriviallyNormedField 𝕜]
   {X} [NormedAddCommGroup X] [NormedSpace 𝕜 X]
   {Y} [NormedAddCommGroup Y] [NormedSpace 𝕜 Y]
   {ι : Type*} [Fintype ι] {Y' : ι → Type*} [∀ i, NormedAddCommGroup (Y' i)]
@@ -55,7 +60,7 @@ open Space
 
 /-- Derivatives on space distiribute over addition. -/
 lemma spacederiv_add [NormedAddCommGroup M] [NormedSpace ℝ M]
-  (f1 f2 : Space d → M) (hf1 : Differentiable ℝ f1) (hf2 : Differentiable ℝ f2) :
+    (f1 f2 : Space d → M) (hf1 : Differentiable ℝ f1) (hf2 : Differentiable ℝ f2) :
     ∂[u] (f1 + f2) = ∂[u] f1 + ∂[u] f2 := by
   unfold Space.deriv
   simp only
@@ -69,7 +74,7 @@ lemma spacederiv_add [NormedAddCommGroup M] [NormedSpace ℝ M]
 
 /-- Derivatives on space distiribute coordinate-wise over addition. -/
 lemma spacederiv_coord_add (f1 f2 : Space d → EuclideanSpace ℝ (Fin d))
-  (hf1 : Differentiable ℝ f1) (hf2 : Differentiable ℝ f2) :
+    (hf1 : Differentiable ℝ f1) (hf2 : Differentiable ℝ f2) :
     (∂[u] (fun x => f1 x i + f2 x i)) =
       (∂[u] (fun x => f1 x i)) + (∂[u] (fun x => f2 x i)) := by
   unfold Space.deriv
@@ -95,10 +100,10 @@ lemma spacederiv_commute [NormedAddCommGroup M] [NormedSpace ℝ M]
   exact ContDiff.contDiffAt hf
   simp only [minSmoothness_of_isRCLikeNormedField, le_refl]
   repeat
-  . apply Differentiable.differentiableAt
+  · apply Differentiable.differentiableAt
     apply ContDiff.differentiable_fderiv
     apply hf
-  . apply differentiableAt_const
+  · apply differentiableAt_const
 
 /-- Coordiate functions of fderiv is differentiable. -/
 lemma differentiable_fderiv_coord (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : ContDiff ℝ 2 f) :
@@ -111,12 +116,13 @@ lemma differentiable_fderiv_coord (f : Space → EuclideanSpace ℝ (Fin 3)) (hf
     decide
   rw [eq]
   apply Differentiable.clm_comp
-  . apply differentiable_const
-  . apply ContDiff.differentiable_fderiv
+  · apply differentiable_const
+  · apply ContDiff.differentiable_fderiv
     apply hf
 
 /-- Second derivatives on space distiribute coordinate-wise over subtraction. -/
-lemma spacederiv_coord_2nd_sub (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : ContDiff ℝ 2 f): ∂[u] ((fun x => ∂[v] (fun x => f x w) x - ∂[w]  (fun x => f x v) x)) = (∂[u] (∂[v] (fun x => f x w))) - (∂[u] (∂[w] (fun x => f x v))) := by
+lemma spacederiv_coord_2nd_sub (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : ContDiff ℝ 2 f):
+    ∂[u] ((fun x => ∂[v] (fun x => f x w) x - ∂[w]  (fun x => f x v) x)) = (∂[u] (∂[v] (fun x => f x w))) - (∂[u] (∂[w] (fun x => f x v))) := by
   unfold Space.deriv
   ext x
   simp only [Pi.sub_apply]
@@ -125,9 +131,9 @@ lemma spacederiv_coord_2nd_sub (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : 
   repeat
     apply Differentiable.differentiableAt
     apply Differentiable.clm_apply
-    . apply differentiable_fderiv_coord
+    · apply differentiable_fderiv_coord
       apply hf
-    . apply differentiable_const
+    · apply differentiable_const
 
 /-!
 
@@ -168,7 +174,8 @@ lemma grad_add (f1 f2 : Space d → ℝ) (hf1 : Differentiable ℝ f1) (hf2 : Di
   exact hf1
   exact hf2
 
-lemma div_add (f1 f2 : Space → EuclideanSpace ℝ (Fin 3)) (hf1 : Differentiable ℝ f1) (hf2 : Differentiable ℝ f2) :
+lemma div_add (f1 f2 : Space → EuclideanSpace ℝ (Fin 3))
+    (hf1 : Differentiable ℝ f1) (hf2 : Differentiable ℝ f2) :
     ∇⬝ (f1 + f2) = ∇⬝ f1 + ∇⬝ f2 := by
   unfold div
   simp only [Pi.add_apply]
@@ -184,13 +191,14 @@ lemma div_add (f1 f2 : Space → EuclideanSpace ℝ (Fin 3)) (hf1 : Differentiab
   ring
   repeat (first | apply hf1 | apply hf2)
 
-lemma curl_add (f1 f2 : Space → EuclideanSpace ℝ (Fin 3)) (hf1 : Differentiable ℝ f1) (hf2 : Differentiable ℝ f2) :
+lemma curl_add (f1 f2 : Space → EuclideanSpace ℝ (Fin 3))
+    (hf1 : Differentiable ℝ f1) (hf2 : Differentiable ℝ f2) :
     ∇× (f1 + f2) = ∇× f1 + ∇× f2 := by
   unfold curl
   simp only [Fin.isValue, Pi.add_apply]
   ext x i
   fin_cases i <;>
-  . simp only [Fin.isValue, coord, basis, EuclideanSpace.basisFun_apply, PiLp.inner_apply,
+  · simp only [Fin.isValue, coord, basis, EuclideanSpace.basisFun_apply, PiLp.inner_apply,
     PiLp.add_apply, EuclideanSpace.single_apply, RCLike.inner_apply, conj_trivial, ite_mul, one_mul,
     zero_mul, Finset.sum_ite_eq', Finset.mem_univ, ↓reduceIte, Fin.zero_eta, Pi.add_apply]
     rw [spacederiv_coord_add, spacederiv_coord_add]
