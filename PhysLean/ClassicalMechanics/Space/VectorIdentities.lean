@@ -21,7 +21,6 @@ variable
   {𝕜} [RCLike 𝕜]
   {X} [NormedAddCommGroup X] [NormedSpace 𝕜 X]
   {Y} [NormedAddCommGroup Y] [NormedSpace 𝕜 Y]
-  {Z} [NormedAddCommGroup Z] [NormedSpace 𝕜 Z]
   {ι : Type*} [Fintype ι] {Y' : ι → Type*} [∀ i, NormedAddCommGroup (Y' i)]
   [∀ i, NormedSpace 𝕜 (Y' i)] {Φ : X → ∀ i, Y' i} {Φ' : X →L[𝕜] ∀ i, Y' i} {x : X}
 
