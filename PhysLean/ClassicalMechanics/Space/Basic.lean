@@ -47,24 +47,6 @@ noncomputable def deriv [AddCommGroup M] [Module ℝ M] [TopologicalSpace M]
 @[inherit_doc deriv]
 macro "∂[" i:term "]" : term => `(deriv $i)
 
-/-- The theorem that derivatives on space commute with one another. -/
-lemma deriv_commute [NormedAddCommGroup M] [NormedSpace ℝ M]
-    (f : Space d → M) (hf : ContDiff ℝ ⊤ f) : ∂[u] (∂[v] f) = ∂[v] (∂[u] f) := by
-  have hf' : ContDiff ℝ (⊤ : ℕ∞) f := hf.of_le le_top
-  rw [contDiff_infty_iff_fderiv] at hf'
-  unfold deriv
-  ext x
-  rw [fderiv_clm_apply, fderiv_clm_apply]
-  simp only [fderiv_const, Pi.zero_apply, ContinuousLinearMap.comp_zero, zero_add,
-    ContinuousLinearMap.flip_apply]
-  rw [IsSymmSndFDerivAt.eq]
-  apply ContDiffAt.isSymmSndFDerivAt_of_omega
-  apply hf.contDiffAt
-  repeat
-    apply hf'.right.contDiffAt.differentiableAt
-    simp only [WithTop.one_le_coe, le_top]
-    apply differentiableAt_const
-
 /-- The vector calculus operator `grad`. -/
 noncomputable def grad (f : Space d → ℝ) :
   Space d → EuclideanSpace ℝ (Fin d) := fun x i =>
