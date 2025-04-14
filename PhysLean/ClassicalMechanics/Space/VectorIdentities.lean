@@ -122,7 +122,8 @@ lemma differentiable_fderiv_coord (f : Space → EuclideanSpace ℝ (Fin 3)) (hf
 
 /-- Second derivatives on space distiribute coordinate-wise over subtraction. -/
 lemma spacederiv_coord_2nd_sub (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : ContDiff ℝ 2 f):
-    ∂[u] ((fun x => ∂[v] (fun x => f x w) x - ∂[w]  (fun x => f x v) x)) = (∂[u] (∂[v] (fun x => f x w))) - (∂[u] (∂[w] (fun x => f x v))) := by
+    ∂[u] ((fun x => ∂[v] (fun x => f x w) x - ∂[w]  (fun x => f x v) x)) =
+    (∂[u] (∂[v] (fun x => f x w))) - (∂[u] (∂[w] (fun x => f x v))) := by
   unfold Space.deriv
   ext x
   simp only [Pi.sub_apply]
@@ -152,7 +153,8 @@ lemma div_of_curl_eq_zero (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : ContD
     Finset.sum_ite_eq', Finset.mem_univ, ↓reduceIte, Pi.zero_apply]
   rw [spacederiv_coord_2nd_sub, spacederiv_coord_2nd_sub, spacederiv_coord_2nd_sub]
   simp only [Fin.isValue, Pi.sub_apply]
-  rw [spacederiv_commute fun x => f x 0, spacederiv_commute fun x => f x 1, spacederiv_commute fun x => f x 2]
+  rw [spacederiv_commute fun x => f x 0, spacederiv_commute fun x => f x 1,
+    spacederiv_commute fun x => f x 2]
   simp only [Fin.isValue, sub_add_sub_cancel', sub_add_sub_cancel, sub_self]
   repeat
     try apply contDiff_euclidean.mp
