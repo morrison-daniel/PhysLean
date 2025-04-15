@@ -272,7 +272,7 @@ lemma curl_smul (f : Space → EuclideanSpace ℝ (Fin 3)) (k : ℝ)
 
 variable {W} [NormedAddCommGroup W] [NormedSpace ℝ W]
 
-theorem div_linear_map (f : W → Space 3 → EuclideanSpace ℝ (Fin 3))
+lemma div_linear_map (f : W → Space 3 → EuclideanSpace ℝ (Fin 3))
     (hf : ∀ w, Differentiable ℝ (f w))
     (hf' : IsLinearMap ℝ f) :
     IsLinearMap ℝ (fun w => ∇⬝ (f w)) := by
@@ -286,7 +286,7 @@ theorem div_linear_map (f : W → Space 3 → EuclideanSpace ℝ (Fin 3))
     rw [div_smul]
     fun_prop
 
-theorem curl_linear_map (f : W → Space 3 → EuclideanSpace ℝ (Fin 3))
+lemma curl_linear_map (f : W → Space 3 → EuclideanSpace ℝ (Fin 3))
     (hf : ∀ w, Differentiable ℝ (f w))
     (hf' : IsLinearMap ℝ f) :
     IsLinearMap ℝ (fun w => ∇× (f w)) := by
