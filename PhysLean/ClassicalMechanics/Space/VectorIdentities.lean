@@ -56,10 +56,10 @@ end
 
 -/
 
-open Space
+namespace Space
 
 /-- Derivatives on space distiribute over addition. -/
-lemma spacederiv_add [NormedAddCommGroup M] [NormedSpace ℝ M]
+lemma deriv_add [NormedAddCommGroup M] [NormedSpace ℝ M]
     (f1 f2 : Space d → M) (hf1 : Differentiable ℝ f1) (hf2 : Differentiable ℝ f2) :
     ∂[u] (f1 + f2) = ∂[u] f1 + ∂[u] f2 := by
   unfold Space.deriv
@@ -73,7 +73,7 @@ lemma spacederiv_add [NormedAddCommGroup M] [NormedSpace ℝ M]
     try apply hf2
 
 /-- Derivatives on space distiribute coordinate-wise over addition. -/
-lemma spacederiv_coord_add (f1 f2 : Space d → EuclideanSpace ℝ (Fin d))
+lemma deriv_coord_add (f1 f2 : Space d → EuclideanSpace ℝ (Fin d))
     (hf1 : Differentiable ℝ f1) (hf2 : Differentiable ℝ f2) :
     (∂[u] (fun x => f1 x i + f2 x i)) =
       (∂[u] (fun x => f1 x i)) + (∂[u] (fun x => f2 x i)) := by
@@ -88,7 +88,7 @@ lemma spacederiv_coord_add (f1 f2 : Space d → EuclideanSpace ℝ (Fin d))
     first | apply hf1 | apply hf2
 
 /-- Derivatives on space commute with one another. -/
-lemma spacederiv_commute [NormedAddCommGroup M] [NormedSpace ℝ M]
+lemma deriv_commute [NormedAddCommGroup M] [NormedSpace ℝ M]
     (f : Space d → M) (hf : ContDiff ℝ 2 f) : ∂[u] (∂[v] f) = ∂[v] (∂[u] f) := by
   unfold Space.deriv
   ext x
@@ -121,7 +121,7 @@ lemma differentiable_fderiv_coord (f : Space → EuclideanSpace ℝ (Fin 3)) (hf
     apply hf
 
 /-- Second derivatives on space distiribute coordinate-wise over subtraction. -/
-lemma spacederiv_coord_2nd_sub (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : ContDiff ℝ 2 f):
+lemma deriv_coord_2nd_sub (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : ContDiff ℝ 2 f):
     ∂[u] ((fun x => ∂[v] (fun x => f x w) x - ∂[w]  (fun x => f x v) x)) =
     (∂[u] (∂[v] (fun x => f x w))) - (∂[u] (∂[w] (fun x => f x v))) := by
   unfold Space.deriv
@@ -151,10 +151,10 @@ lemma div_of_curl_eq_zero (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : ContD
   simp only [Fin.isValue, coord, basis, EuclideanSpace.basisFun_apply, PiLp.inner_apply,
     EuclideanSpace.single_apply, RCLike.inner_apply, conj_trivial, ite_mul, one_mul, zero_mul,
     Finset.sum_ite_eq', Finset.mem_univ, ↓reduceIte, Pi.zero_apply]
-  rw [spacederiv_coord_2nd_sub, spacederiv_coord_2nd_sub, spacederiv_coord_2nd_sub]
+  rw [deriv_coord_2nd_sub, deriv_coord_2nd_sub, deriv_coord_2nd_sub]
   simp only [Fin.isValue, Pi.sub_apply]
-  rw [spacederiv_commute fun x => f x 0, spacederiv_commute fun x => f x 1,
-    spacederiv_commute fun x => f x 2]
+  rw [deriv_commute fun x => f x 0, deriv_commute fun x => f x 1,
+    deriv_commute fun x => f x 2]
   simp only [Fin.isValue, sub_add_sub_cancel', sub_add_sub_cancel, sub_self]
   repeat
     try apply contDiff_euclidean.mp
@@ -171,7 +171,7 @@ lemma grad_add (f1 f2 : Space d → ℝ) (hf1 : Differentiable ℝ f1) (hf2 : Di
   unfold grad
   ext x i
   simp only [Pi.add_apply]
-  rw [spacederiv_add]
+  rw [deriv_add]
   rfl
   exact hf1
   exact hf2
@@ -188,7 +188,7 @@ lemma div_add (f1 f2 : Space → EuclideanSpace ℝ (Fin 3))
   unfold Finset.sum
   simp only [Fin.univ_val_map, List.ofFn_succ, Fin.isValue, Fin.succ_zero_eq_one,
     Fin.succ_one_eq_two, List.ofFn_zero, Multiset.sum_coe, List.sum_cons, List.sum_nil, add_zero]
-  rw [spacederiv_coord_add, spacederiv_coord_add, spacederiv_coord_add]
+  rw [deriv_coord_add, deriv_coord_add, deriv_coord_add]
   simp only [Fin.isValue, Pi.add_apply]
   ring
   repeat (first | apply hf1 | apply hf2)
@@ -203,7 +203,7 @@ lemma curl_add (f1 f2 : Space → EuclideanSpace ℝ (Fin 3))
   · simp only [Fin.isValue, coord, basis, EuclideanSpace.basisFun_apply, PiLp.inner_apply,
     PiLp.add_apply, EuclideanSpace.single_apply, RCLike.inner_apply, conj_trivial, ite_mul, one_mul,
     zero_mul, Finset.sum_ite_eq', Finset.mem_univ, ↓reduceIte, Fin.zero_eta, Pi.add_apply]
-    rw [spacederiv_coord_add, spacederiv_coord_add]
+    rw [deriv_coord_add, deriv_coord_add]
     simp only [Fin.isValue, Pi.add_apply]
     ring
     repeat (first | apply hf1 | apply hf2)
