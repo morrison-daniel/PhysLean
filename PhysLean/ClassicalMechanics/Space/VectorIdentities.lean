@@ -133,10 +133,11 @@ lemma differentiable_fderiv_coord (f : Space → EuclideanSpace ℝ (Fin 3)) (hf
   · apply ContDiff.differentiable_fderiv
     exact hf
 
-/-- Second derivatives on space distiribute coordinate-wise over addition (all three components for div). -/
+/-- Second derivatives distiribute coordinate-wise over addition (all three components for div). -/
 lemma deriv_coord_2nd_add (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : ContDiff ℝ 2 f) :
     ∂[i] (fun x => ∂[u] (fun x => f x u) x + (∂[v] (fun x => f x v) x + ∂[w] (fun x => f x w) x)) =
-    (∂[i] (∂[u] (fun x => f x u))) + (∂[i] (∂[v] (fun x => f x v))) + (∂[i] (∂[w] (fun x => f x w))) := by
+    (∂[i] (∂[u] (fun x => f x u))) + (∂[i] (∂[v] (fun x => f x v))) +
+    (∂[i] (∂[w] (fun x => f x w))) := by
   unfold deriv
   ext x
   rw [fderiv_add, fderiv_add]
@@ -150,7 +151,7 @@ lemma deriv_coord_2nd_add (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : ContD
       exact hf
     · fun_prop
 
-/-- Second derivatives on space distiribute coordinate-wise over subtraction (two components for curl). -/
+/-- Second derivatives distiribute coordinate-wise over subtraction (two components for curl). -/
 lemma deriv_coord_2nd_sub (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : ContDiff ℝ 2 f) :
     ∂[u] (fun x => ∂[v] (fun x => f x w) x - ∂[w]  (fun x => f x v) x) =
     (∂[u] (∂[v] (fun x => f x w))) - (∂[u] (∂[w] (fun x => f x v))) := by
