@@ -173,7 +173,7 @@ lemma deriv_coord_2nd_sub (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : ContD
 -/
 
 lemma Laplacian_eq_div_of_grad (f : Space → ℝ) :
-    ∇² f = ∇ ⬝ ∇ f := by
+    Δ f = ∇ ⬝ ∇ f := by
   unfold Laplacian div grad Finset.sum
   simp only [Fin.univ_val_map, List.ofFn_succ, Fin.isValue, Fin.succ_zero_eq_one,
     Fin.succ_one_eq_two, List.ofFn_zero, Multiset.sum_coe, List.sum_cons, List.sum_nil, add_zero,
@@ -200,7 +200,7 @@ lemma div_of_curl_eq_zero (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : ContD
     exact hf
 
 lemma curl_of_curl (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : ContDiff ℝ 2 f) :
-    ∇ × (∇ × f) = ∇ (∇ ⬝ f) - ∇² f := by
+    ∇ × (∇ × f) = ∇ (∇ ⬝ f) - Δ f := by
   unfold Laplacian_vec Laplacian div grad curl Finset.sum
   simp only [Fin.isValue, coord, basis, EuclideanSpace.basisFun_apply, PiLp.inner_apply,
     EuclideanSpace.single_apply, RCLike.inner_apply, conj_trivial, ite_mul, one_mul, zero_mul,

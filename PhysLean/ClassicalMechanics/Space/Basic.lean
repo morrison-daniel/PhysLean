@@ -94,16 +94,16 @@ noncomputable def Laplacian (f : Space d → ℝ) :
   ∑ i, df2 i x
 
 @[inherit_doc Laplacian]
-scoped[Space] notation "∇²" => Laplacian
+scoped[Space] notation "Δ" => Laplacian
 
 /-- The vector `Laplacian_vec` operator. -/
 noncomputable def Laplacian_vec (f : Space d → EuclideanSpace ℝ (Fin d)) :
     Space d → EuclideanSpace ℝ (Fin d) := fun x i =>
   -- get i-th component of `f`
   let fi i x := coord i (f x)
-  ∇² (fi i) x
+  Δ (fi i) x
 
 @[inherit_doc Laplacian_vec]
-scoped[Space] notation "∇²" => Laplacian_vec
+scoped[Space] notation "Δ" => Laplacian_vec
 
 end Space
