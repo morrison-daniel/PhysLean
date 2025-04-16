@@ -27,15 +27,13 @@ namespace lorentzAlgebra
 open minkowskiMatrix
 
 lemma transpose_eta (A : lorentzAlgebra) : A.1ᵀ * η = - η * A.1 := by
-  have h1 := A.2
-  erw [mem_skewAdjointMatricesLieSubalgebra] at h1
-  simpa only [neg_mul, mem_skewAdjointMatricesSubmodule, IsSkewAdjoint, IsAdjointPair,
-    mul_neg] using h1
+  have h : A.1 ∈ skewAdjointMatricesSubmodule η := by exact A.2
+  simpa only [mem_skewAdjointMatricesSubmodule, IsSkewAdjoint, IsAdjointPair, ← neg_mul_comm]
+    using h
 
 lemma mem_of_transpose_eta_eq_eta_mul_self {A : Matrix (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ Fin 3) ℝ}
     (h : Aᵀ * η = - η * A) : A ∈ lorentzAlgebra := by
-  erw [mem_skewAdjointMatricesLieSubalgebra]
-  simpa [LieAlgebra.Orthogonal.so', IsSkewAdjoint, IsAdjointPair] using h
+  simpa [lorentzAlgebra, LieAlgebra.Orthogonal.so', IsSkewAdjoint, IsAdjointPair] using h
 
 lemma mem_iff {A : Matrix (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ Fin 3) ℝ} :
     A ∈ lorentzAlgebra ↔ Aᵀ * η = - η * A :=
