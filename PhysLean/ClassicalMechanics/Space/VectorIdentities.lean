@@ -118,7 +118,6 @@ lemma deriv_commute [NormedAddCommGroup M] [NormedSpace ℝ M]
     exact hf
   · fun_prop
 
-
 /-- Coordiate functions of fderiv is differentiable. -/
 lemma differentiable_fderiv_coord (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : ContDiff ℝ 2 f) :
     Differentiable ℝ (fderiv ℝ fun x => f x i) := by
@@ -134,9 +133,26 @@ lemma differentiable_fderiv_coord (f : Space → EuclideanSpace ℝ (Fin 3)) (hf
   · apply ContDiff.differentiable_fderiv
     exact hf
 
-/-- Second derivatives on space distiribute coordinate-wise over subtraction. -/
-lemma deriv_coord_2nd_sub (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : ContDiff ℝ 2 f):
-    ∂[u] ((fun x => ∂[v] (fun x => f x w) x - ∂[w]  (fun x => f x v) x)) =
+/-- Second derivatives on space distiribute coordinate-wise over addition (all three components for div). -/
+lemma deriv_coord_2nd_add (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : ContDiff ℝ 2 f) :
+    ∂[i] (fun x => ∂[u] (fun x => f x u) x + (∂[v] (fun x => f x v) x + ∂[w] (fun x => f x w) x)) =
+    (∂[i] (∂[u] (fun x => f x u))) + (∂[i] (∂[v] (fun x => f x v))) + (∂[i] (∂[w] (fun x => f x w))) := by
+  unfold deriv
+  ext x
+  rw [fderiv_add, fderiv_add]
+  simp only [ContinuousLinearMap.add_apply, Pi.add_apply]
+  ring
+  repeat
+    try apply DifferentiableAt.add
+    apply Differentiable.differentiableAt
+    apply Differentiable.clm_apply
+    · apply differentiable_fderiv_coord
+      exact hf
+    · fun_prop
+
+/-- Second derivatives on space distiribute coordinate-wise over subtraction (two components for curl). -/
+lemma deriv_coord_2nd_sub (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : ContDiff ℝ 2 f) :
+    ∂[u] (fun x => ∂[v] (fun x => f x w) x - ∂[w]  (fun x => f x v) x) =
     (∂[u] (∂[v] (fun x => f x w))) - (∂[u] (∂[w] (fun x => f x v))) := by
   unfold deriv
   ext x
@@ -156,8 +172,17 @@ lemma deriv_coord_2nd_sub (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : ContD
 
 -/
 
+lemma Laplacian_eq_div_of_grad (f : Space → ℝ) :
+    ∇² f = ∇ ⬝ ∇ f := by
+  unfold Laplacian div grad Finset.sum
+  simp only [Fin.univ_val_map, List.ofFn_succ, Fin.isValue, Fin.succ_zero_eq_one,
+    Fin.succ_one_eq_two, List.ofFn_zero, Multiset.sum_coe, List.sum_cons, List.sum_nil, add_zero,
+    coord, basis, EuclideanSpace.basisFun_apply, PiLp.inner_apply, EuclideanSpace.single_apply,
+    RCLike.inner_apply, conj_trivial, ite_mul, one_mul, zero_mul, Finset.sum_ite_eq',
+    Finset.mem_univ, ↓reduceIte]
+
 lemma div_of_curl_eq_zero (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : ContDiff ℝ 2 f) :
-    ∇⬝ (∇× f) = 0 := by
+    ∇ ⬝ (∇ × f) = 0 := by
   unfold div curl Finset.sum
   simp only [Fin.isValue, Fin.univ_val_map, List.ofFn_succ, Fin.succ_zero_eq_one,
     Fin.succ_one_eq_two, List.ofFn_zero, Multiset.sum_coe, List.sum_cons, List.sum_nil, add_zero]
@@ -173,6 +198,26 @@ lemma div_of_curl_eq_zero (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : ContD
   repeat
     try apply contDiff_euclidean.mp
     exact hf
+
+lemma curl_of_curl (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : ContDiff ℝ 2 f) :
+    ∇ × (∇ × f) = ∇ (∇ ⬝ f) - ∇² f := by
+  unfold Laplacian_vec Laplacian div grad curl Finset.sum
+  simp only [Fin.isValue, coord, basis, EuclideanSpace.basisFun_apply, PiLp.inner_apply,
+    EuclideanSpace.single_apply, RCLike.inner_apply, conj_trivial, ite_mul, one_mul, zero_mul,
+    Finset.sum_ite_eq', Finset.mem_univ, ↓reduceIte, Fin.univ_val_map, List.ofFn_succ,
+    Fin.succ_zero_eq_one, Fin.succ_one_eq_two, List.ofFn_zero, Multiset.sum_coe, List.sum_cons,
+    List.sum_nil, add_zero]
+  ext x i
+  fin_cases i <;>
+  · simp only [Fin.isValue, Fin.reduceFinMk, Pi.sub_apply]
+    rw [deriv_coord_2nd_sub, deriv_coord_2nd_sub, deriv_coord_2nd_add]
+    rw [deriv_commute fun x => f x 0, deriv_commute fun x => f x 1,
+      deriv_commute fun x => f x 2]
+    simp only [Fin.isValue, Pi.sub_apply, Pi.add_apply]
+    ring
+    repeat
+      try apply contDiff_euclidean.mp
+      exact hf
 
 /-!
 
@@ -193,7 +238,7 @@ lemma grad_add (f1 f2 : Space d → ℝ)
 
 lemma div_add (f1 f2 : Space → EuclideanSpace ℝ (Fin 3))
     (hf1 : Differentiable ℝ f1) (hf2 : Differentiable ℝ f2) :
-    ∇⬝ (f1 + f2) = ∇⬝ f1 + ∇⬝ f2 := by
+    ∇ ⬝ (f1 + f2) = ∇ ⬝ f1 + ∇ ⬝ f2 := by
   unfold div Finset.sum
   ext x
   simp only [coord, Pi.add_apply, basis, EuclideanSpace.basisFun_apply, PiLp.inner_apply,
@@ -208,7 +253,7 @@ lemma div_add (f1 f2 : Space → EuclideanSpace ℝ (Fin 3))
 
 lemma curl_add (f1 f2 : Space → EuclideanSpace ℝ (Fin 3))
     (hf1 : Differentiable ℝ f1) (hf2 : Differentiable ℝ f2) :
-    ∇× (f1 + f2) = ∇× f1 + ∇× f2 := by
+    ∇ × (f1 + f2) = ∇ × f1 + ∇ × f2 := by
   unfold curl
   ext x i
   fin_cases i <;>
@@ -238,7 +283,7 @@ lemma grad_smul (f : Space d → ℝ) (k : ℝ)
 
 lemma div_smul (f : Space → EuclideanSpace ℝ (Fin 3)) (k : ℝ)
     (hf : Differentiable ℝ f) :
-    ∇⬝ (k • f) = k • ∇⬝ f := by
+    ∇ ⬝ (k • f) = k • ∇ ⬝ f := by
   unfold div Finset.sum
   ext x
   simp only [coord, Pi.smul_apply, basis, EuclideanSpace.basisFun_apply, PiLp.inner_apply,
@@ -252,7 +297,7 @@ lemma div_smul (f : Space → EuclideanSpace ℝ (Fin 3)) (k : ℝ)
 
 lemma curl_smul (f : Space → EuclideanSpace ℝ (Fin 3)) (k : ℝ)
     (hf : Differentiable ℝ f) :
-    ∇× (k • f) = k • ∇× f := by
+    ∇ × (k • f) = k • ∇ × f := by
   unfold curl
   ext x i
   fin_cases i <;>
@@ -275,7 +320,7 @@ variable {W} [NormedAddCommGroup W] [NormedSpace ℝ W]
 lemma div_linear_map (f : W → Space 3 → EuclideanSpace ℝ (Fin 3))
     (hf : ∀ w, Differentiable ℝ (f w))
     (hf' : IsLinearMap ℝ f) :
-    IsLinearMap ℝ (fun w => ∇⬝ (f w)) := by
+    IsLinearMap ℝ (fun w => ∇ ⬝ (f w)) := by
   constructor
   · intro w w'
     rw [hf'.map_add]
@@ -289,7 +334,7 @@ lemma div_linear_map (f : W → Space 3 → EuclideanSpace ℝ (Fin 3))
 lemma curl_linear_map (f : W → Space 3 → EuclideanSpace ℝ (Fin 3))
     (hf : ∀ w, Differentiable ℝ (f w))
     (hf' : IsLinearMap ℝ f) :
-    IsLinearMap ℝ (fun w => ∇× (f w)) := by
+    IsLinearMap ℝ (fun w => ∇ × (f w)) := by
   constructor
   · intro w w'
     rw [hf'.map_add]
