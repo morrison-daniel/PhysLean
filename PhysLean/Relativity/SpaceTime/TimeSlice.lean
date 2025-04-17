@@ -26,30 +26,43 @@ open Space
 /-- The timeslice of a function `SpaceTime d → M` forming a function
   `Time → Space d → M`. -/
 def timeSlice {d : ℕ} {M : Type} : (SpaceTime d → M) ≃ (Time → Space d → M) where
-  toFun f := fun t x => f (Lorentz.Vector.toCoord.symm (fun i =>
-    match i with
-    | Sum.inl _ => t
-    | Sum.inr i => x i))
-  invFun f := fun x => f (Lorentz.Vector.toCoord x (Sum.inl 0))
-    (fun i => (Lorentz.Vector.toCoord x (Sum.inr i)))
+  toFun f := Function.curry (f ∘ toTimeAndSpace.symm)
+  invFun f := Function.uncurry f ∘ toTimeAndSpace
   left_inv f := by
     funext x
-    simp only [realLorentzTensor.C_eq_color, Nat.succ_eq_add_one, Nat.reduceAdd, Fin.isValue]
-    congr
-    refine (LinearEquiv.symm_apply_eq Lorentz.Vector.toCoord).mpr ?_
-    generalize Lorentz.Vector.toCoord x = y
-    funext i
-    match i with
-    | Sum.inl 0 => rfl
-    | Sum.inr i => rfl
-  right_inv f := by
-    funext t x
     simp
+  right_inv f := by
+    funext x t
+    simp
+
+/-- The timeslice of a function `SpaceTime d → M` forming a function
+  `Time → Space d → M`, as a linear equivalence. -/
+def timeSliceLinearEquiv {d : ℕ} {M : Type} [AddCommGroup M] [Module ℝ M] :
+    (SpaceTime d → M) ≃ₗ[ℝ] (Time → Space d → M) where
+  toFun := timeSlice
+  invFun := timeSlice.symm
+  map_add' f g := by
+    ext t x
+    simp [timeSlice]
+  map_smul' := by
+    intros c f
+    ext t x
+    simp [timeSlice]
+  left_inv f := by simp
+  right_inv f := by simp
+
+lemma timeSliceLinearEquiv_apply {d : ℕ} {M : Type} [AddCommGroup M] [Module ℝ M]
+    (f : SpaceTime d → M) : timeSliceLinearEquiv f = timeSlice f := by
+  simp [timeSliceLinearEquiv, timeSlice]
+
+lemma timeSliceLinearEquiv_symm_apply {d : ℕ} {M : Type} [AddCommGroup M] [Module ℝ M]
+    (f : Time → Space d → M) : timeSliceLinearEquiv.symm f = timeSlice.symm f := by
+  simp [timeSliceLinearEquiv, timeSlice]
 
 /-- The derivative on space commutes with time-slicing. -/
 semiformal_result "7Z2GA" timeSlice_spatial_deriv {M : Type} [AddCommGroup M]
     [Module ℝ M] [TopologicalSpace M] {d : ℕ} (f : SpaceTime d → M) (i : Fin d) :
-  timeSlice (∂_ (finSumFinEquiv (Sum.inr i)) f) = fun t => ∂[i] (timeSlice f t)
+    timeSlice (∂_ (finSumFinEquiv (Sum.inr i)) f) = fun t => ∂[i] (timeSlice f t)
 
 /-- The derivative on time commutes with time-slicing. -/
 semiformal_result "7Z2LF" timeSlice_time_deriv {M : Type} [AddCommGroup M]
