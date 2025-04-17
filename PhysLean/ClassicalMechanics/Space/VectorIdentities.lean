@@ -29,7 +29,7 @@ variable
   {ι : Type*} [Fintype ι] {Y' : ι → Type*} [∀ i, NormedAddCommGroup (Y' i)]
   [∀ i, NormedSpace 𝕜 (Y' i)] {Φ : X → ∀ i, Y' i} {Φ' : X →L[𝕜] ∀ i, Y' i} {x : X}
 
-lemma ContinousLinearMap.fderiv_pi' (h : DifferentiableAt 𝕜 Φ x):
+lemma ContinousLinearMap.fderiv_pi' (h : DifferentiableAt 𝕜 Φ x) :
     fderiv 𝕜 Φ x = ContinuousLinearMap.pi fun i => (fderiv 𝕜 fun x => Φ x i) x:= by
   apply HasFDerivAt.fderiv
   apply hasFDerivAt_pi''
@@ -44,7 +44,7 @@ lemma ContDiff.differentiable_fderiv (f : X → Y) (hf : ContDiff 𝕜 2 f) :
   apply hf'.right.right.differentiable
   decide
 
-lemma fderiv_coord_eq_proj_comp (h : DifferentiableAt 𝕜 Φ x):
+lemma fderiv_coord_eq_proj_comp (h : DifferentiableAt 𝕜 Φ x) :
     (fderiv 𝕜 fun x => Φ x i) x = (ContinuousLinearMap.proj i).comp (fderiv 𝕜 Φ x) := by
   rw [ContinousLinearMap.fderiv_pi', ContinuousLinearMap.proj_pi]
   exact h
@@ -227,7 +227,7 @@ lemma curl_of_curl (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : ContDiff ℝ
 -/
 
 lemma grad_add (f1 f2 : Space d → ℝ)
-    (hf1 : Differentiable ℝ f1) (hf2 : Differentiable ℝ f2):
+    (hf1 : Differentiable ℝ f1) (hf2 : Differentiable ℝ f2) :
     ∇ (f1 + f2) = ∇ f1 + ∇ f2 := by
   unfold grad
   ext x i
