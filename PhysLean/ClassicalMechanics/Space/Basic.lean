@@ -70,19 +70,40 @@ noncomputable def curl (f : Space → EuclideanSpace ℝ (Fin 3)) :
     | 2 => df 1 0 x - df 0 1 x
 
 @[inherit_doc curl]
-scoped[Space] notation "∇×" => curl
+macro (name := curlNotation) "∇" "×" f:term:100  : term => `(curl $f)
 
 /-- The vector calculus operator `div`. -/
 noncomputable def div (f : Space d → EuclideanSpace ℝ (Fin d)) :
-  Space d → ℝ := fun x =>
+    Space d → ℝ := fun x =>
   -- get i-th component of `f`
   let fi i x := coord i (f x)
-  -- derivative of i-th component in j-th coordinate
+  -- derivative of i-th component in i-th coordinate
   -- ∂fᵢ/∂xⱼ
   let df i x := ∂[i] (fi i) x
   ∑ i, df i x
 
 @[inherit_doc div]
-scoped[Space] notation "∇⬝" => div
+macro (name := divNotation) "∇" "⬝" f:term:100  : term => `(div $f)
+
+/-- The scalar `laplacian` operator. -/
+noncomputable def laplacian (f : Space d → ℝ) :
+    Space d → ℝ := fun x =>
+  -- second derivative of f in i-th coordinate
+  -- ∂²f/∂xᵢ²
+  let df2 i x := ∂[i] (∂[i] f) x
+  ∑ i, df2 i x
+
+@[inherit_doc laplacian]
+scoped[Space] notation "Δ" => laplacian
+
+/-- The vector `laplacian_vec` operator. -/
+noncomputable def laplacian_vec (f : Space d → EuclideanSpace ℝ (Fin d)) :
+    Space d → EuclideanSpace ℝ (Fin d) := fun x i =>
+  -- get i-th component of `f`
+  let fi i x := coord i (f x)
+  Δ (fi i) x
+
+@[inherit_doc laplacian_vec]
+scoped[Space] notation "Δ" => laplacian_vec
 
 end Space
