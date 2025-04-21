@@ -21,7 +21,7 @@ namespace Time
 /-- Given a function `f : Time → M` the derivative of `f`. -/
 noncomputable def deriv [AddCommGroup M] [Module ℝ M] [TopologicalSpace M]
     (f : Time → M) : Time → M :=
-  (fun x => fderiv ℝ f x 1)
+  (fun t => fderiv ℝ f t 1)
 
 @[inherit_doc deriv]
 scoped notation "∂ₜ" => deriv
