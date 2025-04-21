@@ -4,7 +4,6 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Zhi Kai Pong
 -/
 import PhysLean.ClassicalMechanics.Space.Basic
-import PhysLean.ClassicalMechanics.Time.Basic
 import Mathlib.Analysis.InnerProductSpace.Calculus
 
 /-!
