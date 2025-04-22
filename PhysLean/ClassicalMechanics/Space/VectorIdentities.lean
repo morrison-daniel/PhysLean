@@ -27,9 +27,9 @@ variable
   {X} [NormedAddCommGroup X] [NormedSpace 𝕜 X]
   {Y} [NormedAddCommGroup Y] [NormedSpace 𝕜 Y]
   {ι : Type*} [Fintype ι] {Y' : ι → Type*} [∀ i, NormedAddCommGroup (Y' i)]
-  [∀ i, NormedSpace 𝕜 (Y' i)] {Φ : X → ∀ i, Y' i} {Φ' : X →L[𝕜] ∀ i, Y' i} {x : X}
+  [∀ i, NormedSpace 𝕜 (Y' i)] {Φ : X → ∀ i, Y' i} {x : X}
 
-lemma ContinousLinearMap.fderiv_pi' (h : DifferentiableAt 𝕜 Φ x) :
+lemma fderiv_pi' (h : DifferentiableAt 𝕜 Φ x) :
     fderiv 𝕜 Φ x = ContinuousLinearMap.pi fun i => (fderiv 𝕜 fun x => Φ x i) x:= by
   apply HasFDerivAt.fderiv
   apply hasFDerivAt_pi''
@@ -46,8 +46,9 @@ lemma ContDiff.differentiable_fderiv (f : X → Y) (hf : ContDiff 𝕜 2 f) :
 
 lemma fderiv_coord_eq_proj_comp (h : DifferentiableAt 𝕜 Φ x) :
     (fderiv 𝕜 fun x => Φ x i) x = (ContinuousLinearMap.proj i).comp (fderiv 𝕜 Φ x) := by
-  rw [ContinousLinearMap.fderiv_pi', ContinuousLinearMap.proj_pi]
+  rw [fderiv_pi', ContinuousLinearMap.proj_pi]
   exact h
+
 end
 
 /-!
@@ -175,22 +176,22 @@ lemma deriv_coord_2nd_sub (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : ContD
 
 lemma laplacian_eq_div_of_grad (f : Space → ℝ) :
     Δ f = ∇ ⬝ ∇ f := by
-  unfold laplacian div grad Finset.sum
+  unfold laplacian div grad Finset.sum coord basis
   simp only [Fin.univ_val_map, List.ofFn_succ, Fin.isValue, Fin.succ_zero_eq_one,
     Fin.succ_one_eq_two, List.ofFn_zero, Multiset.sum_coe, List.sum_cons, List.sum_nil, add_zero,
-    coord, basis, EuclideanSpace.basisFun_apply, PiLp.inner_apply, EuclideanSpace.single_apply,
+    EuclideanSpace.basisFun_apply, PiLp.inner_apply, EuclideanSpace.single_apply,
     RCLike.inner_apply, conj_trivial, ite_mul, one_mul, zero_mul, Finset.sum_ite_eq',
     Finset.mem_univ, ↓reduceIte]
 
 lemma div_of_curl_eq_zero (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : ContDiff ℝ 2 f) :
     ∇ ⬝ (∇ × f) = 0 := by
-  unfold div curl Finset.sum
-  simp only [Fin.isValue, Fin.univ_val_map, List.ofFn_succ, Fin.succ_zero_eq_one,
-    Fin.succ_one_eq_two, List.ofFn_zero, Multiset.sum_coe, List.sum_cons, List.sum_nil, add_zero]
+  unfold div curl Finset.sum coord basis
   ext x
-  simp only [Fin.isValue, coord, basis, EuclideanSpace.basisFun_apply, PiLp.inner_apply,
+  simp only [Fin.isValue, EuclideanSpace.basisFun_apply, PiLp.inner_apply,
     EuclideanSpace.single_apply, RCLike.inner_apply, conj_trivial, ite_mul, one_mul, zero_mul,
-    Finset.sum_ite_eq', Finset.mem_univ, ↓reduceIte, Pi.zero_apply]
+    Finset.sum_ite_eq', Finset.mem_univ, ↓reduceIte, Fin.univ_val_map, List.ofFn_succ,
+    Fin.succ_zero_eq_one, Fin.succ_one_eq_two, List.ofFn_zero, Multiset.sum_coe, List.sum_cons,
+    List.sum_nil, add_zero, Pi.zero_apply]
   rw [deriv_coord_2nd_sub, deriv_coord_2nd_sub, deriv_coord_2nd_sub]
   simp only [Fin.isValue, Pi.sub_apply]
   rw [deriv_commute fun x => f x 0, deriv_commute fun x => f x 1,
@@ -202,8 +203,8 @@ lemma div_of_curl_eq_zero (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : ContD
 
 lemma curl_of_curl (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : ContDiff ℝ 2 f) :
     ∇ × (∇ × f) = ∇ (∇ ⬝ f) - Δ f := by
-  unfold laplacian_vec laplacian div grad curl Finset.sum
-  simp only [Fin.isValue, coord, basis, EuclideanSpace.basisFun_apply, PiLp.inner_apply,
+  unfold laplacian_vec laplacian div grad curl Finset.sum coord basis
+  simp only [Fin.isValue, EuclideanSpace.basisFun_apply, PiLp.inner_apply,
     EuclideanSpace.single_apply, RCLike.inner_apply, conj_trivial, ite_mul, one_mul, zero_mul,
     Finset.sum_ite_eq', Finset.mem_univ, ↓reduceIte, Fin.univ_val_map, List.ofFn_succ,
     Fin.succ_zero_eq_one, Fin.succ_one_eq_two, List.ofFn_zero, Multiset.sum_coe, List.sum_cons,
@@ -240,13 +241,13 @@ lemma grad_add (f1 f2 : Space d → ℝ)
 lemma div_add (f1 f2 : Space → EuclideanSpace ℝ (Fin 3))
     (hf1 : Differentiable ℝ f1) (hf2 : Differentiable ℝ f2) :
     ∇ ⬝ (f1 + f2) = ∇ ⬝ f1 + ∇ ⬝ f2 := by
-  unfold div Finset.sum
+  unfold div Finset.sum coord basis
   ext x
-  simp only [coord, Pi.add_apply, basis, EuclideanSpace.basisFun_apply, PiLp.inner_apply,
-    PiLp.add_apply, EuclideanSpace.single_apply, RCLike.inner_apply, conj_trivial, ite_mul, one_mul,
-    zero_mul, Finset.sum_ite_eq', Finset.mem_univ, ↓reduceIte, Fin.univ_val_map, List.ofFn_succ,
-    Fin.isValue, Fin.succ_zero_eq_one, Fin.succ_one_eq_two, List.ofFn_zero, Multiset.sum_coe,
-    List.sum_cons, List.sum_nil, add_zero]
+  simp only [Pi.add_apply, EuclideanSpace.basisFun_apply, PiLp.inner_apply, PiLp.add_apply,
+    EuclideanSpace.single_apply, RCLike.inner_apply, conj_trivial, ite_mul, one_mul, zero_mul,
+    Finset.sum_ite_eq', Finset.mem_univ, ↓reduceIte, Fin.univ_val_map, List.ofFn_succ, Fin.isValue,
+    Fin.succ_zero_eq_one, Fin.succ_one_eq_two, List.ofFn_zero, Multiset.sum_coe, List.sum_cons,
+    List.sum_nil, add_zero]
   repeat rw [deriv_coord_add]
   simp only [Fin.isValue, Pi.add_apply]
   ring
@@ -255,12 +256,12 @@ lemma div_add (f1 f2 : Space → EuclideanSpace ℝ (Fin 3))
 lemma curl_add (f1 f2 : Space → EuclideanSpace ℝ (Fin 3))
     (hf1 : Differentiable ℝ f1) (hf2 : Differentiable ℝ f2) :
     ∇ × (f1 + f2) = ∇ × f1 + ∇ × f2 := by
-  unfold curl
+  unfold curl coord basis
   ext x i
   fin_cases i <;>
-  · simp only [Fin.isValue, coord, Pi.add_apply, basis, EuclideanSpace.basisFun_apply,
-    PiLp.inner_apply, PiLp.add_apply, EuclideanSpace.single_apply, RCLike.inner_apply, conj_trivial,
-    ite_mul, one_mul, zero_mul, Finset.sum_ite_eq', Finset.mem_univ, ↓reduceIte, Fin.zero_eta]
+  · simp only [Fin.isValue, Pi.add_apply, EuclideanSpace.basisFun_apply, PiLp.inner_apply,
+    PiLp.add_apply, EuclideanSpace.single_apply, RCLike.inner_apply, conj_trivial, ite_mul, one_mul,
+    zero_mul, Finset.sum_ite_eq', Finset.mem_univ, ↓reduceIte, Fin.zero_eta]
     repeat rw [deriv_coord_add]
     simp only [Fin.isValue, Pi.add_apply]
     ring
@@ -285,13 +286,13 @@ lemma grad_smul (f : Space d → ℝ) (k : ℝ)
 lemma div_smul (f : Space → EuclideanSpace ℝ (Fin 3)) (k : ℝ)
     (hf : Differentiable ℝ f) :
     ∇ ⬝ (k • f) = k • ∇ ⬝ f := by
-  unfold div Finset.sum
+  unfold div Finset.sum coord basis
   ext x
-  simp only [coord, Pi.smul_apply, basis, EuclideanSpace.basisFun_apply, PiLp.inner_apply,
-    PiLp.smul_apply, smul_eq_mul, EuclideanSpace.single_apply, RCLike.inner_apply, conj_trivial,
-    ite_mul, one_mul, zero_mul, Finset.sum_ite_eq', Finset.mem_univ, ↓reduceIte, Fin.univ_val_map,
-    List.ofFn_succ, Fin.isValue, Fin.succ_zero_eq_one, Fin.succ_one_eq_two, List.ofFn_zero,
-    Multiset.sum_coe, List.sum_cons, List.sum_nil, add_zero]
+  simp only [Pi.smul_apply, EuclideanSpace.basisFun_apply, PiLp.inner_apply, PiLp.smul_apply,
+    smul_eq_mul, EuclideanSpace.single_apply, RCLike.inner_apply, conj_trivial, ite_mul, one_mul,
+    zero_mul, Finset.sum_ite_eq', Finset.mem_univ, ↓reduceIte, Fin.univ_val_map, List.ofFn_succ,
+    Fin.isValue, Fin.succ_zero_eq_one, Fin.succ_one_eq_two, List.ofFn_zero, Multiset.sum_coe,
+    List.sum_cons, List.sum_nil, add_zero]
   repeat rw [deriv_coord_smul]
   simp only [Fin.isValue, Pi.smul_apply, smul_eq_mul, mul_add]
   repeat fun_prop
@@ -299,13 +300,12 @@ lemma div_smul (f : Space → EuclideanSpace ℝ (Fin 3)) (k : ℝ)
 lemma curl_smul (f : Space → EuclideanSpace ℝ (Fin 3)) (k : ℝ)
     (hf : Differentiable ℝ f) :
     ∇ × (k • f) = k • ∇ × f := by
-  unfold curl
+  unfold curl coord basis
   ext x i
   fin_cases i <;>
-  · simp only [Fin.isValue, coord, Pi.smul_apply, basis, EuclideanSpace.basisFun_apply,
-    PiLp.inner_apply, PiLp.smul_apply, smul_eq_mul, EuclideanSpace.single_apply, RCLike.inner_apply,
-    conj_trivial, ite_mul, one_mul, zero_mul, Finset.sum_ite_eq', Finset.mem_univ, ↓reduceIte,
-    Fin.zero_eta]
+  · simp only [Fin.isValue, Pi.smul_apply, EuclideanSpace.basisFun_apply, PiLp.inner_apply,
+    PiLp.smul_apply, smul_eq_mul, EuclideanSpace.single_apply, RCLike.inner_apply, conj_trivial,
+    ite_mul, one_mul, zero_mul, Finset.sum_ite_eq', Finset.mem_univ, ↓reduceIte, Fin.zero_eta]
     rw [deriv_coord_smul, deriv_coord_smul, mul_sub]
     simp only [Fin.isValue, Pi.smul_apply, smul_eq_mul]
     repeat fun_prop
