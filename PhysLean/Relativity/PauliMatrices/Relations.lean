@@ -6,7 +6,7 @@ Authors: Joseph Tooby-Smith
 import PhysLean.Relativity.PauliMatrices.Basic
 /-!
 
-## Contractiong of indices of Pauli matrix.
+## Contraction of indices of Pauli matrix.
 
 The main result of this file is `pauliMatrix_contract_pauliMatrix` which states that
 `η_{μν} σ^{μ α dot β} σ^{ν α' dot β'} = 2 ε^{αα'} ε^{dot β dot β'}`.
@@ -46,7 +46,8 @@ lemma pauliCo_contr_pauliContr :
     simp only [Nat.reduceAdd, Nat.succ_eq_add_one, Fin.isValue, Fin.succAbove_zero,
       Function.comp_apply, cons_val_zero, cons_val_one, head_cons, ofRat_basis_repr_apply]
     rw [← PhysLean.RatComplexNum.toComplexNum.map_mul]
-    erw [PhysLean.RatComplexNum.ofNat_mul_toComplexNum 2]
+    change (2 : ℕ) * _
+    rw [PhysLean.RatComplexNum.ofNat_mul_toComplexNum 2]
   rw [contrT_basis_repr_apply]
   conv_lhs =>
     enter [2, x]
