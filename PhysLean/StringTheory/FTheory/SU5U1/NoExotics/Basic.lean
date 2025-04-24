@@ -15,6 +15,10 @@ https://arxiv.org/pdf/1401.5084
 - Condition (27) and (28) for no exotics in the spectrum.
 - Condition (29) for the three lepton doublets with exactly one pair of Higges.
 
+## References
+
+see also: https://arxiv.org/pdf/1011.2212
+
 -/
 namespace FTheory
 
@@ -72,11 +76,60 @@ def ThreeLeptonDoublets : Prop :=
 
 instance : Decidable 𝓜.ThreeLeptonDoublets := decEq _ _
 
+/-!
+
+## Condition on Higges
+
+-/
+
+TODO "ASFXG" "Find a better reference and explaination for the conditions related to these Higges."
+
+/-- The quanta of a bar-5 representation corresponds to an up-type higgs if it has zero
+  chirality flux and negative one hypercharge.
+
+Ref: This is used in arXiv:1507.05961 with no explanation.
+  It is also referenced in arXiv:1011.2212.
+-/
+def IsUpHiggs (a : QuantaBarFive I) : Prop :=
+  a.M = 0 ∧ a.N = -1
+
+instance : DecidablePred (IsUpHiggs (I := I)) := fun _ => instDecidableAnd
+
+/--
+The quanta of a bar-5 representation corresponds to an down-type higgs if it has zero
+  chirality flux and positive on hypercharge.
+
+Ref: This is used in arXiv:1507.05961 with no explanation.
+  It is also referenced in arXiv:1011.2212.
+-/
+def IsDownHiggs (a : QuantaBarFive I) : Prop :=
+  a.M = 0 ∧ a.N = 1
+
+instance : DecidablePred (IsDownHiggs (I := I)) := fun _ => instDecidableAnd
+
+
+/--
+The condition on the matter content for there to be exactly one
+5-bar representation corresponding to `IsUpHiggs` and one corresponding to `IsDownHiggs`.
+-/
+def HasExclusiveHigges : Prop :=
+  𝓜.quantaBarFive.countP IsUpHiggs = 1
+  ∧ 𝓜.quantaBarFive.countP IsDownHiggs = 1
+
+instance : Decidable 𝓜.HasExclusiveHigges := instDecidableAnd
+
+/-!
+
+## Combined conditions
+
+-/
+
 /-- The condition on the matter content for it to produce a valid spectrum. -/
 def ValidMatterSpectrum : Prop :=
   𝓜.ThreeChiralFamiles ∧
   𝓜.NoExotics ∧
-  𝓜.ThreeLeptonDoublets
+  𝓜.ThreeLeptonDoublets ∧
+  𝓜.HasExclusiveHigges
 
 instance : Decidable 𝓜.ValidMatterSpectrum := instDecidableAnd
 
