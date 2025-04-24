@@ -78,9 +78,7 @@ lemma sol_eq (IC : InitialConditions) :
 
 /-- For zero initial conditions, the solution is zero. -/
 lemma sol_zeroIC : S.sol zeroIC = fun _ => 0 := by
-  rw [sol_eq]
-  funext t
-  simp
+  simp [sol_eq]
 
 /-- Given initial conditions, the amplitude of the classical harmonic oscillator. -/
 noncomputable def amplitude (IC : InitialConditions) : ℝ :=
@@ -92,8 +90,7 @@ lemma amplitude_eq (IC : InitialConditions) :
 /-- The amplitude of the classical harmonic oscillator is non-negative. -/
 @[simp]
 lemma amplitude_nonneg (IC : InitialConditions) : 0 ≤ S.amplitude IC := by
-  rw [amplitude_eq]
-  exact sqrt_nonneg _
+  simp [amplitude_eq]
 
 open Complex in
 lemma amplitude_eq_norm (IC : InitialConditions) :
@@ -101,64 +98,47 @@ lemma amplitude_eq_norm (IC : InitialConditions) :
   rw [amplitude_eq]
   trans √(IC.x₀ ^ 2 + (- IC.v₀ / S.ω) ^ 2)
   · ring_nf
-  · rw[← Complex.norm_add_mul_I]
-    simp
+  · simp [← Complex.norm_add_mul_I]
 
 lemma amplitude_sq (IC : InitialConditions) :
     S.amplitude IC ^ 2 = IC.x₀ ^ 2 + (IC.v₀ / S.ω) ^ 2 := by
-  rw [amplitude_eq, sq_sqrt]
-  apply add_nonneg
-  · exact sq_nonneg IC.x₀
-  · exact sq_nonneg (IC.v₀ / S.ω)
+  simp [amplitude_eq, sq_nonneg, add_nonneg]
 
 @[simp]
 lemma amplitude_zeroIC : S.amplitude zeroIC = 0 := by
-  rw [amplitude_eq]
-  simp
+  simp [amplitude_eq]
 
 /-- The amplitude is zero if and only if the inital conditions are zero. -/
 lemma amplitude_eq_zero_iff_IC_eq_zeroIC (IC : InitialConditions) :
     S.amplitude IC = 0 ↔ IC = zeroIC := by
   rw [amplitude_eq]
-  apply Iff.intro
-  · intro h
-    rw [← Complex.norm_add_mul_I, norm_eq_zero] at h
-    rw [← Complex.mk_eq_add_mul_I, Complex.ext_iff] at h
+  apply Iff.intro <;> intro h
+  · rw [← Complex.norm_add_mul_I, norm_eq_zero, ← Complex.mk_eq_add_mul_I, Complex.ext_iff] at h
     simp only [Complex.zero_re, Complex.zero_im, div_eq_zero_iff, ω_neq_zero, or_false] at h
-    ext <;> simp [h]
-  · intro h
-    subst h
-    simp
+    exact InitialConditions.ext_iff.mpr h
+  · aesop
 
 /-- Given initial conditions, the phase of the classical harmonic oscillator. -/
 noncomputable def phase (IC : InitialConditions) : ℝ :=
   (polarCoord (IC.x₀, - IC.v₀/S.ω)).2
 
 lemma phase_le_pi (IC : InitialConditions) : (S.phase IC) ≤ π := by
-  rw [phase, polarCoord]
-  simp only [Complex.equivRealProd_symm_apply, ne_eq, PartialHomeomorph.mk_coe, Complex.ofReal_div,
-    Complex.ofReal_neg]
-  exact Complex.arg_le_pi (↑IC.x₀ + -↑IC.v₀ / ↑S.ω * Complex.I)
+  simp [phase, Complex.arg_le_pi]
 
 lemma neg_pi_lt_phase (IC : InitialConditions) : -π < S.phase IC := by
-  rw [phase, polarCoord]
-  simp only [Complex.equivRealProd_symm_apply, ne_eq, PartialHomeomorph.mk_coe, Complex.ofReal_div]
-  exact Complex.neg_pi_lt_arg (↑IC.x₀ + ↑(-IC.v₀) / ↑S.ω * Complex.I)
+  simp [phase, Complex.neg_pi_lt_arg]
 
 @[simp]
 lemma phase_zeroIC : S.phase zeroIC = 0 := by
-  rw [phase, polarCoord]
-  simp
+  simp [phase]
 
 lemma amplitude_mul_cos_phase (IC : InitialConditions) :
     S.amplitude IC * cos (S.phase IC) = IC.x₀ := by
-  rw [phase, amplitude_eq_norm]
-  simp
+  simp [phase, amplitude_eq_norm]
 
 lemma amplitude_mul_sin_phase (IC : InitialConditions) :
     S.amplitude IC * sin (S.phase IC) = - IC.v₀ / S.ω := by
-  rw [phase, amplitude_eq_norm]
-  simp
+  simp [phase, amplitude_eq_norm]
 
 lemma sol_eq_amplitude_mul_cos_phase (IC : InitialConditions) :
     S.sol IC = fun t => S.amplitude IC * cos (S.ω * t + S.phase IC) := by
@@ -166,9 +146,7 @@ lemma sol_eq_amplitude_mul_cos_phase (IC : InitialConditions) :
   rw [cos_add]
   trans (S.amplitude IC * cos (S.phase IC)) * cos (S.ω * t) -
     (S.amplitude IC * sin (S.phase IC)) * sin (S.ω * t)
-  · rw [amplitude_mul_cos_phase, amplitude_mul_sin_phase]
-    rw [sol]
-    field_simp
+  · rw [amplitude_mul_cos_phase, amplitude_mul_sin_phase, sol]
     ring
   · ring
 
@@ -176,14 +154,10 @@ lemma sol_eq_amplitude_mul_cos_phase (IC : InitialConditions) :
   amplitude. -/
 lemma abs_sol_le_amplitude (IC : InitialConditions) (t : ℝ) :
     abs (S.sol IC t) ≤ S.amplitude IC := by
-  rw [sol_eq_amplitude_mul_cos_phase]
-  simp only
-  rw [abs_mul]
-  rw [abs_of_nonneg (S.amplitude_nonneg IC)]
-  have h1 : abs (cos (S.ω * t + S.phase IC)) ≤ 1 := abs_cos_le_one (S.ω * t + S.phase IC)
+  rw [sol_eq_amplitude_mul_cos_phase, abs_mul, abs_of_nonneg (S.amplitude_nonneg IC)]
+  have h1 : abs (cos (S.ω * t + S.phase IC)) ≤ 1 := abs_cos_le_one ..
   trans S.amplitude IC * 1
-  · exact mul_le_mul_of_nonneg (Preorder.le_refl (S.amplitude IC)) h1
-      (amplitude_nonneg S IC) (zero_le_one' ℝ)
+  · exact mul_le_mul_of_nonneg (Preorder.le_refl ..) h1 (amplitude_nonneg ..) (zero_le_one' ..)
   · simp
 
 /-- For a set of initial conditions `IC` the position of the solution at time `0` is
@@ -212,16 +186,14 @@ lemma sol_velocity_amplitude_phase (IC : InitialConditions) : deriv (S.sol IC) =
   funext t
   rw [sol_eq_amplitude_mul_cos_phase]
   simp only [differentiableAt_const, deriv_const_mul_field']
-  rw [deriv_cos (by fun_prop)]
-  simp only [deriv_add_const', neg_mul, mul_neg]
-  rw [deriv_mul (by fun_prop) (by fun_prop)]
+  rw [deriv_cos (by fun_prop), deriv_add_const', neg_mul, mul_neg,
+    deriv_mul (by fun_prop) (by fun_prop)]
   field_simp
   ring
 
 @[simp]
 lemma sol_velocity_t_zero (IC : InitialConditions) : deriv (S.sol IC) 0 = IC.v₀ := by
-  rw [sol_velocity]
-  simp
+  simp [sol_velocity]
 
 lemma sol_potentialEnergy (IC : InitialConditions) : S.potentialEnergy (S.sol IC) =
     fun t => 1/2 * (S.k * IC.x₀ ^ 2 + S.m * IC.v₀ ^2) * cos (S.ω * t + S.phase IC) ^ 2 := by
@@ -267,8 +239,7 @@ lemma sol_energy (IC : InitialConditions) : S.energy (S.sol IC) =
 lemma sol_lagrangian (IC : InitialConditions) : S.lagrangian (S.sol IC) =
     fun t => - 1/2 * (S.m * IC.v₀ ^2 + S.k * IC.x₀ ^ 2) * cos (2 * (S.ω * t + S.phase IC)) := by
   funext t
-  rw [lagrangian, sol_kineticEnergy, sol_potentialEnergy]
-  rw [Real.cos_two_mul']
+  rw [lagrangian, sol_kineticEnergy, sol_potentialEnergy, Real.cos_two_mul']
   ring
 
 open MeasureTheory in
