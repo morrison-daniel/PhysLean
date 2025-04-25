@@ -76,7 +76,8 @@ theorem fderiv_uncurry'' (f : X → Y → Z) (hf : Differentiable 𝕜 (↿f)) :
   intro dxy
   rw [fderiv_uncurry_sum]
   rw [fderiv_uncurry, fderiv_uncurry']
-  simp
+  simp only [ContinuousLinearMap.add_apply, ContinuousLinearMap.coe_comp',
+    ContinuousLinearMap.coe_fst', Function.comp_apply, ContinuousLinearMap.coe_snd']
   fun_prop
   fun_prop
 
