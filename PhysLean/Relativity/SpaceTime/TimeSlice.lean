@@ -64,22 +64,22 @@ variable {k : Type} [NontriviallyNormedField k]
     [NormedAddCommGroup N] [NormedSpace k N]
     [NormedAddCommGroup W] [NormedSpace k W]
 
-private lemma fderiv_uncurry (f : N → W → M) (y : N × W) (w : W)
-    (h : DifferentiableAt k (Function.uncurry f) y) :
-    fderiv k (Function.uncurry f) y (0, w) =
+lemma fderiv_uncurry (f : N → W → M) (y : N × W) (w : W)
+    (h : DifferentiableAt k (↿f) y) :
+    fderiv k (↿f) y (0, w) =
     fderiv k (fun x => f y.1 x) y.2 w := by
   rw [show (fun x => f y.1 x) =
-    (Function.uncurry f) ∘ (fun x => (y.1, x)) by {ext w; rfl}]
+    (↿f) ∘ (fun x => (y.1, x)) by {ext w; rfl}]
   rw [fderiv_comp _ (by fun_prop) (by fun_prop)]
   rw [(hasFDerivAt_prodMk_right (𝕜 := k) y.1 y.2).fderiv]
   rfl
 
-private lemma fderiv_uncurry' (f : N → W → M) (y : N × W) (n : N)
-    (h : DifferentiableAt k (Function.uncurry f) y) :
-    fderiv k (Function.uncurry f) y (n, 0) =
+lemma fderiv_uncurry' (f : N → W → M) (y : N × W) (n : N)
+    (h : DifferentiableAt k (↿f) y) :
+    fderiv k (↿f) y (n, 0) =
     fderiv k (fun x => f x y.2) y.1 n := by
   rw [show (fun x => f x y.2) =
-    (Function.uncurry f) ∘ (fun x => (x, y.2)) by {ext w; rfl}]
+    (↿f) ∘ (fun x => (x, y.2)) by {ext w; rfl}]
   rw [fderiv_comp _ (by fun_prop) (by fun_prop)]
   rw [(hasFDerivAt_prodMk_left (𝕜 := k) y.1 y.2).fderiv]
   rfl
@@ -87,25 +87,23 @@ private lemma fderiv_uncurry' (f : N → W → M) (y : N × W) (n : N)
 private lemma fderiv_curry (f : N × W → M) (n : N) (w : W)
     (h : DifferentiableAt k f (n, w)) (dw : W) :
     fderiv k (Function.curry f n) w dw = fderiv k (f) (n, w) (0, dw) := by
-  have h1 : f = Function.uncurry (Function.curry f) := by
+  have h1 : f = ↿(Function.curry f) := by
     ext x
-    simp
+    rfl
   conv_rhs =>
     rw [h1]
   rw [fderiv_uncurry]
-  rw [Function.uncurry_curry]
   exact h
 
 private lemma fderiv_curry' (f : N × W → M) (n : N) (w : W)
     (h : DifferentiableAt k f (n, w)) (dn : N) :
     fderiv k (fun n => Function.curry f n w) n dn = fderiv k f (n, w) (dn, 0) := by
-  have h1 : f = Function.uncurry (Function.curry f) := by
+  have h1 : f = ↿(Function.curry f) := by
     ext x
-    simp
+    rfl
   conv_rhs =>
     rw [h1]
   rw [fderiv_uncurry']
-  rw [Function.uncurry_curry]
   exact h
 
 /-- The derivative on space commutes with time-slicing. -/
