@@ -109,8 +109,8 @@ lemma ContDiff.two_fderiv_differentiable (f : X → Y → Z) (hf : ContDiff 𝕜
 lemma fderiv_uncurry_comp_fst (f : X → Y → Z) (x' : X) (y : Y) (hf : Differentiable 𝕜 (↿f)) :
     fderiv 𝕜 (fun y' => (↿f) (x', y')) y
     =
-    (fderiv 𝕜 (↿f) ((Prod.mk x' ·) y)).comp (fderiv 𝕜 (Prod.mk x' ·) y) := by
-  have hl (x' : X) : (fun y' => (↿f) (x', y')) = ↿f ∘ (Prod.mk x' ·) := by
+    (fderiv 𝕜 (↿f) ((x', ·) y)).comp (fderiv 𝕜 (x', ·) y) := by
+  have hl (x' : X) : (fun y' => (↿f) (x', y')) = ↿f ∘ (x', ·) := by
     rfl
   rw [hl]
   rw [fderiv_comp]
@@ -120,8 +120,8 @@ lemma fderiv_uncurry_comp_fst (f : X → Y → Z) (x' : X) (y : Y) (hf : Differe
 lemma fderiv_uncurry_comp_snd (f : X → Y → Z) (y' : Y) (hf : Differentiable 𝕜 (↿f)) :
     fderiv 𝕜 (fun x' => (↿f) (x', y'))
     =
-    fun x => (fderiv 𝕜 (↿f) ((Prod.mk · y') x)).comp (fderiv 𝕜 (Prod.mk · y') x) := by
-  have hl (y' : Y) : (fun x' => (↿f) (x', y')) = ↿f ∘ (Prod.mk · y') := by
+    fun x => (fderiv 𝕜 (↿f) ((·, y') x)).comp (fderiv 𝕜 (·, y') x) := by
+  have hl (y' : Y) : (fun x' => (↿f) (x', y')) = ↿f ∘ (·, y') := by
     rfl
   rw [hl]
   funext x
@@ -130,11 +130,11 @@ lemma fderiv_uncurry_comp_snd (f : X → Y → Z) (y' : Y) (hf : Differentiable 
   · fun_prop
 
 lemma fderiv_inr_fst_clm (x : X) (y : Y) :
-    (fderiv 𝕜 (Prod.mk x ·) y) = ContinuousLinearMap.inr 𝕜 X Y := by
+    (fderiv 𝕜 (x, ·) y) = ContinuousLinearMap.inr 𝕜 X Y := by
   rw [(hasFDerivAt_prodMk_right x y).fderiv]
 
 lemma fderiv_inl_snd_clm (x : X) (y : Y) :
-    (fderiv 𝕜 (Prod.mk · y) x) = ContinuousLinearMap.inl 𝕜 X Y := by
+    (fderiv 𝕜 (·, y) x) = ContinuousLinearMap.inl 𝕜 X Y := by
   rw [(hasFDerivAt_prodMk_left x y).fderiv]
 
 /- Differentiablity conditions. -/
