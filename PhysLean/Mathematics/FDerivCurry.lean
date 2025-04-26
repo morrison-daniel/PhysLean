@@ -43,7 +43,7 @@ lemma fderiv_curry_fst (f : X × Y → Z) (x : X) (y : Y)
   conv_rhs =>
     rw [h1]
   rw [fderiv_uncurry]
-  simp
+  simp only [Function.curry_apply, map_zero, add_zero]
   exact h
 
 lemma fderiv_curry_snd (f : X × Y → Z) (x : X) (y : Y)
@@ -70,7 +70,8 @@ lemma fderiv_uncurry_clm_comp (f : X → Y → Z) (hf : Differentiable 𝕜 (↿
   apply ContinuousLinearMap.ext
   intro dxy
   rw [fderiv_uncurry]
-  simp
+  simp only [ContinuousLinearMap.add_apply, ContinuousLinearMap.coe_comp',
+    ContinuousLinearMap.coe_fst', Function.comp_apply, ContinuousLinearMap.coe_snd']
   fun_prop
 
 lemma fderiv_wrt_prod_clm_comp (f : X × Y → Z) (hf : Differentiable 𝕜 f) :
@@ -215,9 +216,13 @@ lemma fderiv_swap [IsRCLikeNormedField 𝕜] (f : X → Y → Z) (x dx : X) (y d
     · simp
   have h := IsSymmSndFDerivAt.eq hf' (dx,0) (0,dy)
   rw [fderiv_wrt_prod_clm_comp, fderiv_wrt_prod_clm_comp] at h
-  simp at h
+  simp only [ContinuousLinearMap.add_apply, ContinuousLinearMap.coe_comp',
+    ContinuousLinearMap.coe_fst', Function.comp_apply, ContinuousLinearMap.coe_snd', map_zero,
+    add_zero, zero_add] at h
   rw [fderiv_curry_clm_apply, fderiv_curry_clm_apply] at h
-  simp at h
+  simp only [ContinuousLinearMap.add_apply, ContinuousLinearMap.coe_comp',
+    ContinuousLinearMap.coe_fst', Function.comp_apply, map_zero, ContinuousLinearMap.coe_snd',
+    zero_add, add_zero] at h
   exact h
   /- Start of differentiablity conditions. -/
   · refine Differentiable.add ?_ ?_
