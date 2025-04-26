@@ -20,7 +20,7 @@ variable {𝕜 : Type} [NontriviallyNormedField 𝕜]
     [NormedAddCommGroup Z] [NormedSpace 𝕜 Z]
 
 theorem fderiv_uncurry (f : X → Y → Z) (xy dxy : X × Y)
-    (hf : Differentiable 𝕜 (↿f)) :
+    (hf : DifferentiableAt 𝕜 (↿f) xy) :
     fderiv 𝕜 ↿f xy dxy
     =
     fderiv 𝕜 (f · xy.2) xy.1 dxy.1 + fderiv 𝕜 (f xy.1 ·) xy.2 dxy.2 := by
@@ -35,7 +35,7 @@ theorem fderiv_uncurry (f : X → Y → Z) (xy dxy : X × Y)
   simp
 
 lemma fderiv_curry_fst (f : X × Y → Z) (x : X) (y : Y)
-    (h : Differentiable 𝕜 f) (dx : X) :
+    (h : DifferentiableAt 𝕜 f (x,y)) (dx : X) :
     fderiv 𝕜 (fun x' => Function.curry f x' y) x dx = fderiv 𝕜 f (x,y) (dx, 0) := by
   have h1 : f = ↿(Function.curry f) := by
     ext x
@@ -47,7 +47,7 @@ lemma fderiv_curry_fst (f : X × Y → Z) (x : X) (y : Y)
   exact h
 
 lemma fderiv_curry_snd (f : X × Y → Z) (x : X) (y : Y)
-    (h : Differentiable 𝕜 f) (dy : Y) :
+    (h : DifferentiableAt 𝕜 f (x,y)) (dy : Y) :
     fderiv 𝕜 (Function.curry f x) y dy = fderiv 𝕜 (f) (x,y) (0, dy) := by
   have h1 : f = ↿(Function.curry f) := by
     ext x
@@ -93,11 +93,11 @@ TODO "AZ2QN" "Replace following helper lemmas with fun_prop after
     #24056 in Mathlib has gone through."
 
 /-- Helper lemmas showing differentiability from ContDiff 𝕜 2 ↿f. -/
-lemma ContDiff2.differentiable (f : X → Y → Z) (hf : ContDiff 𝕜 2 ↿f) :
+lemma ContDiff.two_differentiable (f : X → Y → Z) (hf : ContDiff 𝕜 2 ↿f) :
     Differentiable 𝕜 (↿f) :=
   ContDiff.differentiable hf (by simp)
 
-lemma ContDiff2.fderiv_differentiable (f : X → Y → Z) (hf : ContDiff 𝕜 2 ↿f) :
+lemma ContDiff.two_fderiv_differentiable (f : X → Y → Z) (hf : ContDiff 𝕜 2 ↿f) :
     Differentiable 𝕜 (fderiv 𝕜 (↿f)) := by
   change ContDiff 𝕜 (1 + 1) ↿f at hf
   rw [contDiff_succ_iff_fderiv] at hf
@@ -105,100 +105,91 @@ lemma ContDiff2.fderiv_differentiable (f : X → Y → Z) (hf : ContDiff 𝕜 2 
   apply ContDiff.differentiable hd2
   rfl
 
-def inclX (y' : Y) : X → X × Y := fun x' => (x', y')
-def inclY (x' : X) : Y → X × Y := fun y' => (x', y')
-
 /- Helper rw lemmas for proving differentiablity conditions. -/
 lemma fderiv_uncurry_comp_fst (f : X → Y → Z) (x' : X) (y : Y) (hf : Differentiable 𝕜 (↿f)) :
     fderiv 𝕜 (fun y' => (↿f) (x', y')) y
     =
-    (fderiv 𝕜 (↿f) (inclY x' y)).comp (fderiv 𝕜 (inclY x') y) := by
-  have hl (x' : X) : (fun y' => (↿f) (x', y')) = ↿f ∘ inclY x' := by
+    (fderiv 𝕜 (↿f) ((Prod.mk x' ·) y)).comp (fderiv 𝕜 (Prod.mk x' ·) y) := by
+  have hl (x' : X) : (fun y' => (↿f) (x', y')) = ↿f ∘ (Prod.mk x' ·) := by
     rfl
   rw [hl]
   rw [fderiv_comp]
   · fun_prop
-  · fun_prop [inclY]
+  · fun_prop
 
 lemma fderiv_uncurry_comp_snd (f : X → Y → Z) (y' : Y) (hf : Differentiable 𝕜 (↿f)) :
     fderiv 𝕜 (fun x' => (↿f) (x', y'))
     =
-    fun x => (fderiv 𝕜 (↿f) (inclX y' x)).comp (fderiv 𝕜 (inclX y') x) := by
-  have hl (y' : Y) : (fun x' => (↿f) (x', y')) = ↿f ∘ inclX y' := by
+    fun x => (fderiv 𝕜 (↿f) ((Prod.mk · y') x)).comp (fderiv 𝕜 (Prod.mk · y') x) := by
+  have hl (y' : Y) : (fun x' => (↿f) (x', y')) = ↿f ∘ (Prod.mk · y') := by
     rfl
   rw [hl]
   funext x
   rw [fderiv_comp]
   · fun_prop
-  · fun_prop [inclX]
+  · fun_prop
 
 lemma fderiv_inr_fst_clm (x : X) (y : Y) :
-    (fderiv 𝕜 (inclY x) y) = ContinuousLinearMap.inr 𝕜 X Y := by
-  unfold inclY
+    (fderiv 𝕜 (Prod.mk x ·) y) = ContinuousLinearMap.inr 𝕜 X Y := by
   rw [(hasFDerivAt_prodMk_right x y).fderiv]
 
 lemma fderiv_inl_snd_clm (x : X) (y : Y) :
-    (fderiv 𝕜 (inclX y) x) = ContinuousLinearMap.inl 𝕜 X Y := by
-  unfold inclX
+    (fderiv 𝕜 (Prod.mk · y) x) = ContinuousLinearMap.inl 𝕜 X Y := by
   rw [(hasFDerivAt_prodMk_left x y).fderiv]
 
 /- Differentiablity conditions. -/
-lemma fderiv_uncurry_differentiable_x (f : X → Y → Z) (y : Y) (hf : ContDiff 𝕜 2 ↿f) :
+lemma fderiv_uncurry_differentiable_fst (f : X → Y → Z) (y : Y) (hf : ContDiff 𝕜 2 ↿f) :
     Differentiable 𝕜 (fderiv 𝕜 fun x' => (↿f) (x', y)) := by
   conv_rhs =>
     ext x
-    rw [fderiv_uncurry_comp_snd (hf := ContDiff2.differentiable f hf)]
+    rw [fderiv_uncurry_comp_snd (hf := hf.two_differentiable)]
   apply Differentiable.clm_comp
   · apply Differentiable.comp
-    · apply ContDiff2.fderiv_differentiable
-      exact hf
-    · fun_prop [inclX]
+    · exact hf.two_fderiv_differentiable
+    · fun_prop
   · conv_rhs =>
       enter [x]
       rw [fderiv_inl_snd_clm]
     fun_prop
 
-lemma fderiv_uncurry_differentiable_y (f : X → Y → Z) (x : X) (hf : ContDiff 𝕜 2 ↿f) :
+lemma fderiv_uncurry_differentiable_snd (f : X → Y → Z) (x : X) (hf : ContDiff 𝕜 2 ↿f) :
     Differentiable 𝕜 (fderiv 𝕜 fun y' => (↿f) (x, y')) := by
   conv_rhs =>
     ext y
-    rw [fderiv_uncurry_comp_fst (hf := ContDiff2.differentiable f hf)]
+    rw [fderiv_uncurry_comp_fst (hf := hf.two_differentiable)]
   apply Differentiable.clm_comp
   · apply Differentiable.comp
-    · apply ContDiff2.fderiv_differentiable
-      exact hf
-    · fun_prop [inclY]
+    · exact hf.two_fderiv_differentiable
+    · fun_prop
   · conv_rhs =>
       enter [y]
       rw [fderiv_inr_fst_clm]
     fun_prop
 
-lemma fderiv_uncurry_differentiable_x_inclX_y (f : X → Y → Z) (x : X) (hf : ContDiff 𝕜 2 ↿f) :
+lemma fderiv_uncurry_differentiable_fst_comp_snd (f : X → Y → Z) (x : X) (hf : ContDiff 𝕜 2 ↿f) :
     Differentiable 𝕜 (fun y' => fderiv 𝕜 (fun x' => (↿f) (x', y')) x) := by
   conv_rhs =>
     enter [y']
-    rw [fderiv_uncurry_comp_snd (hf := ContDiff2.differentiable f hf)]
-  simp [inclX]
+    rw [fderiv_uncurry_comp_snd (hf := hf.two_differentiable)]
+  simp
   apply Differentiable.clm_comp
   · apply Differentiable.comp
-    · apply ContDiff2.fderiv_differentiable
-      exact hf
+    · exact hf.two_fderiv_differentiable
     · fun_prop
   · conv_rhs =>
       enter [y]
       rw [fderiv_inl_snd_clm]
     fun_prop
 
-lemma fderiv_uncurry_differentiable_y_inclY_x (f : X → Y → Z) (y : Y) (hf : ContDiff 𝕜 2 ↿f) :
+lemma fderiv_uncurry_differentiable_snd_comp_fst (f : X → Y → Z) (y : Y) (hf : ContDiff 𝕜 2 ↿f) :
     Differentiable 𝕜 (fun x' => fderiv 𝕜 (fun y' => (↿f) (x', y')) y) := by
   conv_rhs =>
     enter [x']
-    rw [fderiv_uncurry_comp_fst (hf := ContDiff2.differentiable f hf)]
+    rw [fderiv_uncurry_comp_fst (hf := hf.two_differentiable)]
   apply Differentiable.clm_comp
   · apply Differentiable.comp
-    · apply ContDiff2.fderiv_differentiable
-      exact hf
-    · fun_prop [inclY]
+    · exact hf.two_fderiv_differentiable
+    · fun_prop
   · conv_rhs =>
       enter [x]
       rw [fderiv_inr_fst_clm]
@@ -227,23 +218,21 @@ lemma fderiv_swap [IsRCLikeNormedField 𝕜] (f : X → Y → Z) (x dx : X) (y d
   /- Start of differentiablity conditions. -/
   · refine Differentiable.add ?_ ?_
     · refine Differentiable.clm_comp ?_ ?_
-      · apply fderiv_uncurry_differentiable_x_inclX_y
+      · apply fderiv_uncurry_differentiable_fst_comp_snd
         exact hf
       · fun_prop
     · refine Differentiable.clm_comp ?_ ?_
-      · apply fderiv_uncurry_differentiable_y
+      · apply fderiv_uncurry_differentiable_snd
         exact hf
       · fun_prop
   · refine Differentiable.add ?_ ?_
     · refine Differentiable.clm_comp ?_ ?_
-      · apply fderiv_uncurry_differentiable_x
+      · apply fderiv_uncurry_differentiable_fst
         exact hf
       · fun_prop
     · refine Differentiable.clm_comp ?_ ?_
-      · apply fderiv_uncurry_differentiable_y_inclY_x
+      · apply fderiv_uncurry_differentiable_snd_comp_fst
         exact hf
       · fun_prop
-  · apply ContDiff2.differentiable
-    exact hf
-  · apply ContDiff2.fderiv_differentiable
-    exact hf
+  · exact hf.two_differentiable
+  · exact hf.two_fderiv_differentiable
