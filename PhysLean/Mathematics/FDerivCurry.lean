@@ -171,7 +171,7 @@ lemma fderiv_uncurry_differentiable_fst_comp_snd (f : X → Y → Z) (x : X) (hf
   conv_rhs =>
     enter [y']
     rw [fderiv_uncurry_comp_snd (hf := hf.two_differentiable)]
-  simp
+  simp only
   apply Differentiable.clm_comp
   · apply Differentiable.comp
     · exact hf.two_fderiv_differentiable
