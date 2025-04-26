@@ -79,7 +79,7 @@ lemma timeSlice_spatial_deriv {M : Type}
     simp [Space.deriv]
   simp only [realLorentzTensor.C_eq_color, Nat.succ_eq_add_one, Nat.reduceAdd,
     ContinuousLinearEquiv.apply_symm_apply]
-  rw [fderiv_curry]
+  rw [fderiv_curry_snd]
   · simp [basis]
   · fun_prop
 
@@ -104,7 +104,7 @@ lemma timeSlice_time_deriv {M : Type}
       Equiv.coe_fn_mk, Function.comp_apply]
   simp only [realLorentzTensor.C_eq_color, Nat.succ_eq_add_one, Nat.reduceAdd,
     ContinuousLinearEquiv.apply_symm_apply]
-  rw [fderiv_curry']
+  rw [fderiv_curry_fst]
   fun_prop
 
 end SpaceTime
