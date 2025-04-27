@@ -27,7 +27,7 @@ open minkowskiMatrix
 
 /-- The restricted Lorentz group comprises the proper and orthochronous elements of the
 Lorentz group. -/
-def Restricted (d : ℕ) : Subgroup (LorentzGroup d) where
+def restricted (d : ℕ) : Subgroup (LorentzGroup d) where
   carrier := { Λ : LorentzGroup d | IsProper Λ ∧ IsOrthochronous Λ }
   one_mem' := ⟨
     by rw [IsProper]; exact det_one,
@@ -47,5 +47,22 @@ def Restricted (d : ℕ) : Subgroup (LorentzGroup d) where
     exact ⟨
       by rw [IsProper, inv_eq_dual, det_dual, Λ_proper],
       by rw [IsOrthochronous, inv_eq_dual, h_dual]; exact Λ_ortho⟩
+
+/-- The restricted Lorentz group is a normal subgroup of the Lorentz group. -/
+lemma restricted_normal_subgroup {d : ℕ} : (restricted d).Normal := by
+  have h_proper {Λ P : LorentzGroup d} (hP : IsProper P) : IsProper (Λ * P * Λ⁻¹) := by
+    simp only [IsProper, lorentzGroupIsGroup_mul_coe, det_mul]
+    rw [hP, mul_one, ← det_mul, coe_inv, mul_inv_of_invertible, det_one]
+  have h_ortho {Λ O : LorentzGroup d} (hO : IsOrthochronous O) : IsOrthochronous (Λ * O * Λ⁻¹) := by
+    by_cases hΛ : IsOrthochronous Λ
+    · exact mul_othchron_of_othchron_othchron
+        (mul_othchron_of_othchron_othchron hΛ hO)
+        (IsOrthochronous.iff_inv_isOrthochronous.mp hΛ)
+    · exact mul_othchron_of_not_othchron_not_othchron
+        (mul_not_othchron_of_not_othchron_othchron hΛ hO)
+        (IsOrthochronous.iff_inv_isOrthochronous.not.mp hΛ)
+  constructor
+  rintro R ⟨R_proper, R_ortho⟩ Λ
+  exact ⟨h_proper R_proper, h_ortho R_ortho⟩
 
 end LorentzGroup

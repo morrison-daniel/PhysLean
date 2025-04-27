@@ -169,7 +169,7 @@ lemma mul_not_othchron_of_not_othchron_othchron {Λ Λ' : LorentzGroup d} (h : �
   rw [IsOrthochronous_iff_futurePointing] at h h'
   exact NormOne.FuturePointing.metric_reflect_not_mem_mem h h'
 
-/-- The homomorphism from `LorentzGroup` to `ℤ₂` whose kernel are the Orthochronous elements. -/
+/-- The homomorphism from `LorentzGroup` to `ℤ₂`. -/
 def orthchroRep : LorentzGroup d →* ℤ₂ where
   toFun := orthchroMap
   map_one' := orthchroMap_IsOrthochronous (by simp [IsOrthochronous])
@@ -189,6 +189,35 @@ def orthchroRep : LorentzGroup d →* ℤ₂ where
     · rw [orthchroMap_not_IsOrthochronous h, orthchroMap_not_IsOrthochronous h',
         orthchroMap_IsOrthochronous (mul_othchron_of_not_othchron_not_othchron h h')]
       rfl
+
+/-- The orthochronous Lorentz transformations form the kernel of the homomorphism from
+  `LorentzGroup` to `ℤ₂`. -/
+lemma IsOrthochronous.iff_in_orthchroRep_ker : IsOrthochronous Λ ↔ Λ ∈ orthchroRep.ker := by
+  constructor
+  · exact orthchroMap_IsOrthochronous
+  · intro h
+    contrapose! h
+    apply orthchroMap_not_IsOrthochronous at h
+    change orthchroRep Λ = _ at h
+    rw [MonoidHom.mem_ker, h]
+    trivial
+
+/-- The homomorphism from `LorentzGroup` to `ℤ₂` assigns the same value to any Lorentz
+  transformation and its inverse. -/
+lemma orthchroRep_inv_eq_self (Λ : LorentzGroup d) : orthchroRep Λ = orthchroRep Λ⁻¹ := by
+  by_cases h_orth : IsOrthochronous Λ
+  · have hΛ_1 : orthchroRep Λ = (1 : ℤ₂) := by exact orthchroMap_IsOrthochronous h_orth
+    rw [map_inv orthchroRep Λ, hΛ_1]
+    rfl
+  · have hΛ_0 : orthchroRep Λ = (1 : ZMod 2) := by exact orthchroMap_not_IsOrthochronous h_orth
+    rw [map_inv orthchroRep Λ, hΛ_0]
+    rfl
+
+/-- A Lorentz transformation is orthochronous iff its inverse is orthochronous. -/
+lemma IsOrthochronous.iff_inv_isOrthochronous {Λ : LorentzGroup d} :
+    IsOrthochronous Λ ↔ IsOrthochronous Λ⁻¹ := by
+  rw [IsOrthochronous.iff_in_orthchroRep_ker, IsOrthochronous.iff_in_orthchroRep_ker,
+    MonoidHom.mem_ker, MonoidHom.mem_ker, orthchroRep_inv_eq_self]
 
 end LorentzGroup
 
