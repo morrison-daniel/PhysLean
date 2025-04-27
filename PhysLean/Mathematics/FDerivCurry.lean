@@ -167,7 +167,7 @@ lemma fderiv_inl_snd_clm (x : X) (y : Y) :
 /- Differentiablity conditions. -/
 lemma function_differentiableAt_fst (f : X → Y → Z) (x : X) (y : Y) (hf : Differentiable 𝕜 (↿f)) :
     DifferentiableAt 𝕜 (fun x' => f x' y) x := by
-  have hl : (fun x' => f x' y) = ↿f ∘ (· , y) := by
+  have hl : (fun x' => f x' y) = ↿f ∘ (·, y) := by
     funext x'
     rfl
   rw [hl]
@@ -178,7 +178,7 @@ lemma function_differentiableAt_fst (f : X → Y → Z) (x : X) (y : Y) (hf : Di
 
 lemma function_differentiableAt_snd (f : X → Y → Z) (x : X) (y : Y) (hf : Differentiable 𝕜 (↿f)) :
     DifferentiableAt 𝕜 (fun y' => f x y') y := by
-  have hl : (fun y' => f x y') = ↿f ∘ (x , ·) := by
+  have hl : (fun y' => f x y') = ↿f ∘ (x, ·) := by
     funext y'
     rfl
   rw [hl]

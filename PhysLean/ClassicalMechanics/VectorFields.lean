@@ -104,7 +104,7 @@ lemma differentiableAt_fderiv_coord_single
       · exact hf
     have hdd : Differentiable ℝ (↿ftt) := hd.two_differentiable
     have h1 (t : Time) : fderiv ℝ (fun x => ftt t x) x
-      = fderiv ℝ (↿ftt) (t, x) ∘L (ContinuousLinearMap.inr ℝ Time Space):= by
+      = fderiv ℝ (↿ftt) (t, x) ∘L (ContinuousLinearMap.inr ℝ Time Space) := by
       ext w
       simp only [ContinuousLinearMap.coe_comp', Function.comp_apply, ContinuousLinearMap.inr_apply]
       rw [fderiv_uncurry]
@@ -116,7 +116,7 @@ lemma differentiableAt_fderiv_coord_single
       rw [h1]
     refine Differentiable.clm_comp ?_ ?_
     · have hn (t : Time) : fderiv ℝ (↿ftt) (t, x)=
-        fderiv ℝ (↿ftt) ((t , · ) x) := rfl
+        fderiv ℝ (↿ftt) ((t, ·) x) := rfl
       conv =>
         enter [2, y]
         rw [hn]
