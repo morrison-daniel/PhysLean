@@ -139,7 +139,7 @@ lemma fderiv_curry_comp_fst (f : X → Y → Z) (x dx : X) (y : Y)
     rfl
   rw [hl]
   rw [fderiv_comp]
-  simp
+  simp only [ContinuousLinearMap.coe_comp', Function.comp_apply]
   · fun_prop
   · fun_prop
 
@@ -152,7 +152,7 @@ lemma fderiv_curry_comp_snd (f : X → Y → Z) (x : X) (y dy : Y)
     rfl
   rw [hl]
   rw [fderiv_comp]
-  simp
+  simp only [ContinuousLinearMap.coe_comp', Function.comp_apply]
   · fun_prop
   · fun_prop
 

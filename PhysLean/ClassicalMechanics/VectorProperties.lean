@@ -46,9 +46,11 @@ lemma fderiv_swap_time_space_coord
     fderiv ℝ (fun x' => fderiv ℝ (fun t' => f t' x' i) t dt) x dx := by
   have h' := fderiv_swap (𝕜 := ℝ) f t dt x dx
   change (fderiv ℝ
-      (fun t' => (fderiv ℝ ((EuclideanSpace.proj i) ∘ (fun x' => f t' x')) x) dx) t) dt = _
+      (fun t' => (fderiv ℝ ((EuclideanSpace.proj i) ∘
+      (fun x' => f t' x')) x) dx) t) dt = _
   trans (fderiv ℝ
-      (fun t' => ((fderiv ℝ (⇑(EuclideanSpace.proj i)) (f t' x)).comp (fderiv ℝ (fun x' => f t' x') x)) dx) t) dt
+      (fun t' => ((fderiv ℝ (⇑(EuclideanSpace.proj i)) (f t' x)).comp
+      (fderiv ℝ (fun x' => f t' x') x)) dx) t) dt
   · congr
     funext t'
     rw [fderiv_comp]
@@ -62,9 +64,11 @@ lemma fderiv_swap_time_space_coord
     Function.comp_apply]
   rw [h']
   change _ =
-    (fderiv ℝ (fun x' => (fderiv ℝ ((EuclideanSpace.proj i) ∘ (fun t' => f t' x')) t) dt) x) dx
+      (fderiv ℝ (fun x' => (fderiv ℝ ((EuclideanSpace.proj i) ∘
+      (fun t' => f t' x')) t) dt) x) dx
   trans (fderiv ℝ
-      (fun x' => ((fderiv ℝ (⇑(EuclideanSpace.proj i)) (f t x')).comp (fderiv ℝ (fun t' => f t' x') t)) dt) x) dx
+      (fun x' => ((fderiv ℝ (⇑(EuclideanSpace.proj i)) (f t x')).comp
+      (fderiv ℝ (fun t' => f t' x') t)) dt) x) dx
   swap
   · congr
     funext x'
@@ -75,7 +79,8 @@ lemma fderiv_swap_time_space_coord
   simp only [ContinuousLinearMap.fderiv, ContinuousLinearMap.coe_comp',
     Function.comp_apply]
   rw [fderiv_comp']
-  simp
+  simp only [PiLp.proj_apply, ContinuousLinearMap.fderiv,
+    ContinuousLinearMap.coe_comp', Function.comp_apply]
   /- Start of differentiablity conditions. -/
   · fun_prop
   · apply fderiv_curry_differentiableAt_fst_comp_snd
@@ -90,7 +95,7 @@ lemma differentiable_fderiv_coord_single
     DifferentiableAt ℝ (fun t =>
     (fderiv ℝ (fun x => ft t x u) x) (EuclideanSpace.single v 1)) t := by
   apply Differentiable.clm_apply
-  . let ftt : Time → Space → ℝ := fun t x => ft t x u
+  · let ftt : Time → Space → ℝ := fun t x => ft t x u
     have hd : ContDiff ℝ 2 (↿ftt) := by
       change ContDiff ℝ 2 (fun x => (↿ft) x u)
       change ContDiff ℝ 2 ((EuclideanSpace.proj u) ∘ (↿ft))
@@ -101,9 +106,9 @@ lemma differentiable_fderiv_coord_single
     have h1 (t : Time) : fderiv ℝ (fun x => ftt t x) x
       = fderiv ℝ (↿ftt) (t, x) ∘L (ContinuousLinearMap.inr ℝ Time Space):= by
       ext w
-      simp
+      simp only [ContinuousLinearMap.coe_comp', Function.comp_apply, ContinuousLinearMap.inr_apply]
       rw [fderiv_uncurry]
-      simp
+      simp only [fderiv_eq_smul_deriv, smul_eq_mul, zero_mul, zero_add]
       fun_prop
     conv =>
       enter [2, y]
@@ -122,12 +127,13 @@ lemma differentiable_fderiv_coord_single
   · fun_prop
 
 /-- Curl and time derivative commute. -/
-lemma time_deriv_curl_commute (fₜ : Time → Space → EuclideanSpace ℝ (Fin 3)) (t : Time) (x : Space) (hf : ContDiff ℝ 2 ↿fₜ) :
+lemma time_deriv_curl_commute (fₜ : Time → Space → EuclideanSpace ℝ (Fin 3))
+    (t : Time) (x : Space) (hf : ContDiff ℝ 2 ↿fₜ) :
     ∂ₜ (fun t => (∇ × fₜ t) x) t = (∇ × fun x => (∂ₜ (fun t => fₜ t x) t)) x:= by
   funext i
   unfold Time.deriv
   rw [fderiv_pi]
-  . change (fderiv ℝ (fun t => curl (fₜ t) x i) t) 1 = _
+  · change (fderiv ℝ (fun t => curl (fₜ t) x i) t) 1 = _
     unfold curl Space.deriv Space.coord Space.basis
     fin_cases i <;>
     · simp [-fderiv_eq_smul_deriv]
