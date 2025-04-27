@@ -5,6 +5,7 @@ import PhysLean.ClassicalMechanics.Momentum.Basic
 import PhysLean.ClassicalMechanics.Space.Basic
 import PhysLean.ClassicalMechanics.Space.VectorIdentities
 import PhysLean.ClassicalMechanics.Time.Basic
+import PhysLean.ClassicalMechanics.VectorFields
 import PhysLean.CondensedMatter.Basic
 import PhysLean.Cosmology.Basic
 import PhysLean.Cosmology.FLRW.Basic

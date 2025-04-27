@@ -19,7 +19,7 @@ variable {𝕜 : Type} [NontriviallyNormedField 𝕜]
     [NormedAddCommGroup Y] [NormedSpace 𝕜 Y]
     [NormedAddCommGroup Z] [NormedSpace 𝕜 Z]
 
-theorem fderiv_uncurry (f : X → Y → Z) (xy dxy : X × Y)
+lemma fderiv_uncurry (f : X → Y → Z) (xy dxy : X × Y)
     (hf : DifferentiableAt 𝕜 (↿f) xy) :
     fderiv 𝕜 ↿f xy dxy
     =
@@ -106,26 +106,53 @@ lemma ContDiff.two_fderiv_differentiable (f : X → Y → Z) (hf : ContDiff 𝕜
   rfl
 
 /- Helper rw lemmas for proving differentiablity conditions. -/
-lemma fderiv_uncurry_comp_fst (f : X → Y → Z) (x' : X) (y : Y) (hf : Differentiable 𝕜 (↿f)) :
-    fderiv 𝕜 (fun y' => (↿f) (x', y')) y
+lemma fderiv_uncurry_comp_fst (f : X → Y → Z) (y : Y) (hf : Differentiable 𝕜 (↿f)) :
+    fderiv 𝕜 (fun x' => (↿f) (x', y))
     =
-    (fderiv 𝕜 (↿f) ((x', ·) y)).comp (fderiv 𝕜 (x', ·) y) := by
-  have hl (x' : X) : (fun y' => (↿f) (x', y')) = ↿f ∘ (x', ·) := by
-    rfl
-  rw [hl]
-  rw [fderiv_comp]
-  · fun_prop
-  · fun_prop
-
-lemma fderiv_uncurry_comp_snd (f : X → Y → Z) (y' : Y) (hf : Differentiable 𝕜 (↿f)) :
-    fderiv 𝕜 (fun x' => (↿f) (x', y'))
-    =
-    fun x => (fderiv 𝕜 (↿f) ((·, y') x)).comp (fderiv 𝕜 (·, y') x) := by
-  have hl (y' : Y) : (fun x' => (↿f) (x', y')) = ↿f ∘ (·, y') := by
+    fun x => (fderiv 𝕜 (↿f) ((·, y) x)).comp (fderiv 𝕜 (·, y) x) := by
+  have hl (y : Y) : (fun x' => (↿f) (x', y)) = ↿f ∘ (·, y) := by
     rfl
   rw [hl]
   funext x
   rw [fderiv_comp]
+  · fun_prop
+  · fun_prop
+
+lemma fderiv_uncurry_comp_snd (f : X → Y → Z) (x : X) (hf : Differentiable 𝕜 (↿f)) :
+    fderiv 𝕜 (fun y' => (↿f) (x, y'))
+    =
+    fun y => (fderiv 𝕜 (↿f) ((x, ·) y)).comp (fderiv 𝕜 (x, ·) y) := by
+  have hl (x : X) : (fun y' => (↿f) (x, y')) = ↿f ∘ (x, ·) := by
+    rfl
+  rw [hl]
+  funext y
+  rw [fderiv_comp]
+  · fun_prop
+  · fun_prop
+
+lemma fderiv_curry_comp_fst (f : X → Y → Z) (x dx : X) (y : Y)
+    (hf : Differentiable 𝕜 (↿f)) :
+    (fderiv 𝕜 (fun x' => f x' y) x) dx
+    =
+    (fderiv 𝕜 (↿f) ((·, y) x)) ((fderiv 𝕜 (·, y) x) dx) := by
+  have hl (y : Y) : (fun x' => f x' y) = ↿f ∘ (·, y) := by
+    rfl
+  rw [hl]
+  rw [fderiv_comp]
+  simp only [ContinuousLinearMap.coe_comp', Function.comp_apply]
+  · fun_prop
+  · fun_prop
+
+lemma fderiv_curry_comp_snd (f : X → Y → Z) (x : X) (y dy : Y)
+    (hf : Differentiable 𝕜 (↿f)) :
+    (fderiv 𝕜 (fun y' => f x y') y) dy
+    =
+    (fderiv 𝕜 (↿f) ((x, ·) y)) ((fderiv 𝕜 (x, ·) y) dy) := by
+  have hl (x : X) : (fun y' => f x y') = ↿f ∘ (x, ·) := by
+    rfl
+  rw [hl]
+  rw [fderiv_comp]
+  simp only [ContinuousLinearMap.coe_comp', Function.comp_apply]
   · fun_prop
   · fun_prop
 
@@ -138,11 +165,33 @@ lemma fderiv_inl_snd_clm (x : X) (y : Y) :
   rw [(hasFDerivAt_prodMk_left x y).fderiv]
 
 /- Differentiablity conditions. -/
+lemma function_differentiableAt_fst (f : X → Y → Z) (x : X) (y : Y) (hf : Differentiable 𝕜 (↿f)) :
+    DifferentiableAt 𝕜 (fun x' => f x' y) x := by
+  have hl : (fun x' => f x' y) = ↿f ∘ (·, y) := by
+    funext x'
+    rfl
+  rw [hl]
+  apply Differentiable.differentiableAt
+  apply Differentiable.comp
+  · fun_prop
+  · fun_prop
+
+lemma function_differentiableAt_snd (f : X → Y → Z) (x : X) (y : Y) (hf : Differentiable 𝕜 (↿f)) :
+    DifferentiableAt 𝕜 (fun y' => f x y') y := by
+  have hl : (fun y' => f x y') = ↿f ∘ (x, ·) := by
+    funext y'
+    rfl
+  rw [hl]
+  apply Differentiable.differentiableAt
+  apply Differentiable.comp
+  · fun_prop
+  · fun_prop
+
 lemma fderiv_uncurry_differentiable_fst (f : X → Y → Z) (y : Y) (hf : ContDiff 𝕜 2 ↿f) :
     Differentiable 𝕜 (fderiv 𝕜 fun x' => (↿f) (x', y)) := by
   conv_rhs =>
     ext x
-    rw [fderiv_uncurry_comp_snd (hf := hf.two_differentiable)]
+    rw [fderiv_uncurry_comp_fst (hf := hf.two_differentiable)]
   apply Differentiable.clm_comp
   · apply Differentiable.comp
     · exact hf.two_fderiv_differentiable
@@ -156,7 +205,7 @@ lemma fderiv_uncurry_differentiable_snd (f : X → Y → Z) (x : X) (hf : ContDi
     Differentiable 𝕜 (fderiv 𝕜 fun y' => (↿f) (x, y')) := by
   conv_rhs =>
     ext y
-    rw [fderiv_uncurry_comp_fst (hf := hf.two_differentiable)]
+    rw [fderiv_uncurry_comp_snd (hf := hf.two_differentiable)]
   apply Differentiable.clm_comp
   · apply Differentiable.comp
     · exact hf.two_fderiv_differentiable
@@ -170,7 +219,7 @@ lemma fderiv_uncurry_differentiable_fst_comp_snd (f : X → Y → Z) (x : X) (hf
     Differentiable 𝕜 (fun y' => fderiv 𝕜 (fun x' => (↿f) (x', y')) x) := by
   conv_rhs =>
     enter [y']
-    rw [fderiv_uncurry_comp_snd (hf := hf.two_differentiable)]
+    rw [fderiv_uncurry_comp_fst (hf := hf.two_differentiable)]
   apply Differentiable.clm_comp
   · apply Differentiable.comp
     · exact hf.two_fderiv_differentiable
@@ -184,13 +233,47 @@ lemma fderiv_uncurry_differentiable_snd_comp_fst (f : X → Y → Z) (y : Y) (hf
     Differentiable 𝕜 (fun x' => fderiv 𝕜 (fun y' => (↿f) (x', y')) y) := by
   conv_rhs =>
     enter [x']
-    rw [fderiv_uncurry_comp_fst (hf := hf.two_differentiable)]
+    rw [fderiv_uncurry_comp_snd (hf := hf.two_differentiable)]
   apply Differentiable.clm_comp
   · apply Differentiable.comp
     · exact hf.two_fderiv_differentiable
     · fun_prop
   · conv_rhs =>
       enter [x]
+      rw [fderiv_inr_fst_clm]
+    fun_prop
+
+lemma fderiv_curry_differentiableAt_fst_comp_snd (f : X → Y → Z) (x dx : X) (y : Y)
+    (hf : ContDiff 𝕜 2 ↿f) :
+    DifferentiableAt 𝕜 (fun y' => (fderiv 𝕜 (fun x' => f x' y') x) dx) y := by
+  conv_lhs =>
+    enter [x']
+    rw [fderiv_curry_comp_fst (hf := hf.two_differentiable)]
+  refine DifferentiableAt.clm_apply ?_ ?_
+  · simp
+    refine DifferentiableAt.comp y ?_ ?_
+    · apply Differentiable.differentiableAt
+      exact hf.two_fderiv_differentiable
+    · fun_prop
+  · conv_lhs =>
+      enter [x']
+      rw [fderiv_inl_snd_clm]
+    fun_prop
+
+lemma fderiv_curry_differentiableAt_snd_comp_fst (f : X → Y → Z) (x : X) (y dy : Y)
+    (hf : ContDiff 𝕜 2 ↿f) :
+    DifferentiableAt 𝕜 (fun x' => (fderiv 𝕜 (fun y' => f x' y') y) dy) x := by
+  conv_lhs =>
+    enter [x']
+    rw [fderiv_curry_comp_snd (hf := hf.two_differentiable)]
+  refine DifferentiableAt.clm_apply ?_ ?_
+  · simp
+    refine DifferentiableAt.comp x ?_ ?_
+    · apply Differentiable.differentiableAt
+      exact hf.two_fderiv_differentiable
+    · fun_prop
+  · conv_lhs =>
+      enter [x']
       rw [fderiv_inr_fst_clm]
     fun_prop
 
