@@ -10,7 +10,7 @@ import Mathlib.Tactic.FunProp.Differentiable
 /-!
 # Classical vector calculus properties
 
-Vector calculus properties under classical spacetime derivatives.
+Vector calculus properties under classical space and time derivatives.
 
 -/
 namespace ClassicalMechanics
@@ -90,7 +90,7 @@ lemma fderiv_swap_time_space_coord
   · apply fderiv_curry_differentiableAt_snd_comp_fst
     exact hf
 
-lemma differentiable_fderiv_coord_single
+lemma differentiableAt_fderiv_coord_single
     (ft : Time → Space → EuclideanSpace ℝ (Fin 3)) (hf : ContDiff ℝ 2 ↿ft) :
     DifferentiableAt ℝ (fun t =>
     (fderiv ℝ (fun x => ft t x u) x) (EuclideanSpace.single v 1)) t := by
@@ -136,7 +136,9 @@ lemma time_deriv_curl_commute (fₜ : Time → Space → EuclideanSpace ℝ (Fin
   · change (fderiv ℝ (fun t => curl (fₜ t) x i) t) 1 = _
     unfold curl Space.deriv Space.coord Space.basis
     fin_cases i <;>
-    · simp [-fderiv_eq_smul_deriv]
+    · simp only [Fin.zero_eta, Fin.isValue, EuclideanSpace.basisFun_apply, PiLp.inner_apply,
+      EuclideanSpace.single_apply, RCLike.inner_apply, conj_trivial, ite_mul, one_mul, zero_mul,
+      Finset.sum_ite_eq', Finset.mem_univ, ↓reduceIte]
       rw [fderiv_sub]
       rw [dt_distrib]
       rw [fderiv_swap_time_space_coord, fderiv_swap_time_space_coord]
@@ -144,13 +146,15 @@ lemma time_deriv_curl_commute (fₜ : Time → Space → EuclideanSpace ℝ (Fin
       repeat exact hf.two_differentiable
       repeat exact hf
       repeat
-        apply differentiable_fderiv_coord_single
+        apply differentiableAt_fderiv_coord_single
         exact hf
   · intro i
     unfold curl Space.deriv Space.coord Space.basis
     fin_cases i <;>
-    · simp
+    · simp only [Fin.isValue, EuclideanSpace.basisFun_apply, PiLp.inner_apply,
+      EuclideanSpace.single_apply, RCLike.inner_apply, conj_trivial, ite_mul, one_mul, zero_mul,
+      Finset.sum_ite_eq', Finset.mem_univ, ↓reduceIte]
       apply DifferentiableAt.sub
       repeat
-        apply differentiable_fderiv_coord_single
+        apply differentiableAt_fderiv_coord_single
         exact hf
