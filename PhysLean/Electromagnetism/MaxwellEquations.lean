@@ -12,13 +12,13 @@ import PhysLean.Electromagnetism.Basic
 
 namespace Electromagnetism
 
-/-- An electromagnetic system consists of charge density, a current density,
-  the speed of light and the electric permittivity. -/
+/-- An electromagnetic system consists of the electric permittivity
+  and the magnetic permeability. -/
 structure EMSystem where
-  /-- The speed of light. -/
-  c : ℝ
   /-- The permittivity. -/
   ε₀ : ℝ
+  /-- The permeability. -/
+  μ₀ : ℝ
 
 TODO "6V2UZ" "Charge density and current density should be generalized to signed measures,
   in such a way
@@ -36,8 +36,8 @@ namespace EMSystem
 variable (𝓔 : EMSystem)
 open SpaceTime
 
-/-- The permeability. -/
-noncomputable def μ₀ : ℝ := 1/(𝓔.c^2 * 𝓔.ε₀)
+/-- The speed of light. -/
+noncomputable def c : ℝ := 1/(√(𝓔.μ₀ * 𝓔.ε₀))
 
 /-- Coulomb's constant. -/
 noncomputable def coulombConstant : ℝ := 1/(4 * Real.pi * 𝓔.ε₀)
