@@ -17,7 +17,7 @@ PhysLean.Electromagnetism.MaxwellEquations.
 
 namespace Electromagnetism
 
-namespace HomogeneousEM
+namespace Homogeneous
 /-- Optical Medium has scalar electric permittivity as a function of space. -/
 structure OpticalMedium extends EMSystem where
   /-- The electric permittivity of the material. -/
@@ -87,14 +87,14 @@ def OpticalMedium.free (OM : OpticalMedium) : ChargedMedium where
   ρ := fun _ _ => 0
   J := fun _ _ => 0
 
-variable (FS : OpticalMedium)
+variable (OM : OpticalMedium)
 
-local notation "ε₀" => FS.free.ε₀
-local notation "μ₀" => FS.free.μ₀
+local notation "ε₀" => OM.free.ε₀
+local notation "μ₀" => OM.free.μ₀
 
 /-- Maxwell's equations for free space. -/
 theorem GaussLawElectricFree (E : ElectricField)
-    (h : GaussLawElectricHomogeneous FS.free E) :
+    (h : GaussLawElectricHomogeneous OM.free E) :
     ε₀ * (∇ ⬝ E t) x = 0 := by
   rw [h]
   rfl
@@ -105,7 +105,7 @@ theorem GaussLawMagneticFree (B : MagneticField)
   rw [h]
 
 theorem AmpereLawFree (E : ElectricField) (B : MagneticField)
-    (h : AmpereLawHomogeneous FS.free E B) :
+    (h : AmpereLawHomogeneous OM.free E B) :
     (∇ × B t) x = μ₀ • ε₀ • ∂ₜ (fun t => E t x) t := by
   rw [h]
   simp only [smul_add, add_eq_right, smul_eq_zero]
