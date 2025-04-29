@@ -8,52 +8,31 @@ import PhysLean.Electromagnetism.Basic
 
 # Maxwell's equations
 
+Note that currently OpticalMedium is assumed to be isotropic.
+
 -/
 
 namespace Electromagnetism
 
-/-- An electromagnetic system consists of the electric permittivity
+
+/-- An optcial medium consists of the electric permittivity
   and the magnetic permeability. -/
-structure EMSystem where
+structure OpticalMedium where
   /-- The permittivity. -/
-  ε₀ : ℝ
+  ε : Space → ℝ
   /-- The permeability. -/
-  μ₀ : ℝ
+  μ : Space → ℝ
 
-TODO "6V2UZ" "Charge density and current density should be generalized to signed measures,
-  in such a way
-  that they are still easy to work with and can be integrated with with tensor notation.
-  See here:
-  https://leanprover.zulipchat.com/#narrow/channel/479953-PhysLean/topic/Maxwell's.20Equations"
-
-/-- The charge density. -/
-abbrev ChargeDensity := Time → Space → ℝ
-
-/-- Current density. -/
-abbrev CurrentDensity := Time → Space → EuclideanSpace ℝ (Fin 3)
-
-namespace EMSystem
-variable (𝓔 : EMSystem)
+variable (𝓔 : OpticalMedium) (ρ : ChargeDensity) (J : CurrentDensity)
 open SpaceTime
 
-/-- The speed of light. -/
-noncomputable def c : ℝ := 1/(√(𝓔.μ₀ * 𝓔.ε₀))
-
-/-- Coulomb's constant. -/
-noncomputable def coulombConstant : ℝ := 1/(4 * Real.pi * 𝓔.ε₀)
-
-end EMSystem
-
-variable (𝓔 : EMSystem) (ρ : ChargeDensity) (J : CurrentDensity)
-open SpaceTime
-
-local notation "ε₀" => 𝓔.ε₀
-local notation "μ₀" => 𝓔.μ₀
+local notation "ε" => 𝓔.ε
+local notation "μ" => 𝓔.μ
 open Time
 
 /-- Gauss's law for the Electric field. -/
 def GaussLawElectric (E : ElectricField) : Prop :=
-  ∀ t : Time, ∀ x : Space, ε₀ * (∇ ⬝ E t) x = ρ t x
+  ∀ t : Time, ∀ x : Space, ε x * (∇ ⬝ E t) x = ρ t x
 
 /-- Gauss's law for the Magnetic field. -/
 def GaussLawMagnetic (B : MagneticField) : Prop :=
@@ -61,7 +40,7 @@ def GaussLawMagnetic (B : MagneticField) : Prop :=
 
 /-- Ampère's law. -/
 def AmpereLaw (E : ElectricField) (B : MagneticField) : Prop :=
-  ∀ t : Time, ∀ x : Space, (∇ × B t) x = μ₀ • (J t x + ε₀ • ∂ₜ (fun t => E t x) t)
+  ∀ t : Time, ∀ x : Space, (∇ × B t) x = μ x • (J t x + ε x • ∂ₜ (fun t => E t x) t)
 
 /-- Faraday's law. -/
 def FaradayLaw (E : ElectricField) (B : MagneticField) : Prop :=
