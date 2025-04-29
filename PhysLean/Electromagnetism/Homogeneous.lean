@@ -88,6 +88,6 @@ theorem ChargedMedium.faradayLaw_of_free (E : ElectricField) (B : MagneticField)
     (∇ × E t) x = - ∂ₜ (fun t => B t x) t := by
   rw [h]
 
-def OpticalMedium.isFree (E : ElectricField) (B : MagneticField) : Prop :=
+def IsFree (OM : OpticalMedium) (E : ElectricField) (B : MagneticField) : Prop :=
     OM.free.GaussLawElectric E ∧ OM.free.GaussLawMagnetic B ∧
     OM.free.AmpereLaw E B ∧ OM.free.FaradayLaw E B
