@@ -8,13 +8,15 @@ import PhysLean.Electromagnetism.Basic
 
 # Maxwell's equations
 
-Note that currently OpticalMedium is assumed to be isotropic.
+Note that currently the equations are defined for isotropic and homogeneous domains.
 
 -/
 
 namespace Electromagnetism
 
-/-- An optcial medium consists of the electric permittivity
+/-- An optcial medium refers to an isotropic medium
+  (which may or may not be free space)
+  which consists of the electric permittivity
   and the magnetic permeability. -/
 structure OpticalMedium where
   /-- The permittivity. -/
