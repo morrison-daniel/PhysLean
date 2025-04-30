@@ -13,6 +13,7 @@ import PhysLean.Cosmology.FLRW.Basic
 import PhysLean.Electromagnetism.Basic
 import PhysLean.Electromagnetism.FieldStrength.Basic
 import PhysLean.Electromagnetism.FieldStrength.Derivative
+import PhysLean.Electromagnetism.Homogeneous
 import PhysLean.Electromagnetism.LorentzAction
 import PhysLean.Electromagnetism.MaxwellEquations
 import PhysLean.Mathematics.FDerivCurry
