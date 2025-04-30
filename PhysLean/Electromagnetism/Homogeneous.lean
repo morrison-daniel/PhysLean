@@ -34,7 +34,7 @@ abbrev ChargedMedium.GaussLawElectric (E : ElectricField) : Prop :=
   Electromagnetism.GaussLawElectric CM.toOpticalMedium CM.ρ E
 
 /-- Gauss's law for the Magnetic field in homogeneous medium. -/
-abbrev ChargedMedium.GaussLawMagnetic (CM : ChargedMedium)
+abbrev ChargedMedium.GaussLawMagnetic
     (B : MagneticField) : Prop :=
   Electromagnetism.GaussLawMagnetic B
 
@@ -44,7 +44,7 @@ abbrev ChargedMedium.AmpereLaw (CM : ChargedMedium)
   Electromagnetism.AmpereLaw CM.toOpticalMedium CM.J E B
 
 /-- Faraday's law in homogeneous medium. -/
-abbrev ChargedMedium.FaradayLaw (CM : ChargedMedium)
+abbrev ChargedMedium.FaradayLaw
     (E : ElectricField) (B : MagneticField) : Prop :=
   Electromagnetism.FaradayLaw E B
 
@@ -60,34 +60,42 @@ def OpticalMedium.free (OM : OpticalMedium) : ChargedMedium where
 
 variable (OM : OpticalMedium)
 
-local notation "ε" => OM.free.ε
-local notation "μ" => OM.free.μ
+local notation "ε" => OM.ε
+local notation "μ" => OM.μ
 
-/-- Maxwell's equations for free space. -/
-theorem ChargedMedium.gaussLawElectric_of_free (E : ElectricField)
-    (h : OM.free.GaussLawElectric E) :
-    ε x * (∇ ⬝ E t) x = 0 := by
-  rw [h]
-  rfl
+/-- An optical medium which is charge and current free. -/
+def IsFree (OM : OpticalMedium)
+    (E : ElectricField) (B : MagneticField) : Prop :=
+    OM.free.ρ = 0 ∧ OM.free.J = 0 ∧
+    MaxwellEquations OM OM.free.ρ OM.free.J E B
 
-theorem ChargedMedium.gaussLawMagnetic_of_free (B : MagneticField)
-    (h : OM.free.GaussLawMagnetic B) :
+/-- Maxwell's equations for charge and current free medium. -/
+theorem OpticalMedium.gaussLawElectric_of_free (E : ElectricField) (B : MagneticField)
+    (h : IsFree OM E B) :
+    ε * (∇ ⬝ E t) x = 0 := by
+  have h' := h.2.2.1
+  unfold GaussLawElectric at h'
+  rw [h.1] at h'
+  simp_all
+
+theorem OpticalMedium.gaussLawMagnetic_of_isfree (E : ElectricField) (B : MagneticField)
+    (h : IsFree OM E B) :
     (∇ ⬝ B t) x = 0 := by
-  rw [h]
+  have h' := h.2.2.2.1
+  unfold GaussLawMagnetic at h'
+  rw [h']
 
-theorem ChargedMedium.ampereLaw_of_free (E : ElectricField) (B : MagneticField)
-    (h : OM.free.AmpereLaw E B) :
-    (∇ × B t) x = μ x • ε x • ∂ₜ (fun t => E t x) t := by
-  rw [h]
-  simp only [smul_add, add_eq_right, smul_eq_zero]
-  right
-  rfl
+theorem OpticalMedium.ampereLaw_of_isfree (E : ElectricField) (B : MagneticField)
+    (h : IsFree OM E B) :
+    (∇ × B t) x = μ • ε • ∂ₜ (fun t => E t x) t := by
+  have h' := h.2.2.2.2.1
+  unfold AmpereLaw at h'
+  rw [h.2.1] at h'
+  simp_all
 
-theorem ChargedMedium.faradayLaw_of_free (E : ElectricField) (B : MagneticField)
-    (h : OM.free.FaradayLaw E B) :
+theorem OpticalMedium.faradayLaw_of_isfree (E : ElectricField) (B : MagneticField)
+    (h : IsFree OM E B) :
     (∇ × E t) x = - ∂ₜ (fun t => B t x) t := by
-  rw [h]
-
-def IsFree (OM : OpticalMedium) (E : ElectricField) (B : MagneticField) : Prop :=
-    OM.free.GaussLawElectric E ∧ OM.free.GaussLawMagnetic B ∧
-    OM.free.AmpereLaw E B ∧ OM.free.FaradayLaw E B
+  have h' := h.2.2.2.2.2
+  unfold FaradayLaw at h'
+  rw [h']

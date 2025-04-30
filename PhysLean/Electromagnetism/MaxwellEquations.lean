@@ -19,9 +19,9 @@ namespace Electromagnetism
   and the magnetic permeability. -/
 structure OpticalMedium where
   /-- The permittivity. -/
-  ε : Space → ℝ
+  ε : ℝ
   /-- The permeability. -/
-  μ : Space → ℝ
+  μ : ℝ
 
 variable (𝓔 : OpticalMedium) (ρ : ChargeDensity) (J : CurrentDensity)
 open SpaceTime
@@ -32,7 +32,7 @@ open Time
 
 /-- Gauss's law for the Electric field. -/
 def GaussLawElectric (E : ElectricField) : Prop :=
-  ∀ t : Time, ∀ x : Space, ε x * (∇ ⬝ E t) x = ρ t x
+  ∀ t : Time, ∀ x : Space, ε * (∇ ⬝ E t) x = ρ t x
 
 /-- Gauss's law for the Magnetic field. -/
 def GaussLawMagnetic (B : MagneticField) : Prop :=
@@ -40,7 +40,7 @@ def GaussLawMagnetic (B : MagneticField) : Prop :=
 
 /-- Ampère's law. -/
 def AmpereLaw (E : ElectricField) (B : MagneticField) : Prop :=
-  ∀ t : Time, ∀ x : Space, (∇ × B t) x = μ x • (J t x + ε x • ∂ₜ (fun t => E t x) t)
+  ∀ t : Time, ∀ x : Space, (∇ × B t) x = μ • (J t x + ε • ∂ₜ (fun t => E t x) t)
 
 /-- Faraday's law. -/
 def FaradayLaw (E : ElectricField) (B : MagneticField) : Prop :=
@@ -49,7 +49,7 @@ def FaradayLaw (E : ElectricField) (B : MagneticField) : Prop :=
 /-- Maxwell's equations. -/
 def MaxwellEquations (E : ElectricField) (B : MagneticField) : Prop :=
   GaussLawElectric 𝓔 ρ E ∧ GaussLawMagnetic B ∧
-  FaradayLaw E B ∧ AmpereLaw 𝓔 J E B
+  AmpereLaw 𝓔 J E B ∧ FaradayLaw E B
 
 TODO "6V2VD" "Show that if the charge density is spherically symmetric,
   then the electric field is also spherically symmetric."
