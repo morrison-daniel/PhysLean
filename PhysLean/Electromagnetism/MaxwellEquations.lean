@@ -14,7 +14,6 @@ Note that currently OpticalMedium is assumed to be isotropic.
 
 namespace Electromagnetism
 
-
 /-- An optcial medium consists of the electric permittivity
   and the magnetic permeability. -/
 structure OpticalMedium where
