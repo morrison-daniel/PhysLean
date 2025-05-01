@@ -14,17 +14,16 @@ import PhysLean.Meta.Informal.SemiFormal
 In arXiv:1507.05961, the authors give a number of phenomenological constraints on
 the matter content of the SU(5) GUT model in F-theory with an additional U(1) symmetry.
 
-Important terms coming from the superpotential are (0912.0853):
+Important terms coming from the superpotential are (0912.0853) :
 `W ⊃ μ 5Hu 5̄Hd + 𝛽ᵢ 5̄Mⁱ5Hu + 𝜆ᵢⱼₖ 5̄Mⁱ 5̄Mʲ 10ᵏ + W¹ᵢⱼₖₗ 10ⁱ 10ʲ 10ᵏ 5̄Mˡ`
 `+ W²ᵢⱼₖ 10ⁱ 10ʲ 10ᵏ 5̄Hd + W³ᵢⱼ 5̄Mⁱ 5̄Mʲ 5Hu 5Hu + W⁴ᵢ 5̄Mⁱ 5̄Hd 5Hu 5Hu`
 
-Important terms coming from the Kahler potential are (0912.0853):
-`K ⊃ K¹ᵢⱼₖ  10ⁱ 10ʲ 5Mᵏ + K²ᵢ 5̄Hu 5̄Hd 10ⁱ`
+Important terms coming from the Kahler potential are (0912.0853) :
+`K ⊃ K¹ᵢⱼₖ 10ⁱ 10ʲ 5Mᵏ + K²ᵢ 5̄Hu 5̄Hd 10ⁱ`
 
 The following terms break R-parity:
 - `β`, `λ`, `W²`, `W⁴`, `K¹`, `K²`
 (These are the interactions with an odd number of matter fields.)
-
 
 The following terms are involved in proton-decay:
 - `W¹`, `W²`, `K¹`, `λ`
@@ -55,6 +54,26 @@ def chargeW1Term (q5 : Multiset I.allowedBarFiveCharges) (q10 : Multiset I.allow
   (Multiset.product q10 (Multiset.product q10 (Multiset.product q10 q5))).map
   (fun x => x.1 + x.2.1 + x.2.2.1 + x.2.2.2)
 
+lemma chargeW1Term_subset_of_subset_ten (q5bar : Multiset I.allowedBarFiveCharges)
+    (q10 q10' : Multiset I.allowedTenCharges)
+    (h : q10 ⊆ q10') :
+    chargeW1Term q5bar q10 ⊆ chargeW1Term q5bar q10' := by
+  rw [chargeW1Term, chargeW1Term]
+  refine Multiset.map_subset_map ?_
+  rw [@Multiset.subset_iff]
+  intro x
+  simp only [Multiset.mem_product, and_imp]
+  aesop
+
+lemma chargeW1Term_single_q10 (q5 : Multiset I.allowedBarFiveCharges)
+    (q10 : Multiset I.allowedTenCharges) (h : 0 ∉ chargeW1Term q5 q10)
+    (a : I.allowedTenCharges) (ha : a ∈ q10) :
+    0 ∉ chargeW1Term q5 {a} := by
+  have h1 : chargeW1Term q5 {a} ⊆ chargeW1Term q5 q10 := by
+    apply chargeW1Term_subset_of_subset_ten
+    exact Multiset.singleton_subset.mpr ha
+  exact fun a => h (h1 a)
+
 /-- The charges of the term `𝛽ᵢ 5̄Mⁱ5Hu`. -/
 def chargeBetaTerm (q5bar : Multiset I.allowedBarFiveCharges) (qHu : I.allowedBarFiveCharges) :
     Multiset ℤ := q5bar.map (fun x => x.1 + (- qHu.1))
@@ -65,11 +84,51 @@ def chargeLambdaTerm (q5bar : Multiset I.allowedBarFiveCharges)
   (Multiset.product q5bar (Multiset.product q5bar q10)).map
   (fun x => x.1 + x.2.1 + x.2.2.1)
 
-/-- The charges of the term `K¹ᵢⱼₖ  10ⁱ 10ʲ 5Mᵏ`. -/
+lemma chargeLambdaTerm_subset_of_subset_ten (q5bar : Multiset I.allowedBarFiveCharges)
+    (q10 q10' : Multiset I.allowedTenCharges)
+    (h : q10 ⊆ q10') :
+    chargeLambdaTerm q5bar q10 ⊆ chargeLambdaTerm q5bar q10' := by
+  rw [chargeLambdaTerm, chargeLambdaTerm]
+  refine Multiset.map_subset_map ?_
+  rw [@Multiset.subset_iff]
+  intro x
+  simp only [Multiset.mem_product, and_imp]
+  aesop
+
+lemma chargeLambdaTerm_single_q10 (q5 : Multiset I.allowedBarFiveCharges)
+    (q10 : Multiset I.allowedTenCharges) (h : 0 ∉ chargeLambdaTerm q5 q10)
+    (a : I.allowedTenCharges) (ha : a ∈ q10) :
+    0 ∉ chargeLambdaTerm q5 {a} := by
+  have h1 : chargeLambdaTerm q5 {a} ⊆ chargeLambdaTerm q5 q10 := by
+    apply chargeLambdaTerm_subset_of_subset_ten
+    exact Multiset.singleton_subset.mpr ha
+  exact fun a => h (h1 a)
+
+/-- The charges of the term `K¹ᵢⱼₖ 10ⁱ 10ʲ 5Mᵏ`. -/
 def chargeK1Term (q5bar : Multiset I.allowedBarFiveCharges)
     (q10 : Multiset I.allowedTenCharges) : Multiset ℤ :=
   (Multiset.product q10 (Multiset.product q10 q5bar)).map
   (fun x => x.1 + x.2.1 + (- x.2.2.1))
+
+lemma chargeK1Term_subset_of_subset_ten (q5bar : Multiset I.allowedBarFiveCharges)
+    (q10 q10' : Multiset I.allowedTenCharges)
+    (h : q10 ⊆ q10') :
+    chargeK1Term q5bar q10 ⊆ chargeK1Term q5bar q10' := by
+  rw [chargeK1Term, chargeK1Term]
+  refine Multiset.map_subset_map ?_
+  rw [@Multiset.subset_iff]
+  intro x
+  simp only [Multiset.mem_product, and_imp]
+  aesop
+
+lemma chargeK1Term_single_q10 (q5 : Multiset I.allowedBarFiveCharges)
+    (q10 : Multiset I.allowedTenCharges) (h : 0 ∉ chargeK1Term q5 q10)
+    (a : I.allowedTenCharges) (ha : a ∈ q10) :
+    0 ∉ chargeK1Term q5 {a} := by
+  have h1 : chargeK1Term q5 {a} ⊆ chargeK1Term q5 q10 := by
+    apply chargeK1Term_subset_of_subset_ten
+    exact Multiset.singleton_subset.mpr ha
+  exact fun a => h (h1 a)
 
 /-- The charges of the term `W⁴ᵢ 5̄Mⁱ 5̄Hd 5Hu 5Hu`. -/
 def chargeW4Term (q5bar : Multiset I.allowedBarFiveCharges)
@@ -104,27 +163,28 @@ variable {I : CodimensionOneConfig} (𝓜 : MatterContent I)
 /-- A string containing the U(1)-charges associated with interaction terms. -/
 def phenoCharges : String :=
   s!"
-Charges associated with terms:
-μ-term (μ 5Hu 5̄Hd): {chargeMuTerm 𝓜.qHu 𝓜.qHd}
-W¹-term (W¹ᵢⱼₖₗ 10ⁱ 10ʲ 10ᵏ 5̄Mˡ): {(chargeW1Term (𝓜.quantaBarFiveMatter.map QuantaBarFive.q)
+Charges associated with terms :
+μ-term (μ 5Hu 5̄Hd) : {chargeMuTerm 𝓜.qHu 𝓜.qHd}
+W¹-term (W¹ᵢⱼₖₗ 10ⁱ 10ʲ 10ᵏ 5̄Mˡ) : {(chargeW1Term (𝓜.quantaBarFiveMatter.map QuantaBarFive.q)
   (𝓜.quantaTen.map QuantaTen.q)).sort (LE.le) }
-𝛽-term (𝛽ᵢ 5̄Mⁱ5Hu): {(chargeBetaTerm (𝓜.quantaBarFiveMatter.map QuantaBarFive.q)
+𝛽-term (𝛽ᵢ 5̄Mⁱ5Hu) : {(chargeBetaTerm (𝓜.quantaBarFiveMatter.map QuantaBarFive.q)
   𝓜.qHu).sort LE.le}
-𝜆-term (𝜆ᵢⱼₖ 5̄Mⁱ 5̄Mʲ 10ᵏ): {(chargeLambdaTerm (𝓜.quantaBarFiveMatter.map QuantaBarFive.q)
+𝜆-term (𝜆ᵢⱼₖ 5̄Mⁱ 5̄Mʲ 10ᵏ) : {(chargeLambdaTerm (𝓜.quantaBarFiveMatter.map QuantaBarFive.q)
   (𝓜.quantaTen.map QuantaTen.q)).sort LE.le}
-K¹-term (K¹ᵢⱼₖ  10ⁱ 10ʲ 5Mᵏ): {(chargeK1Term (𝓜.quantaBarFiveMatter.map QuantaBarFive.q)
+K¹-term (K¹ᵢⱼₖ 10ⁱ 10ʲ 5Mᵏ) : {(chargeK1Term (𝓜.quantaBarFiveMatter.map QuantaBarFive.q)
   (𝓜.quantaTen.map QuantaTen.q)).sort LE.le}
-W⁴-term (W⁴ᵢ 5̄Mⁱ 5̄Hd 5Hu 5Hu): {(chargeW4Term (𝓜.quantaBarFiveMatter.map QuantaBarFive.q)
+W⁴-term (W⁴ᵢ 5̄Mⁱ 5̄Hd 5Hu 5Hu) : {(chargeW4Term (𝓜.quantaBarFiveMatter.map QuantaBarFive.q)
   𝓜.qHd 𝓜.qHu).sort LE.le}
-K²-term (K²ᵢ 5̄Hu 5̄Hd 10ⁱ): {(chargeK2Term (𝓜.quantaTen.map QuantaTen.q) 𝓜.qHu
+K²-term (K²ᵢ 5̄Hu 5̄Hd 10ⁱ) : {(chargeK2Term (𝓜.quantaTen.map QuantaTen.q) 𝓜.qHu
   𝓜.qHd).sort LE.le}
 ...
-W²-term (W²ᵢⱼₖ 10ⁱ 10ʲ 10ᵏ 5̄Hd): {(chargeW2Term (𝓜.quantaTen.map QuantaTen.q) 𝓜.qHd).sort LE.le}
+W²-term (W²ᵢⱼₖ 10ⁱ 10ʲ 10ᵏ 5̄Hd) : {(chargeW2Term (𝓜.quantaTen.map QuantaTen.q) 𝓜.qHd).sort LE.le}
 ...
-Top-Yukawa (λᵗᵢⱼ 10ⁱ 10ʲ 5Hu): {(chargeYukawaTop (𝓜.quantaTen.map QuantaTen.q) 𝓜.qHu).sort LE.le}
-Bottom-Yukawa (λᵇᵢⱼ 10ⁱ 5̄Mʲ 5̄Hd): {(chargeYukawaBottom (𝓜.quantaBarFiveMatter.map QuantaBarFive.q)
+Top-Yukawa (λᵗᵢⱼ 10ⁱ 10ʲ 5Hu) : {(chargeYukawaTop (𝓜.quantaTen.map QuantaTen.q) 𝓜.qHu).sort LE.le}
+Bottom-Yukawa (λᵇᵢⱼ 10ⁱ 5̄Mʲ 5̄Hd) : {(chargeYukawaBottom
+  (𝓜.quantaBarFiveMatter.map QuantaBarFive.q)
   (𝓜.quantaTen.map QuantaTen.q)
-   𝓜.qHd).sort LE.le}
+  𝓜.qHd).sort LE.le}
 "
 
 /-- A proposition which is true when the `μ`-term (`5Hu 5̄Hd`) does not obey the additional
@@ -141,7 +201,7 @@ instance : Decidable 𝓜.MuTermU1Constrained := instDecidableNot
 - `𝜆ᵢⱼₖ 5̄Mⁱ 5̄Mʲ 10ᵏ`
 - `W²ᵢⱼₖ 10ⁱ 10ʲ 10ᵏ 5̄Hd`
 - `W⁴ᵢ 5̄Mⁱ 5̄Hd 5Hu 5Hu`
-- `K¹ᵢⱼₖ  10ⁱ 10ʲ 5Mᵏ`
+- `K¹ᵢⱼₖ 10ⁱ 10ʲ 5Mᵏ`
 - `K²ᵢ 5̄Hu 5̄Hd 10ⁱ`
 -/
 def RParityU1Constrained : Prop :=
@@ -154,7 +214,7 @@ def RParityU1Constrained : Prop :=
   ∧ 0 ∉ chargeW2Term (𝓜.quantaTen.map QuantaTen.q) 𝓜.qHd
   -- `W⁴ᵢ 5̄Mⁱ 5̄Hd 5Hu 5Hu`
   ∧ 0 ∉ chargeW4Term (𝓜.quantaBarFiveMatter.map QuantaBarFive.q) 𝓜.qHd 𝓜.qHu
-  -- `K¹ᵢⱼₖ  10ⁱ 10ʲ 5Mᵏ`
+  -- `K¹ᵢⱼₖ 10ⁱ 10ʲ 5Mᵏ`
   ∧ 0 ∉ chargeK1Term (𝓜.quantaBarFiveMatter.map QuantaBarFive.q)
     (𝓜.quantaTen.map QuantaTen.q)
   -- `K²ᵢ 5̄Hu 5̄Hd 10ⁱ`
@@ -169,7 +229,7 @@ instance : Decidable 𝓜.RParityU1Constrained := instDecidableAnd
 - `W¹ᵢⱼₖₗ 10ⁱ 10ʲ 10ᵏ 5̄Mˡ`
 - `𝜆ᵢⱼₖ 5̄Mⁱ 5̄Mʲ 10ᵏ`
 - `W²ᵢⱼₖ 10ⁱ 10ʲ 10ᵏ 5̄Hd`
-- `K¹ᵢⱼₖ  10ⁱ 10ʲ 5Mᵏ`
+- `K¹ᵢⱼₖ 10ⁱ 10ʲ 5Mᵏ`
 -/
 def ProtonDecayU1Constrained : Prop :=
   -- `W¹ᵢⱼₖₗ 10ⁱ 10ʲ 10ᵏ 5̄Mˡ`
@@ -179,7 +239,7 @@ def ProtonDecayU1Constrained : Prop :=
     (𝓜.quantaTen.map QuantaTen.q)
   -- `W²ᵢⱼₖ 10ⁱ 10ʲ 10ᵏ 5̄Hd`
   ∧ 0 ∉ chargeW2Term (𝓜.quantaTen.map QuantaTen.q) 𝓜.qHd
-  -- `K¹ᵢⱼₖ  10ⁱ 10ʲ 5Mᵏ`
+  -- `K¹ᵢⱼₖ 10ⁱ 10ʲ 5Mᵏ`
   ∧ 0 ∉ chargeK1Term (𝓜.quantaBarFiveMatter.map QuantaBarFive.q)
     (𝓜.quantaTen.map QuantaTen.q)
 
@@ -188,12 +248,11 @@ instance : Decidable 𝓜.ProtonDecayU1Constrained := instDecidableAnd
 /-- The condition on the matter content for there to exist at least one copy of the coupling
 - `λᵗᵢⱼ 10ⁱ 10ʲ 5Hu`
 -/
-def HasATopYukawa  (𝓜 : MatterContent I) : Prop :=
+def HasATopYukawa (𝓜 : MatterContent I) : Prop :=
   0 ∈ chargeYukawaTop (𝓜.quantaTen.map QuantaTen.q) 𝓜.qHu
 
 instance : Decidable 𝓜.HasATopYukawa :=
   Multiset.decidableMem 0 (chargeYukawaTop (Multiset.map QuantaTen.q 𝓜.quantaTen) 𝓜.qHu)
-
 
 /-- The condition on the matter content for there to exist at least one copy of the coupling
 - `λᵇᵢⱼ 10ⁱ 5̄Mʲ 5̄Hd`

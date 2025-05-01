@@ -171,6 +171,14 @@ lemma quantaBarFiveMatter_map_q_noDup :
     (𝓜.quantaBarFiveMatter.map (QuantaBarFive.q)).Nodup :=
   Multiset.dedup_card_eq_card_iff_nodup.mp 𝓜.distinctly_charged_quantaBarFiveMatter.1
 
+lemma quantaBarFiveMatter_map_q_eq_toFinset :
+    𝓜.quantaBarFiveMatter.map (QuantaBarFive.q) =
+      (𝓜.quantaBarFiveMatter.map QuantaBarFive.q).toFinset.1 := by
+  have h1 := 𝓜.quantaBarFiveMatter_map_q_noDup
+  rw [← Multiset.dedup_eq_self] at h1
+  conv_lhs => rw [← h1]
+  rfl
+
 lemma quantaBarFive_map_q_noDup : (𝓜.quantaBarFive.map (QuantaBarFive.q)).Nodup := by
   simp only [quantaBarFive, Int.reduceNeg, Multiset.map_cons, Multiset.nodup_cons,
     Multiset.mem_cons, Multiset.mem_map, Prod.exists, exists_eq_right, not_or, not_exists,
@@ -184,7 +192,7 @@ set_option maxRecDepth 1000 in
 lemma quantaBarFive_map_q_card_le_seven :
     (𝓜.quantaBarFive.map (QuantaBarFive.q)).card ≤ 7 := by
   rw [← Multiset.dedup_card_eq_card_iff_nodup.mpr 𝓜.quantaBarFive_map_q_noDup]
-  have h1 :  (Multiset.map QuantaBarFive.q 𝓜.quantaBarFive).toFinset ∈
+  have h1 : (Multiset.map QuantaBarFive.q 𝓜.quantaBarFive).toFinset ∈
       Finset.powerset (Finset.univ (α := I.allowedBarFiveCharges)) := by
     rw [Finset.mem_powerset]
     exact Finset.subset_univ _
@@ -199,6 +207,17 @@ lemma quantaBarFive_map_q_card_le_seven :
 lemma quantaBarFive_card_le_seven : 𝓜.quantaBarFive.card ≤ 7 := by
   apply le_of_eq_of_le _ 𝓜.quantaBarFive_map_q_card_le_seven
   simp
+
+lemma quantaTen_map_q_nodup :
+    (𝓜.quantaTen.map (QuantaTen.q)).Nodup :=
+  Multiset.dedup_card_eq_card_iff_nodup.mp 𝓜.distinctly_charged_quantaTen
+
+lemma quantaTen_map_q_eq_toFinset :
+    𝓜.quantaTen.map (QuantaTen.q) = (𝓜.quantaTen.map QuantaTen.q).toFinset.1 := by
+  have h1 := 𝓜.quantaTen_map_q_nodup
+  rw [← Multiset.dedup_eq_self] at h1
+  conv_lhs => rw [← h1]
+  rfl
 
 /-!
 
