@@ -16,6 +16,7 @@ import PhysLean.Electromagnetism.FieldStrength.Derivative
 import PhysLean.Electromagnetism.Homogeneous
 import PhysLean.Electromagnetism.LorentzAction
 import PhysLean.Electromagnetism.MaxwellEquations
+import PhysLean.Electromagnetism.Wave
 import PhysLean.Mathematics.FDerivCurry
 import PhysLean.Mathematics.Fin
 import PhysLean.Mathematics.Fin.Involutions
