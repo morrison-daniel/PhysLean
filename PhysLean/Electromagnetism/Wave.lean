@@ -84,7 +84,7 @@ theorem ElectroMagneticWave (E : ElectricField) (B : MagneticField)
       apply differentiable_pi''
       intro i t
       fin_cases i <;>
-      . simp only [Fin.isValue]
+      · simp only [Fin.isValue]
         apply DifferentiableAt.sub
         repeat
           apply differentiableAt_fderiv_coord_single
