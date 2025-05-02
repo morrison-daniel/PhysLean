@@ -74,7 +74,7 @@ theorem OpticalMedium.gaussLawElectric_of_free (E : ElectricField) (B : Magnetic
     (h : OM.FreeMaxwellEquations E B) :
     (∇ ⬝ E t) x = 0 := by
   have h' := h.1
-  unfold GaussLawElectric at h'
+  rw [GaussLawElectric] at h'
   have h'' : OM.ε * div (E t) x = OM.ε * 0 := by
     rw [mul_zero, h']
     rfl
