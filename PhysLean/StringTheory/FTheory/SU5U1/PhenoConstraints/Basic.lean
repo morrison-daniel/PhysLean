@@ -74,6 +74,14 @@ lemma chargeW1Term_single_q10 (q5 : Multiset I.allowedBarFiveCharges)
     exact Multiset.singleton_subset.mpr ha
   exact fun a => h (h1 a)
 
+lemma chargeW1Term_subset_q10 (q5 : Multiset I.allowedBarFiveCharges)
+    (q10 : Multiset I.allowedTenCharges) (h : 0 ∉ chargeW1Term q5 q10)
+    (S : Multiset I.allowedTenCharges) (hS : S ⊆ q10) :
+    0 ∉ chargeW1Term q5 S := by
+  have h1 : chargeW1Term q5 S ⊆ chargeW1Term q5 q10 := by
+    apply chargeW1Term_subset_of_subset_ten
+    exact hS
+  exact fun a => h (h1 a)
 /-- The charges of the term `𝛽ᵢ 5̄Mⁱ5Hu`. -/
 def chargeBetaTerm (q5bar : Multiset I.allowedBarFiveCharges) (qHu : I.allowedBarFiveCharges) :
     Multiset ℤ := q5bar.map (fun x => x.1 + (- qHu.1))
@@ -104,6 +112,15 @@ lemma chargeLambdaTerm_single_q10 (q5 : Multiset I.allowedBarFiveCharges)
     exact Multiset.singleton_subset.mpr ha
   exact fun a => h (h1 a)
 
+lemma chargeLambdaTerm_subset_q10 (q5 : Multiset I.allowedBarFiveCharges)
+    (q10 : Multiset I.allowedTenCharges) (h : 0 ∉ chargeLambdaTerm q5 q10)
+    (S : Multiset I.allowedTenCharges) (hS : S ⊆ q10) :
+    0 ∉ chargeLambdaTerm q5 S := by
+  have h1 : chargeLambdaTerm q5 S ⊆ chargeLambdaTerm q5 q10 := by
+    apply chargeLambdaTerm_subset_of_subset_ten
+    exact hS
+  exact fun a => h (h1 a)
+
 /-- The charges of the term `K¹ᵢⱼₖ 10ⁱ 10ʲ 5Mᵏ`. -/
 def chargeK1Term (q5bar : Multiset I.allowedBarFiveCharges)
     (q10 : Multiset I.allowedTenCharges) : Multiset ℤ :=
@@ -128,6 +145,15 @@ lemma chargeK1Term_single_q10 (q5 : Multiset I.allowedBarFiveCharges)
   have h1 : chargeK1Term q5 {a} ⊆ chargeK1Term q5 q10 := by
     apply chargeK1Term_subset_of_subset_ten
     exact Multiset.singleton_subset.mpr ha
+  exact fun a => h (h1 a)
+
+lemma chargeK1Term_subset_q10 (q5 : Multiset I.allowedBarFiveCharges)
+    (q10 : Multiset I.allowedTenCharges) (h : 0 ∉ chargeK1Term q5 q10)
+    (S : Multiset I.allowedTenCharges) (hS : S ⊆ q10) :
+    0 ∉ chargeK1Term q5 S := by
+  have h1 : chargeK1Term q5 S ⊆ chargeK1Term q5 q10 := by
+    apply chargeK1Term_subset_of_subset_ten
+    exact hS
   exact fun a => h (h1 a)
 
 /-- The charges of the term `W⁴ᵢ 5̄Mⁱ 5̄Hd 5Hu 5Hu`. -/
@@ -263,6 +289,74 @@ def HasABottomYukawa (𝓜 : MatterContent I) : Prop :=
 
 instance : Decidable 𝓜.HasABottomYukawa :=
   Multiset.decidableMem _ _
+
+/-!
+
+## More sophisticated checks
+-/
+
+lemma lambdaTerm_K1Term_W1Term_subset_check {I : CodimensionOneConfig} {n : ℕ} (𝓜 : MatterContent I)
+    (hcard : 𝓜.quantaBarFiveMatter.card = n) (h : 𝓜.ProtonDecayU1Constrained)
+    (S : Multiset (I.allowedTenCharges))
+    (hS : ∀ (F : Finset { x // x ∈ I.allowedBarFiveCharges }), F.card = n →
+      F ⊆ Finset.univ → F.card = n →
+      (0 ∈ chargeW1Term F.val S ∨ 0 ∈ chargeLambdaTerm F.val S) ∨ 0 ∈ chargeK1Term F.val S:= by
+      decide) :
+      ¬ S ⊆ 𝓜.quantaTen.map QuantaTen.q := by
+  intro hn
+  have hL1 := chargeLambdaTerm_subset_q10 (𝓜.quantaBarFiveMatter.map QuantaBarFive.q)
+    (𝓜.quantaTen.map QuantaTen.q) h.2.1 _ hn
+  have hW1 := chargeW1Term_subset_q10 (𝓜.quantaBarFiveMatter.map QuantaBarFive.q)
+    (𝓜.quantaTen.map QuantaTen.q) h.1 _ hn
+  have hK1 := chargeK1Term_subset_q10 (𝓜.quantaBarFiveMatter.map QuantaBarFive.q)
+    (𝓜.quantaTen.map QuantaTen.q) h.2.2.2 _ hn
+  apply not_or_intro (not_or_intro hW1 hL1) hK1
+  have h5 : ((𝓜.quantaBarFiveMatter).map QuantaBarFive.q).card = n := by
+    rw [Multiset.card_map]
+    exact hcard
+  rw [𝓜.quantaBarFiveMatter_map_q_eq_toFinset] at h5 ⊢
+  generalize (𝓜.quantaBarFiveMatter.map QuantaBarFive.q).toFinset = F at h5 ⊢
+  have hW1T : F ∈ (Finset.powerset (Finset.univ)).filter (fun x => x.card = n) := by
+    rw [Finset.mem_filter]
+    rw [Finset.mem_powerset]
+    simp_all only [Finset.card_val, and_true]
+    exact Finset.subset_univ F
+  revert F
+  simp only [Finset.card_val, Finset.univ_eq_attach, Finset.mem_filter, Finset.mem_powerset,
+    Int.reduceNeg, and_imp]
+  exact hS
+
+lemma lambdaTerm_K1Term_W1Term_singleton_check {I : CodimensionOneConfig} {n : ℕ}
+    (𝓜 : MatterContent I)
+    (hcard : 𝓜.quantaBarFiveMatter.card = n) (h : 𝓜.ProtonDecayU1Constrained)
+    (a : (I.allowedTenCharges))
+    (ha : ∀ (F : Finset { x // x ∈ I.allowedBarFiveCharges }), F.card = n →
+      F ⊆ Finset.univ → F.card = n →
+      (0 ∈ chargeW1Term F.val {a} ∨ 0 ∈ chargeLambdaTerm F.val {a}) ∨
+      0 ∈ chargeK1Term F.val {a} := by decide) :
+    a ∉ 𝓜.quantaTen.map QuantaTen.q := by
+  intro hn
+  have hL1 := chargeLambdaTerm_single_q10 (𝓜.quantaBarFiveMatter.map QuantaBarFive.q)
+    (𝓜.quantaTen.map QuantaTen.q) h.2.1 _ hn
+  have hW1 := chargeW1Term_single_q10 (𝓜.quantaBarFiveMatter.map QuantaBarFive.q)
+    (𝓜.quantaTen.map QuantaTen.q) h.1 _ hn
+  have hK1 := chargeK1Term_single_q10 (𝓜.quantaBarFiveMatter.map QuantaBarFive.q)
+    (𝓜.quantaTen.map QuantaTen.q) h.2.2.2 _ hn
+  apply not_or_intro (not_or_intro hW1 hL1) hK1
+  have h5 : ((𝓜.quantaBarFiveMatter).map QuantaBarFive.q).card = n := by
+    rw [Multiset.card_map]
+    exact hcard
+  rw [𝓜.quantaBarFiveMatter_map_q_eq_toFinset] at h5 ⊢
+  generalize (𝓜.quantaBarFiveMatter.map QuantaBarFive.q).toFinset = F at h5 ⊢
+  have hW1T : F ∈ (Finset.powerset (Finset.univ)).filter (fun x => x.card = n) := by
+    rw [Finset.mem_filter]
+    rw [Finset.mem_powerset]
+    simp_all only [Finset.card_val, and_true]
+    exact Finset.subset_univ F
+  revert F
+  simp only [Finset.card_val, Finset.univ_eq_attach, Finset.mem_filter, Finset.mem_powerset,
+    Int.reduceNeg, and_imp]
+  exact ha
 
 end MatterContent
 end SU5U1
