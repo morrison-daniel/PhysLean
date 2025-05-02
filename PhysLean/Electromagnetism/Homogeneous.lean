@@ -57,6 +57,8 @@ def OpticalMedium.free (OM : OpticalMedium) : ChargedMedium where
   ε := OM.ε
   ρ := fun _ _ => 0
   J := fun _ _ => 0
+  eps_ge_zero := OM.eps_ge_zero
+  mu_ge_zero := OM.mu_ge_zero
 
 variable (OM : OpticalMedium)
 
@@ -70,10 +72,15 @@ def OpticalMedium.FreeMaxwellEquations (OM : OpticalMedium)
 
 theorem OpticalMedium.gaussLawElectric_of_free (E : ElectricField) (B : MagneticField)
     (h : OM.FreeMaxwellEquations E B) :
-    ε * (∇ ⬝ E t) x = 0 := by
+    (∇ ⬝ E t) x = 0 := by
   have h' := h.1
-  rw [h']
-  rfl
+  rw [GaussLawElectric] at h'
+  have h'' : OM.ε * div (E t) x = OM.ε * 0 := by
+    rw [mul_zero, h']
+    rfl
+  apply mul_left_cancel₀ at h''
+  exact h''
+  exact ne_of_gt OM.eps_ge_zero
 
 theorem OpticalMedium.gaussLawMagnetic_of_free (E : ElectricField) (B : MagneticField)
     (h : OM.FreeMaxwellEquations E B) :

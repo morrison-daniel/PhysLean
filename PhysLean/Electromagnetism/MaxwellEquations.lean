@@ -23,6 +23,8 @@ structure OpticalMedium where
   ε : ℝ
   /-- The permeability. -/
   μ : ℝ
+  eps_ge_zero : ε > 0
+  mu_ge_zero : μ > 0
 
 variable (𝓔 : OpticalMedium) (ρ : ChargeDensity) (J : CurrentDensity)
 open SpaceTime
