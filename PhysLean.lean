@@ -6,6 +6,7 @@ import PhysLean.ClassicalMechanics.Space.Basic
 import PhysLean.ClassicalMechanics.Space.VectorIdentities
 import PhysLean.ClassicalMechanics.Time.Basic
 import PhysLean.ClassicalMechanics.VectorFields
+import PhysLean.ClassicalMechanics.WaveEquation.Basic
 import PhysLean.CondensedMatter.Basic
 import PhysLean.CondensedMatter.TightBindingChain.Basic
 import PhysLean.Cosmology.Basic
