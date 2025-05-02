@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Zhi Kai Pong
 -/
 import PhysLean.Electromagnetism.Homogeneous
+import PhysLean.ClassicalMechanics.WaveEquation.Basic
 /-!
 # Electromagnetism wave equation
 
@@ -17,11 +18,6 @@ namespace Electromagnetism
 open Space
 open Time
 open ClassicalMechanics
-
-/-- The general form of the wave equation. -/
-def WaveEquation (f : Time → Space d → EuclideanSpace ℝ (Fin d))
-    (t : Time) (x : Space d) (c : ℝ) : Prop :=
-    c^2 • Δ (f t) x -  ∂ₜ (fun t => (∂ₜ (fun t => f t x) t)) t  = 0
 
 variable (OM : OpticalMedium)
 
