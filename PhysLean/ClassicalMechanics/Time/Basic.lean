@@ -42,7 +42,7 @@ noncomputable def deriv [AddCommGroup M] [Module ℝ M] [TopologicalSpace M]
 @[inherit_doc deriv]
 scoped notation "∂ₜ" => deriv
 
-lemma deriv_smul (f : Time → EuclideanSpace ℝ (Fin 3)) (k : ℝ)
+lemma deriv_smul (f : Time → EuclideanSpace ℝ (Fin d)) (k : ℝ)
     (hf : Differentiable ℝ f) :
     ∂ₜ (fun t => k • f t) t = k • ∂ₜ (fun t => f t) t := by
   rw [deriv]
