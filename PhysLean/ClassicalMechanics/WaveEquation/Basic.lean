@@ -171,8 +171,6 @@ theorem planeWave_isWave (c : ℝ) (s : Space d) (hs : inner s s = 1)
     (f₀'' : ℝ → ℝ →L[ℝ] EuclideanSpace ℝ (Fin d))
     (h' : ∀ x, HasFDerivAt f₀ (f₀' x) x) (h'' : ∀ x, HasFDerivAt (fun x' => f₀' x' 1) (f₀'' x) x) :
     WaveEquation (planeWave f₀ c s hs) t x c := by
-  have hsi (x : EuclideanSpace ℝ (Fin d)) (i : Fin d) :
-    (inner x (EuclideanSpace.single i 1)) = x i := by simp
   unfold WaveEquation planeWave
   conv_lhs =>
     enter [2, 1, t]
