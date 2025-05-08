@@ -80,7 +80,8 @@ theorem planeWave_isWave (c : ℝ) (s : Space d) (hs : inner s s = 1)
     not_false_eq_true, pow_eq_zero_iff]
   right
   ext i
-  have hd_inner (x : EuclideanSpace ℝ (Fin d)): DifferentiableAt ℝ (fun x => inner x s - c * t) x := by
+  have hd_inner (x : EuclideanSpace ℝ (Fin d)):
+      DifferentiableAt ℝ (fun x => inner x s - c * t) x := by
     apply DifferentiableAt.sub
     apply DifferentiableAt.inner
     repeat fun_prop
