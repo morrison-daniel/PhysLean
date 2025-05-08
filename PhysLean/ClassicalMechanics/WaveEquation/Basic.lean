@@ -79,7 +79,7 @@ lemma wave_dx {u v : Fin d} {f₀' : ℝ → ℝ →L[ℝ] EuclideanSpace ℝ (F
     (fun x' => fderiv ℝ (fun x => (inner (f₀ (inner x s - c * t))
     (EuclideanSpace.single u 1))) x' (EuclideanSpace.single v 1))
     =
-    fun x' => (inner (f₀' (inner x' s - c * t) (s v)) (EuclideanSpace.single u 1):ℝ) := by
+    fun x' => (inner (f₀' (inner x' s - c * t) (s v)) (EuclideanSpace.single u 1) : ℝ) := by
   ext x'
   rw [fderiv_inner_apply]
   simp only [fderiv_const, Pi.zero_apply, ContinuousLinearMap.zero_apply, inner_zero_right,
@@ -116,7 +116,7 @@ lemma wave_dx2 {u v : Fin d} {f₀' : ℝ → ℝ →L[ℝ] EuclideanSpace ℝ (
     {f₀'' : ℝ → ℝ →L[ℝ] EuclideanSpace ℝ (Fin d)}
     (h'' : ∀ x, HasFDerivAt (fun x' => f₀' x' 1) (f₀'' x) x) :
     (fderiv ℝ (fun x' => (inner ((f₀' (inner x' s - c * t)) (s u))
-    (EuclideanSpace.single v 1):ℝ)) x) (EuclideanSpace.single u 1)
+    (EuclideanSpace.single v 1) : ℝ)) x) (EuclideanSpace.single u 1)
     =
     inner ((s u) ^ 2 • f₀'' (inner x s - c * t) 1) (EuclideanSpace.single v 1) := by
   rw [fderiv_inner_apply]
