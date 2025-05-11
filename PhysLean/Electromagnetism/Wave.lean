@@ -5,6 +5,7 @@ Authors: Zhi Kai Pong
 -/
 import PhysLean.Electromagnetism.Homogeneous
 import PhysLean.ClassicalMechanics.WaveEquation.Basic
+import Mathlib.LinearAlgebra.CrossProduct
 /-!
 # Electromagnetism wave equation
 
@@ -132,3 +133,94 @@ theorem waveEquation_magneticField_of_freeMaxwellEquations
   · exact hB.uncurry (x := t)
   · rw [inv_nonneg]
     exact smul_nonneg (le_of_lt OM.mu_ge_zero) (le_of_lt OM.eps_ge_zero)
+
+/-- A electric plane wave travelling in the direction of `s` with propagation speed `c`. -/
+@[nolint unusedArguments]
+noncomputable def electricPlaneWave (E₀ : ℝ → EuclideanSpace ℝ (Fin 3))
+    (c : ℝ) (s : Space) (hs : inner s s = (1:ℝ)) : ElectricField :=
+    planeWave E₀ c s hs
+
+/-- A magnetic plane wave travelling in the direction of `s` with propagation speed `c`. -/
+@[nolint unusedArguments]
+noncomputable def magneticPlaneWave (B₀ : ℝ → EuclideanSpace ℝ (Fin 3))
+    (c : ℝ) (s : Space) (hs : inner s s = (1:ℝ)) : MagneticField :=
+    planeWave B₀ c s hs
+
+open Matrix
+
+lemma wave_fderiv_inner_coord_sub {f₀ : ℝ → EuclideanSpace ℝ (Fin 3)} {s : Space} {u v : Fin 3}
+    {f₀' : ℝ → ℝ →L[ℝ] EuclideanSpace ℝ (Fin 3)} (h' : ∀ x, HasFDerivAt f₀ (f₀' x) x) :
+    c * ((fun x' => (fderiv ℝ (fun x => inner (f₀ (inner x s - c * t))
+    (EuclideanSpace.single u 1)) x') (EuclideanSpace.single v 1)) x -
+    (fun x' => (fderiv ℝ (fun x => inner (f₀ (inner x s - c * t))
+    (EuclideanSpace.single v 1)) x') (EuclideanSpace.single u 1)) x)
+    =
+    s u * ∂ₜ (fun t => f₀ (inner x s - c * t)) t v -
+    s v * ∂ₜ (fun t => f₀ (inner x s - c * t)) t u := by
+  rw [wave_dx h', wave_dx h', wave_dt h']
+  simp
+  rw [← mul_one (s u), ← smul_eq_mul (s u), ContinuousLinearMap.map_smul]
+  rw [← mul_one (s v), ← smul_eq_mul (s v), ContinuousLinearMap.map_smul]
+  simp
+  ring
+
+lemma dt_electricPlaneWave_eq_s_cross_dt_B (E₀ : ℝ → EuclideanSpace ℝ (Fin 3))
+    (E₀' : ℝ → ℝ →L[ℝ] EuclideanSpace ℝ (Fin 3)) (s : Space) (hc : c = (Real.sqrt (μ • ε)⁻¹))
+    (hs : inner s s = (1:ℝ)) (E : ElectricField) (B : MagneticField)
+    (hE : E = electricPlaneWave E₀ c s hs) (h' : ∀ x, HasFDerivAt E₀ (E₀' x) x)
+    (hm : OM.FreeMaxwellEquations E B) :
+    (Real.sqrt (μ • ε)⁻¹) • ∂ₜ (fun t => B t x) t = (WithLp.equiv 2 (Fin 3 → ℝ)).symm
+    (WithLp.equiv _ _ s ×₃ WithLp.equiv _ _ (∂ₜ (fun t => E t x) t)) := by
+  rw [crossProduct, ← neg_neg (∂ₜ (fun t => B t x) t),
+      ← OM.faradayLaw_of_free E B, hE, electricPlaneWave, ← hc]
+  unfold planeWave curl coord basis Space.deriv
+  ext i
+  fin_cases i <;>
+  · simp? [-PiLp.inner_apply]
+    rw [wave_fderiv_inner_coord_sub h']
+  exact hm
+
+lemma dt_mageneticPlaneWave_eq_s_cross_neg_dt_E (B₀ : ℝ → EuclideanSpace ℝ (Fin 3))
+    (B₀' : ℝ → ℝ →L[ℝ] EuclideanSpace ℝ (Fin 3)) (s : Space) (hc : c = (Real.sqrt (μ • ε)⁻¹))
+    (hs : inner s s = (1:ℝ)) (E : ElectricField) (B : MagneticField)
+    (hB : B = magneticPlaneWave B₀ c s hs) (h' : ∀ x, HasFDerivAt B₀ (B₀' x) x)
+    (hm : OM.FreeMaxwellEquations E B) :
+    (Real.sqrt (μ • ε)) • ∂ₜ (fun t => E t x) t = - (WithLp.equiv 2 (Fin 3 → ℝ)).symm
+    (WithLp.equiv _ _ s ×₃ WithLp.equiv _ _ (∂ₜ (fun t => B t x) t)) := by
+  have h : (Real.sqrt (μ • ε)) = (Real.sqrt (μ • ε)⁻¹) • (μ • ε) := by
+    nth_rewrite 3 [← Real.sq_sqrt (le_of_lt (smul_pos OM.mu_ge_zero OM.eps_ge_zero))]
+    rw [pow_two, Real.sqrt_inv]
+    simp [← mul_assoc]
+  have hdt : ∀ t, (∂ₜ (fun t => E t x) t) = (μ • ε)⁻¹ • (∇ × B t) x := by
+    intro t
+    rw [OM.ampereLaw_of_free E B]
+    simp only [smul_eq_mul, _root_.mul_inv_rev, ← smul_assoc, mul_assoc, ne_eq, OM.mu_ge_zero,
+      ne_of_gt, not_false_eq_true, inv_mul_cancel_left₀, OM.eps_ge_zero, inv_mul_cancel₀, one_smul]
+    exact hm
+  rw [crossProduct, h, smul_assoc, hdt, hB, magneticPlaneWave, ← hc]
+  unfold planeWave curl coord basis Space.deriv
+  ext i
+  fin_cases i <;>
+  · simp? [-PiLp.inner_apply, ← mul_assoc, OM.mu_ge_zero, OM.eps_ge_zero, ne_of_gt]
+    rw [wave_fderiv_inner_coord_sub h']
+
+theorem electricPlaneWave_eq_s_cross_B (E : ElectricField) (B : MagneticField) :
+    (Real.sqrt (μ • ε)⁻¹) • (B t x) = (WithLp.equiv 2 (Fin 3 → ℝ)).symm
+    (WithLp.equiv _ _ s ×₃ WithLp.equiv _ _ (E t x)) := by
+  sorry
+
+theorem mageneticPlaneWave_eq_s_cross_neg_E (E : ElectricField) (B : MagneticField) :
+    (Real.sqrt (μ • ε)⁻¹) • (E t x) = (WithLp.equiv 2 (Fin 3 → ℝ)).symm
+    (WithLp.equiv _ _ s ×₃ WithLp.equiv _ _ (B t x)) := by
+  sorry
+
+/-
+
+0. Prove the two theorems above by integrating with respect to t
+1. E B s form an orthogonal triad
+2. Define MulAction SO(d) on Space d
+3. wave equation is invariant under MulAction SO(3)
+4. It is justified to assume propagation direction in z (s = (EuclideanSpace.single 2 1))
+    and ElectricField lies in xy-plane
+
+-/
