@@ -34,7 +34,7 @@ theorem waveEquation_electricField_of_freeMaxwellEquations
   have hdt : ∀ t, (∂ₜ (fun t => E t x) t) = (μ • ε)⁻¹ • (∇ × B t) x := by
     intro t
     rw [OM.ampereLaw_of_free E B]
-    · simp [← smul_assoc, mul_assoc, OM.mu_ge_zero, ne_of_gt, OM.eps_ge_zero, h]
+    · simp [← smul_assoc, mul_assoc, OM.mu_ge_zero, ne_of_gt, OM.eps_ge_zero]
     · exact h
   have hdt2 : ∂ₜ (fun t => ∂ₜ (fun t => E t x) t) t =
       ∂ₜ (fun t => (μ • ε)⁻¹ • (∇ × B t) x) t := by aesop
@@ -158,10 +158,12 @@ lemma wave_fderiv_inner_coord_sub {f₀ : ℝ → EuclideanSpace ℝ (Fin 3)} {s
     s u * ∂ₜ (fun t => f₀ (inner x s - c * t)) t v -
     s v * ∂ₜ (fun t => f₀ (inner x s - c * t)) t u := by
   rw [wave_dx h', wave_dx h', wave_dt h']
-  simp
+  simp only [PiLp.inner_apply, RCLike.inner_apply, conj_trivial, EuclideanSpace.single_apply,
+    ite_mul, one_mul, zero_mul, Finset.sum_ite_eq', Finset.mem_univ, ↓reduceIte, PiLp.smul_apply,
+    smul_eq_mul, neg_mul, mul_neg, sub_neg_eq_add]
   rw [← mul_one (s u), ← smul_eq_mul (s u), ContinuousLinearMap.map_smul]
   rw [← mul_one (s v), ← smul_eq_mul (s v), ContinuousLinearMap.map_smul]
-  simp
+  simp only [PiLp.smul_apply, smul_eq_mul, mul_one]
   ring
 
 lemma dt_electricPlaneWave_eq_s_cross_dt_B (E₀ : ℝ → EuclideanSpace ℝ (Fin 3))
@@ -176,7 +178,7 @@ lemma dt_electricPlaneWave_eq_s_cross_dt_B (E₀ : ℝ → EuclideanSpace ℝ (F
   unfold planeWave curl coord basis Space.deriv
   ext i
   fin_cases i <;>
-  · simp? [-PiLp.inner_apply]
+  · simp [-PiLp.inner_apply]
     rw [wave_fderiv_inner_coord_sub h']
   exact hm
 
@@ -201,7 +203,7 @@ lemma dt_mageneticPlaneWave_eq_s_cross_neg_dt_E (B₀ : ℝ → EuclideanSpace �
   unfold planeWave curl coord basis Space.deriv
   ext i
   fin_cases i <;>
-  · simp? [-PiLp.inner_apply, ← mul_assoc, OM.mu_ge_zero, OM.eps_ge_zero, ne_of_gt]
+  · simp [-PiLp.inner_apply, ← mul_assoc, OM.mu_ge_zero, OM.eps_ge_zero, ne_of_gt]
     rw [wave_fderiv_inner_coord_sub h']
 
 theorem electricPlaneWave_eq_s_cross_B (E : ElectricField) (B : MagneticField) :
