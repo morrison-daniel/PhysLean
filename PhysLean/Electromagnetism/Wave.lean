@@ -5,7 +5,6 @@ Authors: Zhi Kai Pong
 -/
 import PhysLean.Electromagnetism.Homogeneous
 import PhysLean.ClassicalMechanics.WaveEquation.Basic
-import Mathlib.LinearAlgebra.CrossProduct
 /-!
 # Electromagnetism wave equation
 
@@ -148,43 +147,9 @@ noncomputable def magneticPlaneWave (B₀ : ℝ → EuclideanSpace ℝ (Fin 3))
 
 open Matrix
 
-lemma wave_fderiv_inner_coord_sub {f₀ : ℝ → EuclideanSpace ℝ (Fin 3)} {s : Space} {u v : Fin 3}
-    {f₀' : ℝ → ℝ →L[ℝ] EuclideanSpace ℝ (Fin 3)} (h' : ∀ x, HasFDerivAt f₀ (f₀' x) x) :
-    c * ((fun x' => (fderiv ℝ (fun x => inner (f₀ (inner x s - c * t))
-    (EuclideanSpace.single u 1)) x') (EuclideanSpace.single v 1)) x -
-    (fun x' => (fderiv ℝ (fun x => inner (f₀ (inner x s - c * t))
-    (EuclideanSpace.single v 1)) x') (EuclideanSpace.single u 1)) x)
-    =
-    s u * ∂ₜ (fun t => f₀ (inner x s - c * t)) t v -
-    s v * ∂ₜ (fun t => f₀ (inner x s - c * t)) t u := by
-  rw [wave_dx h', wave_dx h', wave_dt h']
-  simp only [PiLp.inner_apply, RCLike.inner_apply, conj_trivial, EuclideanSpace.single_apply,
-    ite_mul, one_mul, zero_mul, Finset.sum_ite_eq', Finset.mem_univ, ↓reduceIte, PiLp.smul_apply,
-    smul_eq_mul, neg_mul, mul_neg, sub_neg_eq_add]
-  rw [← mul_one (s u), ← smul_eq_mul (s u), ContinuousLinearMap.map_smul]
-  rw [← mul_one (s v), ← smul_eq_mul (s v), ContinuousLinearMap.map_smul]
-  simp only [PiLp.smul_apply, smul_eq_mul, mul_one]
-  ring
-
-lemma dt_electricPlaneWave_eq_s_cross_dt_B (E₀ : ℝ → EuclideanSpace ℝ (Fin 3))
-    (E₀' : ℝ → ℝ →L[ℝ] EuclideanSpace ℝ (Fin 3)) (s : Space) (hc : c = (Real.sqrt (μ • ε)⁻¹))
-    (hs : inner s s = (1:ℝ)) (E : ElectricField) (B : MagneticField)
-    (hE : E = electricPlaneWave E₀ c s hs) (h' : ∀ x, HasFDerivAt E₀ (E₀' x) x)
-    (hm : OM.FreeMaxwellEquations E B) :
-    (Real.sqrt (μ • ε)⁻¹) • ∂ₜ (fun t => B t x) t = (WithLp.equiv 2 (Fin 3 → ℝ)).symm
-    (WithLp.equiv _ _ s ×₃ WithLp.equiv _ _ (∂ₜ (fun t => E t x) t)) := by
-  rw [crossProduct, ← neg_neg (∂ₜ (fun t => B t x) t),
-      ← OM.faradayLaw_of_free E B, hE, electricPlaneWave, ← hc]
-  unfold planeWave curl coord basis Space.deriv
-  ext i
-  fin_cases i <;>
-  · simp [-PiLp.inner_apply]
-    rw [wave_fderiv_inner_coord_sub h']
-  exact hm
-
-lemma dt_mageneticPlaneWave_eq_s_cross_neg_dt_E (B₀ : ℝ → EuclideanSpace ℝ (Fin 3))
-    (B₀' : ℝ → ℝ →L[ℝ] EuclideanSpace ℝ (Fin 3)) (s : Space) (hc : c = (Real.sqrt (μ • ε)⁻¹))
-    (hs : inner s s = (1:ℝ)) (E : ElectricField) (B : MagneticField)
+lemma dt_E_eq_s_cross_neg_dt_magneticPlaneWave {B₀ : ℝ → EuclideanSpace ℝ (Fin 3)}
+    {B₀' : ℝ → ℝ →L[ℝ] EuclideanSpace ℝ (Fin 3)} {s : Space} {hs : inner s s = (1:ℝ)}
+    {E : ElectricField} {B : MagneticField} (hc : c = (Real.sqrt (μ • ε)⁻¹))
     (hB : B = magneticPlaneWave B₀ c s hs) (h' : ∀ x, HasFDerivAt B₀ (B₀' x) x)
     (hm : OM.FreeMaxwellEquations E B) :
     (Real.sqrt (μ • ε)) • ∂ₜ (fun t => E t x) t = - (WithLp.equiv 2 (Fin 3 → ℝ)).symm
@@ -206,23 +171,102 @@ lemma dt_mageneticPlaneWave_eq_s_cross_neg_dt_E (B₀ : ℝ → EuclideanSpace �
   · simp [-PiLp.inner_apply, ← mul_assoc, OM.mu_ge_zero, OM.eps_ge_zero, ne_of_gt]
     rw [wave_fderiv_inner_coord_sub h']
 
-theorem electricPlaneWave_eq_s_cross_B (E : ElectricField) (B : MagneticField) :
+lemma dt_B_eq_s_cross_dt_electricPlaneWave {E₀ : ℝ → EuclideanSpace ℝ (Fin 3)}
+    {E₀' : ℝ → ℝ →L[ℝ] EuclideanSpace ℝ (Fin 3)} {s : Space} {hs : inner s s = (1:ℝ)}
+    {E : ElectricField} {B : MagneticField} (hc : c = (Real.sqrt (μ • ε)⁻¹))
+    (hE : E = electricPlaneWave E₀ c s hs) (h' : ∀ x, HasFDerivAt E₀ (E₀' x) x)
+    (hm : OM.FreeMaxwellEquations E B) :
+    (Real.sqrt (μ • ε)⁻¹) • ∂ₜ (fun t => B t x) t = (WithLp.equiv 2 (Fin 3 → ℝ)).symm
+    (WithLp.equiv _ _ s ×₃ WithLp.equiv _ _ (∂ₜ (fun t => E t x) t)) := by
+  rw [crossProduct, ← neg_neg (∂ₜ (fun t => B t x) t),
+      ← OM.faradayLaw_of_free E B, hE, electricPlaneWave, ← hc]
+  unfold planeWave curl coord basis Space.deriv
+  ext i
+  fin_cases i <;>
+  · simp [-PiLp.inner_apply]
+    rw [wave_fderiv_inner_coord_sub h']
+  exact hm
+
+theorem E_eq_s_cross_neg_magneticPlaneWave {B₀ : ℝ → EuclideanSpace ℝ (Fin 3)}
+    {B₀' : ℝ → ℝ →L[ℝ] EuclideanSpace ℝ (Fin 3)} {s : Space} {hs : inner s s = (1:ℝ)}
+    {E : ElectricField} {B : MagneticField} (hc : c = (Real.sqrt (μ • ε)⁻¹))
+    (hBwave : B = magneticPlaneWave B₀ c s hs) (h' : ∀ x, HasFDerivAt B₀ (B₀' x) x)
+    (hm : OM.FreeMaxwellEquations E B) (hE : ContDiff ℝ 2 ↿E) : ∃ constE,
+    (Real.sqrt (μ • ε)) • (E t x) = - (WithLp.equiv 2 (Fin 3 → ℝ)).symm
+    (WithLp.equiv _ _ s ×₃ WithLp.equiv _ _ (B t x)) + constE := by
+  have h : ∀ t, ∂ₜ (fun t => (Real.sqrt (μ • ε)) • (E t x)) t +
+      ∂ₜ (fun t => (WithLp.equiv 2 (Fin 3 → ℝ)).symm
+      (WithLp.equiv _ _ s ×₃ WithLp.equiv _ _ (B t x))) t = 0 := by
+    intro t
+    rw [deriv_smul, dt_E_eq_s_cross_neg_dt_magneticPlaneWave OM hc hBwave h' hm]
+    rw [time_deriv_cross_commute]
+    simp
+    · exact differentiable_if_planewave h' hBwave
+    · exact fun x => function_differentiableAt_fst (hf := hE.two_differentiable) ..
+  unfold Time.deriv at h
+  have hderiv : ∀ t, _root_.deriv (fun t => ((Real.sqrt (μ • ε)) • (E t x)) +
+      ((WithLp.equiv 2 (Fin 3 → ℝ)).symm
+      (WithLp.equiv _ _ s ×₃ WithLp.equiv _ _ (B t x)))) t = 0 := by
+    intro t
+    rw [_root_.deriv_add]
+    simp_all
+    · apply DifferentiableAt.const_smul
+      exact function_differentiableAt_fst (hf := hE.two_differentiable) ..
+    · rw [crossProduct]
+      simp
+      exact differentiable_curl_if_planewave h' hBwave
+  apply is_const_of_deriv_eq_zero at hderiv
+  have h1 := hderiv t 0
+  use √(OM.μ • OM.ε) • E 0 x + (WithLp.equiv 2 (Fin 3 → ℝ)).symm
+    ((crossProduct ((WithLp.equiv 2 (Fin 3 → ℝ)) s)) ((WithLp.equiv 2 (Fin 3 → ℝ)) (B 0 x)))
+  rw [← h1]
+  simp
+  · intro x
+    apply DifferentiableAt.add
+    · apply DifferentiableAt.const_smul
+      exact function_differentiableAt_fst (hf := hE.two_differentiable) ..
+    · rw [crossProduct]
+      simp
+      exact differentiable_curl_if_planewave h' hBwave
+
+theorem B_eq_s_cross_electricPlaneWave {E₀ : ℝ → EuclideanSpace ℝ (Fin 3)}
+    {E₀' : ℝ → ℝ →L[ℝ] EuclideanSpace ℝ (Fin 3)} {s : Space} {hs : inner s s = (1:ℝ)}
+    {E : ElectricField} {B : MagneticField} (hc : c = (Real.sqrt (μ • ε)⁻¹))
+    (hEwave : E = electricPlaneWave E₀ c s hs) (h' : ∀ x, HasFDerivAt E₀ (E₀' x) x)
+    (hm : OM.FreeMaxwellEquations E B) (hB : ContDiff ℝ 2 ↿B) : ∃ constB,
     (Real.sqrt (μ • ε)⁻¹) • (B t x) = (WithLp.equiv 2 (Fin 3 → ℝ)).symm
-    (WithLp.equiv _ _ s ×₃ WithLp.equiv _ _ (E t x)) := by
-  sorry
-
-theorem mageneticPlaneWave_eq_s_cross_neg_E (E : ElectricField) (B : MagneticField) :
-    (Real.sqrt (μ • ε)⁻¹) • (E t x) = (WithLp.equiv 2 (Fin 3 → ℝ)).symm
-    (WithLp.equiv _ _ s ×₃ WithLp.equiv _ _ (B t x)) := by
-  sorry
-
-/-
-
-0. Prove the two theorems above by integrating with respect to t
-1. E B s form an orthogonal triad
-2. Define MulAction SO(d) on Space d
-3. wave equation is invariant under MulAction SO(3)
-4. It is justified to assume propagation direction in z (s = (EuclideanSpace.single 2 1))
-    and ElectricField lies in xy-plane
-
--/
+    (WithLp.equiv _ _ s ×₃ WithLp.equiv _ _ (E t x)) + constB := by
+  have h : ∀ t, ∂ₜ (fun t => (Real.sqrt (μ • ε)⁻¹) • (B t x)) t -
+      ∂ₜ (fun t => (WithLp.equiv 2 (Fin 3 → ℝ)).symm
+      (WithLp.equiv _ _ s ×₃ WithLp.equiv _ _ (E t x))) t = 0 := by
+    intro t
+    rw [deriv_smul, dt_B_eq_s_cross_dt_electricPlaneWave OM hc hEwave h' hm]
+    rw [time_deriv_cross_commute]
+    simp
+    · exact differentiable_if_planewave h' hEwave
+    · exact fun x => function_differentiableAt_fst (hf := hB.two_differentiable) ..
+  unfold Time.deriv at h
+  have hderiv : ∀ t, _root_.deriv (fun t => ((Real.sqrt (μ • ε)⁻¹) • (B t x)) -
+      ((WithLp.equiv 2 (Fin 3 → ℝ)).symm
+      (WithLp.equiv _ _ s ×₃ WithLp.equiv _ _ (E t x)))) t = 0 := by
+    intro t
+    rw [deriv_sub]
+    simp_all
+    · apply DifferentiableAt.const_smul
+      exact function_differentiableAt_fst (hf := hB.two_differentiable) ..
+    · rw [crossProduct]
+      simp
+      exact differentiable_curl_if_planewave h' hEwave
+  apply is_const_of_deriv_eq_zero at hderiv
+  have h1 := hderiv t 0
+  use √(OM.μ • OM.ε)⁻¹ • B 0 x - (WithLp.equiv 2 (Fin 3 → ℝ)).symm
+    ((crossProduct ((WithLp.equiv 2 (Fin 3 → ℝ)) s)) ((WithLp.equiv 2 (Fin 3 → ℝ)) (E 0 x)))
+  rw [← h1]
+  simp
+  · intro x
+    apply DifferentiableAt.sub
+    · apply DifferentiableAt.const_smul
+      exact function_differentiableAt_fst (hf := hB.two_differentiable) ..
+    · rw [crossProduct]
+      simp
+      exact differentiable_curl_if_planewave h' hEwave
