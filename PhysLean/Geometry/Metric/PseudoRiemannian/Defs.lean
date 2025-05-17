@@ -39,7 +39,15 @@ of a maximal negative definite subspace.
 * `PseudoRiemannianMetric.toQuadraticForm g x`: The quadratic form `v ↦ gₓ(v, v)` associated
   with the metric at point `x`.
 
+This formalization adopts a direct approach, defining the metric as a family of bilinear forms
+on tangent spaces, varying smoothly over the manifold. This pragmatic choice allows for foundational
+development while acknowledging that a more abstract ideal would involve defining metrics as
+sections of a tensor bundle (e.g., `Hom(TM ⊗ TM, ℝ)` or `TM →L[ℝ] TM →L[ℝ] ℝ`.
+
 ## Reference 
+
+* Barrett O'Neill, "Semi-Riemannian Geometry With Applications to Relativity" (Academic Press, 1983)
+* https://leanprover.zulipchat.com/#narrow/channel/113488-general/topic/.28Pseudo.29.20Riemannian.20metric/with/514930210
 -/
 
 section PseudoRiemannianMetric
