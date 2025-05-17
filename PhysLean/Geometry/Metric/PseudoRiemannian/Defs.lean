@@ -312,6 +312,15 @@ lemma toBilinForm_nondegenerate (g : PseudoRiemannianMetric E H M n I) (x : M) :
     (toBilinForm g x).Nondegenerate := by
   intro v hv; simp_rw [toBilinForm_apply] at hv; exact g.nondegenerate x v hv
 
+/-- The inner product (or scalar product) on the tangent space at point `x`
+  induced by the pseudo-Riemannian metric `g`. This is `gₓ(v, w)`. -/
+def inner (g : PseudoRiemannianMetric E H M n I) (x : M) (v w : TangentSpace I x) : ℝ :=
+  g.val x v w
+
+@[simp]
+lemma inner_apply (g : PseudoRiemannianMetric E H M n I) (x : M) (v w : TangentSpace I x) :
+  inner g x v w = g.val x v w := rfl
+
 /-! ## Flat -/
 
 section Flat
