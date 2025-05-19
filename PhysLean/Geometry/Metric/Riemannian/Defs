@@ -15,7 +15,9 @@ import PhysLean.Mathematics.Geometry.Metric.PseudoRiemannian.Defs
 
 This module defines the Riemannian metric, building on pseudo-Riemannian metrics.
 -/
---namespace PseudoRiemannianMetric
+
+namespace PseudoRiemannianMetric
+
 section RiemannianMetric
 
 open Bundle Set Finset Function Filter Module Topology ContinuousLinearMap
