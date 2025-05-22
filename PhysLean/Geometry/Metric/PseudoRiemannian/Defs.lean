@@ -237,9 +237,9 @@ structure PseudoRiemannianMetric
   /-- The metric is non-degenerate: if `gₓ(v, w) = 0` for all `w`, then `v = 0`. -/
   nondegenerate : ∀ (x : M) (v : TangentSpace I x), (∀ w : TangentSpace I x,
     (val x v) w = 0) → v = 0
-  /-- The metric varies smoothly: Expressed in local coordinates via the chart 
-      `e := extChartAt I x₀`, the function 
-      `y ↦ g_{e.symm y}(mfderiv I I e.symm y v, mfderiv I I e.symm y w)` is `C^n` smooth on the 
+  /-- The metric varies smoothly: Expressed in local coordinates via the chart
+      `e := extChartAt I x₀`, the function
+      `y ↦ g_{e.symm y}(mfderiv I I e.symm y v, mfderiv I I e.symm y w)` is `C^n` smooth on the
       chart's target `e.target` for any constant vectors `v, w` in the model space  `E`. -/
   smooth_in_charts' : ∀ (x₀ : M) (v w : E),
     let e := extChartAt I x₀
@@ -263,12 +263,10 @@ variable [IsManifold I (n + 1) M]
 variable [inst_tangent_findim : ∀ (x : M), FiniteDimensional ℝ (TangentSpace I x)]
 variable {g : PseudoRiemannianMetric E H M n I}
 
-/--
-Given a pseudo-Riemannian metric `g` on manifold `M` and a point `x : M`,
+/-- Given a pseudo-Riemannian metric `g` on manifold `M` and a point `x : M`,
 this function constructs a bilinear form on the tangent space at `x`.
 For tangent vectors `u v : T_x M`, the bilinear form is given by:
-`g_x(u, v) = g(x)(u, v)`
--/
+`g_x(u, v) = g(x)(u, v)` -/
 def toBilinForm (g : PseudoRiemannianMetric E H M n I) (x : M) :
     LinearMap.BilinForm ℝ (TangentSpace I x) where
   toFun := λ v => { toFun := λ w => g.val x v w,
