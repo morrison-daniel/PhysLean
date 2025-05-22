@@ -44,10 +44,11 @@ on tangent spaces, varying smoothly over the manifold. This pragmatic choice all
 development while acknowledging that a more abstract ideal would involve defining metrics as
 sections of a tensor bundle (e.g., `Hom(TM ⊗ TM, ℝ)` or `TM →L[ℝ] TM →L[ℝ] ℝ`.
 
-## Reference 
+## Reference
 
 * Barrett O'Neill, "Semi-Riemannian Geometry With Applications to Relativity" (Academic Press, 1983)
-* https://leanprover.zulipchat.com/#narrow/channel/113488-general/topic/.28Pseudo.29.20Riemannian.20metric/with/514930210
+* [Discussion on Zulip about (Pseudo) Riemannian metrics] https.
+leanprover.zulipchat.com/#narrow/channel/113488-general/topic/.28Pseudo.29.20Riemannian.20metric
 -/
 
 section PseudoRiemannianMetric
@@ -236,9 +237,10 @@ structure PseudoRiemannianMetric
   /-- The metric is non-degenerate: if `gₓ(v, w) = 0` for all `w`, then `v = 0`. -/
   nondegenerate : ∀ (x : M) (v : TangentSpace I x), (∀ w : TangentSpace I x,
     (val x v) w = 0) → v = 0
-  /-- The metric varies smoothly: Expressed in local coordinates via the chart `e := extChartAt I x₀`,
-      the function `y ↦ g_{e.symm y}(mfderiv I I e.symm y v, mfderiv I I e.symm y w)` is `C^n`
-      smooth on the chart's target `e.target` for any constant vectors `v, w` in the model space `E`. -/
+  /-- The metric varies smoothly: Expressed in local coordinates via the chart 
+      `e := extChartAt I x₀`, the function 
+      `y ↦ g_{e.symm y}(mfderiv I I e.symm y v, mfderiv I I e.symm y w)` is `C^n` smooth on the 
+      chart's target `e.target` for any constant vectors `v, w` in the model space  `E`. -/
   smooth_in_charts' : ∀ (x₀ : M) (v w : E),
     let e := extChartAt I x₀
     ContDiffWithinAt ℝ n
@@ -319,7 +321,7 @@ def inner (g : PseudoRiemannianMetric E H M n I) (x : M) (v w : TangentSpace I x
 
 @[simp]
 lemma inner_apply (g : PseudoRiemannianMetric E H M n I) (x : M) (v w : TangentSpace I x) :
-  inner g x v w = g.val x v w := rfl
+    inner g x v w = g.val x v w := rfl
 
 /-! ## Flat -/
 
@@ -493,7 +495,6 @@ lemma apply_vec_sharp
 end Sharp
 
 /-! ## Cotangent -/
-
 section Cotangent
 
 variable {E : Type v} {H : Type w} {M : Type w} {n : WithTop ℕ∞}
@@ -521,7 +522,7 @@ lemma cotangentMetricVal_symm (g : PseudoRiemannianMetric E H M n I) (x : M)
   rw [g.symm x (g.sharpL x ω₁) (g.sharpL x ω₂)]
 
 /-- The induced metric on the cotangent space at point `x` as a bilinear form.
-For covectors ω₁ and ω₂, this gives g(ω₁^#, ω₂^#), where ω^# is
+For covectors `ω₁` and `ω₂`, this gives `g(ω₁^#, ω₂^#)`, where `ω^#` is
 the "sharp" musical isomorphism raising indices. -/
 noncomputable def cotangentToBilinForm (g : PseudoRiemannianMetric E H M n I) (x : M) :
     LinearMap.BilinForm ℝ (TangentSpace I x →L[ℝ] ℝ) where
@@ -547,7 +548,8 @@ noncomputable def cotangentToBilinForm (g : PseudoRiemannianMetric E H M n I) (x
       LinearMap.coe_mk, AddHom.coe_mk,
       RingHom.id_apply, LinearMap.smul_apply]
 
-/-- The induced metric on the cotangent space at point `x` as a quadratic form. -/
+/-- The cometric on the cotangent space T_x*M at `x`, expressed as a quadratic form.
+It is induced by the pseudo-Riemannian metric on the tangent space T_xM. -/
 noncomputable def cotangentToQuadraticForm (g : PseudoRiemannianMetric E H M n I) (x : M) :
     QuadraticForm ℝ (TangentSpace I x →L[ℝ] ℝ) where
   toFun ω := cotangentMetricVal g x ω ω
