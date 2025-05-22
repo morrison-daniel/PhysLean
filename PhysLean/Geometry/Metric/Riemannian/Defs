@@ -4,11 +4,11 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Matteo Cipollina
 -/
 
+import PhysLean.Mathematics.Geometry.Metric.PseudoRiemannian.Defs
 import Mathlib.Algebra.Lie.OfAssociative
 import Mathlib.MeasureTheory.Integral.IntervalIntegral.Basic
 import Mathlib.MeasureTheory.Integral.IntervalIntegral.FundThmCalculus
 import Mathlib.MeasureTheory.Integral.IntervalIntegral.IntegrationByParts
-import PhysLean.Mathematics.Geometry.Metric.PseudoRiemannian.Defs
 
 /-!
 # Riemannian Metric Definitions
@@ -17,7 +17,6 @@ This module defines the Riemannian metric, building on pseudo-Riemannian metrics
 -/
 
 namespace PseudoRiemannianMetric
-
 section RiemannianMetric
 
 open Bundle Set Finset Function Filter Module Topology ContinuousLinearMap
@@ -33,8 +32,8 @@ variable {I : ModelWithCorners ℝ E H} {n : ℕ∞}
 
 /--
 A `RiemannianMetric` on a manifold `M` modeled on `H` with corners `I` (over the model space `E`,
-typically `ℝ^m`) is a family of inner products on the tangent spaces `TangentSpace I x` for each `x : M`.
-This family is required to vary smoothly with `x`, specifically with smoothness `C^n`.
+typically `ℝ^m`) is a family of inner products on the tangent spaces `TangentSpace I x` for 
+each `x : M`. This family is required to vary smoothly with `x`, specifically with smoothness `C^n`.
 
 This structure `extends` `PseudoRiemannianMetric`, inheriting the core properties of a
 pseudo-Riemannian metric, such as being a symmetric, non-degenerate, `C^n`-smooth tensor field
@@ -48,7 +47,8 @@ bilinear form, effectively an inner product, on the tangent space `TangentSpace 
 Parameters:
 - `I`: The `ModelWithCorners` for the manifold `M`. This defines the model space `E` (e.g., `ℝ^d`)
   and the model space for the boundary `H`.
-- `n`: The smoothness class of the metric, an `ℕ∞` value. The metric tensor components are `C^n` functions.
+- `n`: The smoothness class of the metric, an `ℕ∞` value. The metric tensor components are `C^n` 
+  functions.
 - `M`: The type of the manifold.
 - `[TopologicalSpace M]`: Assumes `M` has a topological structure.
 - `[ChartedSpace H M]`: Assumes `M` is equipped with an atlas of charts to `H`.
@@ -99,6 +99,7 @@ lemma riemannian_metric_negDim_zero (g : RiemannianMetric I n M) (x : M) :
   exact g.toQuadraticForm_posDef x
 
 /-! ## InnerProductSpace structure from RiemannianMetric -/
+
 section InnerProductSpace
 
 variable (g : RiemannianMetric I n M) (x : M)
@@ -205,6 +206,7 @@ lemma norm_eq_norm_of_metricNormedAddCommGroup (g : RiemannianMetric I n M) (x :
 end InnerProductSpace
 
 /-! ## Curve -/
+
 section Curve
 
 /-- Calculates the length of a curve `γ` between parameters `t₀` and `t₁`
@@ -215,3 +217,7 @@ def curveLength (g : RiemannianMetric I n M) (γ : ℝ → M) (t₀ t₁ : ℝ)
   ∫ t in t₀..t₁, norm g (γ t) ((mfderiv IDE I γ t) ((1 : ℝ) : TangentSpace IDE t))
 
 end Curve
+
+end RiemannianMetric
+
+end PseudoRiemannianMetric
