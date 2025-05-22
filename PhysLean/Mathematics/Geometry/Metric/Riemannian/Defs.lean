@@ -30,10 +30,10 @@ variable {H : Type w} [TopologicalSpace H]
 variable {M : Type w} [TopologicalSpace M] [ChartedSpace H M] [ChartedSpace H E]
 variable {I : ModelWithCorners ℝ E H} {n : ℕ∞}
 
-/--
-A `RiemannianMetric` on a manifold `M` modeled on `H` with corners `I` (over the model space `E`,
-typically `ℝ^m`) is a family of inner products on the tangent spaces `TangentSpace I x` for 
-each `x : M`. This family is required to vary smoothly with `x`, specifically with smoothness `C^n`.
+/-- A `RiemannianMetric` on a manifold `M` modeled on `H` with corners `I` (over the model space `E`
+, typically `ℝ^m`) is a family of inner products on the tangent spaces `TangentSpace I x`
+for each `x : M`. This family is required to vary smoothly with `x`, specifically with smoothness
+`C^n`.
 
 This structure `extends` `PseudoRiemannianMetric`, inheriting the core properties of a
 pseudo-Riemannian metric, such as being a symmetric, non-degenerate, `C^n`-smooth tensor field
@@ -47,7 +47,7 @@ bilinear form, effectively an inner product, on the tangent space `TangentSpace 
 Parameters:
 - `I`: The `ModelWithCorners` for the manifold `M`. This defines the model space `E` (e.g., `ℝ^d`)
   and the model space for the boundary `H`.
-- `n`: The smoothness class of the metric, an `ℕ∞` value. The metric tensor components are `C^n` 
+- `n`: The smoothness class of the metric, an `ℕ∞` value. The metric tensor components are `C^n`
   functions.
 - `M`: The type of the manifold.
 - `[TopologicalSpace M]`: Assumes `M` has a topological structure.
@@ -55,15 +55,14 @@ Parameters:
 - `[IsManifold I (n + 1) M]`: Assumes `M` is a manifold of smoothness `C^(n+1)`.
   The manifold needs to be slightly smoother than the metric itself for certain constructions.
 - `[inst_tangent_findim : ∀ (x : M), FiniteDimensional ℝ (TangentSpace I x)]`:
-  Ensures that each tangent space is a finite-dimensional real vector space. 
+  Ensures that each tangent space is a finite-dimensional real vector space.
 
 Fields:
 - `toPseudoRiemannianMetric`: The underlying pseudo-Riemannian metric. This provides the
   smooth family of symmetric bilinear forms `val : M → SymBilinForm ℝ (TangentSpace I ·)`.
 - `pos_def'`: The positive-definiteness condition: `∀ x v, v ≠ 0 → val x v v > 0`. This asserts
   that for any point `x` and any non-zero tangent vector `v` at `x`, the metric evaluated
-  on `(v, v)` is strictly positive.
--/
+  on `(v, v)` is strictly positive. -/
 @[ext]
 structure RiemannianMetric
   (I : ModelWithCorners ℝ E H) (n : ℕ∞) (M : Type w)
@@ -129,15 +128,13 @@ noncomputable def tangentInnerCore (g : RiemannianMetric I n M) (x : M) :
     have h_pos : g.inner x v v > 0 := g.pos_def x v h_v_ne_zero
     linarith [h_inner_zero, h_pos]
 
-/-!
-### Local `NormedAddCommGroup` and `InnerProductSpace` Instances
+/-! ### Local `NormedAddCommGroup` and `InnerProductSpace` Instances
 
 These instances are defined locally to be used when a specific Riemannian metric `g`
 and point `x` are in context. They are not global instances to avoid typeclass conflicts
 and to respect the fact that a manifold might not have a canonical Riemannian metric,
 or might be studied with an indefinite (pseudo-Riemannian) metric where these
-standard norm structures are not appropriate.
--/
+standard norm structures are not appropriate.-/
 
 /-- Creates a `NormedAddCommGroup` structure on `TₓM` from a Riemannian metric `g`. -/
 noncomputable def TangentSpace.metricNormedAddCommGroup (g : RiemannianMetric I n M) (x : M) :
