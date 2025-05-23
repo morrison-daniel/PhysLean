@@ -406,6 +406,7 @@ lemma fromPairTContr_tmul_tmul {c c1 c2 : S.C}
     change x1 ⊗ₜ[k] ((S.contr.app (Discrete.mk (c))) (x2 ⊗ₜ[k] y1) • y2)
   simp [tmul_smul]
 
+set_option maxHeartbeats 400000 in
 lemma fromPairT_contr_fromPairT_eq_fromPairTContr_tmul (c c1 c2 : S.C)
     (x1 : (S.FD.obj (Discrete.mk c1)).V)
     (x2 : (S.FD.obj (Discrete.mk c)).V)
@@ -458,8 +459,9 @@ lemma fromPairT_contr_fromPairT_eq_fromPairTContr_tmul (c c1 c2 : S.C)
   conv_lhs => simp only [prodLeftMap_id, CompTriple.comp_eq]
   conv_rhs => rw [fromPairTContr_tmul_tmul]
   conv_rhs => rw [fromPairT_tmul]
-  simp
+  simp only [permT_permT, map_smul]
 
+set_option maxHeartbeats 400000 in
 lemma fromPairT_contr_fromPairT_eq_fromPairTContr (c c1 c2 : S.C)
     (x : (S.FD.obj (Discrete.mk c1)).V ⊗[k] (S.FD.obj (Discrete.mk c)).V)
     (y : (S.FD.obj (Discrete.mk (S.τ c))).V ⊗[k] (S.FD.obj (Discrete.mk c2)).V) :
@@ -811,7 +813,8 @@ lemma actionT_fromConstTriple {c1 c2 c3 : S.C}
 -/
 
 /-- A general constant node. -/
-def fromConst {n : ℕ} {c : Fin n → S.C} (T : 𝟙_ (Rep k G) ⟶ S.F.obj (OverColor.mk c)) :
+noncomputable def fromConst {n : ℕ} {c : Fin n → S.C}
+    (T : 𝟙_ (Rep k G) ⟶ S.F.obj (OverColor.mk c)) :
     Tensor S c := (T.hom (1 : k))
 
 /-!

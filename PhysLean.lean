@@ -21,6 +21,8 @@ import PhysLean.Electromagnetism.Wave
 import PhysLean.Mathematics.FDerivCurry
 import PhysLean.Mathematics.Fin
 import PhysLean.Mathematics.Fin.Involutions
+import PhysLean.Mathematics.Geometry.Metric.PseudoRiemannian.Defs
+import PhysLean.Mathematics.Geometry.Metric.Riemannian.Defs
 import PhysLean.Mathematics.LinearMaps
 import PhysLean.Mathematics.List
 import PhysLean.Mathematics.List.InsertIdx
@@ -264,4 +266,7 @@ import PhysLean.StringTheory.FTheory.SU5U1.PhenoConstraints.FiveBarFive
 import PhysLean.StringTheory.FTheory.SU5U1.PhenoConstraints.FiveBarSeven
 import PhysLean.StringTheory.FTheory.SU5U1.PhenoConstraints.FiveBarSix
 import PhysLean.StringTheory.FTheory.SU5U1.PhenoConstraints.TenCharges
+import PhysLean.StringTheory.FTheory.SU5U1.Potential.Basic
+import PhysLean.StringTheory.FTheory.SU5U1.Potential.PresentIrredSet
+import PhysLean.StringTheory.FTheory.SU5U1.Potential.ReducedCharges
 import PhysLean.Thermodynamics.Basic
