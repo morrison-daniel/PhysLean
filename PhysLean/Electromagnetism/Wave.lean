@@ -166,7 +166,7 @@ lemma electricPlaneWave_transverse_forall_x {E₀ : ℝ → EuclideanSpace ℝ (
     simp [-PiLp.inner_apply]
     rw [E'eqdivE]
     rw [OM.gaussLawElectric_of_free E B]
-    simp
+    simp only [PiLp.inner_apply, RCLike.inner_apply, conj_trivial, mul_zero]
     exact hm
     rw [hEwave, electricPlaneWave]
     unfold planeWave
@@ -178,7 +178,7 @@ lemma electricPlaneWave_transverse_forall_x {E₀ : ℝ → EuclideanSpace ℝ (
   use E t 0
   intro x
   rw [inner_sub_left, E'eqzero x 0]
-  simp
+  simp only [PiLp.inner_apply, RCLike.inner_apply, conj_trivial, sub_self]
   apply Differentiable.inner
   rw [hEwave, electricPlaneWave]
   unfold planeWave
@@ -212,7 +212,7 @@ lemma magneticPlaneWave_transverse_forall_x {B₀ : ℝ → EuclideanSpace ℝ (
     simp [-PiLp.inner_apply]
     rw [B'eqdivB]
     rw [OM.gaussLawMagnetic_of_free E B]
-    simp
+    simp only [PiLp.inner_apply, RCLike.inner_apply, conj_trivial, mul_zero]
     exact hm
     rw [hBwave, magneticPlaneWave]
     unfold planeWave
@@ -224,7 +224,7 @@ lemma magneticPlaneWave_transverse_forall_x {B₀ : ℝ → EuclideanSpace ℝ (
   use B t 0
   intro x
   rw [inner_sub_left, B'eqzero x 0]
-  simp
+  simp only [PiLp.inner_apply, RCLike.inner_apply, conj_trivial, sub_self]
   apply Differentiable.inner
   rw [hBwave, magneticPlaneWave]
   unfold planeWave
@@ -347,7 +347,7 @@ lemma B_eq_s_cross_electricPlaneWave {E₀ : ℝ → EuclideanSpace ℝ (Fin 3)}
         ((crossProduct ((WithLp.equiv 2 (Fin 3 → ℝ)) s)) ((WithLp.equiv 2 (Fin 3 → ℝ)) (E t x))))
         t 1) y = _
     rw [h]
-    simp
+    simp only [PiLp.zero_apply, ContinuousLinearMap.zero_apply]
     · apply DifferentiableAt.const_smul
       exact function_differentiableAt_fst (hf := hB.two_differentiable) ..
     · exact differentiable_crossProduct_if_planewave h' hEwave
