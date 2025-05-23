@@ -35,9 +35,8 @@ lemma fderiv_coord_dt (f : Time → Space → EuclideanSpace ℝ (Fin 3)) (t dt 
     (fun x => (fderiv ℝ (fun t => f t x) t) dt i) := by
   ext x
   rw [fderiv_pi]
-  · rfl
-  · intro i
-    fun_prop
+  rfl
+  · fun_prop
 
 /-- Derivatives along space coordinates and time commute. -/
 lemma fderiv_swap_time_space_coord
@@ -87,7 +86,7 @@ lemma fderiv_swap_time_space_coord
   · fun_prop
   · apply fderiv_curry_differentiableAt_fst_comp_snd
     exact hf
-  · exact hf
+  · fun_prop
   · fun_prop
   · apply fderiv_curry_differentiableAt_snd_comp_fst
     exact hf
@@ -116,16 +115,7 @@ lemma differentiableAt_fderiv_coord_single
       enter [2, y]
       change fderiv ℝ (fun x => ftt y x) x
       rw [h1]
-    refine Differentiable.clm_comp ?_ ?_
-    · have hn (t : Time) : fderiv ℝ (↿ftt) (t, x)=
-        fderiv ℝ (↿ftt) ((t, ·) x) := rfl
-      conv =>
-        enter [2, y]
-        rw [hn]
-      refine Differentiable.comp' ?_ ?_
-      · exact hd.two_fderiv_differentiable
-      · fun_prop
-    · fun_prop
+    fun_prop
   · fun_prop
 
 /-- Curl and time derivative commute. -/
@@ -146,7 +136,7 @@ lemma time_deriv_curl_commute (fₜ : Time → Space → EuclideanSpace ℝ (Fin
       rw [fderiv_swap_time_space_coord, fderiv_swap_time_space_coord]
       rw [fderiv_coord_dt, fderiv_coord_dt]
       repeat exact hf.two_differentiable
-      repeat exact hf
+      repeat fun_prop
       repeat
         apply differentiableAt_fderiv_coord_single
         exact hf
@@ -154,8 +144,8 @@ lemma time_deriv_curl_commute (fₜ : Time → Space → EuclideanSpace ℝ (Fin
     unfold curl Space.deriv Space.coord Space.basis
     fin_cases i <;>
     · simp only [Fin.isValue, EuclideanSpace.basisFun_apply, PiLp.inner_apply,
-      EuclideanSpace.single_apply, RCLike.inner_apply, conj_trivial, ite_mul, one_mul, zero_mul,
-      Finset.sum_ite_eq', Finset.mem_univ, ↓reduceIte]
+        EuclideanSpace.single_apply, RCLike.inner_apply, conj_trivial, ite_mul, one_mul, zero_mul,
+        Finset.sum_ite_eq', Finset.mem_univ, ↓reduceIte]
       apply DifferentiableAt.sub
       repeat
         apply differentiableAt_fderiv_coord_single
@@ -183,13 +173,13 @@ lemma time_deriv_cross_commute {s : Space} {f : Time → EuclideanSpace ℝ (Fin
   ext i
   fin_cases i <;>
   · simp only [Nat.succ_eq_add_one, Nat.reduceAdd, Fin.isValue, LinearMap.mk₂_apply,
-    WithLp.equiv_pi_apply, Fin.reduceFinMk, WithLp.equiv_symm_pi_apply, cons_val]
+      WithLp.equiv_pi_apply, Fin.reduceFinMk, WithLp.equiv_symm_pi_apply, cons_val]
     rw [h]
     repeat rw [Time.deriv]
     simp only [Fin.isValue, fderiv_eq_smul_deriv, smul_eq_mul, one_mul, PiLp.smul_apply]
     rw [deriv_pi]
     simp only [Fin.isValue, WithLp.equiv_symm_pi_apply, cons_val]
-    intro i
-    fin_cases i <;>
-    · simp only [Fin.isValue, Fin.reduceFinMk, WithLp.equiv_symm_pi_apply, cons_val]
-      fun_prop
+    · intro i
+      fin_cases i <;>
+      · simp only [Fin.isValue, Fin.reduceFinMk, WithLp.equiv_symm_pi_apply, cons_val]
+        fun_prop

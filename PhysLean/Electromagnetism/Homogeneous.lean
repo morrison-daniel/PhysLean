@@ -71,7 +71,8 @@ def OpticalMedium.FreeMaxwellEquations (OM : OpticalMedium)
 
 theorem OpticalMedium.gaussLawElectric_of_free (E : ElectricField) (B : MagneticField)
     (h : OM.FreeMaxwellEquations E B) :
-    (∇ ⬝ E t) x = 0 := by
+    ∀ t x, (∇ ⬝ E t) x = 0 := by
+  intro t x
   have h' := h.1
   rw [GaussLawElectric] at h'
   have h'' : OM.ε * div (E t) x = OM.ε * 0 := by
@@ -83,16 +84,19 @@ theorem OpticalMedium.gaussLawElectric_of_free (E : ElectricField) (B : Magnetic
 
 theorem OpticalMedium.gaussLawMagnetic_of_free (E : ElectricField) (B : MagneticField)
     (h : OM.FreeMaxwellEquations E B) :
-    (∇ ⬝ B t) x = 0 := by
+    ∀ t x, (∇ ⬝ B t) x = 0 := by
+  intro t x
   rw [h.2.1]
 
 theorem OpticalMedium.ampereLaw_of_free (E : ElectricField) (B : MagneticField)
     (h : OM.FreeMaxwellEquations E B) :
-    (∇ × B t) x = μ • ε • ∂ₜ (fun t => E t x) t := by
+    ∀ t x, (∇ × B t) x = μ • ε • ∂ₜ (fun t => E t x) t := by
+  intro t x
   rw [h.2.2.1]
   aesop
 
 theorem OpticalMedium.faradayLaw_of_free (E : ElectricField) (B : MagneticField)
     (h : OM.FreeMaxwellEquations E B) :
-    (∇ × E t) x = - ∂ₜ (fun t => B t x) t := by
+    ∀ t x, (∇ × E t) x = - ∂ₜ (fun t => B t x) t := by
+  intro t x
   rw [h.2.2.2]
