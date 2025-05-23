@@ -4,6 +4,9 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Joseph Tooby-Smith
 -/
 import PhysLean.StringTheory.FTheory.SU5U1.NoExotics.Basic
+import Mathlib.Analysis.Normed.Ring.Lemmas
+import Mathlib.Algebra.Order.Star.Basic
+import Mathlib.Tactic.FinCases
 /-!
 
 # Chirality flux and no exotics
