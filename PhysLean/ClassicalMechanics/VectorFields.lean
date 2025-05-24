@@ -153,14 +153,16 @@ lemma time_deriv_curl_commute (fₜ : Time → Space → EuclideanSpace ℝ (Fin
 
 open Matrix
 
+set_option quotPrecheck false in
+infixl:70 " ⨯ₑ₃ "  => fun a b => (WithLp.equiv 2 (Fin 3 → ℝ)).symm
+    (WithLp.equiv 2 (Fin 3 → ℝ) a ×₃ WithLp.equiv 2 (Fin 3 → ℝ) b)
+
 /-- Cross product and time derivative commute. -/
 lemma time_deriv_cross_commute {s : Space} {f : Time → EuclideanSpace ℝ (Fin 3)}
     (hf : Differentiable ℝ f) :
-    (WithLp.equiv 2 (Fin 3 → ℝ)).symm
-    (WithLp.equiv _ _ s ×₃ WithLp.equiv _ _ (∂ₜ (fun t => f t) t))
+    s ⨯ₑ₃ (∂ₜ (fun t => f t) t)
     =
-    ∂ₜ (fun t => (WithLp.equiv 2 (Fin 3 → ℝ)).symm
-    (WithLp.equiv _ _ s ×₃ WithLp.equiv _ _ (f t))) t := by
+    ∂ₜ (fun t => s ⨯ₑ₃ (f t)) t := by
   have h (u v : Fin 3): s u * ∂ₜ (fun t => f t) t v - s v * ∂ₜ (fun t => f t) t u =
       ∂ₜ (fun t => s u * f t v - s v * f t u) t := by
     repeat rw [Time.deriv]
@@ -173,7 +175,7 @@ lemma time_deriv_cross_commute {s : Space} {f : Time → EuclideanSpace ℝ (Fin
   ext i
   fin_cases i <;>
   · simp only [Nat.succ_eq_add_one, Nat.reduceAdd, Fin.isValue, LinearMap.mk₂_apply,
-      WithLp.equiv_pi_apply, Fin.reduceFinMk, WithLp.equiv_symm_pi_apply, cons_val]
+    WithLp.equiv_pi_apply, Fin.reduceFinMk, WithLp.equiv_symm_pi_apply, cons_val]
     rw [h]
     repeat rw [Time.deriv]
     simp only [Fin.isValue, fderiv_eq_smul_deriv, smul_eq_mul, one_mul, PiLp.smul_apply]

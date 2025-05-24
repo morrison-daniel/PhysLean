@@ -142,25 +142,24 @@ noncomputable def magneticPlaneWave (B₀ : ℝ → EuclideanSpace ℝ (Fin 3))
     planeWave B₀ c s hs
 
 /-- An electric plane wave minus a constant field is transverse for all x. -/
-lemma electricPlaneWave_transverse_forall_x {E₀ : ℝ → EuclideanSpace ℝ (Fin 3)}
-    {s : Space} {hs : inner ℝ s s = (1:ℝ)} {E : ElectricField}
+lemma transverse_upto_time_fun_of_eq_electricPlaneWave {E₀ : ℝ → EuclideanSpace ℝ (Fin 3)}
+    {s : Space} {hs : inner ℝ s s = 1} {E : ElectricField}
     {B : MagneticField} (hEwave : E = electricPlaneWave E₀ c s hs)
     (h' : Differentiable ℝ E₀) (hm : OM.FreeMaxwellEquations E B) :
-    ∀ t, ∃ constE, ∀ x, inner ℝ (E t x - constE) s = 0 := by
-  intro t
-  have E'eqdivE : ∀ x y, inner ℝ (fderiv ℝ (E t) x y) s = inner ℝ y s * (∇ ⬝ (E t)) x := by
-    intro x y
+    ∃ (c : Time → EuclideanSpace ℝ (Fin 3)), ∀ t x, inner ℝ (E t x - c t) s = 0 := by
+  have E'eqdivE : ∀ t x y, inner ℝ (fderiv ℝ (E t) x y) s = inner ℝ y s * (∇ ⬝ (E t)) x := by
+    intro t x y
     rw [hEwave, electricPlaneWave]
     unfold planeWave div coord basis Space.deriv
     rw [PiLp.inner_apply]
     simp [-PiLp.inner_apply]
     conv_lhs =>
       enter [2, i]
-      rw [wave_deriv_inner_eq_inner_deriv_proj h']
+      rw [wave_fderiv_inner_eq_inner_fderiv_proj h']
     rw [← Finset.mul_sum]
     simp
-  have E'eqzero : ∀ x, fderiv ℝ (fun x => (inner ℝ (E t x) s)) x = 0 := by
-    intro t
+  have E'eqzero : ∀ t x, fderiv ℝ (fun x => (inner ℝ (E t x) s)) x = 0 := by
+    intro t x
     ext y
     rw [fderiv_inner_apply]
     simp [-PiLp.inner_apply]
@@ -174,10 +173,11 @@ lemma electricPlaneWave_transverse_forall_x {E₀ : ℝ → EuclideanSpace ℝ (
     fun_prop
     exact fun x => wave_differentiable
     fun_prop
-  apply is_const_of_fderiv_eq_zero at E'eqzero
-  use E t 0
-  intro x
-  rw [inner_sub_left, E'eqzero x 0]
+  use fun t => E t 0
+  intro t x
+  have hx' := E'eqzero t
+  apply is_const_of_fderiv_eq_zero at hx'
+  rw [inner_sub_left, hx' x 0]
   simp only [PiLp.inner_apply, RCLike.inner_apply, conj_trivial, sub_self]
   apply Differentiable.inner
   rw [hEwave, electricPlaneWave]
@@ -188,25 +188,24 @@ lemma electricPlaneWave_transverse_forall_x {E₀ : ℝ → EuclideanSpace ℝ (
   fun_prop
 
 /-- An magnetic plane wave minus a constant field is transverse for all x. -/
-lemma magneticPlaneWave_transverse_forall_x {B₀ : ℝ → EuclideanSpace ℝ (Fin 3)}
-    {s : Space} {hs : inner ℝ s s = (1:ℝ)} {E : ElectricField}
+lemma transverse_upto_time_fun_of_eq_magneticPlaneWave {B₀ : ℝ → EuclideanSpace ℝ (Fin 3)}
+    {s : Space} {hs : inner ℝ s s = 1} {E : ElectricField}
     {B : MagneticField} (hBwave : B = magneticPlaneWave B₀ c s hs)
     (h' : Differentiable ℝ B₀) (hm : OM.FreeMaxwellEquations E B) :
-    ∀ t, ∃ constB, ∀ x, inner ℝ (B t x - constB) s = 0 := by
-  intro t
-  have B'eqdivB : ∀ x y, inner ℝ (fderiv ℝ (B t) x y) s = inner ℝ y s * (∇ ⬝ (B t)) x := by
-    intro x y
+    ∃ (c : Time → EuclideanSpace ℝ (Fin 3)), ∀ t x, inner ℝ (B t x - c t) s = 0 := by
+  have B'eqdivB : ∀ t x y, inner ℝ (fderiv ℝ (B t) x y) s = inner ℝ y s * (∇ ⬝ (B t)) x := by
+    intro t x y
     rw [hBwave, magneticPlaneWave]
     unfold planeWave div coord basis Space.deriv
     rw [PiLp.inner_apply]
     simp [-PiLp.inner_apply]
     conv_lhs =>
       enter [2, i]
-      rw [wave_deriv_inner_eq_inner_deriv_proj h']
+      rw [wave_fderiv_inner_eq_inner_fderiv_proj h']
     rw [← Finset.mul_sum]
     simp
-  have B'eqzero : ∀ x, fderiv ℝ (fun x => (inner ℝ (B t x) s)) x = 0 := by
-    intro x
+  have B'eqzero : ∀ t x, fderiv ℝ (fun x => (inner ℝ (B t x) s)) x = 0 := by
+    intro t x
     ext y
     rw [fderiv_inner_apply]
     simp [-PiLp.inner_apply]
@@ -220,10 +219,11 @@ lemma magneticPlaneWave_transverse_forall_x {B₀ : ℝ → EuclideanSpace ℝ (
     fun_prop
     exact fun x => wave_differentiable
     fun_prop
-  apply is_const_of_fderiv_eq_zero at B'eqzero
-  use B t 0
-  intro x
-  rw [inner_sub_left, B'eqzero x 0]
+  use fun t => B t 0
+  intro t x
+  have hx' := B'eqzero t
+  apply is_const_of_fderiv_eq_zero at hx'
+  rw [inner_sub_left, hx' x 0]
   simp only [PiLp.inner_apply, RCLike.inner_apply, conj_trivial, sub_self]
   apply Differentiable.inner
   rw [hBwave, magneticPlaneWave]
@@ -233,17 +233,14 @@ lemma magneticPlaneWave_transverse_forall_x {B₀ : ℝ → EuclideanSpace ℝ (
   exact fun x => wave_differentiable
   fun_prop
 
-open Matrix
-
 /-- The time derivative of a magnetic planewave induces an electric field with
-time derivative equal to `-s ×₃ B'`. -/
-lemma dt_E_eq_s_cross_neg_dt_magneticPlaneWave {B₀ : ℝ → EuclideanSpace ℝ (Fin 3)}
-    {s : Space} {hs : inner ℝ s s = (1:ℝ)} {E : ElectricField} {B : MagneticField}
+time derivative equal to `- s ⨯ₑ₃ B'`. -/
+lemma time_deriv_electricPlaneWave_eq_cross_time_deriv_magneticPlaneWave
+    {t : Time} {x : Space} {B₀ : ℝ → EuclideanSpace ℝ (Fin 3)}
+    {s : Space} {hs : inner ℝ s s = 1} {E : ElectricField} {B : MagneticField}
     (hc : c = (√(μ • ε))⁻¹) (hBwave : B = magneticPlaneWave B₀ c s hs)
     (h' : Differentiable ℝ B₀) (hm : OM.FreeMaxwellEquations E B) :
-    ∀ t x, (√(μ • ε)) • ∂ₜ (fun t => E t x) t = - (WithLp.equiv 2 (Fin 3 → ℝ)).symm
-    (WithLp.equiv _ _ s ×₃ WithLp.equiv _ _ (∂ₜ (fun t => B t x) t)) := by
-  intro t x
+    (√(μ • ε)) • ∂ₜ (fun t => E t x) t = - (s ⨯ₑ₃ (∂ₜ (fun t => B t x) t)) := by
   have h : (√(μ • ε)) = ((√(μ • ε))⁻¹) • (μ • ε) := by
     nth_rw 3 [← Real.sq_sqrt (le_of_lt (smul_pos OM.mu_ge_zero OM.eps_ge_zero))]
     rw [pow_two]
@@ -254,111 +251,109 @@ lemma dt_E_eq_s_cross_neg_dt_magneticPlaneWave {B₀ : ℝ → EuclideanSpace �
     simp only [smul_eq_mul, _root_.mul_inv_rev, ← smul_assoc, mul_assoc, ne_eq, OM.mu_ge_zero,
       ne_of_gt, not_false_eq_true, inv_mul_cancel_left₀, OM.eps_ge_zero, inv_mul_cancel₀, one_smul]
     exact hm
-  rw [crossProduct, h, smul_assoc, hdt, hBwave, magneticPlaneWave, ← hc]
+  rw [h, smul_assoc, hdt, hBwave, magneticPlaneWave, ← hc, crossProduct]
   unfold planeWave curl coord basis Space.deriv
   ext i
   fin_cases i <;>
   · simp [-PiLp.inner_apply, ← mul_assoc, OM.mu_ge_zero, OM.eps_ge_zero, ne_of_gt]
-    rw [wave_fderiv_inner_coord_sub h']
+    rw [mul_sub, wave_fderiv_inner_coord_sub h', wave_fderiv_inner_coord_sub h']
+    ring
 
 /-- The time derivative of an electric planewave induces a magnetic field with
-time derivative equal to `s ×₃ E'`. -/
-lemma dt_B_eq_s_cross_dt_electricPlaneWave {E₀ : ℝ → EuclideanSpace ℝ (Fin 3)}
-    {s : Space} {hs : inner ℝ s s = (1:ℝ)} {E : ElectricField} {B : MagneticField}
+time derivative equal to `s ⨯ₑ₃ E'`. -/
+lemma time_deriv_magneticPlaneWave_eq_cross_time_deriv_electricPlaneWave
+    {t : Time} {x : Space}  {E₀ : ℝ → EuclideanSpace ℝ (Fin 3)}
+    {s : Space} {hs : inner ℝ s s = 1} {E : ElectricField} {B : MagneticField}
     (hc : c = (√(μ • ε))⁻¹) (hEwave : E = electricPlaneWave E₀ c s hs)
     (h' : Differentiable ℝ E₀) (hm : OM.FreeMaxwellEquations E B) :
-    ∀ t x, (√(μ • ε))⁻¹ • ∂ₜ (fun t => B t x) t = (WithLp.equiv 2 (Fin 3 → ℝ)).symm
-    (WithLp.equiv _ _ s ×₃ WithLp.equiv _ _ (∂ₜ (fun t => E t x) t)) := by
-  intro t x
-  rw [crossProduct, ← neg_neg (∂ₜ (fun t => B t x) t),
-      ← OM.faradayLaw_of_free E B, hEwave, electricPlaneWave, ← hc]
+    (√(μ • ε))⁻¹ • ∂ₜ (fun t => B t x) t = s ⨯ₑ₃ (∂ₜ (fun t => E t x) t) := by
+  rw [← neg_neg (∂ₜ (fun t => B t x) t),
+      ← OM.faradayLaw_of_free E B, hEwave, electricPlaneWave, ← hc, crossProduct]
   unfold planeWave curl coord basis Space.deriv
   ext i
   fin_cases i <;>
   · simp [-PiLp.inner_apply]
-    rw [wave_fderiv_inner_coord_sub h']
+    rw [mul_sub, wave_fderiv_inner_coord_sub h', wave_fderiv_inner_coord_sub h']
+    ring
   exact hm
 
-/-- A magnetic planewave induces an electric field equal to `-s ×₃ B` plus a constant field. -/
-lemma E_eq_s_cross_neg_magneticPlaneWave {B₀ : ℝ → EuclideanSpace ℝ (Fin 3)}
-    {s : Space} {hs : inner ℝ s s = (1:ℝ)} {E : ElectricField} {B : MagneticField}
-    (hc : c = (√(μ • ε))⁻¹) (hBwave : B = magneticPlaneWave B₀ c s hs) (h' : Differentiable ℝ B₀)
-    (hm : OM.FreeMaxwellEquations E B) (hE : ContDiff ℝ 2 ↿E) : ∀ x, ∃ constE, ∀ t,
-    (√(μ • ε)) • (E t x) = - (WithLp.equiv 2 (Fin 3 → ℝ)).symm
-    (WithLp.equiv _ _ s ×₃ WithLp.equiv _ _ (B t x)) + constE := by
-  intro x
-  have h : ∀ t, ∂ₜ (fun t => (√(μ • ε)) • (E t x)) t +
-      ∂ₜ (fun t => (WithLp.equiv 2 (Fin 3 → ℝ)).symm
-      (WithLp.equiv _ _ s ×₃ WithLp.equiv _ _ (B t x))) t = 0 := by
-    intro t
-    rw [deriv_smul, dt_E_eq_s_cross_neg_dt_magneticPlaneWave OM hc hBwave h' hm]
+/-- A magnetic planewave induces an electric field equal to `- s ⨯ₑ₃ B` plus a constant field. -/
+lemma electricPlaneWave_eq_cross_magneticPlaneWave_upto_space_fun
+    {B₀ : ℝ → EuclideanSpace ℝ (Fin 3)} {s : Space} {hs : inner ℝ s s = 1}
+    {E : ElectricField} {B : MagneticField} (hc : c = (√(μ • ε))⁻¹)
+    (hBwave : B = magneticPlaneWave B₀ c s hs) (h' : Differentiable ℝ B₀)
+    (hm : OM.FreeMaxwellEquations E B) (hE : ContDiff ℝ 2 ↿E) :
+    ∃ (c : Space → EuclideanSpace ℝ (Fin 3)), ∀ t x,
+    (√(μ • ε)) • (E t x) = - (s ⨯ₑ₃ (B t x)) + c x := by
+  have h : ∀ t x, ∂ₜ (fun t => (√(μ • ε)) • (E t x)) t + ∂ₜ (fun t => s ⨯ₑ₃ (B t x)) t = 0 := by
+    intro t x
+    rw [deriv_smul, time_deriv_electricPlaneWave_eq_cross_time_deriv_magneticPlaneWave
+         OM hc hBwave h' hm]
     rw [time_deriv_cross_commute]
     simp only [neg_add_cancel]
-    · exact differentiable_t_if_planewave h' hBwave
+    · exact time_differentiable_of_eq_planewave h' hBwave
     · exact fun x => function_differentiableAt_fst (hf := hE.two_differentiable) ..
   unfold Time.deriv at h
-  have hderiv : ∀ t, _root_.deriv (fun t => ((√(μ • ε)) • (E t x)) +
-      ((WithLp.equiv 2 (Fin 3 → ℝ)).symm
-      (WithLp.equiv _ _ s ×₃ WithLp.equiv _ _ (B t x)))) t = 0 := by
-    intro t
+  have hderiv : ∀ t x, _root_.deriv (fun t => ((√(μ • ε)) • (E t x)) +
+      s ⨯ₑ₃ (B t x)) t = 0 := by
+    intro t x
     rw [_root_.deriv_add]
     simp_all
     · apply DifferentiableAt.const_smul
       exact function_differentiableAt_fst (hf := hE.two_differentiable) ..
-    · exact differentiable_crossProduct_if_planewave h' hBwave
-  apply is_const_of_deriv_eq_zero at hderiv
-  use √(OM.μ • OM.ε) • E 0 x + (WithLp.equiv 2 (Fin 3 → ℝ)).symm
-    ((crossProduct ((WithLp.equiv 2 (Fin 3 → ℝ)) s)) ((WithLp.equiv 2 (Fin 3 → ℝ)) (B 0 x)))
-  intro t
-  rw [← hderiv t 0]
+    · exact crossProduct_differentiable_of_right_eq_planewave h' hBwave
+  use fun x => (√(μ • ε)) • (E 0 x) + (s ⨯ₑ₃ B 0 x)
+  intro t x
+  have ht' := fun t => hderiv t x
+  apply is_const_of_deriv_eq_zero at ht'
+  simp only
+  rw [ht' 0 t]
   simp only [smul_eq_mul, neg_add_cancel_comm_assoc]
   · intro x
     apply DifferentiableAt.add
     · apply DifferentiableAt.const_smul
       exact function_differentiableAt_fst (hf := hE.two_differentiable) ..
-    · exact differentiable_crossProduct_if_planewave h' hBwave
+    · exact crossProduct_differentiable_of_right_eq_planewave h' hBwave
 
 /-- An electric planewave induces an magnetic field equal to `s ×₃ E` plus a constant field. -/
-lemma B_eq_s_cross_electricPlaneWave {E₀ : ℝ → EuclideanSpace ℝ (Fin 3)}
-    {s : Space} {hs : inner ℝ s s = (1:ℝ)} {E : ElectricField} {B : MagneticField}
-    (hc : c = (√(μ • ε))⁻¹) (hEwave : E = electricPlaneWave E₀ c s hs) (h' : Differentiable ℝ E₀)
-    (hm : OM.FreeMaxwellEquations E B) (hB : ContDiff ℝ 2 ↿B) : ∀ x, ∃ constB, ∀ t,
-    (√(μ • ε))⁻¹ • (B t x) = (WithLp.equiv 2 (Fin 3 → ℝ)).symm
-    (WithLp.equiv _ _ s ×₃ WithLp.equiv _ _ (E t x)) + constB := by
-  intro x
+lemma magneticPlaneWave_eq_cross_electricPlaneWave_upto_space_fun
+    {E₀ : ℝ → EuclideanSpace ℝ (Fin 3)} {s : Space} {hs : inner ℝ s s = (1:ℝ)}
+    {E : ElectricField} {B : MagneticField} (hc : c = (√(μ • ε))⁻¹)
+    (hEwave : E = electricPlaneWave E₀ c s hs) (h' : Differentiable ℝ E₀)
+    (hm : OM.FreeMaxwellEquations E B) (hB : ContDiff ℝ 2 ↿B) :
+    ∃ (c : Space → EuclideanSpace ℝ (Fin 3)), ∀ t x,
+    (√(μ • ε))⁻¹ • (B t x) = s ⨯ₑ₃ (E t x) + c x := by
   have h : ∀ t x, ∂ₜ (fun t => (√(μ • ε))⁻¹ • (B t x)) t -
-      ∂ₜ (fun t => (WithLp.equiv 2 (Fin 3 → ℝ)).symm
-      (WithLp.equiv _ _ s ×₃ WithLp.equiv _ _ (E t x))) t = 0 := by
+      ∂ₜ (fun t => s ⨯ₑ₃ (E t x)) t = 0 := by
     intro t x
-    rw [deriv_smul, dt_B_eq_s_cross_dt_electricPlaneWave OM hc hEwave h' hm]
+    rw [deriv_smul, time_deriv_magneticPlaneWave_eq_cross_time_deriv_electricPlaneWave
+        OM hc hEwave h' hm]
     rw [time_deriv_cross_commute]
-    simp only [sub_self]
-    · exact differentiable_t_if_planewave h' hEwave
+    simp [sub_self]
+    · exact time_differentiable_of_eq_planewave h' hEwave
     · exact fun x => function_differentiableAt_fst (hf := hB.two_differentiable) ..
   unfold Time.deriv at h
-  have hderiv : ∀ t, fderiv ℝ (fun t => ((√(μ • ε))⁻¹ • (B t x)) -
-      ((WithLp.equiv 2 (Fin 3 → ℝ)).symm
-      (WithLp.equiv _ _ s ×₃ WithLp.equiv _ _ (E t x)))) t = 0 := by
-    intro t
+  have hderiv : ∀ t x, fderiv ℝ (fun t => ((√(μ • ε))⁻¹ • (B t x)) -
+      s ⨯ₑ₃ (E t x)) t = 0 := by
+    intro t x
     ext y
     rw [fderiv_sub]
     change (fderiv ℝ (fun t => (√(μ • ε))⁻¹ • B t x) t 1 -
-        fderiv ℝ (fun t => (WithLp.equiv 2 (Fin 3 → ℝ)).symm
-        ((crossProduct ((WithLp.equiv 2 (Fin 3 → ℝ)) s)) ((WithLp.equiv 2 (Fin 3 → ℝ)) (E t x))))
-        t 1) y = _
+        fderiv ℝ (fun t => s ⨯ₑ₃ (E t x)) t 1) y = _
     rw [h]
     simp only [PiLp.zero_apply, ContinuousLinearMap.zero_apply]
     · apply DifferentiableAt.const_smul
       exact function_differentiableAt_fst (hf := hB.two_differentiable) ..
-    · exact differentiable_crossProduct_if_planewave h' hEwave
-  apply is_const_of_fderiv_eq_zero at hderiv
-  use (√(μ • ε))⁻¹ • B 0 x - (WithLp.equiv 2 (Fin 3 → ℝ)).symm
-    ((crossProduct ((WithLp.equiv 2 (Fin 3 → ℝ)) s)) ((WithLp.equiv 2 (Fin 3 → ℝ)) (E 0 x)))
-  intro t
-  rw [← hderiv t 0]
+    · exact crossProduct_differentiable_of_right_eq_planewave h' hEwave
+  use fun x => (√(μ • ε))⁻¹ • (B 0 x) - (s ⨯ₑ₃ E 0 x)
+  intro t x
+  have ht' := fun t => hderiv t x
+  apply is_const_of_fderiv_eq_zero at ht'
+  simp only
+  rw [ht' 0 t]
   simp only [smul_eq_mul, add_sub_cancel]
   · intro x
     apply DifferentiableAt.sub
     · apply DifferentiableAt.const_smul
       exact function_differentiableAt_fst (hf := hB.two_differentiable) ..
-    · exact differentiable_crossProduct_if_planewave h' hEwave
+    · exact crossProduct_differentiable_of_right_eq_planewave h' hEwave

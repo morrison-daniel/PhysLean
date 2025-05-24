@@ -3,10 +3,8 @@ Copyright (c) 2025 Zhi Kai Pong. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Zhi Kai Pong
 -/
-import PhysLean.ClassicalMechanics.Time.Basic
 import Mathlib.Analysis.InnerProductSpace.Calculus
-import Mathlib.LinearAlgebra.CrossProduct
-import PhysLean.ClassicalMechanics.Space.Basic
+import PhysLean.ClassicalMechanics.VectorFields
 /-!
 # Wave equation
 
@@ -214,21 +212,19 @@ theorem planeWave_isWave (c : ℝ) (s : Space d) (hs : inner ℝ s s = 1)
 ## Helper lemmas for further derivation
 -/
 
+/-- If `f₀` is a function of `(inner ℝ x s - c * t)`, `fderiv` with respect to a spatial coordinates
+is equal to the corresponding component of the propagation direction `s` times the time derivative. -/
 lemma wave_fderiv_inner_coord_sub {f₀ : ℝ → EuclideanSpace ℝ (Fin 3)}
     {s : Space} {u v : Fin 3} (h' : Differentiable ℝ f₀) :
     c * ((fun x' => (fderiv ℝ (fun x => inner ℝ (f₀ (inner ℝ x s - c * t))
-    (EuclideanSpace.single u 1)) x') (EuclideanSpace.single v 1)) x -
-    (fun x' => (fderiv ℝ (fun x => inner ℝ (f₀ (inner ℝ x s - c * t))
     (EuclideanSpace.single v 1)) x') (EuclideanSpace.single u 1)) x)
     =
-    s u * ∂ₜ (fun t => f₀ (inner ℝ x s - c * t)) t v -
-    s v * ∂ₜ (fun t => f₀ (inner ℝ x s - c * t)) t u := by
-  rw [wave_dx, wave_dx, wave_dt]
+    - s u * ∂ₜ (fun t => f₀ (inner ℝ x s - c * t)) t v := by
+  rw [wave_dx, wave_dt]
   simp only [PiLp.inner_apply, RCLike.inner_apply, conj_trivial, EuclideanSpace.single_apply,
     ite_mul, one_mul, zero_mul, Finset.sum_ite_eq', Finset.mem_univ, ↓reduceIte, PiLp.smul_apply,
     smul_eq_mul, neg_mul, mul_neg, sub_neg_eq_add]
   rw [← mul_one (s u), ← smul_eq_mul (s u), ContinuousLinearMap.map_smul]
-  rw [← mul_one (s v), ← smul_eq_mul (s v), ContinuousLinearMap.map_smul]
   simp only [PiLp.smul_apply, smul_eq_mul, mul_one]
   ring
   repeat
@@ -236,7 +232,7 @@ lemma wave_fderiv_inner_coord_sub {f₀ : ℝ → EuclideanSpace ℝ (Fin 3)}
     apply DifferentiableAt.hasFDerivAt
     fun_prop
 
-lemma differentiable_t_if_planewave {s : Space} {hs : inner ℝ s s = 1}
+lemma time_differentiable_of_eq_planewave {s : Space} {hs : inner ℝ s s = 1}
     {f₀ : ℝ → EuclideanSpace ℝ (Fin 3)} {f : Time → Space → EuclideanSpace ℝ (Fin 3)}
     (h' : Differentiable ℝ f₀) (hf : f = planeWave f₀ c s hs) :
     Differentiable ℝ fun t => f t x := by
@@ -244,13 +240,10 @@ lemma differentiable_t_if_planewave {s : Space} {hs : inner ℝ s s = 1}
   unfold planeWave
   fun_prop
 
-open Matrix
-
-lemma differentiable_crossProduct_if_planewave {s : Space} {hs : inner ℝ s s = 1}
+lemma crossProduct_differentiable_of_right_eq_planewave {s : Space} {hs : inner ℝ s s = 1}
     {f₀ : ℝ → EuclideanSpace ℝ (Fin 3)} {f : Time → Space → EuclideanSpace ℝ (Fin 3)}
     (h' : Differentiable ℝ f₀) (hf : f = planeWave f₀ c s hs) :
-    DifferentiableAt Time (fun t => (WithLp.equiv 2 (Fin 3 → ℝ)).symm
-    (((WithLp.equiv 2 (Fin 3 → ℝ)) s) ×₃ ((WithLp.equiv 2 (Fin 3 → ℝ)) (f t x))))
+    DifferentiableAt Time (fun t => s ⨯ₑ₃ (f t x))
   t := by
   rw [hf, crossProduct]
   unfold planeWave
@@ -262,7 +255,7 @@ lemma differentiable_crossProduct_if_planewave {s : Space} {hs : inner ℝ s s =
       Fin.reduceFinMk, WithLp.equiv_symm_pi_apply, Matrix.cons_val]
     fun_prop
 
-lemma wave_deriv_inner_eq_inner_deriv_proj {f₀ : ℝ → EuclideanSpace ℝ (Fin 3)}
+lemma wave_fderiv_inner_eq_inner_fderiv_proj {f₀ : ℝ → EuclideanSpace ℝ (Fin 3)}
     {s : Space} {i : Fin 3} (h' : Differentiable ℝ f₀) :
     ∀ x y, s i * (fderiv ℝ (fun x => f₀ (inner ℝ x s - c * t)) x) y i
     =
