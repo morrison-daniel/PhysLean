@@ -212,8 +212,9 @@ theorem planeWave_isWave (c : ℝ) (s : Space d) (hs : inner ℝ s s = 1)
 ## Helper lemmas for further derivation
 -/
 
-/-- If `f₀` is a function of `(inner ℝ x s - c * t)`, `fderiv` with respect to a spatial coordinates
-is equal to the corresponding component of the propagation direction `s` times the time derivative. -/
+/-- If `f₀` is a function of `(inner ℝ x s - c * t)`, the fderiv of its components
+with respect to spatial coordinates is equal to the corresponding component of
+the propagation direction `s` times time derivative. -/
 lemma wave_fderiv_inner_coord_sub {f₀ : ℝ → EuclideanSpace ℝ (Fin 3)}
     {s : Space} {u v : Fin 3} (h' : Differentiable ℝ f₀) :
     c * ((fun x' => (fderiv ℝ (fun x => inner ℝ (f₀ (inner ℝ x s - c * t))
