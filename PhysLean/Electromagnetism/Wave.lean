@@ -256,7 +256,8 @@ lemma time_deriv_electricPlaneWave_eq_cross_time_deriv_magneticPlaneWave
   ext i
   fin_cases i <;>
   · simp [-PiLp.inner_apply, ← mul_assoc, OM.mu_ge_zero, OM.eps_ge_zero, ne_of_gt]
-    rw [mul_sub, wave_fderiv_inner_coord_sub h', wave_fderiv_inner_coord_sub h']
+    rw [mul_sub, space_fderiv_of_inner_product_wave_eq_space_fderiv h',
+      space_fderiv_of_inner_product_wave_eq_space_fderiv h']
     ring
 
 /-- The time derivative of an electric planewave induces a magnetic field with
@@ -273,7 +274,8 @@ lemma time_deriv_magneticPlaneWave_eq_cross_time_deriv_electricPlaneWave
   ext i
   fin_cases i <;>
   · simp [-PiLp.inner_apply]
-    rw [mul_sub, wave_fderiv_inner_coord_sub h', wave_fderiv_inner_coord_sub h']
+    rw [mul_sub, space_fderiv_of_inner_product_wave_eq_space_fderiv h',
+      space_fderiv_of_inner_product_wave_eq_space_fderiv h']
     ring
   exact hm
 

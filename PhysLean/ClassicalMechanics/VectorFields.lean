@@ -154,6 +154,8 @@ lemma time_deriv_curl_commute (fₜ : Time → Space → EuclideanSpace ℝ (Fin
 open Matrix
 
 set_option quotPrecheck false in
+/-- Cross product in `EuclideanSpace ℝ (Fin 3)`. Uses `⨯` which is typed using `\X` or
+`\vectorproduct` or `\crossproduct`. -/
 infixl:70 " ⨯ₑ₃ "  => fun a b => (WithLp.equiv 2 (Fin 3 → ℝ)).symm
     (WithLp.equiv 2 (Fin 3 → ℝ) a ×₃ WithLp.equiv 2 (Fin 3 → ℝ) b)
 
