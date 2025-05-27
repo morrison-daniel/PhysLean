@@ -198,7 +198,7 @@ lemma time_deriv_cross_commute {s : Space} {f : Time → EuclideanSpace ℝ (Fin
   rw [fderiv_cross_commute]
   fun_prop
 
--- #25193
+/-- Pending #25193. -/
 @[elab_as_elim, cases_eliminator]
 def WithLp.rec {V} {p} (motive : WithLp p V → Sort*)
     (toLp : ∀ v, motive ((WithLp.equiv p _).symm v)) : ∀ v, motive v := toLp

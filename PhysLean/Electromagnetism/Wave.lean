@@ -502,7 +502,7 @@ lemma magneticField_sub_s_cross_electricField_eq_const_of_EMwave
     simp [hc_non_zero]
   rw [← hu, ← hcuB (c⁻¹ * inner ℝ x s) x, hcxB]
 
---#25205
+/-- Pending #25205. -/
 lemma Fin.forall_fin_three {p : Fin 3 → Prop} : (∀ i, p i) ↔ p 0 ∧ p 1 ∧ p 2 :=
   Fin.forall_fin_succ.trans <| and_congr_right fun _ => Fin.forall_fin_two
 
