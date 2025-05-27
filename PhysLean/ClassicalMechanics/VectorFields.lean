@@ -177,11 +177,12 @@ lemma fderiv_cross_commute {u : ℝ} {s : Space} {f : ℝ → EuclideanSpace ℝ
   rw [crossProduct]
   ext i
   fin_cases i <;>
-  · simp [-fderiv_eq_smul_deriv]
+  · simp only [Nat.succ_eq_add_one, Nat.reduceAdd, Fin.isValue, LinearMap.mk₂_apply,
+      WithLp.equiv_pi_apply, Fin.reduceFinMk, WithLp.equiv_symm_pi_apply, cons_val]
     rw [h]
-    simp
+    simp only [Fin.isValue, fderiv_eq_smul_deriv, smul_eq_mul, one_mul, PiLp.smul_apply]
     rw [deriv_pi]
-    simp
+    simp only [Fin.isValue, WithLp.equiv_symm_pi_apply, cons_val]
     · intro i
       fin_cases i <;>
       · simp
@@ -206,12 +207,12 @@ lemma inner_cross_self (v w : EuclideanSpace ℝ (Fin 3)) :
     inner ℝ v (w ⨯ₑ₃ v) = 0 := by
   cases v using WithLp.rec with | _ v =>
   cases w using WithLp.rec with | _ w =>
-  simp [-PiLp.inner_apply, EuclideanSpace.inner_piLp_equiv_symm]
+  simp only [Equiv.apply_symm_apply, EuclideanSpace.inner_piLp_equiv_symm, star_trivial]
   rw [dotProduct_comm, dot_cross_self]
 
 lemma inner_self_cross (v w : EuclideanSpace ℝ (Fin 3)) :
     inner ℝ v (v ⨯ₑ₃ w) = 0 := by
   cases v using WithLp.rec with | _ v =>
   cases w using WithLp.rec with | _ w =>
-  simp [-PiLp.inner_apply, EuclideanSpace.inner_piLp_equiv_symm]
+  simp only [Equiv.apply_symm_apply, EuclideanSpace.inner_piLp_equiv_symm, star_trivial]
   rw [dotProduct_comm, dot_self_cross]

@@ -538,10 +538,13 @@ theorem orthonormal_triad_of_EMwave {s : Space} {hs : inner ℝ s s = 1}
     have hr : Symmetric r := fun _ _ ↦ inner_eq_zero_symm.mp
     simp_rw [Symmetric.pairwise_on hr, Fin.forall_fin_three, r]
     constructor
-    simp [-PiLp.inner_apply]
+    simp only [Nat.succ_eq_add_one, Nat.reduceAdd, Fin.isValue, lt_self_iff_false, smul_eq_mul,
+      Matrix.cons_val_zero, inner_self_eq_zero, smul_eq_zero, inv_eq_zero, norm_eq_zero, or_self,
+      IsEmpty.forall_iff, Fin.lt_one_iff, Matrix.cons_val_one, forall_const, Fin.reduceLT,
+      Matrix.cons_val, true_and, r]
     constructor
     · rw [inner_smul_left, inner_smul_right]
-      simp [-PiLp.inner_apply]
+      simp only [map_inv₀, conj_trivial, mul_eq_zero, inv_eq_zero, norm_eq_zero, r]
       right
       right
       rw [← hBcdiff t x]
@@ -551,12 +554,16 @@ theorem orthonormal_triad_of_EMwave {s : Space} {hs : inner ℝ s s = 1}
       rw [inner_cross_self]
       simp
     · rw [inner_smul_left]
-      simp [-PiLp.inner_apply]
+      simp only [map_inv₀, conj_trivial, mul_eq_zero, inv_eq_zero, norm_eq_zero, r]
       right
       rw [hEc]
-    · simp [-PiLp.inner_apply]
+    · simp only [Nat.succ_eq_add_one, Nat.reduceAdd, Fin.isValue, Fin.not_lt_zero, smul_eq_mul,
+        Matrix.cons_val_one, Matrix.cons_val_zero, IsEmpty.forall_iff, lt_self_iff_false,
+        inner_self_eq_zero, smul_eq_zero, inv_eq_zero, norm_eq_zero, or_self, Fin.reduceLT,
+        Matrix.cons_val, forall_const, true_and, Fin.lt_one_iff, Fin.reduceEq, and_self,
+        and_true, r]
       rw [inner_smul_left]
-      simp [-PiLp.inner_apply]
+      simp only [map_inv₀, conj_trivial, mul_eq_zero, inv_eq_zero, norm_eq_zero, r]
       right
       rw [← hBcdiff t x]
       simp only [smul_eq_mul, sub_add, sub_sub_cancel]
