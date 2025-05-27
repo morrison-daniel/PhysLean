@@ -241,13 +241,24 @@ lemma time_differentiable_of_eq_planewave {s : Space} {hs : inner ℝ s s = 1}
   unfold planeWave
   fun_prop
 
-lemma crossProduct_differentiable_of_right_eq_planewave {s : Space} {hs : inner ℝ s s = 1}
+lemma crossProduct_time_differentiable_of_right_eq_planewave {s : Space} {hs : inner ℝ s s = 1}
     {f₀ : ℝ → EuclideanSpace ℝ (Fin 3)} {f : Time → Space → EuclideanSpace ℝ (Fin 3)}
     (h' : Differentiable ℝ f₀) (hf : f = planeWave f₀ c s hs) :
-    DifferentiableAt Time (fun t => s ⨯ₑ₃ (f t x))
-  t := by
+    DifferentiableAt ℝ (fun t => s ⨯ₑ₃ (f t x)) t := by
   rw [hf, crossProduct]
   unfold planeWave
+  apply differentiable_pi''
+  intro i
+  fin_cases i <;>
+  · simp only [Nat.succ_eq_add_one, Nat.reduceAdd, Fin.isValue, PiLp.inner_apply,
+      RCLike.inner_apply, conj_trivial, LinearMap.mk₂_apply, WithLp.equiv_pi_apply,
+      Fin.reduceFinMk, WithLp.equiv_symm_pi_apply, Matrix.cons_val]
+    fun_prop
+
+lemma crossProduct_differentiable_of_right_eq_planewave {s : Space}
+    {f₀ : ℝ → EuclideanSpace ℝ (Fin 3)} (h' : Differentiable ℝ f₀) :
+    DifferentiableAt ℝ (fun u => s ⨯ₑ₃ (f₀ u)) u := by
+  rw [crossProduct]
   apply differentiable_pi''
   intro i
   fin_cases i <;>
@@ -295,3 +306,16 @@ lemma wave_fderiv_inner_eq_inner_fderiv_proj {f₀ : ℝ → EuclideanSpace ℝ 
     fin_cases i <;>
     · simp only [PiLp.inner_apply, RCLike.inner_apply, conj_trivial, Fin.zero_eta, Fin.isValue]
       fun_prop
+
+lemma differentiable_uncurry_of_eq_planewave {s : Space} {hs : inner ℝ s s = 1}
+    {f₀ : ℝ → EuclideanSpace ℝ (Fin 3)} (hf : f = planeWave f₀ c s hs)
+    (h' : Differentiable ℝ f₀) : Differentiable ℝ ↿f := by
+  rw [hf]
+  unfold planeWave
+  change Differentiable ℝ (f₀ ∘ fun (t, x) => (inner ℝ x s - c * t))
+  apply Differentiable.comp
+  · fun_prop
+  · apply Differentiable.sub
+    · apply Differentiable.inner
+      repeat fun_prop
+    · fun_prop
