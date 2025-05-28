@@ -435,7 +435,7 @@ theorem magneticField_transverse_upto_const_of_EMwave {s : Space} {hs : inner �
   simp
 
 /-- `E + s ⨯ₑ₃ B` is constant for an EMwave. -/
-lemma electricField_add_s_cross_magneticField_eq_const_of_EMwave
+lemma electricField_add_cross_magneticField_eq_const_of_planeWave
     {s : Space} {hs : inner ℝ s s = 1}
     {E₀ : ℝ → EuclideanSpace ℝ (Fin 3)} {B₀ : ℝ → EuclideanSpace ℝ (Fin 3)}
     {E : ElectricField} {B : MagneticField} (hc : c = (√(μ • ε))⁻¹)
@@ -469,7 +469,7 @@ lemma electricField_add_s_cross_magneticField_eq_const_of_EMwave
   rw [← hu, ← hcuE (c⁻¹ * inner ℝ x s) x, hcxE]
 
 /-- `B - s ⨯ₑ₃ E` is constant for an EMwave. -/
-lemma magneticField_sub_s_cross_electricField_eq_const_of_EMwave
+lemma magneticField_sub_cross_electricField_eq_const_of_planeWave
     {s : Space} {hs : inner ℝ s s = 1}
     {E₀ : ℝ → EuclideanSpace ℝ (Fin 3)} {B₀ : ℝ → EuclideanSpace ℝ (Fin 3)}
     {E : ElectricField} {B : MagneticField} (hc : c = (√(μ • ε))⁻¹)
@@ -503,12 +503,12 @@ lemma magneticField_sub_s_cross_electricField_eq_const_of_EMwave
   rw [← hu, ← hcuB (c⁻¹ * inner ℝ x s) x, hcxB]
 
 /-- Pending #25205. -/
-lemma Fin.forall_fin_three {p : Fin 3 → Prop} : (∀ i, p i) ↔ p 0 ∧ p 1 ∧ p 2 :=
+lemma _root_.Fin.forall_fin_three {p : Fin 3 → Prop} : (∀ i, p i) ↔ p 0 ∧ p 1 ∧ p 2 :=
   Fin.forall_fin_succ.trans <| and_congr_right fun _ => Fin.forall_fin_two
 
 /-- Unit vectors in the direciton of `B`, `E` and `s` form an orthonormal traid for an EMwave
 after subtracting the appropriate constant fields. -/
-theorem orthonormal_triad_of_EMwave {s : Space} {hs : inner ℝ s s = 1}
+theorem orthonormal_triad_of_electromagneticplaneWave {s : Space} {hs : inner ℝ s s = 1}
     {E₀ : ℝ → EuclideanSpace ℝ (Fin 3)} {B₀ : ℝ → EuclideanSpace ℝ (Fin 3)}
     {E : ElectricField} {B : MagneticField} (hc : c = (√(μ • ε))⁻¹)
     (hEwave : E = electricPlaneWave E₀ c s hs)
@@ -519,7 +519,7 @@ theorem orthonormal_triad_of_EMwave {s : Space} {hs : inner ℝ s s = 1}
     E t x - Ep ≠ 0 ∧ B t x - Bp ≠ 0 →
     Orthonormal ℝ ![((‖E t x - Ep‖)⁻¹) • (E t x - Ep), ((‖B t x - Bp‖)⁻¹) • (B t x - Bp), s] := by
   obtain ⟨Ec, hEc⟩ := electricField_transverse_upto_const_of_EMwave OM hc hEwave hBwave hE' hB' hm
-  obtain ⟨Bcdiff, hBcdiff⟩ := magneticField_sub_s_cross_electricField_eq_const_of_EMwave
+  obtain ⟨Bcdiff, hBcdiff⟩ := magneticField_sub_cross_electricField_eq_const_of_planeWave
       OM hc hEwave hBwave hE' hB' hm
   use Ec, Bcdiff + (√(μ • ε)) • (s ⨯ₑ₃ Ec)
   intro t x h

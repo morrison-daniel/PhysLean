@@ -200,7 +200,7 @@ lemma time_deriv_cross_commute {s : Space} {f : Time → EuclideanSpace ℝ (Fin
 
 /-- Pending #25193. -/
 @[elab_as_elim, cases_eliminator]
-def WithLp.rec {V} {p} (motive : WithLp p V → Sort*)
+def _root_.WithLp.rec {V} {p} (motive : WithLp p V → Sort*)
     (toLp : ∀ v, motive ((WithLp.equiv p _).symm v)) : ∀ v, motive v := toLp
 
 lemma inner_cross_self (v w : EuclideanSpace ℝ (Fin 3)) :
