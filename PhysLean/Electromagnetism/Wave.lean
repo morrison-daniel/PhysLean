@@ -502,10 +502,6 @@ lemma magneticField_sub_cross_electricField_eq_const_of_planeWave
     simp [hc_non_zero]
   rw [← hu, ← hcuB (c⁻¹ * inner ℝ x s) x, hcxB]
 
-/-- Pending #25205. -/
-lemma _root_.Fin.forall_fin_three {p : Fin 3 → Prop} : (∀ i, p i) ↔ p 0 ∧ p 1 ∧ p 2 :=
-  Fin.forall_fin_succ.trans <| and_congr_right fun _ => Fin.forall_fin_two
-
 /-- Unit vectors in the direciton of `B`, `E` and `s` form an orthonormal traid for an EMwave
 after subtracting the appropriate constant fields. -/
 theorem orthonormal_triad_of_electromagneticplaneWave {s : Space} {hs : inner ℝ s s = 1}
@@ -523,51 +519,38 @@ theorem orthonormal_triad_of_electromagneticplaneWave {s : Space} {hs : inner �
       OM hc hEwave hBwave hE' hB' hm
   use Ec, Bcdiff + (√(μ • ε)) • (s ⨯ₑ₃ Ec)
   intro t x h
-  rw [Orthonormal]
-  constructor
-  · intro i
-    fin_cases i
-    · exact norm_smul_inv_norm h.1
-    · exact norm_smul_inv_norm h.2
-    · rw [norm_eq_sqrt_real_inner]
-      simp [hs]
-  · rw [Pairwise]
-    let r : EuclideanSpace ℝ (Fin 3) → EuclideanSpace ℝ (Fin 3) → Prop :=
-        fun u v ↦ (inner ℝ u v = 0)
-    change Pairwise (Function.onFun r _)
-    have hr : Symmetric r := fun _ _ ↦ inner_eq_zero_symm.mp
-    simp_rw [Symmetric.pairwise_on hr, Fin.forall_fin_three, r]
-    constructor
-    simp only [Nat.succ_eq_add_one, Nat.reduceAdd, Fin.isValue, lt_self_iff_false, smul_eq_mul,
-      Matrix.cons_val_zero, inner_self_eq_zero, smul_eq_zero, inv_eq_zero, norm_eq_zero, or_self,
-      IsEmpty.forall_iff, Fin.lt_one_iff, Matrix.cons_val_one, forall_const, Fin.reduceLT,
-      Matrix.cons_val, true_and, r]
-    constructor
-    · rw [inner_smul_left, inner_smul_right]
-      simp only [map_inv₀, conj_trivial, mul_eq_zero, inv_eq_zero, norm_eq_zero, r]
-      right
-      right
-      rw [← hBcdiff t x]
-      simp only [smul_eq_mul, sub_add, sub_sub_cancel]
-      rw [← smul_sub, inner_smul_right]
-      rw [← WithLp.equiv_symm_sub, ← LinearMap.map_sub, ← WithLp.equiv_sub]
-      rw [inner_cross_self]
-      simp
-    · rw [inner_smul_left]
-      simp only [map_inv₀, conj_trivial, mul_eq_zero, inv_eq_zero, norm_eq_zero, r]
-      right
-      rw [hEc]
-    · simp only [Nat.succ_eq_add_one, Nat.reduceAdd, Fin.isValue, Fin.not_lt_zero, smul_eq_mul,
-        Matrix.cons_val_one, Matrix.cons_val_zero, IsEmpty.forall_iff, lt_self_iff_false,
-        inner_self_eq_zero, smul_eq_zero, inv_eq_zero, norm_eq_zero, or_self, Fin.reduceLT,
-        Matrix.cons_val, forall_const, true_and, Fin.lt_one_iff, Fin.reduceEq, and_self,
-        and_true, r]
-      rw [inner_smul_left]
-      simp only [map_inv₀, conj_trivial, mul_eq_zero, inv_eq_zero, norm_eq_zero, r]
-      right
-      rw [← hBcdiff t x]
-      simp only [smul_eq_mul, sub_add, sub_sub_cancel]
-      rw [← smul_sub, inner_smul_left]
-      rw [← WithLp.equiv_symm_sub, ← LinearMap.map_sub, ← WithLp.equiv_sub]
-      rw [real_inner_comm, inner_self_cross]
-      simp
+  simp only [Nat.succ_eq_add_one, Nat.reduceAdd, smul_eq_mul, orthonormal_vecCons_iff,
+    Fin.forall_fin_succ, Fin.isValue, Matrix.cons_val_zero, Matrix.cons_val_succ,
+    Matrix.cons_val_fin_one, forall_const, IsEmpty.forall_iff, Orthonormal.of_isEmpty, and_self,
+    and_true]
+  repeat' constructor
+  · exact norm_smul_inv_norm h.1
+  · /- E orthogonal to B. -/
+    rw [inner_smul_left, inner_smul_right]
+    simp only [map_inv₀, conj_trivial, mul_eq_zero, inv_eq_zero, norm_eq_zero]
+    right
+    right
+    rw [← hBcdiff t x]
+    simp only [smul_eq_mul, sub_add, sub_sub_cancel]
+    rw [← smul_sub, inner_smul_right]
+    rw [← WithLp.equiv_symm_sub, ← LinearMap.map_sub, ← WithLp.equiv_sub]
+    rw [inner_cross_self]
+    simp
+  · /- E orthogonal to s. -/
+    rw [inner_smul_left]
+    simp only [map_inv₀, conj_trivial, mul_eq_zero, inv_eq_zero, norm_eq_zero]
+    right
+    rw [hEc]
+  · exact norm_smul_inv_norm h.2
+  · /- B orthogonal to s. -/
+    rw [inner_smul_left]
+    simp only [map_inv₀, conj_trivial, mul_eq_zero, inv_eq_zero, norm_eq_zero]
+    right
+    rw [← hBcdiff t x]
+    simp only [smul_eq_mul, sub_add, sub_sub_cancel]
+    rw [← smul_sub, inner_smul_left]
+    rw [← WithLp.equiv_symm_sub, ← LinearMap.map_sub, ← WithLp.equiv_sub]
+    rw [real_inner_comm, inner_self_cross]
+    simp
+  · rw [norm_eq_sqrt_real_inner]
+    simp [hs]
