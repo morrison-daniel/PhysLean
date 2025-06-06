@@ -14,7 +14,7 @@ signal processing is also introduced.
 
 The mathematics may have overlap with quantum mechanics and may require refactoring in the future.
 
-Note TODO `EGQUA` may require considerable effort to be made rigorous and may heavily depend on
+Note TODO `EGU3E` may require considerable effort to be made rigorous and may heavily depend on
 the status of Fourier theory in Mathlib.
 
 -/
@@ -42,7 +42,7 @@ noncomputable def TransverseHarmonicPlaneWave {c : ℝ} {k : Space} {E₀x E₀y
 
 /-- The transverse harmonic planewave representation is equivalent to the general planewave
   expression with `c = ω/k`. -/
-theorem TransverseHarmonicPlaneWaveisPlaneWave {c : ℝ} {k : Space} {E₀x E₀y ω δx δy : ℝ}
+lemma TransverseHarmonicPlaneWaveisPlaneWave {c : ℝ} {k : Space} {E₀x E₀y ω δx δy : ℝ}
     {Ex Ey : Time → Space → ℝ} (hc_non_zero : c ≠ 0) (hk : k = EuclideanSpace.single 2 (ω/c))
     (hx : Ex = harmonicWave (fun _ => E₀x) (fun _ => ω) (fun r => inner ℝ k r - δx) k)
     (hy : Ey = harmonicWave (fun _ => E₀y) (fun _ => ω) (fun r => inner ℝ k r - δy) k) :
@@ -60,7 +60,7 @@ theorem TransverseHarmonicPlaneWaveisPlaneWave {c : ℝ} {k : Space} {E₀x E₀
   ring_nf
   simp [hc_non_zero]
 
-TODO "EGQUA" "Show that any disturbance (subject to certian conditions) can be expressed
+TODO "EGU3E" "Show that any disturbance (subject to certian conditions) can be expressed
     as a superposition of harmonic plane waves via Fourier integral."
 
 /-!
