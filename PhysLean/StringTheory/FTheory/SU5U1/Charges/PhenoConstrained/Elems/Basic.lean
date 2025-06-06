@@ -16,7 +16,7 @@ by combining the trees of `nonPhenoConstrainedChargesSame`,
 
 These trees are complete in the sense that they contain all the non pheno-constrained, complete,
 charges which are in `ofFinset I.allowedBarFiveCharges I.allowedTenCharges`.
-We use the `Tree` type defined in `FTheory.SU5U1.Charges.Tree.Basic` here for efficiency.
+We use the `FourTree` type here for efficiency.
 
 We break the properties of these trees into smaller modules, to aid in
 speed of building.
@@ -38,14 +38,15 @@ namespace Charges
 open PotentialTerm
 open ChargeProfile
 open CodimensionOneConfig
-open Tree Leaf Twig Branch Trunk
-
+open Tree
+open PhysLean
 /-- For a given `I : CodimensionOneConfig` the tree of charges containing all
   charges which are not phenomenlogically constrained, and which permit a top
   Yukawa coupling. Unlike `nonPhenoConstrainedCharges`, these trees are calculated
   and therefore not good when using `decide` etc.
 -/
-def nonPhenoConstrainedChargesExt (I : CodimensionOneConfig) : Tree :=
+def nonPhenoConstrainedChargesExt (I : CodimensionOneConfig) :
+    FourTree (Option ℤ) (Option ℤ) (Finset ℤ) (Finset ℤ) :=
   let completionTopYukawa := ((((irreducibleElems I topYukawa).map
     (fromChargeProfile topYukawa)).bind
     (completions I.allowedBarFiveCharges I.allowedTenCharges)).dedup.filter
@@ -59,7 +60,8 @@ def nonPhenoConstrainedChargesExt (I : CodimensionOneConfig) : Tree :=
   let addThreeTopYukawa := (((addTwoTopYukawa).bind (fun x =>
     (minimalSuperSet I.allowedBarFiveCharges I.allowedTenCharges x).val)).dedup.filter
     (fun x => ¬ IsPhenoConstrained x))
-  Tree.fromMultiset (completionTopYukawa + addOneTopYukawa + addTwoTopYukawa + addThreeTopYukawa)
+  FourTree.fromMultiset (completionTopYukawa + addOneTopYukawa +
+    addTwoTopYukawa + addThreeTopYukawa)
 
 /-- For a given `I : CodimensionOneConfig` the tree of charges containing all
   charges which are not phenomenlogically constrained, and which permit a top
@@ -67,7 +69,8 @@ def nonPhenoConstrainedChargesExt (I : CodimensionOneConfig) : Tree :=
 
   These trees can be found with e.g.
   `#eval nonPhenoConstrainedChargesExt nextToNearestNeighbor`. -/
-def nonPhenoConstrainedCharges : (I : CodimensionOneConfig) → Tree
+def nonPhenoConstrainedCharges : (I : CodimensionOneConfig) →
+    FourTree (Option ℤ) (Option ℤ) (Finset ℤ) (Finset ℤ)
   | same => nonPhenoConstrainedChargesSame
   | nearestNeighbor => nonPhenoConstrainedChargesNearestNeighbor
   | nextToNearestNeighbor => nonPhenoConstrainedChargesNextToNearestNeighbor

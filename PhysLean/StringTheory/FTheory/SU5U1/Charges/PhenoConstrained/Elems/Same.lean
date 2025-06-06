@@ -13,7 +13,7 @@ and prove properties about them.
 
 These trees are complete in the sense that they contain all the non pheno-constrained, complete,
 charges which are in `ofFinset same.allowedBarFiveCharges same.allowedTenCharges`.
-We use the `Tree` type defined in `FTheory.SU5U1.Charges.Tree.Basic` here for efficiency.
+We use the `FourTree` type here for efficiency.
 
 We break the properties of these trees into smaller modules, to aid in
 speed of building.
@@ -35,15 +35,16 @@ namespace Charges
 open PotentialTerm
 open ChargeProfile
 open CodimensionOneConfig
-open Tree Leaf Twig Branch Trunk
-
+open PhysLean
+open Tree
 /-- For `I = same` the tree of charges containing all
   charges which are not phenomenlogically constrained, and which permit a top
   Yukawa coupling.
 
   These trees can be found with e.g.
   `#eval nonPhenoConstrainedChargesExt nextToNearestNeighbor`. -/
-def nonPhenoConstrainedChargesSame : Tree :=
+def nonPhenoConstrainedChargesSame :
+    FourTree (Option ℤ) (Option ℤ) (Finset ℤ) (Finset ℤ) :=
   root {trunk (some (-3)) {branch (some 2) {twig {0} {leaf {-1, 3}},
     twig {1} {leaf {0, 2}, leaf {-1, 3}},
     twig {-3} {leaf {0, 2}, leaf {-1, 3}, leaf {-2, 0, 2}},

@@ -14,7 +14,7 @@ not pheno-constrained, and prove properties about them.
 These trees are complete in the sense that they contain all the non pheno-constrained, complete,
 charges which are in
 `ofFinset nextToNearestNeighbor.allowedBarFiveCharges nextToNearestNeighbor.allowedTenCharges`.
-We use the `Tree` type defined in `FTheory.SU5U1.Charges.Tree.Basic` here for efficiency.
+We use the `FourTree` type here for efficiency.
 
 We break the properties of these trees into smaller modules, to aid in
 speed of building.
@@ -29,7 +29,7 @@ namespace Charges
 open PotentialTerm
 open ChargeProfile
 open CodimensionOneConfig
-open Tree Leaf Twig Branch Trunk
+open PhysLean Tree
 
 /-- For `I = nextToNearestNeighbor` the tree of charges containing all
   charges which are not phenomenlogically constrained, and which permit a top
@@ -37,7 +37,8 @@ open Tree Leaf Twig Branch Trunk
 
   These trees can be found with e.g.
   `#eval nonPhenoConstrainedChargesExt nextToNearestNeighbor`. -/
-def nonPhenoConstrainedChargesNextToNearestNeighbor : Tree :=
+def nonPhenoConstrainedChargesNextToNearestNeighbor :
+    FourTree (Option ℤ) (Option ℤ) (Finset ℤ) (Finset ℤ) :=
   root {trunk (some 12) {branch (some (-8)) {twig {-13} {leaf {-9, 1}},
     twig {12} {leaf {-9, 1}}},
   branch (some 2) {twig {-3} {leaf {-9, 11}},
