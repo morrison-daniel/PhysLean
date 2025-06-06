@@ -54,7 +54,9 @@ theorem TransverseHarmonicPlaneWaveisPlaneWave {c : ℝ} {k : Space} {E₀x E₀
   ext1 t
   ext1 x
   rw [hx, hy, harmonicWave, harmonicWave, hk]
-  simp
+  simp only [Fin.isValue, PiLp.inner_apply, EuclideanSpace.single_apply, RCLike.inner_apply,
+    conj_trivial, mul_ite, mul_zero, Finset.sum_ite_eq', Finset.mem_univ, ↓reduceIte, ite_mul,
+    one_mul, zero_mul, neg_mul]
   ring_nf
   simp [hc_non_zero]
 
