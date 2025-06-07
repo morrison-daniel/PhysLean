@@ -9,62 +9,73 @@ import PhysLean.ClassicalMechanics.WaveEquation.Basic
 
 Time-harmonic waves.
 
-The complex representation which finds major applications in optics and
-signal processing is also introduced.
-
-The mathematics may have overlap with quantum mechanics and may require refactoring in the future.
-
 Note TODO `EGU3E` may require considerable effort to be made rigorous and may heavily depend on
 the status of Fourier theory in Mathlib.
 
 -/
 
 namespace ClassicalMechanics
+open Space
+
+/-- The wavevector which indicates a direction and has magnitude `2π/λ`. -/
+abbrev WaveVector (d : ℕ := 3) := EuclideanSpace ℝ (Fin d)
+
+noncomputable def WaveVector.toDirection {d : ℕ} (k : WaveVector d) (h : k ≠ 0) :
+    Direction d where
+  unit := (‖k‖⁻¹) • (k)
+  norm := norm_smul_inv_norm h
 
 /-- General form of time-harmonic wave in terms of angular frequency `ω` and wave vector `k`. -/
-noncomputable def harmonicWave (a ω g: Space → ℝ) (k : Space) :
-    Time → Space → ℝ :=
+noncomputable def harmonicWave (a g : Space d → ℝ) (ω : WaveVector d → ℝ) (k : WaveVector d) :
+    Time → Space d → ℝ :=
     fun t r => a r * Real.cos (ω k * t - g r)
 
 TODO "EGQUA" "Show that the wave equation is invariant under rotations and any direction `s`
     can be rotated to `EuclideanSpace.single 2 1` if only one wave is concerened."
 
-set_option linter.unusedVariables false in
 /-- Transverse monochromatic time-harmonic plane wave where the direction of propagation
   is taken to be `EuclideanSpace.single 2 1`. -/
-@[nolint unusedArguments]
-noncomputable def TransverseHarmonicPlaneWave {c : ℝ} {k : Space} {E₀x E₀y ω δx δy : ℝ}
-    {Ex Ey : Time → Space → ℝ} (hk : k = EuclideanSpace.single 2 (ω/c))
-    (hx : Ex = harmonicWave (fun _ => E₀x) (fun _ => ω) (fun r => inner ℝ k r - δx) k)
-    (hy : Ey = harmonicWave (fun _ => E₀y) (fun _ => ω) (fun r => inner ℝ k r - δy) k) :
+noncomputable def transverseHarmonicPlaneWave (k : WaveVector) (E₀x E₀y ω δx δy : ℝ) :
     Time → Space → EuclideanSpace ℝ (Fin 3) :=
+    let Ex := harmonicWave (fun _ => E₀x) (fun r => inner ℝ k r - δx) (fun _ => ω) k
+    let Ey := harmonicWave (fun _ => E₀y) (fun r => inner ℝ k r - δy) (fun _ => ω) k
     fun t x => Ex t x • EuclideanSpace.single 0 1 + Ey t x • EuclideanSpace.single 1 1
 
+/-- Pending #25552. -/
+
+@[simp]
+theorem _root_.WithLp.equiv_symm_eq_zero_iff {p V} [AddCommGroup V] {v : V} :
+    (WithLp.equiv p V).symm v = 0 ↔ v = 0 := Iff.rfl
+
+@[simp]
+theorem _root_.WithLp.equiv_eq_zero_iff {p V} [AddCommGroup V] {v : WithLp p V} :
+    WithLp.equiv p V v = 0 ↔ v = 0 := Iff.rfl
+
+@[simp]
+theorem _root_.EuclideanSpace.single_eq_zero_iff {ι 𝕜} [RCLike 𝕜] [DecidableEq ι] {i : ι} {x : 𝕜} :
+    EuclideanSpace.single i x = 0 ↔ x = 0 := Pi.single_eq_zero_iff
+
 /-- The transverse harmonic planewave representation is equivalent to the general planewave
-  expression with `c = ω/k`. -/
-lemma TransverseHarmonicPlaneWaveisPlaneWave {c : ℝ} {k : Space} {E₀x E₀y ω δx δy : ℝ}
-    {Ex Ey : Time → Space → ℝ} (hc_non_zero : c ≠ 0) (hk : k = EuclideanSpace.single 2 (ω/c))
-    (hx : Ex = harmonicWave (fun _ => E₀x) (fun _ => ω) (fun r => inner ℝ k r - δx) k)
-    (hy : Ey = harmonicWave (fun _ => E₀y) (fun _ => ω) (fun r => inner ℝ k r - δy) k) :
-    (TransverseHarmonicPlaneWave hk hx hy) = planeWave
+  expression with `c = ω/‖k‖`. -/
+lemma transverseHarmonicPlaneWave_eq_PlaneWave {c : ℝ} {k : WaveVector} {E₀x E₀y ω δx δy : ℝ}
+    (hc_ge_zero : 0 < c) (hω_ge_zero : 0 < ω) (hk : k = EuclideanSpace.single 2 (ω/c)) :
+    (transverseHarmonicPlaneWave k E₀x E₀y ω δx δy) = planeWave
     (fun p => (E₀x * Real.cos (-(ω/c)*p + δx)) • (EuclideanSpace.single 0 1) +
     (E₀y * Real.cos (-(ω/c)*p + δy)) • (EuclideanSpace.single 1 1)) c
-    (EuclideanSpace.single 2 1) (by simp) := by
-  unfold TransverseHarmonicPlaneWave planeWave
+    (WaveVector.toDirection k (by rw [hk]; simp [ne_of_gt, hc_ge_zero, hω_ge_zero])) := by
+  unfold transverseHarmonicPlaneWave planeWave
   ext1 t
   ext1 x
-  rw [hx, hy, harmonicWave, harmonicWave, hk]
-  simp only [Fin.isValue, PiLp.inner_apply, EuclideanSpace.single_apply, RCLike.inner_apply,
-    conj_trivial, mul_ite, mul_zero, Finset.sum_ite_eq', Finset.mem_univ, ↓reduceIte, ite_mul,
-    one_mul, zero_mul, neg_mul]
+  rw [harmonicWave, harmonicWave, WaveVector.toDirection]
+  simp [-PiLp.inner_apply, RCLike.inner_apply, conj_trivial, Fin.isValue, PiLp.smul_apply,
+    smul_eq_mul, neg_mul]
+  have normk: ‖k‖ = ω/c := by
+    rw [hk]
+    simp [← abs_div, hc_ge_zero, hω_ge_zero, le_of_lt]
+  rw [normk]
+  rw [mul_sub, inner_smul_right, real_inner_comm, ← mul_assoc]
   ring_nf
-  simp [hc_non_zero]
+  simp [ne_of_gt, hc_ge_zero, hω_ge_zero, mul_comm ω, mul_assoc]
 
 TODO "EGU3E" "Show that any disturbance (subject to certian conditions) can be expressed
     as a superposition of harmonic plane waves via Fourier integral."
-
-/-!
-
-## Complex representation of harmonic waves
-
--/
