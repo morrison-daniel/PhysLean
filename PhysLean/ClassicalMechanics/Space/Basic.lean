@@ -128,6 +128,7 @@ scoped[Space] notation "Δ" => laplacian_vec
 
 /-- Notion of direction where `unit` returns a unit vector in the direction specified. -/
 structure Direction (d : ℕ := 3) where
+  /-- Unit vector specifying the direction. -/
   unit : EuclideanSpace ℝ (Fin d)
   norm : ‖unit‖ = 1
 
