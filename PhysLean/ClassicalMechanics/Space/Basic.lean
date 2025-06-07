@@ -131,6 +131,7 @@ structure Direction (d : ℕ := 3) where
   unit : EuclideanSpace ℝ (Fin d)
   norm : ‖unit‖ = 1
 
+/-- Direction of a `Space` value with respect to the origin. -/
 noncomputable def toDirection {d : ℕ} (x : Space d) (h : x ≠ 0): Direction d where
   unit := (‖x‖⁻¹) • (x)
   norm := norm_smul_inv_norm h

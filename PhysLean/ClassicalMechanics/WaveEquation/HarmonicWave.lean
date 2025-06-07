@@ -20,15 +20,16 @@ open Space
 /-- The wavevector which indicates a direction and has magnitude `2π/λ`. -/
 abbrev WaveVector (d : ℕ := 3) := EuclideanSpace ℝ (Fin d)
 
+/-- Direction of a wavevector. -/
 noncomputable def WaveVector.toDirection {d : ℕ} (k : WaveVector d) (h : k ≠ 0) :
     Direction d where
   unit := (‖k‖⁻¹) • (k)
   norm := norm_smul_inv_norm h
 
 /-- General form of time-harmonic wave in terms of angular frequency `ω` and wave vector `k`. -/
-noncomputable def harmonicWave (a g : Space d → ℝ) (ω : WaveVector d → ℝ) (k : WaveVector d) :
+noncomputable def harmonicWave (a g : ℝ → Space d → ℝ) (ω : WaveVector d → ℝ) (k : WaveVector d) :
     Time → Space d → ℝ :=
-    fun t r => a r * Real.cos (ω k * t - g r)
+    fun t r => a (ω k) r * Real.cos (ω k * t - g (ω k) r)
 
 TODO "EGQUA" "Show that the wave equation is invariant under rotations and any direction `s`
     can be rotated to `EuclideanSpace.single 2 1` if only one wave is concerened."
@@ -37,8 +38,8 @@ TODO "EGQUA" "Show that the wave equation is invariant under rotations and any d
   is taken to be `EuclideanSpace.single 2 1`. -/
 noncomputable def transverseHarmonicPlaneWave (k : WaveVector) (E₀x E₀y ω δx δy : ℝ) :
     Time → Space → EuclideanSpace ℝ (Fin 3) :=
-    let Ex := harmonicWave (fun _ => E₀x) (fun r => inner ℝ k r - δx) (fun _ => ω) k
-    let Ey := harmonicWave (fun _ => E₀y) (fun r => inner ℝ k r - δy) (fun _ => ω) k
+    let Ex := harmonicWave (fun _ _ => E₀x) (fun _ r => inner ℝ k r - δx) (fun _ => ω) k
+    let Ey := harmonicWave (fun _ _ => E₀y) (fun _ r => inner ℝ k r - δy) (fun _ => ω) k
     fun t x => Ex t x • EuclideanSpace.single 0 1 + Ey t x • EuclideanSpace.single 1 1
 
 /-- Pending #25552. -/
@@ -56,8 +57,8 @@ theorem _root_.EuclideanSpace.single_eq_zero_iff {ι 𝕜} [RCLike 𝕜] [Decida
     EuclideanSpace.single i x = 0 ↔ x = 0 := Pi.single_eq_zero_iff
 
 /-- The transverse harmonic planewave representation is equivalent to the general planewave
-  expression with `c = ω/‖k‖`. -/
-lemma transverseHarmonicPlaneWave_eq_PlaneWave {c : ℝ} {k : WaveVector} {E₀x E₀y ω δx δy : ℝ}
+  expression with `‖k‖ = ω/c`. -/
+lemma transverseHarmonicPlaneWave_eq_planeWave {c : ℝ} {k : WaveVector} {E₀x E₀y ω δx δy : ℝ}
     (hc_ge_zero : 0 < c) (hω_ge_zero : 0 < ω) (hk : k = EuclideanSpace.single 2 (ω/c)) :
     (transverseHarmonicPlaneWave k E₀x E₀y ω δx δy) = planeWave
     (fun p => (E₀x * Real.cos (-(ω/c)*p + δx)) • (EuclideanSpace.single 0 1) +
