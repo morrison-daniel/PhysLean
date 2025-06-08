@@ -5,6 +5,7 @@ Authors: Zhi Kai Pong
 -/
 import PhysLean.ClassicalMechanics.WaveEquation.Basic
 /-!
+
 # Harmonic Wave
 
 Time-harmonic waves.
