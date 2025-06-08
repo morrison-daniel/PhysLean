@@ -37,7 +37,8 @@ TODO "EGQUA" "Show that the wave equation is invariant under rotations and any d
 
 set_option linter.unusedVariables false in
 /-- Transverse monochromatic time-harmonic plane wave where the direction of propagation
-  is taken to be `EuclideanSpace.single 2 1`. -/
+  is taken to be `EuclideanSpace.single 2 1`. `f₀x` and `f₀y` are the respective amplitudes,
+  `ω` is the angular frequency, `δx` and `δy` are the respective phases for `fx` and `fy`. -/
 @[nolint unusedArguments]
 noncomputable def transverseHarmonicPlaneWave (k : WaveVector) (f₀x f₀y ω δx δy : ℝ)
     (hk : k = EuclideanSpace.single 2 (ω/c)) :
