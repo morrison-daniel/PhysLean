@@ -49,6 +49,7 @@ import PhysLean.Meta.Remark.Properties
 import PhysLean.Meta.TODO.Basic
 import PhysLean.Meta.TransverseTactics
 import PhysLean.Optics.Basic
+import PhysLean.Optics.Polarization.Basic
 import PhysLean.Particles.BeyondTheStandardModel.GeorgiGlashow.Basic
 import PhysLean.Particles.BeyondTheStandardModel.PatiSalam.Basic
 import PhysLean.Particles.BeyondTheStandardModel.RHN.AnomalyCancellation.Basic

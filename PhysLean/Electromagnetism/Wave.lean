@@ -7,7 +7,8 @@ import PhysLean.Electromagnetism.Homogeneous
 import PhysLean.ClassicalMechanics.WaveEquation.Basic
 import PhysLean.ClassicalMechanics.Space.VectorIdentities
 /-!
-# Electromagnetism wave equation
+
+# Electromagnetic wave equation
 
 The electromagnetic wave eqaution as a consequence of the charge and current free
 Maxwell's Equations in homogeneous isotropic medium.
