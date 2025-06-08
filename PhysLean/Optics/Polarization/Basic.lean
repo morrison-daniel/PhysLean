@@ -41,7 +41,7 @@ set_option linter.unusedVariables false in
 /-- General form of monochromatic time-harmonic electromagnetic plane wave where
   the direction of propagation is taken to be `EuclideanSpace.single 2 1`.
   `E₀x` and `E₀y` are the respective amplitudes, `ω` is the angular frequency,
-  `δx` and `δy` are the respective phases for `Ex` and `Ey`.-/
+  `δx` and `δy` are the respective phases for `Ex` and `Ey`. -/
 @[nolint unusedArguments]
 noncomputable def harmonicElectromagneticPlaneWave (k : WaveVector) (E₀x E₀y ω δx δy : ℝ)
     (hk : k = EuclideanSpace.single 2 (ω/c)) :
@@ -69,43 +69,44 @@ lemma harmonicElectromagneticPlaneWave_eq_electricplaneWave {c : ℝ} {k : WaveV
 
 -/
 
-/-- `E₀x * cos (τ + δx)` is equivalent to `monochromX` with `τ = ω * t - inner ℝ k r`. -/
-lemma eq_monochromX (k : WaveVector) (E₀x ω δx : ℝ) (t : Time) (r : Space)
-    (h : τ = ω * t - inner ℝ k r) :
-    E₀x * cos (τ + δx) = monochromX k E₀x ω δx t r := by
+variable {k : WaveVector} {E₀x E₀y τ ω δx δy : ℝ} {t : Time} {r : Space}
+
+/-- `monochromX` is equivalent to `E₀x * cos (τ + δx)` with `τ = ω * t - inner ℝ k r`. -/
+lemma eq_monochromX (h : τ = ω * t - inner ℝ k r) :
+    monochromX k E₀x ω δx t r = E₀x * cos (τ + δx) := by
   rw [h, monochromX, harmonicWave, sub_add]
 
-/-- `E₀y * cos (τ + δy)` is equivalent to `monochromY` with `τ = ω * t - inner ℝ k r`. -/
-lemma eq_monochromY (k : WaveVector) (E₀y ω δy : ℝ) (t : Time) (r : Space)
-    (h : τ = ω * t - inner ℝ k r) :
-    E₀y * cos (τ + δy) = monochromY k E₀y ω δy t r := by
+/-- `monochromY` is equivalent to `E₀y * cos (τ + δy)` with `τ = ω * t - inner ℝ k r`. -/
+lemma eq_monochromY (h : τ = ω * t - inner ℝ k r) :
+    monochromY k E₀y ω δy t r = E₀y * cos (τ + δy) := by
   rw [h, monochromY, harmonicWave, sub_add]
+
+local notation "Ex" => monochromX k E₀x ω δx t r
+local notation "Ey" => monochromY k E₀y ω δy t r
 
 /-- The locus of the electric field vector of an monochromatic time-harmonic
   electromagnetic plane wave is an ellipse. -/
-theorem polarizationEllipse {E₀x E₀y τ δx δy : ℝ} (hx : E₀x ≠ 0) (hy : E₀y ≠ 0) :
-    ((E₀x * cos (τ + δx))/E₀x)^2 + ((E₀y * cos (τ + δy))/E₀y)^2 -
-    2 * (E₀x * cos (τ + δx)) * (E₀y * cos (τ + δy)) * cos (δy - δx) / (E₀x * E₀y) =
+theorem polarizationEllipse (hx : E₀x ≠ 0) (hy : E₀y ≠ 0) (h : τ = ω * t - inner ℝ k r) :
+    (Ex / E₀x)^2 + (Ey / E₀y)^2 - 2 * (Ex / E₀x) * (Ey / E₀y) * cos (δy - δx) =
     sin (δy - δx) ^ 2 := by
-  have h1 : (E₀x * cos (τ + δx))/E₀x * sin δy - (E₀y * cos (τ + δy))/E₀y * sin δx =
+  rw [eq_monochromX h, eq_monochromY h]
+  have h1 : (E₀x * cos (τ + δx)) / E₀x * sin δy - (E₀y * cos (τ + δy)) / E₀y * sin δx =
       cos τ * sin (δy - δx) := by
     field_simp
     rw [cos_add, cos_add, sin_sub]
     ring
-  have h2 : (E₀x * cos (τ + δx))/E₀x * cos δy - (E₀y * cos (τ + δy))/E₀y * cos δx =
+  have h2 : (E₀x * cos (τ + δx)) / E₀x * cos δy - (E₀y * cos (τ + δy)) / E₀y * cos δx =
       sin τ * sin (δy - δx) := by
     field_simp
     rw [cos_add, cos_add, sin_sub]
     ring
   trans (E₀x * cos (τ + δx) / E₀x) ^ 2 * (sin δy ^ 2 + cos δy ^ 2) +
       (E₀y * cos (τ + δy) / E₀y) ^ 2 * (sin δx ^ 2 + cos δx ^ 2) -
-      2 * E₀x * cos (τ + δx) * E₀y * cos (τ + δy) * cos (δy - δx) / (E₀x * E₀y)
-  · field_simp
-    left
-    ring
+      2 * (E₀x * cos (τ + δx) / E₀x) * (E₀y * cos (τ + δy) / E₀y) * cos (δy - δx)
+  · simp
   trans (cos τ * sin (δy - δx)) ^ 2 + (sin τ * sin (δy - δx)) ^ 2
   · rw [← h1, ← h2]
-    rw [cos_add, cos_add, cos_sub]
+    rw [cos_sub]
     ring
   trans (cos τ ^ 2 + sin τ ^ 2) * sin (δy - δx) ^ 2
   · ring
