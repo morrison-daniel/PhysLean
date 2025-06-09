@@ -29,7 +29,7 @@ The terms of the Kahler potential are (arXiv:0912.0853) :
   `β`, `λ`, `W²`, `W⁴`, `K¹`, `K²`
 - `causeProtonDecay` : The finite set of terms which contribute to proton decay.
   `W¹`, `W²`, `K¹`, `λ`
-- `IsPresent`: The condition on the potential terms for them to be present
+- `AllowsTerm`: The condition on the potential terms for them to be present
   based on the `U(1)` charges.
 
 ## Previous versions
@@ -70,19 +70,60 @@ inductive PotentialTerm
   | bottomYukawa : PotentialTerm
 deriving DecidableEq, Fintype
 
+/-- The types of field present in SU(5) F-Theory. -/
+inductive FieldLabel
+  | fiveBarHu
+  | fiveHu
+  | fiveBarHd
+  | fiveHd
+  | fiveBarMatter
+  | fiveMatter
+  | tenMatter
+deriving DecidableEq, Fintype
+
+/-- The R-Parity of a field, landding on `1` if it is in the non-trivial representation
+  and `0` otherwise. -/
+def FieldLabel.RParity : FieldLabel → Fin 2
+  | fiveBarHu => 0
+  | fiveHu => 0
+  | fiveBarHd => 0
+  | fiveHd => 0
+  | fiveBarMatter => 1
+  | fiveMatter => 1
+  | tenMatter => 1
+
 namespace PotentialTerm
 
-/-- The finite set of terms in the superpotential and Kahler potential which violate R-parity.
-- `𝛽ᵢ 5̄Mⁱ5Hu`
-- `𝜆ᵢⱼₖ 5̄Mⁱ 5̄Mʲ 10ᵏ`
-- `W²ᵢⱼₖ 10ⁱ 10ʲ 10ᵏ 5̄Hd`
-- `W⁴ᵢ 5̄Mⁱ 5̄Hd 5Hu 5Hu`
-- `K¹ᵢⱼₖ 10ⁱ 10ʲ 5Mᵏ`
-- `K²ᵢ 5̄Hu 5̄Hd 10ⁱ`
-These correspond to the terms with an odd number of matter fields.
--/
-def violateRParity : Finset PotentialTerm :=
-  {β, Λ, W2, W4, K1, K2}
+/-- The fields contained within a given term of the potential. -/
+def toFieldLabel : PotentialTerm → List FieldLabel
+  | μ => [.fiveBarHd, .fiveHu]
+  | β => [.fiveHu, .fiveBarMatter]
+  | Λ => [.fiveBarMatter, .fiveBarMatter, .tenMatter]
+  | W1 => [.tenMatter, .tenMatter, .tenMatter, .fiveBarMatter]
+  | W2 => [.tenMatter, .tenMatter, .tenMatter, .fiveBarHd]
+  | W3 => [.fiveBarMatter, .fiveBarMatter, .fiveHu, .fiveHu]
+  | W4 => [.fiveBarMatter, .fiveBarHd, .fiveHu, .fiveHu]
+  | K1 => [.tenMatter, .tenMatter, .fiveMatter]
+  | K2 => [.fiveBarHu, .fiveBarHd, .tenMatter]
+  | topYukawa => [.tenMatter, .tenMatter, .fiveHu]
+  | bottomYukawa => [.tenMatter, .fiveBarMatter, .fiveBarHd]
+
+/-- The degree of a term in the potential. -/
+def degree (T : PotentialTerm) : ℕ := T.toFieldLabel.length
+
+lemma degree_le_four (T : PotentialTerm) : T.degree ≤ 4 := by
+  cases T
+  all_goals simp [toFieldLabel, degree]
+
+/-- The R-parity of a term in the potential. -/
+def RParity (T : PotentialTerm) : Fin 2 :=
+  (T.toFieldLabel.map FieldLabel.RParity).foldl (· + ·) 0
+
+/- The terms which violate R-parity are those with an odd-number of matter fields. -/
+lemma violates_RParity_iff_mem {T : PotentialTerm} :
+    T.RParity = 1 ↔ T ∈ ({β, Λ, W2, W4, K1, K2} : Finset PotentialTerm) := by
+  revert T
+  decide
 
 /-- The finite set of terms in the superpotential and Kahler potential which are involved in
   proton decay.

@@ -126,4 +126,15 @@ noncomputable def laplacian_vec (f : Space d → EuclideanSpace ℝ (Fin d)) :
 @[inherit_doc laplacian_vec]
 scoped[Space] notation "Δ" => laplacian_vec
 
+/-- Notion of direction where `unit` returns a unit vector in the direction specified. -/
+structure Direction (d : ℕ := 3) where
+  /-- Unit vector specifying the direction. -/
+  unit : EuclideanSpace ℝ (Fin d)
+  norm : ‖unit‖ = 1
+
+/-- Direction of a `Space` value with respect to the origin. -/
+noncomputable def toDirection {d : ℕ} (x : Space d) (h : x ≠ 0) : Direction d where
+  unit := (‖x‖⁻¹) • (x)
+  norm := norm_smul_inv_norm h
+
 end Space
