@@ -412,8 +412,6 @@ lemma curl_linear_map (f : W → Space 3 → EuclideanSpace ℝ (Fin 3))
     rw [curl_smul]
     fun_prop
 
-end Space
-
 /-!
 
 ## Inner product space identities
@@ -467,3 +465,5 @@ lemma grad_inner {d : ℕ} :
     · simp
   · intro i
     fun_prop
+
+end Space
