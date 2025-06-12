@@ -3,17 +3,12 @@ Copyright (c) 2025 Joseph Tooby-Smith. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Joseph Tooby-Smith
 -/
-import Mathlib.Data.Finset.Powerset
-import Mathlib.Data.Finset.Prod
-import Mathlib.Tactic.FinCases
-import Mathlib.Tactic.DeriveFintype
-import PhysLean.StringTheory.FTheory.SU5U1.Charges.OfRationalSection
+import PhysLean.Particles.SuperSymmetry.SU5.FieldLabels
 /-!
 
-# Potential of the SU(5) + U(1) GUT for F-Theory
+# Potential of the SU(5) + U(1) GUT
 
-This file contains properties of the potential terms of the `SU(5)` SUSY GUT with an
-additional `U(1)` gauge group in F-theory.
+This file contains properties of the potential terms of the `SU(5)` SUSY.
 
 The terms from the superpotential considered are (arXiv:0912.0853) :
 `W ⊃ μ 5Hu 5̄Hd + 𝛽ᵢ 5̄Mⁱ5Hu + 𝜆ᵢⱼₖ 5̄Mⁱ 5̄Mʲ 10ᵏ + W¹ᵢⱼₖₗ 10ⁱ 10ʲ 10ᵏ 5̄Mˡ`
@@ -29,8 +24,6 @@ The terms of the Kahler potential are (arXiv:0912.0853) :
   `β`, `λ`, `W²`, `W⁴`, `K¹`, `K²`
 - `causeProtonDecay` : The finite set of terms which contribute to proton decay.
   `W¹`, `W²`, `K¹`, `λ`
-- `AllowsTerm`: The condition on the potential terms for them to be present
-  based on the `U(1)` charges.
 
 ## Previous versions
 
@@ -38,11 +31,9 @@ A previous version of this code was replaced in PR #569.
 
 -/
 
-namespace FTheory
+namespace SuperSymmetry
 
-namespace SU5U1
-
-variable {I : CodimensionOneConfig}
+namespace SU5
 
 /-- Relevant terms part of the superpotential and Kahler potential of the `SU(5)` SUSY GUT. -/
 inductive PotentialTerm
@@ -69,28 +60,6 @@ inductive PotentialTerm
   /-- The term `λᵇᵢⱼ 10ⁱ 5̄Mʲ 5̄Hd`. -/
   | bottomYukawa : PotentialTerm
 deriving DecidableEq, Fintype
-
-/-- The types of field present in SU(5) F-Theory. -/
-inductive FieldLabel
-  | fiveBarHu
-  | fiveHu
-  | fiveBarHd
-  | fiveHd
-  | fiveBarMatter
-  | fiveMatter
-  | tenMatter
-deriving DecidableEq, Fintype
-
-/-- The R-Parity of a field, landding on `1` if it is in the non-trivial representation
-  and `0` otherwise. -/
-def FieldLabel.RParity : FieldLabel → Fin 2
-  | fiveBarHu => 0
-  | fiveHu => 0
-  | fiveBarHd => 0
-  | fiveHd => 0
-  | fiveBarMatter => 1
-  | fiveMatter => 1
-  | tenMatter => 1
 
 namespace PotentialTerm
 
@@ -172,6 +141,6 @@ def causeProtonDecay : Finset PotentialTerm :=
 
 end PotentialTerm
 
-end SU5U1
+end SU5
 
-end FTheory
+end SuperSymmetry
