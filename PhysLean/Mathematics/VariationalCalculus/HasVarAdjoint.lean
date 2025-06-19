@@ -3,9 +3,8 @@ Copyright (c) 2025 Tomas Skrivan. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Tomas Skrivan, Joseph Tooby-Smith
 -/
-import Mathlib.Algebra.Lie.OfAssociative
 import Mathlib.MeasureTheory.Integral.IntegralEqImproper
-import PhysLean.Mathematics.VariationalCalculus.IsTestFunction
+import PhysLean.Mathematics.VariationalCalculus.Basic
 /-!
 # Variational adjoint
 
@@ -15,6 +14,7 @@ https://en.wikipedia.org/wiki/Distribution_(mathematics) under 'Preliminaries: T
 operator' but we require that the adjoint is function between test functions too.
 
 The key results are:
+  - variational adjoint is unique on test functions
   - variational adjoint of identity is identity, `HasVarAdjoint.id`
   - variational adjoint of composition is composition of adjoint in reverse order,
     `HasVarAdjoint.comp`
@@ -22,12 +22,6 @@ The key results are:
   - variational adjoint of algebraic operations is algebraic operation of adjoints,
     `HasVarAdjoint.neg`, `HasVarAdjoint.add`, `HasVarAdjoint.sub`, `HasVarAdjoint.mul_left`,
     `HasVarAdjoint.mul_right`, `HasVarAdjoint.smul_left`, `HasVarAdjoint.smul_right`
-
-The variational adjoint is not uniquelly defined, having `HasVarAdjoint F F'` and
-`HasVarAdjoint F G'` does not imply `F' = G'`. Further investigation needs to be done. Likely
-the adjoint is unique almost everywhere when applied to test functions. To extend it to
-other functions one would have to invoke continuity and density of test function in some
-appropriate function space.
 -/
 
 open InnerProductSpace MeasureTheory ContDiff
@@ -74,7 +68,7 @@ lemma comp {F : (X → V) → (X → W)} {G : (X → U) → (X → V)} {F' G'}
     rw [hG.adjoint _ _ hφ (hF.test_fun_preserving' _ hψ)]
 
 protected lemma deriv :
-    HasVarAdjoint (fun φ : ℝ → ℝ => deriv φ) (fun φ => - deriv φ) where
+    HasVarAdjoint (fun φ : ℝ → ℝ => deriv φ) (fun φ x => - deriv φ x) where
   test_fun_preserving _ hφ := by
     have ⟨h,h'⟩ := hφ
     constructor
@@ -83,7 +77,7 @@ protected lemma deriv :
   test_fun_preserving' _ hφ := by
     have ⟨h,h'⟩ := hφ
     constructor
-    · eta_expand; dsimp; fun_prop
+    · fun_prop
     · apply HasCompactSupport.neg'
       apply HasCompactSupport.deriv h'
   adjoint φ ψ hφ hψ := by
@@ -130,6 +124,41 @@ lemma congr_adjoint {F : (X → U) → (X → V)} {G' : (X → V) → (X → U)}
   adjoint φ ψ hφ hψ := by
     rw [h' ψ hψ]
     exact h.adjoint φ ψ hφ hψ
+
+/-- Variational adjoint is unique only when applied to test functions. -/
+lemma unique {F : (X → U) → (X → V)} {F' G'  : (X → V) → (X → U)}
+    {μ : Measure X} [IsFiniteMeasureOnCompacts μ] [μ.IsOpenPosMeasure]
+    [OpensMeasurableSpace X] (hF' : HasVarAdjoint F F' μ) (hG' : HasVarAdjoint F G' μ)  :
+    ∀ φ, IsTestFunction φ → F' φ = G' φ := by
+  obtain ⟨F_preserve_test, F'_preserve_test, F'_adjoint⟩ := hF'
+  obtain ⟨F_preserve_test, G'_preserve_test, G'_adjoint⟩ := hG'
+  intro φ hφ
+  rw [← zero_add (G' φ)]
+  rw [← sub_eq_iff_eq_add]
+  change (F' - G') φ = 0
+  apply fundamental_theorem_of_variational_calculus μ
+  · simp
+    apply IsTestFunction.sub
+    · exact F'_preserve_test φ hφ
+    · exact G'_preserve_test φ hφ
+  · intro ψ hψ
+    simp [inner_sub_left]
+    rw [MeasureTheory.integral_sub]
+    · conv_lhs =>
+        enter [2, 2, a]
+        rw [← inner_conj_symm]
+      conv_lhs =>
+        enter [1, 2, a]
+        rw [← inner_conj_symm]
+      simp[← F'_adjoint ψ φ hψ hφ,G'_adjoint ψ φ hψ hφ]
+    · apply IsTestFunction.integrable
+      apply IsTestFunction.inner
+      · exact F'_preserve_test φ hφ
+      · exact hψ
+    · apply IsTestFunction.integrable
+      apply IsTestFunction.inner
+      · exact G'_preserve_test φ hφ
+      · exact hψ
 
 lemma neg {F : (X → U) → (X → V)} {F' : (X → V) → (X → U)}
     {μ : Measure X}
