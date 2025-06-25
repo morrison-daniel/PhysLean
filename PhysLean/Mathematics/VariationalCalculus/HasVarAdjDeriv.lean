@@ -4,8 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Tomas Skrivan, Joseph Tooby-Smith
 -/
 import PhysLean.Mathematics.VariationalCalculus.HasVarAdjoint
-import Mathlib.Analysis.InnerProductSpace.ProdL2
-import PhysLean.Mathematics.FDerivCurry
+import PhysLean.Mathematics.Calculus.AdjFDeriv
 /-!
 # Variational adjoint derivative
 
@@ -28,9 +27,9 @@ variable
   {X} [NormedAddCommGroup X] [NormedSpace ℝ X] [MeasureSpace X]
   {Y} [NormedAddCommGroup Y] [NormedSpace ℝ Y] [MeasureSpace Y]
   {Z} [NormedAddCommGroup Z] [NormedSpace ℝ Z] [MeasureSpace Z]
-  {U} [NormedAddCommGroup U] [InnerProductSpace ℝ U]
-  {V} [NormedAddCommGroup V] [InnerProductSpace ℝ V]
-  {W} [NormedAddCommGroup W] [InnerProductSpace ℝ W]
+  {U} [NormedAddCommGroup U] [NormedSpace ℝ U] [InnerProductSpace' ℝ U]
+  {V} [NormedAddCommGroup V] [NormedSpace ℝ V] [InnerProductSpace' ℝ V]
+  {W} [NormedAddCommGroup W] [NormedSpace ℝ W] [InnerProductSpace' ℝ W]
 
 /-- This is analogue of saying `F' = (fderiv ℝ F u).adjoint`.
 
@@ -185,6 +184,69 @@ protected lemma deriv (F : (ℝ → U) → (ℝ → ℝ)) (F') (u) (hF : HasVarA
     HasVarAdjDerivAt (fun φ : ℝ → U => deriv (F φ))
     (fun ψ x => F' (fun x' => - deriv ψ x') x) u :=
   comp (F:=deriv) (G:=F) (hF := deriv' (F u) hF.apply_smooth_self) (hG := hF)
+
+lemma fmap [CompleteSpace U] [CompleteSpace V]
+    (f : X → U → V) {f' : X → U → _ }
+    (u : X → U) (hu : ContDiff ℝ ∞ u)
+    (hf' : ContDiff ℝ ∞ ↿f) (hf : ∀ x u, HasAdjFDerivAt ℝ (f x) (f' x u) u) :
+    HasVarAdjDerivAt (fun (φ : X → U) x => f x (φ x)) (fun ψ x => f' x (u x) (ψ x)) u where
+  smooth_at := hu
+  diff := by fun_prop
+  linearize := by
+    intro φ hφ x
+    unfold deriv
+    conv => lhs; rw[fderiv_comp' (𝕜:=ℝ) (g:=(fun u : U => f _ u)) _
+            (by fun_prop (config:={maxTransitionDepth:=3}) (disch:=aesop))
+            (by fun_prop (config:={maxTransitionDepth:=3}) (disch:=aesop))]
+    conv => rhs; rw[fderiv_comp' (𝕜:=ℝ) (g:=(fun u : U => f _ u)) _
+            (by fun_prop (config:={maxTransitionDepth:=3}) (disch:=aesop)) (by fun_prop)]
+    simp[deriv_smul]
+  adjoint := by
+    apply HasVarAdjoint.congr_fun
+    case h' =>
+      intro φ hφ; funext x
+      unfold deriv
+      conv =>
+        lhs
+        rw[fderiv_comp' (𝕜:=ℝ) (g:=_) (f:=fun s : ℝ => u x + s • φ x) _
+          (by fun_prop (config:={maxTransitionDepth:=3}) (disch:=aesop)) (by fun_prop)]
+        simp[deriv_smul]
+    case h =>
+      constructor
+      · intros;
+        constructor
+        · fun_prop
+        · expose_names
+          rw [← exists_compact_iff_hasCompactSupport]
+          have h1 := h.supp
+          rw [← exists_compact_iff_hasCompactSupport] at h1
+          obtain ⟨K, cK, hK⟩ := h1
+          refine ⟨K, cK, ?_⟩
+          intro x hx
+          rw [hK x hx]
+          simp
+      · intro φ hφ
+        constructor
+        · apply ContDiff.fun_comp
+            (g:= fun x : X×U×V => f' x.1 x.2.1 x.2.2)
+            (f:= fun x => (x, u x, φ x))
+          · apply HasAdjFDerivAt.contDiffAt_deriv <;> assumption
+          · fun_prop
+        · rw [← exists_compact_iff_hasCompactSupport]
+          have h1 := hφ.supp
+          rw [← exists_compact_iff_hasCompactSupport] at h1
+          obtain ⟨K, cK, hK⟩ := h1
+          refine ⟨K, cK, ?_⟩
+          intro x hx
+          rw [hK x hx]
+          have hfx := (hf x (u x)).hasAdjoint_fderiv
+          exact HasAdjoint.adjoint_apply_zero hfx
+      · intros
+        congr 1; funext x
+        rw[← PreInnerProductSpace.Core.conj_inner_symm]
+        rw[← (hf x (u x)).hasAdjoint_fderiv.adjoint_inner_left]
+        rw[PreInnerProductSpace.Core.conj_inner_symm]
+      · intros K cK; use K; simp_all
 
 lemma neg (F : (X → U) → (X → V)) (F') (u) (hF : HasVarAdjDerivAt F F' u) :
     HasVarAdjDerivAt (fun φ x => -F φ x) (fun ψ x => - F' ψ x) u where
