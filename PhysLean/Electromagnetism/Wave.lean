@@ -306,12 +306,12 @@ lemma electricPlaneWave_eq_cross_magneticPlaneWave_upto_space_fun
   have hderiv : ∀ t x, _root_.deriv (fun t => (E t x) +
       (√(μ • ε))⁻¹ • (s.unit ⨯ₑ₃ (B t x))) t = 0 := by
     intro t x
-    rw [_root_.deriv_add, _root_.deriv_smul]
+    rw [_root_.deriv_fun_add, _root_.deriv_fun_smul]
     simp_all
     · fun_prop
     · exact crossProduct_time_differentiable_of_right_eq_planewave h' hBwave
     · exact function_differentiableAt_fst (hf := by fun_prop) ..
-    · apply DifferentiableAt.const_smul
+    · apply DifferentiableAt.fun_const_smul
       exact crossProduct_time_differentiable_of_right_eq_planewave h' hBwave
   use fun x => (E 0 x) + (√(μ • ε))⁻¹ • (s.unit ⨯ₑ₃ B 0 x)
   intro t x
@@ -323,7 +323,7 @@ lemma electricPlaneWave_eq_cross_magneticPlaneWave_upto_space_fun
   · intro x
     apply DifferentiableAt.add
     · exact function_differentiableAt_fst (hf := by fun_prop) ..
-    · apply DifferentiableAt.const_smul
+    · apply DifferentiableAt.fun_const_smul
       exact crossProduct_time_differentiable_of_right_eq_planewave h' hBwave
 
 /-- An electric planewave induces an magnetic field equal to `s ×₃ E` plus a constant field. -/
@@ -347,15 +347,15 @@ lemma magneticPlaneWave_eq_cross_electricPlaneWave_upto_space_fun
       (√(μ • ε)) • (s.unit ⨯ₑ₃ (E t x))) t = 0 := by
     intro t x
     ext1
-    rw [fderiv_sub]
-    rw [fderiv_const_smul]
+    rw [fderiv_fun_sub]
+    rw [fderiv_fun_const_smul]
     change (fderiv ℝ (fun t => B t x) t 1) -
         ((√(μ • ε)) • fderiv ℝ (fun t => (s.unit ⨯ₑ₃ (E t x))) t 1) = _
     rw [h]
     simp only [PiLp.zero_apply, ContinuousLinearMap.zero_apply]
     · exact crossProduct_time_differentiable_of_right_eq_planewave h' hEwave
     · exact function_differentiableAt_fst (hf := by fun_prop) ..
-    · apply DifferentiableAt.const_smul
+    · apply DifferentiableAt.fun_const_smul
       exact crossProduct_time_differentiable_of_right_eq_planewave h' hEwave
   use fun x => (B 0 x) - (√(μ • ε)) • (s.unit ⨯ₑ₃ E 0 x)
   intro t x
@@ -363,12 +363,11 @@ lemma magneticPlaneWave_eq_cross_electricPlaneWave_upto_space_fun
   apply is_const_of_fderiv_eq_zero at ht'
   simp only
   rw [ht' 0 t]
-  simp only [smul_eq_mul, WithLp.equiv_smul, map_smul, LinearMap.smul_apply,
-    WithLp.equiv_symm_smul, add_sub_cancel]
+  simp only [smul_eq_mul, WithLp.equiv_apply, WithLp.equiv_symm_apply, add_sub_cancel]
   · intro x
     apply DifferentiableAt.sub
     · exact function_differentiableAt_fst (hf := by fun_prop) ..
-    · apply DifferentiableAt.const_smul
+    · apply DifferentiableAt.fun_const_smul
       exact crossProduct_time_differentiable_of_right_eq_planewave h' hEwave
 
 /-- The electric field of an EMwave minus a constant field is transverse. -/
@@ -390,10 +389,10 @@ theorem electricField_transverse_upto_const_of_EMwave {s : Direction}
     intro t x
     rw [hcx']
     simp only [smul_eq_mul, neg_smul, PiLp.inner_apply, PiLp.add_apply, PiLp.neg_apply,
-      PiLp.smul_apply, WithLp.equiv_symm_pi_apply, RCLike.inner_apply, conj_trivial]
+      PiLp.smul_apply, WithLp.equiv_symm_apply, PiLp.toLp_apply, RCLike.inner_apply, conj_trivial]
     rw [crossProduct, Finset.sum, Finset.sum]
     simp only [Nat.succ_eq_add_one, Nat.reduceAdd, Fin.isValue, LinearMap.mk₂_apply,
-      WithLp.equiv_pi_apply, Fin.univ_val_map, List.ofFn_succ, Matrix.cons_val_zero,
+      WithLp.equiv_apply, PiLp.ofLp_apply, Fin.univ_val_map, List.ofFn_succ, Matrix.cons_val_zero,
       Matrix.cons_val_succ, Fin.succ_zero_eq_one, Matrix.cons_val_fin_one, Fin.succ_one_eq_two,
       List.ofFn_zero, Multiset.sum_coe, List.sum_cons, List.sum_nil, add_zero]
     ring
@@ -423,13 +422,12 @@ theorem magneticField_transverse_upto_const_of_EMwave {s : Direction}
     intro t x
     rw [hcx']
     simp only [smul_eq_mul, neg_smul, PiLp.inner_apply, PiLp.add_apply, PiLp.neg_apply,
-      PiLp.smul_apply, WithLp.equiv_symm_pi_apply, RCLike.inner_apply, conj_trivial]
+      PiLp.smul_apply, WithLp.equiv_symm_apply, PiLp.toLp_apply, RCLike.inner_apply, conj_trivial]
     rw [crossProduct, Finset.sum, Finset.sum]
-    simp only [Nat.succ_eq_add_one, Nat.reduceAdd, Fin.isValue, WithLp.equiv_smul, map_smul,
-      LinearMap.smul_apply, LinearMap.mk₂_apply, WithLp.equiv_pi_apply, Pi.smul_apply, smul_eq_mul,
-      Fin.univ_val_map, List.ofFn_succ, Matrix.cons_val_zero, Matrix.cons_val_succ,
-      Fin.succ_zero_eq_one, Matrix.cons_val_fin_one, Fin.succ_one_eq_two, List.ofFn_zero,
-      Multiset.sum_coe, List.sum_cons, List.sum_nil, add_zero]
+    simp only [Nat.succ_eq_add_one, Nat.reduceAdd, Fin.isValue, WithLp.equiv_apply,
+      LinearMap.mk₂_apply, PiLp.ofLp_apply, Fin.univ_val_map, List.ofFn_succ, Matrix.cons_val_zero,
+      Matrix.cons_val_succ, Fin.succ_zero_eq_one, Matrix.cons_val_fin_one, Fin.succ_one_eq_two,
+      List.ofFn_zero, Multiset.sum_coe, List.sum_cons, List.sum_nil, add_zero]
     ring
   use cx 0
   intro t x
@@ -536,8 +534,9 @@ theorem orthonormal_triad_of_electromagneticplaneWave {s : Direction}
     rw [← hBcdiff t x]
     simp only [smul_eq_mul, sub_add, sub_sub_cancel]
     rw [← smul_sub, inner_smul_right]
-    rw [← WithLp.equiv_symm_sub, ← LinearMap.map_sub, ← WithLp.equiv_sub]
-    rw [inner_cross_self]
+    simp only [WithLp.equiv_symm_apply, WithLp.equiv_apply]
+    rw [← WithLp.toLp_sub, ← LinearMap.map_sub, ← WithLp.ofLp_sub]
+    erw [inner_cross_self]
     simp
   · /- E orthogonal to s. -/
     rw [inner_smul_left]
@@ -552,8 +551,9 @@ theorem orthonormal_triad_of_electromagneticplaneWave {s : Direction}
     rw [← hBcdiff t x]
     simp only [smul_eq_mul, sub_add, sub_sub_cancel]
     rw [← smul_sub, inner_smul_left]
-    rw [← WithLp.equiv_symm_sub, ← LinearMap.map_sub, ← WithLp.equiv_sub]
-    rw [real_inner_comm, inner_self_cross]
+    simp only [WithLp.equiv_symm_apply, WithLp.equiv_apply]
+    rw [← WithLp.toLp_sub, ← LinearMap.map_sub, ← WithLp.ofLp_sub]
+    erw [real_inner_comm, inner_self_cross]
     simp
   · exact s.norm
 
