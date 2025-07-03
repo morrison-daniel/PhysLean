@@ -3,9 +3,7 @@ Copyright (c) 2025 Joseph Tooby-Smith. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Joseph Tooby-Smith
 -/
-import PhysLean.Relativity.Tensors.RealTensor.Basic
 import PhysLean.Relativity.Tensors.ComplexTensor.Basic
-import PhysLean.Relativity.Tensors.Elab
 /-!
 
 ## Derivative of Real Lorentz tensors
@@ -18,9 +16,10 @@ namespace realLorentzTensor
 open Tensor
 
 /-- The map between coordinates given a map ` ℝT(d, cm) → ℝT(d, cn)`. -/
-noncomputable def mapToBasis {d n m : ℕ} {cm : Fin m → (realLorentzTensor d).C}
-    {cn : Fin n → (realLorentzTensor d).C} (f : ℝT(d, cm) → ℝT(d, cn)) :
-    (ComponentIdx cm → ℝ) → ComponentIdx cn → ℝ :=
+noncomputable def mapToBasis {d n m : ℕ} {cm : Fin m → realLorentzTensor.Color}
+    {cn : Fin n → realLorentzTensor.Color} (f : ℝT(d, cm) → ℝT(d, cn)) :
+    (ComponentIdx (S := realLorentzTensor d) cm → ℝ) →
+    ComponentIdx (S := realLorentzTensor d) cn → ℝ :=
   Finsupp.equivFunOnFinite ∘ (basis cn).repr.toEquiv.toFun ∘
   f ∘ (basis cm).repr.symm.toEquiv.toFun
   ∘ Finsupp.equivFunOnFinite.symm
@@ -28,8 +27,8 @@ noncomputable def mapToBasis {d n m : ℕ} {cm : Fin m → (realLorentzTensor d)
 open ComponentIdx
 /-- The derivative of a function `f : ℝT(d, cm) → ℝT(d, cn)`, giving a function
     `ℝT(d, cm) → ℝT(d, (Sum.elim cm cn) ∘ finSumFinEquiv.symm)`. -/
-noncomputable def derivative {d n m : ℕ} {cm : Fin m → (realLorentzTensor d).C}
-    {cn : Fin n → (realLorentzTensor d).C} (f : ℝT(d, cm) → ℝT(d, cn)) :
+noncomputable def derivative {d n m : ℕ} {cm : Fin m → realLorentzTensor.Color}
+    {cn : Fin n → realLorentzTensor.Color} (f : ℝT(d, cm) → ℝT(d, cn)) :
     ℝT(d, cm) → ℝT(d, (Sum.elim (fun i => (realLorentzTensor d).τ (cm i)) cn) ∘
       finSumFinEquiv.symm) := fun y =>
       (Tensor.basis _).repr.toEquiv.symm <|
@@ -47,8 +46,8 @@ noncomputable def derivative {d n m : ℕ} {cm : Fin m → (realLorentzTensor d)
 @[inherit_doc realLorentzTensor.derivative]
 scoped[realLorentzTensor] notation "∂" => realLorentzTensor.derivative
 
-lemma derivative_repr {d n m : ℕ} {cm : Fin m → (realLorentzTensor d).C}
-    {cn : Fin n → (realLorentzTensor d).C} (f : ℝT(d, cm) → ℝT(d, cn))
+lemma derivative_repr {d n m : ℕ} {cm : Fin m → realLorentzTensor.Color}
+    {cn : Fin n → realLorentzTensor.Color} (f : ℝT(d, cm) → ℝT(d, cn))
     (y : ℝT(d, cm))
     (b : (j : Fin (m + n)) →
       Fin ((realLorentzTensor d).repDim

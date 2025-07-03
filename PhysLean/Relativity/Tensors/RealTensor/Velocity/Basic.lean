@@ -3,7 +3,7 @@ Copyright (c) 2024 Joseph Tooby-Smith. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Joseph Tooby-Smith
 -/
-import PhysLean.Relativity.Tensors.RealTensor.Vector.Basic
+import PhysLean.Relativity.Tensors.RealTensor.Vector.MinkowskiProduct
 /-!
 
 # Lorentz Velocities
@@ -96,7 +96,7 @@ lemma minkowskiProduct_continuous_fst (u : Vector d) :
   have h1 : (fun (x : Velocity d) => ⟪x.1, u⟫ₘ) =
     (fun (x : Velocity d) => ⟪u, x.1⟫ₘ) := by
     ext x
-    simp only [realLorentzTensor.C_eq_color, Nat.succ_eq_add_one, Nat.reduceAdd]
+    simp only [Nat.succ_eq_add_one, Nat.reduceAdd]
     rw [minkowskiProduct_symm]
   rw [h1]
   exact minkowskiProduct_continuous_snd u
@@ -112,6 +112,11 @@ noncomputable def zero : Velocity d := ⟨Vector.basis (Sum.inl 0),
   by simp [mem_iff, minkowskiMatrix.inl_0_inl_0]⟩
 
 noncomputable instance : Zero (Velocity d) := ⟨zero⟩
+
+@[simp]
+lemma zero_timeComponent : (0 : Velocity d).1.timeComponent = 1 := by
+  change (Vector.basis (Sum.inl 0)).timeComponent = 1
+  simp
 
 /-- A continuous path from a velocity `u` to the zero velocity. -/
 noncomputable def pathFromZero (u : Velocity d) : Path zero u where
@@ -129,7 +134,7 @@ noncomputable def pathFromZero (u : Velocity d) : Path zero u where
               toCoord_basis, ↓reduceIte, mul_one, smul_eq_mul, one_mul, minkowskiProduct_basis_left,
               minkowskiProduct_self_eq_one]
             ring
-        simp only [realLorentzTensor.C_eq_color, Nat.succ_eq_add_one, Nat.reduceAdd, Fin.isValue, x]
+        simp only [Nat.succ_eq_add_one, Nat.reduceAdd, Fin.isValue, x]
         ring_nf
         rw [Real.sq_sqrt, norm_spatialPart_sq_eq]
         ring
@@ -138,7 +143,7 @@ noncomputable def pathFromZero (u : Velocity d) : Path zero u where
           · apply mul_nonneg
             · exact sq_nonneg _
             · exact sq_nonneg _
-      · simp only [timeComponent, realLorentzTensor.C_eq_color, Nat.succ_eq_add_one, Nat.reduceAdd,
+      · simp only [timeComponent, Nat.succ_eq_add_one, Nat.reduceAdd,
         Fin.isValue, zero, map_add, map_smul, Pi.add_apply, Pi.smul_apply, toCoord_basis,
         ↓reduceIte, smul_eq_mul, mul_one]
         ring_nf
@@ -154,7 +159,7 @@ noncomputable def pathFromZero (u : Velocity d) : Path zero u where
     simp
   target' := by
     ext
-    simp only [realLorentzTensor.C_eq_color, Nat.succ_eq_add_one, Nat.reduceAdd, Set.Icc.coe_one,
+    simp only [Nat.succ_eq_add_one, Nat.reduceAdd, Set.Icc.coe_one,
       one_pow, one_mul, Fin.isValue, mul_one, one_smul, add_eq_right, smul_eq_zero]
     left
     rw [norm_spatialPart_sq_eq]
