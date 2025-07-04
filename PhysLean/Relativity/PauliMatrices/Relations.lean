@@ -3,7 +3,7 @@ Copyright (c) 2025 Joseph Tooby-Smith. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Joseph Tooby-Smith
 -/
-import PhysLean.Relativity.PauliMatrices.Basic
+import PhysLean.Relativity.PauliMatrices.ToTensor
 import PhysLean.Relativity.Tensors.ComplexTensor.Units.Basic
 /-!
 
@@ -34,6 +34,7 @@ lemma pauliCo_contr_pauliContr :
     {σ_^^ | ν α β ⊗ σ^^^ | ν α' β' = (2 : ℂ) •ₜ εL | α α' ⊗ εR | β β'}ᵀ := by
   apply (Tensor.basis _).repr.injective
   ext b
+  simp only [Tensorial.self_toTensor_apply]
   conv_rhs =>
     rw [permT_basis_repr_symm_apply]
     rw [_root_.map_smul]
@@ -53,7 +54,7 @@ lemma pauliCo_contr_pauliContr :
   conv_lhs =>
     enter [2, x]
     rw [prodT_basis_repr_apply]
-    simp only [pauliCo_eq_ofRat, pauliContr_eq_ofRat]
+    simp only [pauliCo_eq_ofRat, toTensor_eq_ofRat]
     simp only [Fin.isValue, ofRat_basis_repr_apply, Function.comp_apply, Monoidal.tensorUnit_obj,
       Equivalence.symm_inverse, Action.functorCategoryEquivalence_functor,
       Action.FunctorCategoryEquivalence.functor_obj_obj, Functor.comp_obj,
@@ -73,6 +74,7 @@ lemma pauliCo_contr_pauliContr :
   decide +kernel
 
 lemma pauliCoDown_trace_pauliCo : {(σ___ | μ β α ⊗ σ_^^ | ν α β) = (2 •ₜ η' | μ ν)}ᵀ := by
+  simp only [Tensorial.self_toTensor_apply]
   conv_lhs =>
     rw [pauliCoDown_eq_ofRat, pauliCo_eq_ofRat, prodT_ofRat_ofRat,
       contrT_ofRat, contrT_ofRat]
@@ -88,6 +90,7 @@ lemma pauliCoDown_trace_pauliCo : {(σ___ | μ β α ⊗ σ_^^ | ν α β) = (2 
   decide +kernel
 
 lemma pauliCo_trace_pauliCoDown: {σ_^^ | μ α β ⊗ σ___ | ν β α = 2 •ₜ η' | μ ν}ᵀ := by
+  simp only [Tensorial.self_toTensor_apply]
   conv_lhs =>
     rw [pauliCoDown_eq_ofRat, pauliCo_eq_ofRat]
     rw [prodT_ofRat_ofRat,
@@ -105,8 +108,9 @@ lemma pauliCo_trace_pauliCoDown: {σ_^^ | μ α β ⊗ σ___ | ν β α = 2 •�
 lemma pauliContr_mul_pauliContrDown_add :
     {((σ^^^ | μ α β ⊗ σ^__ | ν β α') + (σ^^^ | ν α β ⊗ σ^__ | μ β α')) =
     2 •ₜ η | μ ν ⊗ δL | α α'}ᵀ := by
+  simp only [Tensorial.self_toTensor_apply]
   conv_lhs =>
-    rw [pauliContrDown_ofRat, pauliContr_eq_ofRat, prodT_ofRat_ofRat,
+    rw [pauliContrDown_ofRat, toTensor_eq_ofRat, prodT_ofRat_ofRat,
       contrT_ofRat, permT_ofRat, ← map_add]
   conv_rhs =>
     rw [leftAltLeftUnit_eq_ofRat, contrMetric_eq_ofRat, prodT_ofRat_ofRat, ← map_nsmul,
@@ -120,8 +124,9 @@ lemma pauliContr_mul_pauliContrDown_add :
 lemma auliContrDown_pauliContr_mul_add :
     {((σ^__ | μ β α ⊗ σ^^^ | ν α β') + (σ^__ | ν β α ⊗ σ^^^ | μ α β')) =
     2 •ₜ η | μ ν ⊗ δR' | β β'}ᵀ := by
+  simp only [Tensorial.self_toTensor_apply]
   conv_lhs =>
-    rw [pauliContrDown_ofRat, pauliContr_eq_ofRat, prodT_ofRat_ofRat,
+    rw [pauliContrDown_ofRat, toTensor_eq_ofRat, prodT_ofRat_ofRat,
       contrT_ofRat, permT_ofRat, ← map_add]
   conv_rhs =>
     rw [altRightRightUnit_eq_ofRat, contrMetric_eq_ofRat, prodT_ofRat_ofRat, ← map_nsmul,

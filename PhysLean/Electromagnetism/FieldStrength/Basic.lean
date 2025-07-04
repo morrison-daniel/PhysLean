@@ -52,6 +52,7 @@ lemma mem_of_repr {d : ℕ} {F : ℝT[d, .up, .up]}
     Pi.neg_apply, permT_basis_repr_symm_apply]
   have h1 : b = fun | 0 => b 0 | 1 => b 1 := by aesop
   conv_lhs => rw [h1]
+  simp only [Tensorial.self_toTensor_apply]
   rw [h]
   simp only [Nat.succ_eq_add_one, Nat.reduceAdd, Fin.isValue, Matrix.cons_val_zero,
     id_eq, eq_mpr_eq_cast, neg_inj]
@@ -59,14 +60,17 @@ lemma mem_of_repr {d : ℕ} {F : ℝT[d, .up, .up]}
   fin_cases i <;> rfl
 
 lemma repr_symm {d : ℕ} (F : FieldStrength d) (i j : Fin (1 + d))
-    (x : ℝT[d, .up]) :
+    (x : SpaceTime d) :
     (Tensor.basis _).repr (F.1 x) (fun | 0 => i | 1 => j)
     = - (Tensor.basis _).repr (F.1 x) (fun | 0 => j | 1 => i) := by
   obtain ⟨F, hF⟩ := F
+  simp_all only [Tensorial.self_toTensor_apply]
   simp only [Nat.succ_eq_add_one, Nat.reduceAdd, Submodule.mem_mk, Fin.isValue,
     AddSubmonoid.mem_mk, AddSubsemigroup.mem_mk] at hF
   simp only [Nat.succ_eq_add_one, Nat.reduceAdd]
-  conv_lhs => rw [hF x]
+  have hf1 := hF x
+  simp only [Tensorial.self_toTensor_apply] at hf1
+  conv_lhs => rw [hf1]
   rw [Tensor.permT_basis_repr_symm_apply, map_neg]
   simp only [Fin.isValue, Finsupp.coe_neg, Pi.neg_apply, neg_inj]
   congr with x
@@ -74,7 +78,7 @@ lemma repr_symm {d : ℕ} (F : FieldStrength d) (i j : Fin (1 + d))
 
 @[simp]
 lemma repr_diag_zero {d : ℕ} (F : FieldStrength d) (i : Fin (1 + d))
-    (x : ℝT[d, .up]) :
+    (x : SpaceTime d) :
     (Tensor.basis _).repr (F.1 x) (fun | 0 => i | 1 => i)
     = 0 := by
   have hl (a : ℝ) (ha : a = -a) : a = 0 := CharZero.eq_neg_self_iff.mp ha
@@ -155,7 +159,7 @@ lemma ofElectricField_coe {d : ℕ} (E : ElectricField d) :
 
 /-- The field strength from a magnetic field as an element of `ℝT[3, .up, .up]`.
   This is only defined here for 4d spacetime. -/
-noncomputable def ofMagneticFieldAux (B : MagneticField) (x : ℝT[3, .up]) :
+noncomputable def ofMagneticFieldAux (B : MagneticField) (x : SpaceTime 3) :
       ℝT[3, .up, .up] := (Tensor.basis _).repr.symm <|
       Finsupp.equivFunOnFinite.symm <| fun b =>
     match b 0, b 1 with
