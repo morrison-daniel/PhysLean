@@ -3,11 +3,7 @@ Copyright (c) 2025 Ammar Husain. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Ammar Husain
 -/
-import PhysLean.Meta.TODO.Basic
-import Mathlib.Analysis.InnerProductSpace.Basic
-import Mathlib.Analysis.Calculus.Deriv.Add
-import Mathlib.Analysis.Calculus.Deriv.Mul
-import PhysLean.QuantumMechanics.PlanckConstant
+import PhysLean.QuantumMechanics.OneDimension.Operators.Momentum
 /-!
 
 # The 1d QM system with general potential
@@ -19,13 +15,6 @@ namespace QuantumMechanics
 namespace OneDimension
 
 open PhysLean HilbertSpace Constants
-
-/-- The momentum operator is defined as the map from `ℝ → ℂ` to `ℝ → ℂ` taking
-  `ψ` to `- i ℏ ψ'`.
-
-  The notation `Pᵒᵖ` can be used for the momentum operator. -/
-noncomputable def momentumOperator (ψ : ℝ → ℂ) : ℝ → ℂ :=
-  fun x ↦ - Complex.I * ℏ * deriv ψ x
 
 private lemma fun_add {α : Type*} (f g : α → ℂ) :
   (fun x ↦ f x) + (fun x ↦ g x) = fun x ↦ f x + g x := by
