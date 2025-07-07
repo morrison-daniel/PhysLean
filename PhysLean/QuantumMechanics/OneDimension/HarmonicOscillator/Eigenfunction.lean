@@ -4,7 +4,6 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Joseph Tooby-Smith
 -/
 import PhysLean.QuantumMechanics.OneDimension.HarmonicOscillator.Basic
-import Mathlib.Topology.Algebra.Polynomial
 import PhysLean.Mathematics.SpecialFunctions.PhysHermite
 /-!
 
@@ -159,10 +158,10 @@ lemma eigenfunction_continuous (n : ℕ) : Continuous (Q.eigenfunction n) := by
 /-- The `n`th eigenfunction is an eigenfunction of the parity operator with
   the eigenvalue `(-1) ^ n`. -/
 lemma eigenfunction_parity (n : ℕ) :
-    parity (Q.eigenfunction n) = (-1) ^ n * Q.eigenfunction n := by
+    parityOperator (Q.eigenfunction n) = (-1) ^ n * Q.eigenfunction n := by
   funext x
   rw [eigenfunction_eq]
-  simp only [parity, LinearMap.coe_mk, AddHom.coe_mk, mul_neg, Pi.mul_apply, Pi.pow_apply,
+  simp only [parityOperator, LinearMap.coe_mk, AddHom.coe_mk, mul_neg, Pi.mul_apply, Pi.pow_apply,
     Pi.neg_apply, Pi.one_apply]
   rw [show -x / Q.ξ = - (x / Q.ξ) by ring]
   rw [← physHermite_eq_aeval, physHermite_parity]
