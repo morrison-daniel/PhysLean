@@ -9,6 +9,7 @@ import Mathlib.Analysis.Calculus.ParametricIntegral
 import PhysLean.Meta.Informal.SemiFormal
 import PhysLean.Meta.Linters.Sorry
 import Mathlib.Analysis.SpecialFunctions.Log.Summable
+import Mathlib.MeasureTheory.Integral.Prod
 /-!
 
 # Canonical ensemble
@@ -30,6 +31,7 @@ to the properties of additions of canonical ensembles.
 -/
 
 open MeasureTheory
+open Real Temperature
 
 /-- A Canonical ensemble is described by a type `ι`, corresponding to the type of microstates,
   and a map `ι → ℝ` which associates which each microstate an energy. -/
@@ -86,6 +88,12 @@ noncomputable def congr (e : ι1 ≃ᵐ ι) : CanonicalEnsemble ι1 where
     · exact MeasurableEquiv.measurable e
   μ_sigmaFinite := MeasurableEquiv.sigmaFinite_map e.symm
 
+@[simp]
+lemma congr_energy_comp_symmm (e : ι1 ≃ᵐ ι) :
+    (𝓒.congr e).energy ∘ e.symm = 𝓒.energy := by
+  funext i
+  simp [congr]
+
 /-- Scalar multiplication of `CanonicalEnsemble`, defined such that
   `nsmul n 𝓒` is `n` coppies of the canonical ensemble `𝓒`. -/
 noncomputable def nsmul (n : ℕ) (𝓒1 : CanonicalEnsemble ι) : CanonicalEnsemble (Fin n → ι) where
@@ -107,6 +115,12 @@ abbrev microstates (𝓒 : CanonicalEnsemble ι) : Type := ι
 lemma μ_add : (𝓒 + 𝓒1).μ = 𝓒.μ.prod 𝓒1.μ := rfl
 
 lemma μ_nsmul (n : ℕ) : (nsmul n 𝓒).μ = MeasureTheory.Measure.pi fun _ => 𝓒.μ := rfl
+
+lemma μ_nsmul_zero_eq : (nsmul 0 𝓒).μ = Measure.pi (fun _ => 0) := by
+  simp [nsmul, μ_nsmul]
+  congr
+  funext x
+  exact Fin.elim0 x
 
 /-!
 
@@ -148,6 +162,44 @@ lemma nsmul_succ (n : ℕ) [SigmaFinite 𝓒.μ] : nsmul n.succ 𝓒 = (𝓒 + n
   · refine Eq.symm (MeasureTheory.MeasurePreserving.map_eq ?_)
     refine MeasurePreserving.symm _ ?_
     exact MeasureTheory.measurePreserving_piFinSuccAbove (n := n) (fun _ => 𝓒.μ) 0
+
+/-!
+
+## Non zero nature of the measure
+
+-/
+
+instance [NeZero 𝓒.μ] [NeZero 𝓒1.μ] : NeZero (𝓒 + 𝓒1).μ := by
+  simp [μ_add]
+  refine { out := ?_ }
+  rw [← @Measure.measure_univ_pos]
+  have h1 : (𝓒.μ.prod (𝓒1.μ)) Set.univ =
+      (𝓒.μ Set.univ) * (𝓒1.μ Set.univ) := by
+    rw [← @Measure.prod_prod]
+    simp
+  rw [h1]
+  exact NeZero.pos (𝓒.μ Set.univ * 𝓒1.μ Set.univ)
+
+instance μ_neZero_congr [NeZero 𝓒.μ] (e : ι1 ≃ᵐ ι) :
+    NeZero (𝓒.congr e).μ := by
+  refine { out := ?_ }
+  rw [← @Measure.measure_univ_pos]
+  simp only [Measure.measure_univ_pos, ne_eq]
+  refine (Measure.map_ne_zero_iff ?_).mpr ?_
+  · fun_prop
+  · exact Ne.symm (NeZero.ne' _)
+
+instance [NeZero 𝓒.μ] (n : ℕ) : NeZero (nsmul n 𝓒).μ := by
+  induction n with
+  | zero =>
+    rw [μ_nsmul_zero_eq]
+    rw [@neZero_iff]
+    simp only [ne_eq]
+    refine Measure.measure_univ_ne_zero.mp ?_
+    simp
+  | succ n ih =>
+    rw [nsmul_succ]
+    infer_instance
 
 /-!
 
@@ -202,6 +254,36 @@ lemma μBolt_nsmul [SigmaFinite 𝓒.μ] (n : ℕ) (T : Temperature) :
     rw [ih]
     exact MeasureTheory.measurePreserving_piFinSuccAbove (fun _ => 𝓒.μBolt T) 0
 
+lemma μBolt_ne_zero_of_μ_ne_zero (T : Temperature) (h : 𝓒.μ ≠ 0) :
+    𝓒.μBolt T ≠ 0 := by
+  simp [μBolt] at ⊢ h
+  rw [Measure.ext_iff'] at ⊢ h
+  simp only [Measure.coe_zero, Pi.zero_apply]
+  have hs : {x | ENNReal.ofReal (rexp (-(↑T.β * 𝓒.energy x))) ≠ 0} = Set.univ := by
+    ext i
+    simp only [ne_eq, ENNReal.ofReal_eq_zero, not_le, Set.mem_setOf_eq, Set.mem_univ, iff_true]
+    exact exp_pos _
+  conv =>
+    enter [1, s]
+    rw [MeasureTheory.withDensity_apply_eq_zero' (by fun_prop), hs]
+    simp
+  simpa using h
+
+instance (T : Temperature) [NeZero 𝓒.μ] : NeZero (𝓒.μBolt T) := by
+  refine { out := ?_ }
+  apply μBolt_ne_zero_of_μ_ne_zero
+  exact Ne.symm (NeZero.ne' 𝓒.μ)
+
+instance (T : Temperature) [IsFiniteMeasure (𝓒.μBolt T)] [IsFiniteMeasure (𝓒1.μBolt T)] :
+    IsFiniteMeasure ((𝓒 + 𝓒1).μBolt T) := by
+  simp only [μBolt_add]
+  exact Measure.prod.instIsFiniteMeasure (𝓒.μBolt T) (𝓒1.μBolt T)
+
+instance (T : Temperature) [IsFiniteMeasure (𝓒.μBolt T)] (n : ℕ) :
+    IsFiniteMeasure ((nsmul n 𝓒).μBolt T) := by
+  simp [μBolt_nsmul]
+  exact MeasureTheory.Measure.pi.instIsFiniteMeasure (fun _ => 𝓒.μBolt T)
+
 /-!
 
 ## The partition function of the canonical ensemble
@@ -230,6 +312,14 @@ lemma partitionFunction_add {T : Temperature} :
   rw [← measureReal_prod_prod]
   congr
   exact Eq.symm Set.univ_prod_univ
+
+@[simp]
+lemma partitionFunction_congr (e : ι1 ≃ᵐ ι) (T : Temperature) :
+    (𝓒.congr e).partitionFunction T = 𝓒.partitionFunction T := by
+  rw [partitionFunction_eq_integral, partitionFunction_eq_integral]
+  simp [congr]
+  rw [integral_map_equiv]
+  simp
 
 /-- The partition function of `n` copies of a canonical ensemble. -/
 lemma partitionFunction_nsmul (n : ℕ) (T : Temperature) :
@@ -270,34 +360,210 @@ lemma partitionFunction_comp_ofβ_apply (β : ℝ≥0) :
     (𝓒.μ.withDensity (fun i => ENNReal.ofReal (exp (- β * 𝓒.energy i)))).real Set.univ := by
   simp only [partitionFunction, μBolt, β_ofβ, neg_mul]
 
-@[sorryful, nolint unusedHavesSuffices]
-lemma paritionFunction_hasFDerivAt (T : Temperature) (hT : T.1 ≠ 0) :
-    let F' : ℝ → ι → ℝ →L[ℝ] ℝ := fun T i => rexp (-(1 / (kB * T)) * 𝓒.energy i) •
-    (fderiv ℝ (fun T => (- (1 / (kB * T)) * 𝓒.energy i)) T)
-    HasFDerivAt (𝕜 := ℝ)
-      (fun T => (𝓒.partitionFunction ∘ Real.toNNReal) T) (∫ (i :ι), F' T i ∂𝓒.μ) T := by
-  refine HasFDerivAt.congr_of_eventuallyEq
-    (f := fun T => ∫ i, exp (- (1 / (kB * T)) * 𝓒.energy i) ∂𝓒.μ) ?_ ?_
-  have h0 (i : ι) : HasFDerivAt (𝕜 := ℝ) (fun T => (- (1 / (kB * T)) * 𝓒.energy i))
-    (fderiv ℝ (fun T => (- (1 / (kB * T)) * 𝓒.energy i)) T.toReal) T.toReal := by
-    refine DifferentiableAt.hasFDerivAt ?_
-    refine DifferentiableAt.fun_mul ?_ ?_
-    · refine differentiableAt_fun_neg_iff.mpr ?_
-      refine DifferentiableAt.fun_div ?_ ?_ ?_
-      · fun_prop
-      · fun_prop
-      · simp_all
-        apply And.intro
-        · exact kB_neq_zero
-        · simpa [Temperature.toReal] using hT
+/-!
+
+## The probability measure
+
+-/
+
+/-- The probability of a given microstate in a canonical ensemble. -/
+noncomputable def probability (T : Temperature) (i : ι) : ℝ :=
+  (exp (- T.β * 𝓒.energy i)) / partitionFunction 𝓒 T
+
+lemma probability_add {T : Temperature} (i : ι × ι1) :
+    (𝓒 + 𝓒1).probability T i = 𝓒.probability T i.1 * 𝓒1.probability T i.2 := by
+  simp [probability, partitionFunction_add, mul_add, Real.exp_add]
+  ring
+
+@[simp]
+lemma probability_congr (e : ι1 ≃ᵐ ι) (T : Temperature) (i : ι1) :
+    (𝓒.congr e).probability T i = 𝓒.probability T (e i) := by
+  simp [probability]
+
+lemma probability_nsmul (n : ℕ) (T : Temperature) (f : Fin n → ι) :
+    (nsmul n 𝓒).probability T f = ∏ i, 𝓒.probability T (f i) := by
+  induction n with
+  | zero =>
+    simp [probability, partitionFunction_nsmul]
+  | succ n ih =>
+    rw [nsmul_succ]
+    rw [probability_congr]
+    rw [probability_add]
+    simp only [MeasurableEquiv.piFinSuccAbove_apply, Fin.insertNthEquiv_zero,
+      Fin.consEquiv_symm_apply]
+    rw [ih]
+    exact Eq.symm (Fin.prod_univ_succAbove (fun i => 𝓒.probability T (f i)) 0)
+
+/-- The probability measure associated with the Boltzmann distribution of a
+  canonical ensemble. -/
+noncomputable def μProd (T : Temperature) : MeasureTheory.Measure ι :=
+  (𝓒.μBolt T Set.univ)⁻¹ • 𝓒.μBolt T
+
+instance (T : Temperature) : SigmaFinite (𝓒.μProd T) :=
+  inferInstanceAs (SigmaFinite ((𝓒.μBolt T Set.univ)⁻¹ • 𝓒.μBolt T))
+
+instance (T : Temperature) [IsFiniteMeasure (𝓒.μBolt T)]
+  [NeZero 𝓒.μ] : IsProbabilityMeasure (𝓒.μProd T) := inferInstanceAs <|
+  IsProbabilityMeasure ((𝓒.μBolt T Set.univ)⁻¹ • 𝓒.μBolt T)
+
+lemma μProd_add {T : Temperature} [IsFiniteMeasure (𝓒.μBolt T)]
+    [IsFiniteMeasure (𝓒1.μBolt T)] : (𝓒 + 𝓒1).μProd T = (𝓒.μProd T).prod (𝓒1.μProd T) := by
+  rw [μProd, μProd, μProd, μBolt_add]
+  rw [MeasureTheory.Measure.prod_smul_left, MeasureTheory.Measure.prod_smul_right]
+  rw [smul_smul]
+  congr
+  trans ((𝓒.μBolt T) Set.univ * (𝓒1.μBolt T) Set.univ)⁻¹
+  swap
+  · by_cases h : (𝓒.μBolt T) Set.univ = 0
+    · simp [h]
+    by_cases h1 : (𝓒1.μBolt T) Set.univ = 0
+    · simp [h1]
+    rw [ENNReal.mul_inv]
+    · simp
+    · simp
+  · rw [← @Measure.prod_prod]
+    simp
+
+lemma μProd_congr (e : ι1 ≃ᵐ ι) (T : Temperature) :
+    (𝓒.congr e).μProd T = (𝓒.μProd T).map e.symm := by
+  simp [μProd, μBolt_congr]
+  congr 2
+  rw [MeasurableEquiv.map_apply]
+  simp
+
+lemma μProd_nsmul (n : ℕ) (T : Temperature) [IsFiniteMeasure (𝓒.μBolt T)] :
+    (nsmul n 𝓒).μProd T = MeasureTheory.Measure.pi fun _ => 𝓒.μProd T := by
+  induction n with
+  | zero =>
+    simp [nsmul, μProd, μBolt]
+    congr
+    funext x
+    exact Fin.elim0 x
+  | succ n ih =>
+    rw [nsmul_succ]
+    rw [μProd_congr]
+    rw [μProd_add]
+    refine MeasurePreserving.map_eq ?_
+    refine MeasurePreserving.symm _ ?_
+    rw [ih]
+    exact MeasureTheory.measurePreserving_piFinSuccAbove (fun _ => 𝓒.μProd T) 0
+
+/-!
+
+## Integrability of energy
+
+-/
+
+@[fun_prop]
+lemma integrable_energy_add (T : Temperature) [IsFiniteMeasure (𝓒.μBolt T)]
+    [IsFiniteMeasure (𝓒1.μBolt T)]
+    [NeZero 𝓒.μ] [NeZero 𝓒1.μ]
+    (h : Integrable 𝓒.energy (𝓒.μProd T)) (h1 : Integrable 𝓒1.energy (𝓒1.μProd T)) :
+    Integrable (𝓒 + 𝓒1).energy ((𝓒 + 𝓒1).μProd T) := by
+  rw [μProd_add]
+  refine Integrable.add'' ?_ ?_
+  · have h1 : (fun (i : ι × ι1) => 𝓒.energy i.1)
+      = fun (i : ι × ι1) => 𝓒.energy i.1 * (fun (i : ι1) => 1) i.2 := by
+      funext i
+      simp
+    rw [h1]
+    apply Integrable.mul_prod (f := 𝓒.energy) (g := (fun (i : ι1) => 1))
     · fun_prop
-  let F' : ℝ → ι → ℝ →L[ℝ] ℝ := fun T i => rexp (-(1 / (kB * T)) * 𝓒.energy i) •
-    (fderiv ℝ (fun T => (- (1 / (kB * T)) * 𝓒.energy i)) T)
-  have h (i : ι) : HasFDerivAt (𝕜 := ℝ) (fun (T : ℝ) => rexp (-(1 / (kB * T)) * 𝓒.energy i))
-    (F' T.toReal i) T.toReal := HasFDerivAt.exp (h0 i)
-  let F : ℝ → ι → ℝ := fun T i => exp (- (1 / (kB * T)) * 𝓒.energy i)
-  change HasFDerivAt (𝕜 := ℝ) (fun T => ∫ i, F T i ∂𝓒.μ) (∫ (i :ι), F' T i ∂𝓒.μ) T
-  · sorry
-  · sorry
+    · fun_prop
+  · have h1 : (fun (i : ι × ι1) => 𝓒1.energy i.2)
+      = fun (i : ι × ι1) => (fun (i : ι) => 1) i.1 * 𝓒1.energy i.2 := by
+      funext i
+      simp
+    rw [h1]
+    apply Integrable.mul_prod (f := (fun (i : ι) => 1)) (g := 𝓒1.energy)
+    · fun_prop
+    · fun_prop
+
+@[fun_prop]
+lemma integrable_energy_congr (T : Temperature) (e : ι1 ≃ᵐ ι)
+    (h : Integrable 𝓒.energy (𝓒.μProd T)) :
+    Integrable (𝓒.congr e).energy ((𝓒.congr e).μProd T) := by
+  simp [μProd_congr]
+  refine (integrable_map_equiv e.symm (𝓒.congr e).energy).mpr ?_
+  simp only [congr_energy_comp_symmm]
+  exact h
+
+@[fun_prop]
+lemma integrable_energy_nsmul (n : ℕ) (T : Temperature)
+    [IsFiniteMeasure (𝓒.μBolt T)] [NeZero 𝓒.μ]
+    (h : Integrable 𝓒.energy (𝓒.μProd T)) :
+    Integrable (nsmul n 𝓒).energy ((nsmul n 𝓒).μProd T) := by
+  induction n with
+  | zero =>
+    simp [nsmul, μProd_nsmul]
+  | succ n ih =>
+    rw [nsmul_succ]
+    apply integrable_energy_congr
+    apply integrable_energy_add
+    · exact h
+    · exact ih
+
+/-!
+
+## The mean energy
+
+-/
+
+/-- The mean energy of the canonical ensemble at temperature `T`. -/
+noncomputable def meanEnergy (T : Temperature) : ℝ := ∫ i, 𝓒.energy i ∂𝓒.μProd T
+
+lemma meanEnergy_add {T : Temperature}
+    [IsFiniteMeasure (𝓒1.μBolt T)] [IsFiniteMeasure (𝓒.μBolt T)]
+    [NeZero 𝓒.μ] [NeZero 𝓒1.μ]
+    (h1 : Integrable 𝓒.energy (𝓒.μProd T))
+    (h2 : Integrable 𝓒1.energy (𝓒1.μProd T)) :
+    (𝓒 + 𝓒1).meanEnergy T = 𝓒.meanEnergy T + 𝓒1.meanEnergy T := by
+  rw [meanEnergy]
+  simp only [energy_add_apply]
+  rw [μProd_add]
+  rw [MeasureTheory.integral_prod]
+  simp only
+  conv_lhs =>
+    enter [2, x]
+    rw [integral_add (integrable_const _) h2]
+    rw [integral_const]
+    simp
+  rw [integral_add h1 (integrable_const _)]
+  rw [integral_const]
+  simp
+  rfl
+  · simpa [μProd_add] using integrable_energy_add 𝓒 𝓒1 T h1 h2
+
+lemma meanEnergy_congr (e : ι1 ≃ᵐ ι) (T : Temperature) :
+    (𝓒.congr e).meanEnergy T = 𝓒.meanEnergy T := by
+  simp [meanEnergy, μProd_congr]
+  refine MeasurePreserving.integral_comp' ?_ 𝓒.energy
+  refine { measurable := ?_, map_eq := ?_ }
+  · exact MeasurableEquiv.measurable e
+  · exact MeasurableEquiv.map_map_symm e
+
+lemma meanEnergy_nsmul (n : ℕ) (T : Temperature)
+    [IsFiniteMeasure (𝓒.μBolt T)] [NeZero 𝓒.μ]
+    (h1 : Integrable 𝓒.energy (𝓒.μProd T)) :
+    (nsmul n 𝓒).meanEnergy T = n * 𝓒.meanEnergy T := by
+  induction n with
+  | zero =>
+    simp [nsmul, meanEnergy, μProd_nsmul]
+  | succ n ih =>
+    rw [nsmul_succ, meanEnergy_congr, meanEnergy_add, ih]
+    simp only [Nat.cast_add, Nat.cast_one]
+    ring
+    · exact h1
+    · exact integrable_energy_nsmul 𝓒 n T h1
+
+/-!
+
+## The entropy
+
+-/
+
+/-- The entropy of the Canonical ensemble. -/
+noncomputable def entropy (T : Temperature) : ℝ :=
+  - kB * ∫ i, log (probability 𝓒 T i) ∂𝓒.μProd T
 
 end CanonicalEnsemble
