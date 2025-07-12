@@ -59,22 +59,21 @@ variable [NormedSpace 𝕜 E]
    `C ≥ 0` is a global scalar.
 -/
 def ofLinear (s : Finset (ℕ × ℕ)) (f : 𝓢(ℝ, E) →ₗ[𝕜] 𝕜)
-    (hf : ∃ C : ℝ≥0, ∀ η : 𝓢(ℝ, E), ∃ (k : ℕ) (n : ℕ) (x : ℝ), (k, n) ∈ s ∧
-      ‖f η‖ ≤ C * (|x| ^ k * ‖iteratedDeriv n η x‖)) : ℝ→d[𝕜] E where
-  __ := f
-  cont := Seminorm.cont_withSeminorms_normedSpace 𝕜 (schwartz_withSeminorms 𝕜 ℝ E) f <| by
-    obtain ⟨C, hf⟩ := hf
-    refine ⟨s, C, fun η ↦ ?_⟩
+    (hf : ∃ C : ℝ, 0 ≤ C ∧ ∀ η : 𝓢(ℝ, E), ∃ (k : ℕ) (n : ℕ) (x : ℝ), (k, n) ∈ s ∧
+      ‖f η‖ ≤ C * (|x| ^ k * ‖iteratedDeriv n η x‖)) : ℝ→d[𝕜] E :=
+  mkCLMtoNormedSpace f (by simp) (by simp) <| by
+    obtain ⟨C, hC, hf⟩ := hf
+    refine ⟨s, C, hC, fun η ↦ ?_⟩
     obtain ⟨k, n, x, hkn, hη⟩ := hf η
     have hs : s.Nonempty := ⟨(k, n), hkn⟩
-    refine hη.trans <| mul_le_mul_of_nonneg_left ((le_seminorm' 𝕜 k n η x).trans ?_) C.2
+    refine hη.trans <| mul_le_mul_of_nonneg_left ((le_seminorm' 𝕜 k n η x).trans ?_) hC
     rw [Seminorm.finset_sup_apply]
     refine (NNReal.coe_le_coe (r₁ := ⟨SchwartzMap.seminorm 𝕜 k n η, apply_nonneg _ _⟩)).2 ?_
     convert s.le_sup hkn
       (f := fun kn : ℕ × ℕ ↦ (⟨SchwartzMap.seminorm 𝕜 kn.1 kn.2 η, apply_nonneg _ _⟩ : ℝ≥0))
 
 @[simp] lemma ofLinear_apply (s : Finset (ℕ × ℕ)) (f : 𝓢(ℝ, E) →ₗ[𝕜] 𝕜)
-    (hf : ∃ C : ℝ≥0, ∀ η : 𝓢(ℝ, E), ∃ (k : ℕ) (n : ℕ) (x : ℝ), (k, n) ∈ s ∧
+    (hf : ∃ C : ℝ, 0 ≤ C ∧ ∀ η : 𝓢(ℝ, E), ∃ (k : ℕ) (n : ℕ) (x : ℝ), (k, n) ∈ s ∧
       ‖f η‖ ≤ C * (|x| ^ k * ‖iteratedDeriv n η x‖))
     (η : 𝓢(ℝ, E)) :
     ofLinear 𝕜 E s f hf η = f η :=
@@ -107,5 +106,19 @@ def diracDelta (v : E) (a : ℝ) : ℝ→d[𝕜] E :=
   rfl
 
 end InnerProductSpace
+
+
+section RCLike
+
+/-- Definition of derivative of distribution: Let `f` be a distribution. Then its derivative is
+`f'` where given a test function `η`, `f' η := -f(η')`. -/
+def derivative (f : ℝ→d[𝕜] 𝕜) : ℝ→d[𝕜] 𝕜 :=
+  (ContinuousLinearEquiv.neg 𝕜).toContinuousLinearMap.comp <| f.comp <| SchwartzMap.derivCLM 𝕜
+
+@[simp] lemma derivative_apply (f : ℝ→d[𝕜] 𝕜) (η : 𝓢(ℝ, 𝕜)) :
+    f.derivative 𝕜 η = -f (SchwartzMap.derivCLM 𝕜 η) :=
+  rfl
+
+end RCLike
 
 end Distribution
