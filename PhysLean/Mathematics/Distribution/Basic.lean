@@ -34,7 +34,7 @@ noncomputable section
 /-- A distribution on `E` (normed vector space over `𝕜`) is a continuous linear map
 `𝓢(ℝ, E) →L[𝕜] 𝕜` where `𝒮(ℝ, E)` is the Schwarz space of smooth functions `ℝ → E` with rapidly
 decreasing iterated derivatives. This is notated as `ℝ →d[𝕜] E`. -/
-def Distribution (𝕜 : Type) [RCLike 𝕜] (E : Type) [NormedAddCommGroup E] [NormedSpace 𝕜 E]
+abbrev Distribution (𝕜 : Type) [RCLike 𝕜] (E : Type) [NormedAddCommGroup E] [NormedSpace 𝕜 E]
     [NormedSpace ℝ E] [IsScalarTower ℝ 𝕜 E] : Type :=
   𝓢(ℝ, E) →L[𝕜] 𝕜
 
@@ -73,20 +73,22 @@ def ofLinear (s : Finset (ℕ × ℕ)) (f : 𝓢(ℝ, E) →ₗ[𝕜] 𝕜)
     convert s.le_sup hkn
       (f := fun kn : ℕ × ℕ ↦ (⟨SchwartzMap.seminorm 𝕜 kn.1 kn.2 η, apply_nonneg _ _⟩ : ℝ≥0))
 
+@[simp] lemma ofLinear_apply (s : Finset (ℕ × ℕ)) (f : 𝓢(ℝ, E) →ₗ[𝕜] 𝕜)
+    (hf : ∃ C : ℝ≥0, ∀ η : 𝓢(ℝ, E), ∃ (k : ℕ) (n : ℕ) (x : ℝ), (k, n) ∈ s ∧
+      ‖f η‖ ≤ C * (|x| ^ k * ‖iteratedDeriv n η x‖))
+    (η : 𝓢(ℝ, E)) :
+    ofLinear 𝕜 E s f hf η = f η :=
+  rfl
+
 /-- Dirac delta given a continuous linear function `dir : E →L[𝕜] 𝕜`. This is a generalisation of
 `diracDelta` which takes in a specified direction `v`, and evaluate the test function `η` to give
-`⟨v, η 0⟩`. Here `dir` acts like `⟨v, ─⟩`. -/
-def diracDelta' (dir : E →L[𝕜] 𝕜) : ℝ→d[𝕜] E :=
-  ofLinear 𝕜 E { (0, 0) }
-    { toFun η := dir (η 0)
-      map_add' η₁ η₂ := by simp
-      map_smul' c η := by simp } <| by
-    obtain ⟨M, hMpos, hM⟩ := dir.isBoundedLinearMap.bound
-    refine ⟨⟨M, le_of_lt hMpos⟩, fun η ↦ ⟨0, 0, 0, by simp, ?_⟩⟩
-    calc
-      ‖dir (η 0)‖
-        ≤ M * ‖η 0‖ := hM (η 0)
-      _ = M * (|0| ^ 0 * ‖iteratedDeriv 0 η 0‖) := by simp
+`⟨v, η a⟩`. Here `dir` acts like `⟨v, ─⟩`. -/
+def diracDelta' (dir : E →L[𝕜] 𝕜) (a : ℝ) : ℝ→d[𝕜] E :=
+  dir.comp (delta 𝕜 E a)
+
+@[simp] lemma diracDelta'_apply (dir : E →L[𝕜] 𝕜) (a : ℝ) (η : 𝓢(ℝ, E)) :
+    diracDelta' 𝕜 E dir a η = dir (η a) :=
+  rfl
 
 end NormedSpace
 
@@ -95,10 +97,14 @@ section InnerProductSpace
 
 variable [InnerProductSpace 𝕜 E]
 
-/-- Dirac delta given a direction `v`. It evaluates a test function `η` to give `⟨v, η 0⟩`.
+/-- Dirac delta given a direction `v`. It evaluates a test function `η` to give `⟨v, η a⟩`.
 For a generalisation repalcing `⟨v, ─⟩` with a continuous linear function, use `diracDelta'`. -/
-def diracDelta (v : E) : ℝ→d[𝕜] E :=
-  diracDelta' 𝕜 E (innerSL 𝕜 v)
+def diracDelta (v : E) (a : ℝ) : ℝ→d[𝕜] E :=
+  diracDelta' 𝕜 E (innerSL 𝕜 v) a
+
+@[simp] lemma diracDelta_apply (v : E) (a : ℝ) (η : 𝓢(ℝ, E)) :
+    diracDelta 𝕜 E v a η = inner 𝕜 v (η a) :=
+  rfl
 
 end InnerProductSpace
 
