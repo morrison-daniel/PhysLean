@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Kenny Lau
 -/
 
-import Mathlib.Analysis.Distribution.SchwartzSpace
+import Mathlib.Analysis.Distribution.FourierSchwartz
 
 /-!
 # Distributions
@@ -112,13 +112,45 @@ section RCLike
 
 /-- Definition of derivative of distribution: Let `f` be a distribution. Then its derivative is
 `f'` where given a test function `η`, `f' η := -f(η')`. -/
-def derivative (f : ℝ→d[𝕜] 𝕜) : ℝ→d[𝕜] 𝕜 :=
-  (ContinuousLinearEquiv.neg 𝕜).toContinuousLinearMap.comp <| f.comp <| SchwartzMap.derivCLM 𝕜
+def derivative : (ℝ→d[𝕜] 𝕜) →ₗ[𝕜] (ℝ→d[𝕜] 𝕜) where
+  toFun f := (ContinuousLinearEquiv.neg 𝕜).toContinuousLinearMap.comp <| f.comp <|
+    SchwartzMap.derivCLM 𝕜
+  map_add' f₁ f₂ := by simp
+  map_smul' c f := by simp
 
 @[simp] lemma derivative_apply (f : ℝ→d[𝕜] 𝕜) (η : 𝓢(ℝ, 𝕜)) :
     f.derivative 𝕜 η = -f (SchwartzMap.derivCLM 𝕜 η) :=
   rfl
 
+open MeasureTheory in
+/-- A measurable function `f` that is bounded by `C + |x|^n` can be made into a distribution. -/
+def ofPolynomialGrowth (f : ℝ → 𝕜) (hfm : AEStronglyMeasurable f)
+    (hfp : ∃ (a C : ℝ) (n : ℕ), (fun x ↦ ‖f x‖) ≤ᵐ[(volume)] (fun x ↦ C + a * ‖x‖^n)) :
+    ℝ→d[𝕜] 𝕜 :=
+  ofLinear 𝕜 𝕜 { (0, 0) }
+    { toFun η := ∫ x, f x * η x
+      map_add' η₁ η₂ := sorry
+      map_smul' c η := sorry }
+    sorry
+
 end RCLike
+
+
+section Complex
+
+variable (E : Type) [NormedAddCommGroup E] [NormedSpace ℂ E]
+
+/-- Definition of Fourier transform of distribution: Let `f` be a distribution. Then its Fourier
+transform is `F(f)` where given a test function `η`, `F(f)(η) := f(F(η))`. -/
+def fourierTransform : (ℝ→d[ℂ] E) →ₗ[ℂ] (ℝ→d[ℂ] E) where
+  toFun f := f.comp <| SchwartzMap.fourierTransformCLM ℂ (E := E) (V := ℝ)
+  map_add' f₁ f₂ := by simp
+  map_smul' c f := by simp
+
+@[simp] lemma fourierTransform_apply (f : ℝ→d[ℂ] E) (η : 𝓢(ℝ, E)) :
+    fourierTransform E f η = f (SchwartzMap.fourierTransformCLM ℂ η) :=
+  rfl
+
+end Complex
 
 end Distribution
