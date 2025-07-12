@@ -1,4 +1,25 @@
+/-
+Copyright (c) 2025 Kenny Lau. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Kenny Lau
+-/
+
 import Mathlib.Analysis.Distribution.SchwartzSpace
+
+/-!
+# Distributions
+
+This file defines distributions, which are continuous linear functionals that take in as test
+functions those `ℝ → E` that are Schwartz functions, i.e. smooth functions with rapidly decreasing iterated derivatives. `E` can be a normed vector space over `ℝ` or `ℂ`, and the linear functionals
+also respectively output `ℝ` or `ℂ`.
+
+## Examples
+- `Distribution.diracDelta'`: takes in a "direction" in the form of a continuous linear map
+  `E →L[𝕜] 𝕜` (the direction `v` corresponds to the inner product `⟨v, -⟩`), and returns the Dirac
+  delta distribution in that direction. This is a distribution that evaluates the test function `η`
+  at `0` and then take the inner product with `v`, i.e. `⟨v, η 0⟩`.
+
+-/
 
 open SchwartzMap NNReal
 noncomputable section
