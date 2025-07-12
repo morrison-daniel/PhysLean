@@ -122,17 +122,6 @@ def derivative : (ℝ→d[𝕜] 𝕜) →ₗ[𝕜] (ℝ→d[𝕜] 𝕜) where
     f.derivative 𝕜 η = -f (SchwartzMap.derivCLM 𝕜 η) :=
   rfl
 
-open MeasureTheory in
-/-- A measurable function `f` that is bounded by `C + |x|^n` can be made into a distribution. -/
-def ofPolynomialGrowth (f : ℝ → 𝕜) (hfm : AEStronglyMeasurable f)
-    (hfp : ∃ (a C : ℝ) (n : ℕ), (fun x ↦ ‖f x‖) ≤ᵐ[(volume)] (fun x ↦ C + a * ‖x‖^n)) :
-    ℝ→d[𝕜] 𝕜 :=
-  ofLinear 𝕜 𝕜 { (0, 0) }
-    { toFun η := ∫ x, f x * η x
-      map_add' η₁ η₂ := sorry
-      map_smul' c η := sorry }
-    sorry
-
 end RCLike
 
 
