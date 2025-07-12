@@ -10,7 +10,8 @@ import Mathlib.Analysis.Distribution.SchwartzSpace
 # Distributions
 
 This file defines distributions, which are continuous linear functionals that take in as test
-functions those `ℝ → E` that are Schwartz functions, i.e. smooth functions with rapidly decreasing iterated derivatives. `E` can be a normed vector space over `ℝ` or `ℂ`, and the linear functionals
+functions those `ℝ → E` that are Schwartz functions, i.e. smooth functions with rapidly decreasing
+iterated derivatives. `E` can be a normed vector space over `ℝ` or `ℂ`, and the linear functionals
 also respectively output `ℝ` or `ℂ`.
 
 ## Examples
