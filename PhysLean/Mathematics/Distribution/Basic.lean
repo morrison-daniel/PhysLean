@@ -9,22 +9,28 @@ import Mathlib.Analysis.Distribution.FourierSchwartz
 /-!
 # Distributions
 
-This file defines distributions, which are continuous linear functionals that take in as test
-functions those `ℝ → E` that are smooth functions with rapidly decreasing iterated derivatives.
-(The space of all these test functions is called the Schwartz space `𝓢(ℝ, E)`.)
+This file defines distributions `E →d[𝕜] F`, which is a way to generalise functions `E → F`.
+Mathematically, a distribution `u : E →d[𝕜] F` takes in a test function `η : E → 𝕜` that is smooth
+with rapidly decreasing iterated derivatives, and outputs a value in `F`. This operation is required
+to be linear and continuous. Note that the space of test functions is called the Schwartz space and
+is denoted `𝓢(E, 𝕜)`.
 
-`E` can be a normed vector space over `ℝ` or `ℂ`, and the continuous linear functionals are also
-required to output values in `ℝ` or `ℂ` respectively.
+`E` is required to be a normed vector space over `ℝ`, and `F` can be a normed vector space over `ℝ`
+or `ℂ` (which is the field denoted `𝕜`).
 
 ## Important Results
-- `Distribution.ofLinear`: constructs a distribution from a linear functional `F` and some
-  conditions that implies that `F` is continuous.
+- `Distribution.derivative` and `Distribution.fourierTransform` allow us to make sense of these
+  operations that might not make sense a priori on general functions.
 
 ## Examples
-- `Distribution.diracDelta`: takes in a direction `v : E`, and returns the Dirac delta distribution
-  in that direction. Given the test function `η`, `diracDelta v η = ⟨v, η 0⟩`.
-- `Distribution.diracDelta'`: a slight generalisation of `diracDelta` where the inner product
-  `⟨v, ─⟩` is replaced by a continuous linear map `E →L[𝕜] 𝕜`.
+- `Distribution.diracDelta`: Dirac delta distribution at a point `a : E` is a distribution
+  that takes in a test function `η : 𝓢(E, 𝕜)` and outputs `η a`.
+
+## TODO
+- In the future, any function of polynomial growth can be interpreted as a distribution. This will
+  be helpful for defining the distributions that correspond to `H` (Heaviside step function), or
+  `cos(x)`.
+- Generalise `derivative` to higher dimensional domain.
 
 -/
 
@@ -34,92 +40,88 @@ noncomputable section
 /-- A distribution on `E` (normed vector space over `𝕜`) is a continuous linear map
 `𝓢(ℝ, E) →L[𝕜] 𝕜` where `𝒮(ℝ, E)` is the Schwarz space of smooth functions `ℝ → E` with rapidly
 decreasing iterated derivatives. This is notated as `ℝ →d[𝕜] E`. -/
-abbrev Distribution (𝕜 : Type) [RCLike 𝕜] (E : Type) [NormedAddCommGroup E] [NormedSpace 𝕜 E]
-    [NormedSpace ℝ E] [IsScalarTower ℝ 𝕜 E] : Type :=
-  𝓢(ℝ, E) →L[𝕜] 𝕜
+abbrev Distribution (𝕜 E F : Type) [RCLike 𝕜] [NormedAddCommGroup E] [NormedAddCommGroup F]
+    [NormedSpace ℝ E] [NormedSpace 𝕜 F] : Type :=
+  𝓢(E, 𝕜) →L[𝕜] F
 
-@[inherit_doc] notation:25 "ℝ→d[" 𝕜:25 "] " E:0 => Distribution 𝕜 E
+@[inherit_doc] notation:25 E:arg "→d[" 𝕜:25 "] " F:arg => Distribution 𝕜 E F
 
-variable (𝕜 : Type) [RCLike 𝕜] (E : Type) [NormedAddCommGroup E] [NormedSpace ℝ E]
+variable (𝕜 : Type) {E F : Type} [RCLike 𝕜] [NormedAddCommGroup E] [NormedAddCommGroup F]
 
 namespace Distribution
 
 section NormedSpace
 
-variable [NormedSpace 𝕜 E]
+variable [NormedSpace ℝ E] [NormedSpace 𝕜 F]
 
 /-- We construct a distribution from the following data:
 1. We take a finite set `s` of pairs `(k, n) ∈ ℕ × ℕ` that will be explained later.
-2. We take a linear map `f` that evaluates the given Schwartz function `η`. At this stage we don't
-   need `f` to be continuous.
+2. We take a linear map `u` that evaluates the given Schwartz function `η`. At this stage we don't
+   need `u` to be continuous.
 3. Recall that a Schwartz function `η` satisfies a bound
-   `|x|ᵏ * ‖(dⁿ/dxⁿ) η‖ < Mₙₖ` where `Mₙₖ : ℝ` only depends on `(k, n) : ℕ × ℕ`.
-4. This step is where `s` is used: for each test function `η`, the norm `‖f η‖` is required to be
-   bounded by `C * (|x|ᵏ * ‖(dⁿ/dxⁿ) η‖)` for some `x : ℝ` and for some `(k, n) ∈ s`, where
+   `‖x‖ᵏ * ‖(dⁿ/dxⁿ) η‖ < Mₙₖ` where `Mₙₖ : ℝ` only depends on `(k, n) : ℕ × ℕ`.
+4. This step is where `s` is used: for each test function `η`, the norm `‖u η‖` is required to be
+   bounded by `C * (‖x‖ᵏ * ‖(dⁿ/dxⁿ) η‖)` for some `x : ℝ` and for some `(k, n) ∈ s`, where
    `C ≥ 0` is a global scalar.
 -/
-def ofLinear (s : Finset (ℕ × ℕ)) (f : 𝓢(ℝ, E) →ₗ[𝕜] 𝕜)
-    (hf : ∃ C : ℝ, 0 ≤ C ∧ ∀ η : 𝓢(ℝ, E), ∃ (k : ℕ) (n : ℕ) (x : ℝ), (k, n) ∈ s ∧
-      ‖f η‖ ≤ C * (|x| ^ k * ‖iteratedDeriv n η x‖)) : ℝ→d[𝕜] E :=
-  mkCLMtoNormedSpace f (by simp) (by simp) <| by
-    obtain ⟨C, hC, hf⟩ := hf
+def ofLinear (s : Finset (ℕ × ℕ)) (u : 𝓢(E, 𝕜) →ₗ[𝕜] F)
+    (hu : ∃ C : ℝ, 0 ≤ C ∧ ∀ η : 𝓢(E, 𝕜), ∃ (k : ℕ) (n : ℕ) (x : E), (k, n) ∈ s ∧
+      ‖u η‖ ≤ C * (‖x‖ ^ k * ‖iteratedFDeriv ℝ n η x‖)) : E →d[𝕜] F :=
+  mkCLMtoNormedSpace u (by simp) (by simp) <| by
+    obtain ⟨C, hC, hu⟩ := hu
     refine ⟨s, C, hC, fun η ↦ ?_⟩
-    obtain ⟨k, n, x, hkn, hη⟩ := hf η
+    obtain ⟨k, n, x, hkn, hη⟩ := hu η
     have hs : s.Nonempty := ⟨(k, n), hkn⟩
-    refine hη.trans <| mul_le_mul_of_nonneg_left ((le_seminorm' 𝕜 k n η x).trans ?_) hC
+    refine hη.trans <| mul_le_mul_of_nonneg_left ((le_seminorm 𝕜 k n η x).trans ?_) hC
     rw [Seminorm.finset_sup_apply]
     refine (NNReal.coe_le_coe (r₁ := ⟨SchwartzMap.seminorm 𝕜 k n η, apply_nonneg _ _⟩)).2 ?_
     convert s.le_sup hkn
       (f := fun kn : ℕ × ℕ ↦ (⟨SchwartzMap.seminorm 𝕜 kn.1 kn.2 η, apply_nonneg _ _⟩ : ℝ≥0))
 
-@[simp] lemma ofLinear_apply (s : Finset (ℕ × ℕ)) (f : 𝓢(ℝ, E) →ₗ[𝕜] 𝕜)
-    (hf : ∃ C : ℝ, 0 ≤ C ∧ ∀ η : 𝓢(ℝ, E), ∃ (k : ℕ) (n : ℕ) (x : ℝ), (k, n) ∈ s ∧
-      ‖f η‖ ≤ C * (|x| ^ k * ‖iteratedDeriv n η x‖))
-    (η : 𝓢(ℝ, E)) :
-    ofLinear 𝕜 E s f hf η = f η :=
+@[simp] lemma ofLinear_apply (s : Finset (ℕ × ℕ)) (u : 𝓢(E, 𝕜) →ₗ[𝕜] F)
+    (hu : ∃ C : ℝ, 0 ≤ C ∧ ∀ η : 𝓢(E, 𝕜), ∃ (k : ℕ) (n : ℕ) (x : E), (k, n) ∈ s ∧
+      ‖u η‖ ≤ C * (‖x‖ ^ k * ‖iteratedFDeriv ℝ n η x‖))
+    (η : 𝓢(E, 𝕜)) :
+    ofLinear 𝕜 s u hu η = u η :=
   rfl
 
-/-- Dirac delta given a continuous linear function `dir : E →L[𝕜] 𝕜`. This is a generalisation of
-`diracDelta` which takes in a specified direction `v`, and evaluate the test function `η` to give
-`⟨v, η a⟩`. Here `dir` acts like `⟨v, ─⟩`. -/
-def diracDelta' (dir : E →L[𝕜] 𝕜) (a : ℝ) : ℝ→d[𝕜] E :=
-  dir.comp (delta 𝕜 E a)
+/-- Dirac delta distribution `diracDelta 𝕜 a : E →d[𝕜] 𝕜` takes in a test function `η : 𝓢(E, 𝕜)`
+and outputs `η a`. Intuitively this is an infinite density at a single point `a`. -/
+def diracDelta (a : E) : E →d[𝕜] 𝕜 :=
+  delta 𝕜 𝕜 a
 
-@[simp] lemma diracDelta'_apply (dir : E →L[𝕜] 𝕜) (a : ℝ) (η : 𝓢(ℝ, E)) :
-    diracDelta' 𝕜 E dir a η = dir (η a) :=
+@[simp] lemma diracDelta_apply (a : E) (η : 𝓢(E, 𝕜)) :
+    diracDelta 𝕜 a η = η a :=
+  rfl
+
+/-- Dirac delta in a given direction `v : F`. `diracDelta' 𝕜 a v` takesn in a test function
+`η : 𝓢(E, 𝕜)` and outputs `η a • v`. Intuitively this is an infinitely intense vector field
+at a single point `a` pointing at the direction `v`. -/
+def diracDelta' (a : E) (v : F) : E →d[𝕜] F :=
+  ContinuousLinearMap.smulRight (diracDelta 𝕜 a) v
+
+@[simp] lemma diracDelta'_apply (a : E) (v : F) (η : 𝓢(E, 𝕜)) :
+    diracDelta' 𝕜 a v η = η a • v :=
   rfl
 
 end NormedSpace
 
 
-section InnerProductSpace
-
-variable [InnerProductSpace 𝕜 E]
-
-/-- Dirac delta given a direction `v`. It evaluates a test function `η` to give `⟨v, η a⟩`.
-For a generalisation repalcing `⟨v, ─⟩` with a continuous linear function, use `diracDelta'`. -/
-def diracDelta (v : E) (a : ℝ) : ℝ→d[𝕜] E :=
-  diracDelta' 𝕜 E (innerSL 𝕜 v) a
-
-@[simp] lemma diracDelta_apply (v : E) (a : ℝ) (η : 𝓢(ℝ, E)) :
-    diracDelta 𝕜 E v a η = inner 𝕜 v (η a) :=
-  rfl
-
-end InnerProductSpace
-
-
 section RCLike
 
-/-- Definition of derivative of distribution: Let `f` be a distribution. Then its derivative is
-`f'` where given a test function `η`, `f' η := -f(η')`. -/
-def derivative : (ℝ→d[𝕜] 𝕜) →ₗ[𝕜] (ℝ→d[𝕜] 𝕜) where
-  toFun f := (ContinuousLinearEquiv.neg 𝕜).toContinuousLinearMap.comp <| f.comp <|
+/-- Definition of derivative of distribution: Let `u` be a distribution. Then its derivative is
+`u'` where given a test function `η`, `u' η := -u(η')`. This agrees with the distribution generated
+by the derivative of a differentiable function (with suitable conditions) (to be defined later),
+because of integral by parts (where the boundary conditions are `0` by the test functions being
+rapidly decreasing). -/
+def derivative : (ℝ →d[𝕜] 𝕜) →ₗ[𝕜] (ℝ →d[𝕜] 𝕜) where
+  toFun u := (ContinuousLinearEquiv.neg 𝕜).toContinuousLinearMap.comp <| u.comp <|
     SchwartzMap.derivCLM 𝕜
-  map_add' f₁ f₂ := by simp
-  map_smul' c f := by simp
+  map_add' u₁ u₂ := by simp
+  map_smul' c u := by simp
 
-@[simp] lemma derivative_apply (f : ℝ→d[𝕜] 𝕜) (η : 𝓢(ℝ, 𝕜)) :
-    f.derivative 𝕜 η = -f (SchwartzMap.derivCLM 𝕜 η) :=
+@[simp] lemma derivative_apply (u : ℝ→d[𝕜] 𝕜) (η : 𝓢(ℝ, 𝕜)) :
+    u.derivative 𝕜 η = -u (derivCLM 𝕜 η) :=
   rfl
 
 end RCLike
@@ -127,17 +129,19 @@ end RCLike
 
 section Complex
 
-variable (E : Type) [NormedAddCommGroup E] [NormedSpace ℂ E]
+variable [InnerProductSpace ℝ E] [FiniteDimensional ℝ E] [MeasurableSpace E] [BorelSpace E]
+  [NormedSpace ℂ F]
 
-/-- Definition of Fourier transform of distribution: Let `f` be a distribution. Then its Fourier
-transform is `F(f)` where given a test function `η`, `F(f)(η) := f(F(η))`. -/
-def fourierTransform : (ℝ→d[ℂ] E) →ₗ[ℂ] (ℝ→d[ℂ] E) where
-  toFun f := f.comp <| SchwartzMap.fourierTransformCLM ℂ (E := E) (V := ℝ)
-  map_add' f₁ f₂ := by simp
-  map_smul' c f := by simp
+variable (E F) in
+/-- Definition of Fourier transform of distribution: Let `u` be a distribution. Then its Fourier
+transform is `F{u}` where given a test function `η`, `F{u}(η) := u(F{η})`. -/
+def fourierTransform : (E →d[ℂ] F) →ₗ[ℂ] (E →d[ℂ] F) where
+  toFun u := u.comp <| fourierTransformCLM ℂ (E := ℂ) (V := E)
+  map_add' u₁ u₂ := by simp
+  map_smul' c u := by simp
 
-@[simp] lemma fourierTransform_apply (f : ℝ→d[ℂ] E) (η : 𝓢(ℝ, E)) :
-    fourierTransform E f η = f (SchwartzMap.fourierTransformCLM ℂ η) :=
+@[simp] lemma fourierTransform_apply (u : E →d[ℂ] F) (η : 𝓢(E, ℂ)) :
+    u.fourierTransform E F η = u (fourierTransformCLM ℂ η) :=
   rfl
 
 end Complex
