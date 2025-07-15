@@ -37,9 +37,12 @@ or `ℂ` (which is the field denoted `𝕜`).
 open SchwartzMap NNReal
 noncomputable section
 
-/-- A distribution on `E` (normed vector space over `𝕜`) is a continuous linear map
-`𝓢(ℝ, E) →L[𝕜] 𝕜` where `𝒮(ℝ, E)` is the Schwarz space of smooth functions `ℝ → E` with rapidly
-decreasing iterated derivatives. This is notated as `ℝ →d[𝕜] E`. -/
+/-- An `F`-valued distribution on `E` (where `E` is a normed vector space over `ℝ` and `F` is a
+normed vector space over `𝕜`) is a continuous linear map `𝓢(E, 𝕜) →L[𝕜] F` where `𝒮(E, 𝕜)` is
+the Schwartz space of smooth functions `E → 𝕜` with rapidly decreasing iterated derivatives. This
+is notated as `E →d[𝕜] F`.
+
+This should be seen as a generalisation of functions `E → F`. -/
 abbrev Distribution (𝕜 E F : Type) [RCLike 𝕜] [NormedAddCommGroup E] [NormedAddCommGroup F]
     [NormedSpace ℝ E] [NormedSpace 𝕜 F] : Type :=
   𝓢(E, 𝕜) →L[𝕜] F
