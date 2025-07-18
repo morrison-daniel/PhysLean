@@ -487,12 +487,12 @@ open InnerProductSpace
 /-- The inner product is differentiable. -/
 lemma inner_differentiable {d : ℕ} :
     Differentiable ℝ (fun y : Space d => ⟪y, y⟫_ℝ) := by
-  simp
+  simp only [PiLp.inner_apply, RCLike.inner_apply, conj_trivial]
   fun_prop
 
 /-- The gradient of the inner product is given by `2 • x`. -/
 lemma grad_inner {d : ℕ} :
-    ∇ (fun y : Space d => ⟪y, y⟫_ℝ) = fun z => 2 • z := by
+    ∇ (fun y : Space d => ⟪y, y⟫_ℝ) = fun z => (2:ℝ) • z := by
   ext z i
   simp [Space.grad]
   rw [deriv]
@@ -519,7 +519,9 @@ lemma grad_inner {d : ℕ} :
       trans deriv i ((fun x => x^ 2) ∘ fun y => y b) z
       · rfl
       rw [deriv, fderiv_comp]
-      simp
+      simp only [ContinuousLinearMap.coe_comp', Function.comp_apply, fderiv_eq_smul_deriv,
+        differentiableAt_fun_id, deriv_fun_pow'', Nat.cast_ofNat, Nat.add_one_sub_one, pow_one,
+        deriv_id'', mul_one, smul_eq_mul, mul_eq_zero, OfNat.ofNat_ne_zero, false_or]
       · left
         rw [← deriv_eq]
         rw [deriv_component_diff]
