@@ -3,7 +3,7 @@ Copyright (c) 2025 Joseph Tooby-Smith. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Joseph Tooby-Smith
 -/
-import PhysLean.Relativity.SpaceTime.ProperTime
+import PhysLean.Relativity.Special.ProperTime
 /-!
 # Twin Paradox
 
@@ -82,10 +82,10 @@ informal_lemma ageGap_nonneg where
   `[7.5, 6, 0, 0]` and then at (different) constant speed to `[15, 0, 0, 0]`. -/
 def example1 : InstantaneousTwinParadox where
   startPoint := 0
-  endPoint := toCoord.symm (fun
+  endPoint := (fun
     | Sum.inl 0 => 15
     | Sum.inr i => 0)
-  twinBMid := toCoord.symm (fun
+  twinBMid := (fun
     | Sum.inl 0 => 7.5
     | Sum.inr 0 => 6
     | Sum.inr i => 0)
@@ -95,7 +95,7 @@ def example1 : InstantaneousTwinParadox where
     simp only [interiorFutureLightCone, sub_zero, Fin.isValue, Set.mem_setOf_eq,
       LinearEquiv.apply_symm_apply, Nat.ofNat_pos, and_true]
     refine (timeLike_iff_norm_sq_pos _).mpr ?_
-    rw [innerProduct_toCoord]
+    rw [minkowskiProduct_toCoord]
     simp
   twinBMid_causallyFollows_startPoint := by
     simp only [causallyFollows]
@@ -104,7 +104,7 @@ def example1 : InstantaneousTwinParadox where
       LinearEquiv.apply_symm_apply]
     norm_num
     refine (timeLike_iff_norm_sq_pos _).mpr ?_
-    rw [innerProduct_toCoord]
+    rw [minkowskiProduct_toCoord]
     simp [Fin.sum_univ_three]
     norm_num
   endPoint_causallyFollows_twinBMid := by
@@ -113,22 +113,23 @@ def example1 : InstantaneousTwinParadox where
     simp [interiorFutureLightCone]
     norm_num
     refine (timeLike_iff_norm_sq_pos _).mpr ?_
-    rw [innerProduct_toCoord]
+    rw [minkowskiProduct_toCoord]
     simp [Fin.sum_univ_three]
     norm_num
 
 @[simp]
 lemma example1_properTimeTwinA : example1.properTimeTwinA = 15 := by
-  simp [properTimeTwinA, example1, properTime, innerProduct_toCoord]
+  simp [properTimeTwinA, example1, properTime, minkowskiProduct_toCoord]
 
 @[simp]
 lemma example1_properTimeTwinB : example1.properTimeTwinB = 9 := by
-  simp only [properTimeTwinB, properTime, example1, sub_zero, innerProduct_toCoord, Fin.isValue,
-    LinearEquiv.apply_symm_apply, Fin.sum_univ_three, mul_zero, add_zero, map_sub, Pi.sub_apply,
-    zero_sub, mul_neg, neg_mul, neg_neg]
-  rw [show √(7.5 * 7.5 - 6 * 6) = √20.25 by norm_num]
-  rw [show √((15 - 7.5) * (15 - 7.5) - 6 * 6) = √20.25 by norm_num]
-  rw [show √20.25 = 4.5 from sqrt_eq_cases.mpr (by norm_num)]
+  simp only [properTimeTwinB, properTime, Nat.succ_eq_add_one,
+    Nat.reduceAdd, example1, sub_zero, minkowskiProduct_toCoord, Fin.isValue,
+    LinearEquiv.apply_symm_apply, Fin.sum_univ_three, mul_zero, add_zero, map_sub,
+    LinearMap.sub_apply, Finset.sum_const_zero, zero_mul]
+  norm_num
+  rw [show √81 = 9 from sqrt_eq_cases.mpr (by norm_num)]
+  rw [show √4 = 2 from sqrt_eq_cases.mpr (by norm_num)]
   norm_num
 
 lemma example1_ageGap : example1.ageGap = 6 := by

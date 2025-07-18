@@ -5,8 +5,9 @@ Authors: Joseph Tooby-Smith, Lode Vermeulen
 -/
 import PhysLean.Meta.TODO.Basic
 import PhysLean.Meta.Informal.SemiFormal
-import PhysLean.ClassicalMechanics.Time.Basic
-import PhysLean.ClassicalMechanics.Space.VectorIdentities
+import PhysLean.SpaceAndTime.Space.VectorIdentities
+import PhysLean.Meta.Linters.Sorry
+import PhysLean.SpaceAndTime.Time.Basic
 import Mathlib.Analysis.Calculus.Deriv.Add
 import Mathlib.Analysis.Calculus.Deriv.Mul
 import Mathlib.Analysis.Calculus.Deriv.Pow
@@ -123,40 +124,31 @@ lemma lagrangian_parity (xₜ : Time → Space 1) :
     inner_neg_neg, sub_left_inj, mul_eq_mul_left_iff, mul_eq_zero, inv_eq_zero, OfNat.ofNat_ne_zero,
     false_or]
   left
-  have hx : deriv (- xₜ) t = - deriv xₜ t := by
-    exact deriv.neg
-  rewrite [hx]
+  rw [show deriv (- xₜ) t = - deriv xₜ t from deriv.neg]
   simp only [inner_neg_neg]
 
 /-- The force of the classical harmonic oscillator defined as `- dU(x)/dx` where `U(x)`
   is the potential energy. -/
-noncomputable def force (S : HarmonicOscillator) (x : Space 1)
-  : EuclideanSpace ℝ (Fin 1) := - ∇ (potentialEnergy S) x
+noncomputable def force (S : HarmonicOscillator) (x : Space 1) : EuclideanSpace ℝ (Fin 1) :=
+  - ∇ (potentialEnergy S) x
 
 /-- The force on the classical harmonic oscillator is `- k x`. -/
-lemma force_is_linear (x : Space 1) : force S x = - S.k • x := by
+lemma force_eq_linear (x : Space 1) : force S x = - S.k • x := by
   unfold force potentialEnergy
   change -∇ ((1 / (2 : ℝ)) • S.k • (fun (x : Space 1) => ⟪x, x⟫_ℝ)) x = -S.k • x
   rw [grad_smul, grad_smul]
   · rw [grad_inner]
-    simp only [one_div, Pi.smul_apply, neg_smul, neg_inj, smul_smul, smul_algebra_smul_comm]
+    simp only [Pi.smul_apply, neg_smul, neg_inj, smul_smul, smul_algebra_smul_comm]
     simp only [mul_smul]
-    have h4 : (2 : ℕ) • (2⁻¹ : ℝ) • S.k • x = (2 : ℝ) • (2⁻¹ : ℝ) • S.k • x := by
-      norm_cast
-    rw [h4]
-    simp only [smul_eq_iff_eq_invOf_smul]
-    rfl
+    rw [smul_comm]
+    simp only [one_div, ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, inv_smul_smul₀]
   · simp only [inner_differentiable]
-  · change Differentiable ℝ (fun x => S.k • ⟪x, x⟫_ℝ)
-    simp only [Differentiable.const_smul, inner_differentiable]
-
+  · simp only [Differentiable.const_smul, inner_differentiable]
 
 /-- The definition of the equation of motion for the classical harmonic oscillator
   defined through the Euler-Lagrange equations. -/
-semiformal_result"6ZTP5" EquationOfMotion (x : Time → ℝ) : Prop
-
-/- This variable should be removed once the above `semiformal_result` is implemented. -/
-variable (EquationOfMotion : (x : Time → Space 1) → Prop)
+@[sorryful]
+def EquationOfMotion (x : Time → Space 1) : Prop := sorry
 
 /-- The equations of motion are satisfied if and only if Newton's second law holds. -/
 semiformal_result "6YBEI" equationOfMotion_iff_newtons_second_law (x : Time → Space 1) :
@@ -167,10 +159,8 @@ semiformal_result "6YBEI" equationOfMotion_iff_newtons_second_law (x : Time → 
 
   semiformal implmentation notes:
   - This is not expected to be easy to define. -/
-semiformal_result "6YBIG" ExtremaOfAction (x : Time → ℝ) : Prop
-
-/- This variable should be removed once the above `semiformal_result` is implemented. -/
-variable (ExtremaOfAction : (x : Time → Space 1) → Prop)
+@[sorryful]
+def ExtremaOfAction (x : Time → Space 1) : Prop := by sorry
 
 /-- A trajectory `x : ℝ → ℝ` satsifies the equation of motion if and only if
   it is an extrema of the action.
@@ -178,8 +168,9 @@ variable (ExtremaOfAction : (x : Time → Space 1) → Prop)
   Implementation note: This result depends on other semi-formal results which
   will need defining before this.
 -/
-semiformal_result "6YBQH" equationOfMotion_iff_extremaOfAction (x : Time → Space 1) :
-  EquationOfMotion x ↔ ExtremaOfAction x
+@[sorryful]
+lemma equationOfMotion_iff_extremaOfAction (x : Time → Space 1) :
+    EquationOfMotion x ↔ ExtremaOfAction x := by sorry
 
 TODO "6VZHC" "Create a new folder for the damped harmonic oscillator, initially as a place-holder."
 

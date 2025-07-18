@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Joseph Tooby-Smith
 -/
 import PhysLean.QuantumMechanics.OneDimension.HarmonicOscillator.Eigenfunction
-import Mathlib.Analysis.Fourier.FourierTransform
+import PhysLean.QuantumMechanics.OneDimension.HilbertSpace.Gaussians
 /-!
 
 # Completeness of the eigenfunctions of the Harmonic Oscillator

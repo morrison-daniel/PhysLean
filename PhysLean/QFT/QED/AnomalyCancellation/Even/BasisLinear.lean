@@ -11,7 +11,6 @@ import PhysLean.QFT.QED.AnomalyCancellation.VectorLike
 We give a basis of `LinSols` in the even case. This basis has the special property
 that splits into two planes on which every point is a solution to the ACCs.
 -/
-universe v u
 
 open Nat
 open Finset
@@ -426,7 +425,7 @@ lemma Pa_evenShitZero (f : Fin n.succ → ℚ) (g : Fin n → ℚ) : Pa f g (eve
   rw [P!_evenShiftZero, evenShiftZero_eq_evenFst_zero, P_evenFst]
   exact Rat.add_zero (f 0)
 
-lemma P!_evenShiftLast (f : Fin n → ℚ) : P! f (evenShiftLast) = 0 := by
+lemma P!_evenShiftLast (f : Fin n → ℚ) : P! f evenShiftLast = 0 := by
   rw [P!, sum_of_charges]
   simp [HSMul.hSMul, SMul.smul, basis!_on_evenShiftLast]
 

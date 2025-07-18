@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Joseph Tooby-Smith
 -/
 import PhysLean.StringTheory.FTheory.SU5U1.Quanta.FromParts
+import PhysLean.Particles.SuperSymmetry.SU5.Charges.MinimallyAllowsTerm.FinsetTerms
 /-!
 
 # Anomaly cancellation
@@ -24,7 +25,7 @@ imposed.
 namespace FTheory
 
 namespace SU5U1
-
+open SuperSymmetry.SU5
 variable {I : CodimensionOneConfig}
 
 /--

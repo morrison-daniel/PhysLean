@@ -3,9 +3,12 @@ Copyright (c) 2025 Joseph Tooby-Smith. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Joseph Tooby-Smith
 -/
-import PhysLean.ClassicalMechanics.HarmonicOscillator.Basic
-import Mathlib.Analysis.SpecialFunctions.Integrals
+import Mathlib.Algebra.Lie.OfAssociative
+import Mathlib.Analysis.CStarAlgebra.Classes
+import Mathlib.Analysis.SpecialFunctions.Integrals.Basic
 import Mathlib.Analysis.SpecialFunctions.PolarCoord
+import Mathlib.Data.Real.StarOrdered
+import PhysLean.ClassicalMechanics.HarmonicOscillator.Basic
 /-!
 
 # Solutions to the classical harmonic oscillator
@@ -176,9 +179,9 @@ lemma sol_differentiable (IC : InitialConditions) : Differentiable ℝ (S.sol IC
 lemma sol_velocity (IC : InitialConditions) : deriv (S.sol IC) =
     fun t => - IC.x₀ * S.ω * sin (S.ω * t) + IC.v₀ * cos (S.ω * t) := by
   funext t
-  rw [sol_eq, deriv_add (by fun_prop) (by fun_prop)]
+  rw [sol_eq, deriv_fun_add (by fun_prop) (by fun_prop)]
   simp only [differentiableAt_const, deriv_const_mul_field']
-  rw [deriv_cos (by fun_prop), deriv_sin (by fun_prop), deriv_mul (by fun_prop) (by fun_prop)]
+  rw [deriv_cos (by fun_prop), deriv_sin (by fun_prop), deriv_fun_mul (by fun_prop) (by fun_prop)]
   field_simp [S.ω_neq_zero]
   ring_nf
 
@@ -188,7 +191,7 @@ lemma sol_velocity_amplitude_phase (IC : InitialConditions) : deriv (S.sol IC) =
   rw [sol_eq_amplitude_mul_cos_phase]
   simp only [differentiableAt_const, deriv_const_mul_field']
   rw [deriv_cos (by fun_prop), deriv_add_const', neg_mul, mul_neg,
-    deriv_mul (by fun_prop) (by fun_prop)]
+    deriv_fun_mul (by fun_prop) (by fun_prop)]
   field_simp
   ring
 
@@ -277,10 +280,6 @@ lemma sol_action (IC : InitialConditions) (t1 t2 : ℝ) :
 
 -/
 
-/- This variable should be removed once the the corresponding `semiformal_result`
-  is implemented. -/
-variable (EquationOfMotion : (x : Time → ℝ) → Prop)
-
 TODO "6VZI3" "For the classical harmonic oscillator find the time for which it returns to
   it's initial position and velocity."
 
@@ -291,8 +290,9 @@ TODO "6VZJH" "For the classical harmonic oscillator find the velocity when it pa
   zero."
 
 /-- The solutions for any initial condition solve the equation of motion. -/
-semiformal_result "6YATB" sol_equationOfMotion (IC : InitialConditions) :
-    EquationOfMotion (S.sol IC)
+@[sorryful]
+lemma sol_equationOfMotion (IC : InitialConditions) :
+    EquationOfMotion (S.sol IC) := by sorry
 
 /-- The solutions to the equation of motion for a given set of initial conditions
   are unique.
@@ -300,9 +300,10 @@ semiformal_result "6YATB" sol_equationOfMotion (IC : InitialConditions) :
   Semiformal implmentation:
   - One may needed the added condition of smoothness on `x` here.
   - `EquationOfMotion` needs defining before this can be proved. -/
-semiformal_result "6VZJO" sol_unique (IC : InitialConditions) (x : Time → ℝ) :
+@[sorryful]
+lemma sol_unique (IC : InitialConditions) (x : Time → ℝ) :
     EquationOfMotion x ∧ x 0 = IC.x₀ ∧ deriv x 0 = IC.v₀ →
-    x = S.sol IC
+    x = S.sol IC := by sorry
 
 end HarmonicOscillator
 

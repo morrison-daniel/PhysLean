@@ -17,12 +17,10 @@ namespace HarmonicOscillator
 
 variable (Q : HarmonicOscillator)
 
-open Nat
-open PhysLean
-open HilbertSpace
+open Nat PhysLean HilbertSpace Constants
 
 /-- The `n`th eigenvalues for a Harmonic oscillator is defined as `(n + 1/2) * ℏ * ω`. -/
-noncomputable def eigenValue (n : ℕ) : ℝ := (n + 1/2) * Q.ℏ * Q.ω
+noncomputable def eigenValue (n : ℕ) : ℝ := (n + 1/2) * ℏ * Q.ω
 
 /-!
 
@@ -41,8 +39,7 @@ lemma deriv_eigenfunction_zero : deriv (Q.eigenfunction 0) =
     trans deriv (Complex.exp ∘ (fun (x : ℝ) => - x ^ 2 / (2 * Q.ξ ^ 2))) x
     · rfl
     rw [deriv_comp]
-    simp only [Complex.deriv_exp, deriv_div_const, deriv.neg', differentiableAt_const,
-      deriv_const_mul_field', neg_mul]
+    simp only [Complex.deriv_exp, deriv_div_const, deriv.fun_neg']
     have h1' : deriv (fun x => (Complex.ofReal x) ^ 2) x = 2 * x := by
       trans deriv (fun x => Complex.ofReal x * Complex.ofReal x) x
       · apply congr
@@ -50,7 +47,7 @@ lemma deriv_eigenfunction_zero : deriv (Q.eigenfunction 0) =
         funext x
         ring
         rfl
-      rw [deriv_mul]
+      rw [deriv_fun_mul]
       simp only [Complex.deriv_ofReal, one_mul, mul_one]
       ring
       · exact Complex.differentiableAt_ofReal
@@ -103,7 +100,7 @@ lemma deriv_physHermite_characteristic_length (n : ℕ) :
     rw [fderiv_comp_deriv _ (by fun_prop) (by fun_prop)]
     simp only [Function.comp_apply, fderiv_eq_smul_deriv, smul_eq_mul, Complex.deriv_ofReal,
       Complex.real_smul, Complex.ofReal_mul, mul_one]
-    rw [deriv_mul (by fun_prop) (by fun_prop)]
+    rw [deriv_fun_mul (by fun_prop) (by fun_prop)]
     simp only [deriv_const', zero_mul, deriv_id'', mul_one, zero_add]
     rw [deriv_physHermite]
     simp only [Pi.natCast_def, Pi.mul_apply, Pi.ofNat_apply, cast_ofNat, Pi.add_apply, Pi.one_apply,
@@ -119,8 +116,8 @@ lemma deriv_eigenfunction_succ (n : ℕ) :
       - (x/Q.ξ) * physHermite (n + 1) (x/Q.ξ)) * Q.eigenfunction 0 x) := by
   funext x
   rw [eigenfunction_eq_mul_eigenfunction_zero]
-  rw [deriv_mul (by fun_prop) (by fun_prop)]
-  rw [deriv_mul (by fun_prop) (by fun_prop)]
+  rw [deriv_fun_mul (by fun_prop) (by fun_prop)]
+  rw [deriv_fun_mul (by fun_prop) (by fun_prop)]
   simp only [ofNat_nonneg, pow_nonneg, Real.sqrt_mul, one_div, mul_inv_rev, Complex.ofReal_mul,
     Complex.ofReal_inv, differentiableAt_const, deriv_mul, deriv_const', zero_mul, mul_zero,
     add_zero, zero_add, smul_eq_mul]
@@ -149,7 +146,7 @@ lemma deriv_deriv_eigenfunction_zero (x : ℝ) : deriv (deriv (Q.eigenfunction 0
   simp only [Complex.real_smul, Complex.ofReal_div, Complex.ofReal_neg, Complex.ofReal_mul,
     differentiableAt_const, deriv_const_mul_field', mul_eq_mul_left_iff, div_eq_zero_iff,
     neg_eq_zero, _root_.mul_eq_zero, Complex.ofReal_eq_zero]
-  rw [deriv_mul (by fun_prop) (by fun_prop)]
+  rw [deriv_fun_mul (by fun_prop) (by fun_prop)]
   simp only [differentiableAt_const, deriv_const_mul_field', Complex.deriv_ofReal, mul_one]
   rw [deriv_eigenfunction_zero]
   simp only [neg_mul, Complex.ofReal_div, Complex.ofReal_neg, Complex.ofReal_mul, Pi.mul_apply,
@@ -172,16 +169,16 @@ lemma deriv_deriv_eigenfunction_succ (n : ℕ) (x : ℝ) :
     Real.sqrt_eq_zero, cast_eq_zero, ne_eq, AddLeftCancelMonoid.add_eq_zero, one_ne_zero, and_false,
     not_false_eq_true, pow_eq_zero_iff, OfNat.ofNat_ne_zero, or_false, ξ_ne_zero]
   left
-  rw [deriv_mul (by fun_prop) (by fun_prop)]
+  rw [deriv_fun_mul (by fun_prop) (by fun_prop)]
   rw [deriv_eigenfunction_zero]
   simp only [← mul_assoc, neg_mul, Complex.ofReal_div, Complex.ofReal_neg, Complex.ofReal_mul,
     Pi.mul_apply, Pi.smul_apply, smul_eq_mul, ← add_mul, mul_eq_mul_right_iff]
   left
-  rw [deriv_sub (by fun_prop) (by fun_prop)]
-  rw [deriv_mul (by fun_prop) (by fun_prop)]
+  rw [deriv_fun_sub (by fun_prop) (by fun_prop)]
+  rw [deriv_fun_mul (by fun_prop) (by fun_prop)]
   simp only [differentiableAt_const, deriv_mul, deriv_const', zero_mul, mul_zero, add_zero,
     deriv_add, zero_add]
-  rw [deriv_mul (by fun_prop) (by fun_prop)]
+  rw [deriv_fun_mul (by fun_prop) (by fun_prop)]
   simp only [deriv_div_const, Complex.deriv_ofReal, one_div, Complex.ofReal_one, Complex.ofReal_pow]
   nth_rewrite 2 [deriv_physHermite_characteristic_length]
   simp only [one_div, Complex.ofReal_inv, cast_add, cast_one, add_tsub_cancel_right]
@@ -258,7 +255,7 @@ lemma schrodingerOperator_eigenfunction (n : ℕ) (x : ℝ) :
   simp only [schrodingerOperator_eq_ξ, one_div]
   rw [Q.deriv_deriv_eigenfunction]
   have hm' := Complex.ofReal_ne_zero.mpr (Ne.symm (_root_.ne_of_lt Q.hm))
-  have hℏ' := Complex.ofReal_ne_zero.mpr (Ne.symm (_root_.ne_of_lt Q.hℏ))
+  have hℏ' := Complex.ofReal_ne_zero.mpr ℏ_ne_zero
   rw [eigenValue]
   simp only [← Complex.ofReal_pow, ξ_sq]
   field_simp

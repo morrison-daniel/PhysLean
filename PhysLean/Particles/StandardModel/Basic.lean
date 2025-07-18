@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 import Mathlib.Geometry.Manifold.Instances.Real
 import PhysLean.Meta.Informal.SemiFormal
-import PhysLean.Relativity.SpaceTime.Basic
+import PhysLean.SpaceAndTime.SpaceTime.Basic
 /-!
 # The Standard Model
 
@@ -13,7 +13,7 @@ This file defines the basic properties of the standard model in particle physics
 
 -/
 TODO "6V2FP" "Redefine the gauge group as a quotient of SU(3) x SU(2) x U(1) by a subgroup of ℤ₆."
-universe v u
+
 namespace StandardModel
 
 open Manifold
@@ -32,14 +32,16 @@ where `α` is a sixth complex root of unity.
 
 See https://math.ucr.edu/home/baez/guts.pdf
 -/
-semiformal_result "6V2FZ" gaugeGroupℤ₆SubGroup [inst : Group GaugeGroupI] : Subgroup GaugeGroupI
+@[sorryful]
+def gaugeGroupℤ₆SubGroup [inst : Group GaugeGroupI] : Subgroup GaugeGroupI := sorry
 
 /-- The smallest possible gauge group of the Standard Model, i.e., the quotient of `GaugeGroupI` by
 the ℤ₆-subgroup `gaugeGroupℤ₆SubGroup`.
 
 See https://math.ucr.edu/home/baez/guts.pdf
 -/
-semiformal_result "6V2GA" GaugeGroupℤ₆ : Type
+@[sorryful]
+def GaugeGroupℤ₆ : Type := sorry
 
 /-- The ℤ₂subgroup of the un-quotiented gauge group which acts trivially on all particles in the
 standard model, i.e., the ℤ₂-subgroup of `GaugeGroupI` derived from the ℤ₂ subgroup of

@@ -5,6 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 import PhysLean.Meta.Informal.Basic
 import PhysLean.Meta.Informal.SemiFormal
+import PhysLean.Meta.Linters.Sorry
 import PhysLean.QuantumMechanics.FiniteTarget.HilbertSpace
 /-!
 
@@ -95,8 +96,9 @@ noncomputable def hamiltonian : T.HilbertSpace →ₗ[ℂ] T.HilbertSpace :=
   T.E0 • ∑ n : Fin T.N, |n⟩⟨n| - T.t • ∑ n : Fin T.N, (|n⟩⟨n + 1| + |n + 1⟩⟨n|)
 
 /-- The hamiltonian of the tight binding chain is hermitian. -/
-semiformal_result "BUEDT" hamiltonian_hermitian (ψ φ : T.HilbertSpace) :
-    ⟪T.hamiltonian ψ, φ⟫_ℂ = ⟪ψ, T.hamiltonian φ⟫_ℂ
+@[sorryful]
+lemma hamiltonian_hermitian (ψ φ : T.HilbertSpace) :
+    ⟪T.hamiltonian ψ, φ⟫_ℂ = ⟪ψ, T.hamiltonian φ⟫_ℂ := by sorry
 
 /-- The Hamiltonian applied to the localized state `|n⟩` gives
   `T.E0 • |n⟩ - T.t • (|n + 1⟩ + |n - 1⟩)`. -/
@@ -139,8 +141,8 @@ lemma energy_localizedState (n : Fin T.N) (htn : 1 < T.N) : ⟪|n⟩, T.hamilton
     have hn : (-1 : Fin T.N) = 0 := by
       trans n - n
       · nth_rewrite 1 [h2]
-        ring
-      · ring
+        exact Eq.symm (sub_sub_cancel_left n 1)
+      · exact Fin.sub_self
     aesop
   · simp
 
@@ -290,7 +292,7 @@ lemma quantaWaveNumber_exp_sub_one (n : Fin T.N) (k : T.QuantaWaveNumber) :
 lemma quantaWaveNumber_exp_add_one (n : Fin T.N) (k : T.QuantaWaveNumber) :
     Complex.exp (Complex.I * k * (n + 1).val * T.a) =
     Complex.exp (Complex.I * k * n * T.a) * Complex.exp (Complex.I * k * T.a) := by
-  have hn : n = (n + 1) - 1 := by ring
+  have hn : n = (n + 1) - 1 := by exact Eq.symm (add_sub_cancel_right n 1)
   conv_rhs =>
     rw [hn, quantaWaveNumber_exp_sub_one, mul_assoc, ← Complex.exp_add]
     simp
@@ -301,8 +303,9 @@ noncomputable def energyEigenstate (k : T.QuantaWaveNumber) : T.HilbertSpace :=
   ∑ n : Fin T.N, Complex.exp (Complex.I * k * n * T.a) • |n⟩
 
 /-- The energy eigenstates of the tight binding chain are orthogonal. -/
-semiformal_result "BUDDT" energyEigenstate_orthogonal :
-  Pairwise fun k1 k2 => ⟪T.energyEigenstate k1, T.energyEigenstate k2⟫_ℂ = 0
+@[sorryful]
+lemma energyEigenstate_orthogonal :
+    Pairwise fun k1 k2 => ⟪T.energyEigenstate k1, T.energyEigenstate k2⟫_ℂ = 0 := by sorry
 
 /-- The energy eigenvalue of the tight binding chain for a `k` in `QuantaWaveNumber` is
   `E0 - 2 * t * Real.cos (k * T.a)`. -/

@@ -17,11 +17,11 @@ namespace FTheory
 
 namespace SU5U1
 
-variable {I : CodimensionOneConfig}
 namespace Charges
-open PotentialTerm
+
+open SuperSymmetry.SU5.Charges
 open CodimensionOneConfig
-open PhysLean Tree
+open Tree
 
 /-!
 

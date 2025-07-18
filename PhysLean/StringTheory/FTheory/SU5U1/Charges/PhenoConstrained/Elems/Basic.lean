@@ -6,7 +6,8 @@ Authors: Joseph Tooby-Smith
 import PhysLean.StringTheory.FTheory.SU5U1.Charges.PhenoConstrained.Elems.Same
 import PhysLean.StringTheory.FTheory.SU5U1.Charges.PhenoConstrained.Elems.NearestNeighbor
 import PhysLean.StringTheory.FTheory.SU5U1.Charges.PhenoConstrained.Elems.NextToNearestNeighbor
-import PhysLean.StringTheory.FTheory.SU5U1.Charges.MinimallyAllowsTerm.OfFinset
+import PhysLean.Particles.SuperSymmetry.SU5.Charges.MinimallyAllowsTerm.OfFinset
+import PhysLean.StringTheory.FTheory.SU5U1.Charges.OfRationalSection
 /-!
 
 # Elements of the non pheno-constrained charges
@@ -34,8 +35,9 @@ namespace FTheory
 
 namespace SU5U1
 
-variable {I : CodimensionOneConfig}
 namespace Charges
+open SuperSymmetry.SU5
+open SuperSymmetry.SU5.Charges
 open PotentialTerm
 open CodimensionOneConfig
 open Tree
