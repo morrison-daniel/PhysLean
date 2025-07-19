@@ -151,8 +151,9 @@ lemma force_eq_linear (x : Space 1) : force S x = - S.k • x := by
 def EquationOfMotion (x : Time → Space 1) : Prop := sorry
 
 /-- The equations of motion are satisfied if and only if Newton's second law holds. -/
-semiformal_result "6YBEI" equationOfMotion_iff_newtons_second_law (x : Time → Space 1) :
-    EquationOfMotion x ↔ ∀ t, force S (x t) = S.m • deriv (fun t' => deriv x t') t
+@[sorryful]
+lemma equationOfMotion_iff_newtons_second_law (x : Time → Space 1) :
+    EquationOfMotion x ↔ ∀ t, force S (x t) = S.m • deriv (fun t' => deriv x t') t := by sorry
 
 /-- The proposition on a trajectory which is true if that trajectory is an extrema of the
   action.
