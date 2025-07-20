@@ -183,19 +183,25 @@ lemma sol_eq_amplitude_mul_cos_phase (IC : InitialConditions) :
   rw [cos_add]
   trans fun _ => (S.amplitude IC • cos (S.phase IC)) • cos (S.ω * t) -
     (S.amplitude IC • sin (S.phase IC)) • sin (S.ω * t)
-  -- trans (S.amplitude IC • (fun _ => cos (S.phase IC)) • cos (S.ω * t)) -
-    -- (S.amplitude IC • (fun _ => sin (S.phase IC) * sin (S.ω * t)))
   · simp_rw [sol, smul_eq_mul, amplitude_mul_cos_phase, amplitude_mul_sin_phase]
     simp only [Fin.isValue, one_div, smul_eq_mul, neg_mul, sub_neg_eq_add]
-    sorry
-  · sorry
+    rw [@PiLp.ext_iff]
+    simp only [PiLp.add_apply, PiLp.smul_apply, smul_eq_mul, Fin.isValue]
+    intro i
+    fin_cases i
+    simp only [Fin.zero_eta, Fin.isValue]
+    group
+  · simp only [smul_eq_mul]
+    rw [@funext_iff]
+    simp only [Pi.smul_apply, smul_eq_mul, forall_const]
+    group
 
 /-- For any time the position of the harmonic oscillator is less then the
   amplitude. -/
 lemma abs_sol_le_amplitude (IC : InitialConditions) (t : ℝ) : ‖S.sol IC t‖ ≤ S.amplitude IC := by
   rw [sol_eq_amplitude_mul_cos_phase]
   rw [norm_smul, norm_of_nonneg (S.amplitude_nonneg IC)]
-  have h1 : ‖cos (S.ω * t + S.phase IC)‖ ≤ 1 := abs_cos_le_one ..
+  -- have h1 : ‖cos (S.ω * t + S.phase IC)‖ ≤ 1 := abs_cos_le_one ..
   trans S.amplitude IC * 1
   · apply mul_le_mul_of_nonneg
     · exact Preorder.le_refl (S.amplitude IC)
