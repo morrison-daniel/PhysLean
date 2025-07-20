@@ -221,45 +221,27 @@ lemma sol_velocity (IC : InitialConditions) : deriv (S.sol IC) =
   funext t
   rw [sol_eq, deriv_fun_add (by fun_prop) (by fun_prop)]
   simp only [differentiableAt_const, deriv_const_mul_field']
-  rw [deriv_smul_const, deriv_smul_const]
+  rw [deriv_smul_const (by fun_prop), deriv_smul_const (by fun_prop)]
   simp only [deriv_div_const, neg_smul]
   rw [deriv_cos (by fun_prop), deriv_sin (by fun_prop), deriv_fun_mul (by fun_prop) (by fun_prop)]
   field_simp
   ring_nf
   rw [← mul_smul, add_right_inj, mul_rotate, NonUnitalRing.mul_assoc]
   field_simp [mul_div_assoc, div_self, mul_one, S.ω_neq_zero]
-  · apply DifferentiableAt.mul_const
-    apply DifferentiableAt.sin
-    refine differentiableAt_of_deriv_ne_zero ?_
-    sorry
-  --   apply AnalyticAt.differentiableAt
-  --   -- refine AnalyticAt.differentiableAt ?_
-
-  --   rw [analyticAt_congr]
-  --   expose_names
-  --   · expose_names
-  --     exact analyticAt_const
-  --     sorry
-  --   -- · exact analyticAt_const
-  --     -- sorry
-  --   · sorry
-  --   · sorry
-  --   -- rw [DifferentiableAt.sin]
-  --   sorry
-  -- · sorry
 
 lemma sol_velocity_amplitude_phase (IC : InitialConditions) : deriv (S.sol IC) =
     fun t => - S.amplitude IC • (fun _ =>  S.ω • sin (S.ω * t + S.phase IC)) := by
-  funext t _
+  funext t i
   rw [sol_eq_amplitude_mul_cos_phase]
   simp only [differentiableAt_const, deriv_const_mul_field']
   rw [@deriv_fun_const_smul']
   simp only [deriv_div_const, neg_smul]
-  sorry
-  -- rw [deriv_cos (by fun_prop), deriv_add_const', neg_mul, mul_neg,
-  --   deriv_fun_mul (by fun_prop) (by fun_prop)]
-  -- field_simp
-  -- ring
+  simp only [PiLp.smul_apply, smul_eq_mul, Pi.neg_apply, Pi.smul_apply]
+  rw [deriv_pi, deriv_cos (by fun_prop), deriv_add_const', neg_mul, mul_neg, deriv_fun_mul (by fun_prop) (by fun_prop)]
+  simp only [deriv_const', zero_mul, deriv_id'', mul_one, zero_add, neg_inj, mul_eq_mul_left_iff]
+  left
+  · exact Lean.Grind.CommSemiring.mul_comm (sin (S.ω * t + S.phase IC)) S.ω
+  · fun_prop
 
 @[simp]
 lemma sol_velocity_t_zero (IC : InitialConditions) : deriv (S.sol IC) 0 = IC.v₀ := by
