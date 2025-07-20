@@ -102,11 +102,15 @@ lemma amplitude_eq_norm (IC : InitialConditions) :
   rw [amplitude_eq]
   trans √(‖IC.x₀‖^2 + (‖IC.v₀‖/S.ω)^2)
   · ring
-  · simp only [← Complex.norm_add_mul_I]
-    have h1 : ((↑‖IC.x₀‖) : ℂ) = ((↑(IC.x₀ 0)) : ℂ) := by
-      simp only [Fin.isValue, Complex.ofReal_inj]
-      sorry
-    sorry
+  · simp only [Complex.norm_add_mul_I, norm_eq_sqrt_sq_add_sq]
+    simp only [Fin.isValue, one_div, real_smul, smul_eq_mul, sub_re, ofReal_re, mul_re, inv_re,
+      normSq_ofReal, div_self_mul_self', I_re, mul_zero, ofReal_im, I_im, mul_one, sub_self, inv_im,
+      neg_zero, zero_div, mul_im, add_zero, zero_mul, sub_zero, sub_im, zero_sub, even_two,
+      Even.neg_pow]
+    field_simp
+    rw [@PiLp.norm_sq_eq_of_L2, @PiLp.norm_sq_eq_of_L2]
+    simp only [Finset.univ_unique, Fin.default_eq_zero, Fin.isValue, norm_eq_abs, sq_abs,
+      Finset.sum_singleton]
 
 lemma amplitude_sq (IC : InitialConditions) :
     S.amplitude IC ^ 2 = ‖IC.x₀‖^2 + (‖IC.v₀‖/S.ω)^2 := by
@@ -142,18 +146,34 @@ lemma phase_zeroIC : S.phase zeroIC = 0 := by
 
 lemma amplitude_mul_cos_phase (IC : InitialConditions) :
     S.amplitude IC * cos (S.phase IC) = IC.x₀ 0 := by
-  simp [phase, amplitude_eq_norm]
+  simp only [phase, amplitude_eq_norm]
+
+  -- simp only [Fin.isValue, one_div, Complex.real_smul, smul_eq_mul, polarCoord_apply,
+  --   Complex.equivRealProd_symm_apply, Complex.ofReal_div, Complex.ofReal_neg]
+  -- have h1 : ‖↑(IC.x₀ 0) - (↑S.ω)⁻¹ * (↑(IC.v₀ 0) * Complex.I)‖ =
+  --   ‖↑(IC.x₀ 0) - (↑S.ω)⁻¹ * ↑(IC.v₀ 0) * Complex.I‖ := by sorry
+  -- rw [h1]
+  -- rw [Complex.norm_eq_sqrt_sq_add_sq]
+  -- simp only [Fin.isValue, Complex.sub_re, Complex.ofReal_re, Complex.mul_re, Complex.inv_re,
+  --   Complex.normSq_ofReal, div_self_mul_self', Complex.inv_im, Complex.ofReal_im, neg_zero,
+  --   zero_div, mul_zero, sub_zero, Complex.I_re, Complex.mul_im, zero_mul, add_zero, Complex.I_im,
+  --   mul_one, sub_self, Complex.sub_im, zero_sub, even_two, Even.neg_pow]
+
+  -- simp only [Complex.norm_add_mul_I]
+  -- simp only [norm_eq_sqrt_sq_add_sq]
+
 
 lemma amplitude_mul_sin_phase (IC : InitialConditions) :
     S.amplitude IC * sin (S.phase IC) = - (1/S.ω) • IC.v₀ 0 := by
   simp [phase, amplitude_eq_norm]
 
 lemma sol_eq_amplitude_mul_cos_phase (IC : InitialConditions) :
-    S.sol IC = fun t => S.amplitude IC * cos (S.ω * t + S.phase IC) := by
+    S.sol IC = fun t => S.amplitude IC • (fun _ =>  cos (S.ω * t + S.phase IC)) := by
   funext t
   rw [cos_add]
-  trans (S.amplitude IC * cos (S.phase IC)) * cos (S.ω * t) -
-    (S.amplitude IC * sin (S.phase IC)) * sin (S.ω * t)
+  sorry
+  trans (S.amplitude IC • (fun _ => cos (S.phase IC)) • cos (S.ω * t)) -
+    (S.amplitude IC • (fun _ => sin (S.phase IC) * sin (S.ω * t)))
   · rw [amplitude_mul_cos_phase, amplitude_mul_sin_phase, sol]
     ring
   · ring
@@ -184,12 +204,35 @@ lemma sol_velocity (IC : InitialConditions) : deriv (S.sol IC) =
   funext t
   rw [sol_eq, deriv_fun_add (by fun_prop) (by fun_prop)]
   simp only [differentiableAt_const, deriv_const_mul_field']
+  rw [deriv_smul_const, deriv_smul_const]
+  simp only [deriv_div_const, neg_smul]
   rw [deriv_cos (by fun_prop), deriv_sin (by fun_prop), deriv_fun_mul (by fun_prop) (by fun_prop)]
-  field_simp [S.ω_neq_zero]
+  field_simp
   ring_nf
+  rw [← mul_smul, add_right_inj, mul_rotate, NonUnitalRing.mul_assoc]
+  field_simp [mul_div_assoc, div_self, mul_one, S.ω_neq_zero]
+  · apply DifferentiableAt.mul_const
+    apply DifferentiableAt.sin
+    refine differentiableAt_of_deriv_ne_zero ?_
+    apply?
+    apply AnalyticAt.differentiableAt
+    -- refine AnalyticAt.differentiableAt ?_
+
+    rw [analyticAt_congr]
+    expose_names
+    · expose_names
+      exact analyticAt_const
+      sorry
+    -- · exact analyticAt_const
+      -- sorry
+    · sorry
+    · sorry
+    -- rw [DifferentiableAt.sin]
+    sorry
+  · sorry
 
 lemma sol_velocity_amplitude_phase (IC : InitialConditions) : deriv (S.sol IC) =
-    fun t => - S.amplitude IC * S.ω * sin (S.ω * t + S.phase IC) := by
+    fun t => - S.amplitude IC • (fun _ =>  S.ω • sin (S.ω * t + S.phase IC)) := by
   funext t
   rw [sol_eq_amplitude_mul_cos_phase]
   simp only [differentiableAt_const, deriv_const_mul_field']
@@ -202,8 +245,9 @@ lemma sol_velocity_amplitude_phase (IC : InitialConditions) : deriv (S.sol IC) =
 lemma sol_velocity_t_zero (IC : InitialConditions) : deriv (S.sol IC) 0 = IC.v₀ := by
   simp [sol_velocity]
 
-lemma sol_potentialEnergy (IC : InitialConditions) : S.potentialEnergy (S.sol IC) =
-    fun t => 1/2 * (S.k * ‖IC.x₀‖ ^ 2 + S.m * ‖IC.v₀‖ ^2) * cos (S.ω * t + S.phase IC) ^ 2 := by
+
+lemma sol_potentialEnergy (IC : InitialConditions) (t : Time) : S.potentialEnergy (S.sol IC t) =
+  1/2 * (S.k * ‖IC.x₀‖ ^ 2 + S.m * ‖IC.v₀‖ ^2) * cos (S.ω * t + S.phase IC) ^ 2 := by
   funext t
   trans 1/2 * S.k * (IC.x₀ ^ 2 + (1 / S.ω) ^ 2 * IC.v₀ ^ 2) * cos (S.ω * t + S.phase IC) ^ 2
   · rw [potentialEnergy, sol_eq_amplitude_mul_cos_phase]
