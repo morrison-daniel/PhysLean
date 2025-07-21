@@ -98,7 +98,7 @@ lemma amplitude_nonneg (IC : InitialConditions) : 0 ≤ S.amplitude IC := by
 
 open Complex in
 lemma amplitude_eq_norm (IC : InitialConditions) :
-    S.amplitude IC = ‖((IC.x₀ 0) + (1 / S.ω) * (IC.v₀ 0) * Complex.I)‖ := by
+    S.amplitude IC = ‖((IC.x₀ 0) - (1 / S.ω) * (IC.v₀ 0) * Complex.I)‖ := by
   rw [amplitude_eq]
   trans √(‖IC.x₀‖^2 + (‖IC.v₀‖/S.ω)^2)
   · ring
@@ -132,7 +132,7 @@ lemma amplitude_eq_zero_iff_IC_eq_zeroIC (IC : InitialConditions) :
 
 /-- Given initial conditions, the phase of the classical harmonic oscillator. -/
 noncomputable def phase (IC : InitialConditions) : ℝ :=
-  (polarCoord (‖IC.x₀‖, - ‖IC.v₀‖/S.ω)).2
+  (polarCoord (IC.x₀ 0, - (IC.v₀ 0)/S.ω)).2
 
 lemma phase_le_pi (IC : InitialConditions) : (S.phase IC) ≤ π := by
   simp [phase, Complex.arg_le_pi]
@@ -146,36 +146,17 @@ lemma phase_zeroIC : S.phase zeroIC = 0 := by
 
 lemma amplitude_mul_cos_phase (IC : InitialConditions) :
     S.amplitude IC * cos (S.phase IC) = IC.x₀ 0 := by
-  simp only [phase, amplitude_eq_norm]
-  -- simp only [Fin.isValue, one_div, Complex.real_smul, smul_eq_mul, map_sub, Complex.conj_ofReal,
-  --   map_mul, map_inv₀, Complex.conj_I, mul_neg, sub_neg_eq_add, polarCoord_apply,
-  --   Complex.equivRealProd_symm_apply, Complex.ofReal_div, Complex.ofReal_neg]
-  -- rw [Complex.norm_add_mul_I]
-  -- -- rw [Complex.norm_eq_sqrt_sq_add_sq]
-  -- simp only [Fin.isValue, Complex.add_re, Complex.ofReal_re, Complex.mul_re, Complex.inv_re,
-  --   Complex.normSq_ofReal, div_self_mul_self', Complex.I_re, mul_zero, Complex.ofReal_im,
-  --   Complex.I_im, mul_one, sub_self, Complex.inv_im, neg_zero, zero_div, Complex.mul_im, add_zero,
-  --   zero_mul, Complex.add_im, zero_add]
-  -- rw [← Complex.norm_add_mul_I]
-
-  simp only [Fin.isValue, one_div, Complex.real_smul, smul_eq_mul, polarCoord_apply,
-    Complex.equivRealProd_symm_apply, Complex.ofReal_div, Complex.ofReal_neg]
-  have h1 : ‖↑(IC.x₀ 0) + (↑S.ω)⁻¹ * (↑(IC.v₀ 0) * Complex.I)‖ =
-    ‖↑(IC.x₀ 0) + (↑S.ω)⁻¹ * ↑(IC.v₀ 0) * Complex.I‖ := by sorry
-  rw [Complex.norm_eq_sqrt_sq_add_sq]
-  simp only [Fin.isValue, Complex.add_re, Complex.ofReal_re, Complex.mul_re, Complex.inv_re,
-    Complex.normSq_ofReal, div_self_mul_self', Complex.inv_im, Complex.ofReal_im, neg_zero,
-    zero_div, mul_zero, sub_zero, Complex.I_re, Complex.mul_im, zero_mul, add_zero, Complex.I_im,
-    mul_one, sub_self, Complex.add_im, zero_add]
-  sorry
-
-  -- simp only [Complex.norm_add_mul_I]
-  -- simp only [norm_eq_sqrt_sq_add_sq]
-
+  simp only [phase, amplitude_eq_norm, polarCoord_apply, Complex.equivRealProd_symm_apply,
+    smul_eq_mul, Complex.ofReal_div, Complex.ofReal_neg]
+  group
+  simp
 
 lemma amplitude_mul_sin_phase (IC : InitialConditions) :
     S.amplitude IC * sin (S.phase IC) = - (1/S.ω) • IC.v₀ 0 := by
-  simp [phase, amplitude_eq_norm]
+  simp only [phase, amplitude_eq_norm, polarCoord_apply, Complex.equivRealProd_symm_apply,
+    smul_eq_mul, Complex.ofReal_div, Complex.ofReal_neg]
+  group
+  simp
 
 lemma sol_eq_amplitude_mul_cos_phase (IC : InitialConditions) :
     S.sol IC = fun t => S.amplitude IC • (fun _ =>  cos (S.ω * t + S.phase IC)) := by
@@ -201,11 +182,13 @@ lemma sol_eq_amplitude_mul_cos_phase (IC : InitialConditions) :
 lemma abs_sol_le_amplitude (IC : InitialConditions) (t : ℝ) : ‖S.sol IC t‖ ≤ S.amplitude IC := by
   rw [sol_eq_amplitude_mul_cos_phase]
   rw [norm_smul, norm_of_nonneg (S.amplitude_nonneg IC)]
-  -- have h1 : ‖cos (S.ω * t + S.phase IC)‖ ≤ 1 := abs_cos_le_one ..
   trans S.amplitude IC * 1
   · apply mul_le_mul_of_nonneg
     · exact Preorder.le_refl (S.amplitude IC)
-    · sorry -- Use h1 (need to transform it first to make it a vector)
+    · simp only [@PiLp.norm_eq_of_L2, Finset.univ_unique, Fin.default_eq_zero, Fin.isValue,
+        norm_eq_abs, sq_abs, Finset.sum_const, Finset.card_singleton, one_smul, sqrt_le_one,
+        sq_le_one_iff_abs_le_one]
+      exact abs_cos_le_one (S.ω * t + S.phase IC)
     · exact amplitude_nonneg S IC
     · exact zero_le_one' ℝ
   · simp
@@ -243,7 +226,8 @@ lemma sol_velocity_amplitude_phase (IC : InitialConditions) : deriv (S.sol IC) =
   rw [@deriv_fun_const_smul']
   simp only [deriv_div_const, neg_smul]
   simp only [PiLp.smul_apply, smul_eq_mul, Pi.neg_apply, Pi.smul_apply]
-  rw [deriv_pi, deriv_cos (by fun_prop), deriv_add_const', neg_mul, mul_neg, deriv_fun_mul (by fun_prop) (by fun_prop)]
+  rw [deriv_pi, deriv_cos (by fun_prop), deriv_add_const', neg_mul, mul_neg,
+    deriv_fun_mul (by fun_prop) (by fun_prop)]
   simp only [deriv_const', zero_mul, deriv_id'', mul_one, zero_add, neg_inj, mul_eq_mul_left_iff]
   left
   · exact Lean.Grind.CommSemiring.mul_comm (sin (S.ω * t + S.phase IC)) S.ω
@@ -255,7 +239,7 @@ lemma sol_velocity_t_zero (IC : InitialConditions) : deriv (S.sol IC) 0 = IC.v�
 
 
 lemma sol_potentialEnergy (IC : InitialConditions) (t : Time) : S.potentialEnergy (S.sol IC t) =
-  1/2 * (S.k * ‖IC.x₀‖ ^ 2 + S.m * ‖IC.v₀‖ ^2) * cos (S.ω * t + S.phase IC) ^ 2 := by
+    1/2 * (S.k * ‖IC.x₀‖ ^ 2 + S.m * ‖IC.v₀‖ ^2) * cos (S.ω * t + S.phase IC) ^ 2 := by
   trans 1/2 * S.k * (‖IC.x₀‖ ^ 2 + (1 / S.ω) ^ 2 * ‖IC.v₀‖ ^ 2) * cos (S.ω * t + S.phase IC) ^ 2
   · rw [potentialEnergy, sol_eq_amplitude_mul_cos_phase]
     ring_nf
