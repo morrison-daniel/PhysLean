@@ -7,8 +7,6 @@ import PhysLean.SpaceAndTime.Space.Basic
 import Mathlib.Analysis.InnerProductSpace.Calculus
 import Mathlib.Analysis.Calculus.FDeriv.Symmetric
 import Mathlib.Analysis.SpecialFunctions.Pow.Deriv
-import Mathlib.Analysis.Calculus.FDeriv.Add
-
 import Mathlib.Analysis.Calculus.Gradient.Basic
 /-!
 
@@ -237,7 +235,7 @@ lemma grad_eq_gradiant {d} (f : Space d → ℝ) :
       ⟪∇ f x, y⟫_ℝ := by
     rw [gradient, toDual_symm_apply]
     exact Eq.symm (grad_inner_eq f x y)
-  have h1 : ∀ y, ⟪gradient f x- ∇ f x, y⟫_ℝ = 0 := by
+  have h1 : ∀ y, ⟪gradient f x - ∇ f x, y⟫_ℝ = 0 := by
     intro y
     rw [inner_sub_left, hx y]
     simp
@@ -503,7 +501,7 @@ lemma grad_inner {d : ℕ} :
       · congr
         funext y
         ring
-      trans deriv i ((fun x => x^ 2) ∘ fun y => y i ) z
+      trans deriv i ((fun x => x^ 2) ∘ fun y => y i) z
       · rfl
       rw [deriv, fderiv_comp]
       · simp
