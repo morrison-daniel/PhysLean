@@ -23,7 +23,8 @@ variable {d : ℕ}
 /--
 A matrix `Λ` is in the Lorentz group if and only if it satisfies `Λᵀ * η * Λ = η`.
 -/
-lemma mem_iff_transpose_mul_minkowskiMatrix_mul_self (Λ : Matrix (Fin 1 ⊕ Fin d) (Fin 1 ⊕ Fin d) ℝ) :
+lemma mem_iff_transpose_mul_minkowskiMatrix_mul_self
+    (Λ : Matrix (Fin 1 ⊕ Fin d) (Fin 1 ⊕ Fin d) ℝ) :
     Λ ∈ LorentzGroup d ↔ Λᵀ * η * Λ = η := by
   rw [mem_iff_dual_mul_self]
   rw [dual]
@@ -103,10 +104,10 @@ theorem exp_mem_lorentzGroup (A : lorentzAlgebra) : (NormedSpace.exp ℝ) A.1 �
   calc
     (η * (NormedSpace.exp ℝ) (-A.1) * η) * η * (NormedSpace.exp ℝ) A.1
     _ = η * (NormedSpace.exp ℝ) (-A.1) * (η * η) * (NormedSpace.exp ℝ) A.1 := by noncomm_ring
-    _ = η * (NormedSpace.exp ℝ) (-A.1) * 1 * (NormedSpace.exp ℝ) A.1     := by rw [minkowskiMatrix.sq]
+    _ = η * (NormedSpace.exp ℝ) (-A.1) * 1 * (NormedSpace.exp ℝ) A.1   := by rw [minkowskiMatrix.sq]
     _ = η * (NormedSpace.exp ℝ) (-A.1 + A.1)             := by
-                                                    rw [mul_one, mul_assoc, NormedSpace.exp_add_of_commute]
-                                                    exact Commute.neg_left rfl
+                                            rw [mul_one, mul_assoc, NormedSpace.exp_add_of_commute]
+                                            exact Commute.neg_left rfl
     _ = η * (NormedSpace.exp ℝ) 0                        := by rw [neg_add_cancel]
     _ = η * 1                            := by rw [NormedSpace.exp_zero]
     _ = η                                := by rw [mul_one]
