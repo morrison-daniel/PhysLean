@@ -1,16 +1,17 @@
-/-Copyright (c) 2025 Matteo Cipollina. All rights reserved.
+/-
+Copyright (c) 2025 Matteo Cipollina. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Matteo Cipollina
 -/
-
 import PhysLean.Relativity.LorentzAlgebra.Basic
 import PhysLean.Relativity.LorentzGroup.Basic
 import Mathlib.Analysis.Normed.Algebra.MatrixExponential
 import Mathlib.Analysis.Normed.Field.Instances
 import Mathlib.Topology.Metrizable.CompletelyMetrizable
-
 /-!
+
 # Additional Lemmas for the Lorentz Group
+
 -/
 
 open Matrix
