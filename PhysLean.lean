@@ -225,8 +225,8 @@ import PhysLean.QuantumMechanics.PlanckConstant
 import PhysLean.Relativity.Bispinors.Basic
 import PhysLean.Relativity.CliffordAlgebra
 import PhysLean.Relativity.LorentzAlgebra.Basic
-import PhysLean.Relativity.LorentzAlgebra.ExponentialMap
 import PhysLean.Relativity.LorentzAlgebra.Basis
+import PhysLean.Relativity.LorentzAlgebra.ExponentialMap
 import PhysLean.Relativity.LorentzGroup.Basic
 import PhysLean.Relativity.LorentzGroup.Boosts.Apply
 import PhysLean.Relativity.LorentzGroup.Boosts.Basic
