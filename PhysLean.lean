@@ -36,6 +36,7 @@ import PhysLean.Mathematics.Geometry.Metric.Riemannian.Defs
 import PhysLean.Mathematics.InnerProductSpace.Adjoint
 import PhysLean.Mathematics.InnerProductSpace.Basic
 import PhysLean.Mathematics.InnerProductSpace.Calculus
+import PhysLean.Mathematics.LieTrace
 import PhysLean.Mathematics.LinearMaps
 import PhysLean.Mathematics.List
 import PhysLean.Mathematics.List.InsertIdx
