@@ -25,6 +25,9 @@ import PhysLean.Mathematics.Calculus.AdjFDeriv
 import PhysLean.Mathematics.Calculus.Divergence
 import PhysLean.Mathematics.DataStructures.FourTree.Basic
 import PhysLean.Mathematics.DataStructures.FourTree.UniqueMap
+import PhysLean.Mathematics.DataStructures.Matrix.LieTrace
+import PhysLean.Mathematics.DataStructures.Matrix.LieTraceReals
+import PhysLean.Mathematics.DataStructures.Matrix.SchurTriangulation
 import PhysLean.Mathematics.Distribution.Basic
 import PhysLean.Mathematics.Distribution.OfBounded
 import PhysLean.Mathematics.Distribution.PowMul
@@ -36,8 +39,6 @@ import PhysLean.Mathematics.Geometry.Metric.Riemannian.Defs
 import PhysLean.Mathematics.InnerProductSpace.Adjoint
 import PhysLean.Mathematics.InnerProductSpace.Basic
 import PhysLean.Mathematics.InnerProductSpace.Calculus
-import PhysLean.Mathematics.LieTrace
-import PhysLean.Mathematics.LieTraceReals
 import PhysLean.Mathematics.LinearMaps
 import PhysLean.Mathematics.List
 import PhysLean.Mathematics.List.InsertIdx
@@ -45,7 +46,6 @@ import PhysLean.Mathematics.List.InsertionSort
 import PhysLean.Mathematics.PiTensorProduct
 import PhysLean.Mathematics.RatComplexNum
 import PhysLean.Mathematics.SO3.Basic
-import PhysLean.Mathematics.SchurTriangulation
 import PhysLean.Mathematics.SpecialFunctions.PhysHermite
 import PhysLean.Mathematics.VariationalCalculus.Basic
 import PhysLean.Mathematics.VariationalCalculus.HasVarAdjDeriv
