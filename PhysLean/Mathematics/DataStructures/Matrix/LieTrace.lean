@@ -4,7 +4,13 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Matteo Cipollina
 -/
 import Mathlib.Analysis.Normed.Algebra.MatrixExponential
-import PhysLean.Mathematics.SchurTriangulation
+import Mathlib.Topology.Algebra.InfiniteSum.Constructions
+import Mathlib.Topology.Algebra.InfiniteSum.Basic
+import Mathlib.Topology.Algebra.InfiniteSum.Module
+import PhysLean.Mathematics.DataStructures.Matrix.SchurTriangulation
+import Mathlib.Analysis.Complex.Basic
+import Mathlib.Topology.Algebra.InfiniteSum.Module
+import Mathlib.Topology.Algebra.InfiniteSum.Constructions
 
 /-!
 # Lie's Trace Formula

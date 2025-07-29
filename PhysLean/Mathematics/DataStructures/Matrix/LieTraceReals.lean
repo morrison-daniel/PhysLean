@@ -2,7 +2,7 @@ import Mathlib.Analysis.Normed.Algebra.MatrixExponential
 import Mathlib.Topology.Algebra.InfiniteSum.Constructions
 import Mathlib.Topology.Algebra.InfiniteSum.Basic
 import Mathlib.Topology.Algebra.InfiniteSum.Module
-import PhysLean.Mathematics.LieTrace
+import PhysLean.Mathematics.DataStructures.Matrix.LieTrace
 import Mathlib.Analysis.Complex.Basic
 import Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure
 import Mathlib.Analysis.Complex.Polynomial.Basic
@@ -25,7 +25,8 @@ attribute [local instance] Matrix.linftyOpNormedAlgebra
 attribute [local instance] Matrix.linftyOpNormedRing
 attribute [local instance] Matrix.instCompleteSpace
 
-lemma Matrix.map_pow {α β m : Type*} [Fintype m] [DecidableEq m] [Semiring α] [Semiring β]
+lemma Matrix.map_pow {α β m : Type*}
+    [Fintype m] [DecidableEq m] [Semiring α] [Semiring β]
     (f : α →+* β) (A : Matrix m m α) (k : ℕ) :
     (A ^ k).map f = (A.map f) ^ k := by
   induction k with
