@@ -59,12 +59,14 @@ lemma NormedSpace.exp_map_algebraMap {n : Type*} [Fintype n] [DecidableEq n]
 Lie's trace formula over ℝ: det(exp(A)) = exp(tr(A)) for any real matrix A.
 This is proved by transferring the result from ℂ using the naturality of polynomial identities.
 -/
-lemma Matrix.det_exp_real {n : Type*} [Fintype n] [DecidableEq n] [LinearOrder n]
+theorem Matrix.det_exp_real {n : Type*} [Fintype n] [DecidableEq n] [LinearOrder n]
     (A : Matrix n n ℝ) : (NormedSpace.exp ℝ A).det = Real.exp A.trace := by
   let A_ℂ := A.map (algebraMap ℝ ℂ)
   have h_complex : (NormedSpace.exp ℂ A_ℂ).det = Complex.exp A_ℂ.trace := by
     haveI : IsAlgClosed ℂ := Complex.isAlgClosed
-    rw [@det_exp]; rw [← Complex.exp_eq_exp_ℂ]
+    haveI : LinearOrder ℂ := by infer_instance
+    haveI : Fintype ℂ := by infer_instance
+    rw [← Complex.exp_eq_exp_ℂ, Matrix.det_exp]
   have h_trace_comm : A_ℂ.trace = (algebraMap ℝ ℂ) A.trace := by
     simp only [A_ℂ, trace, diag_map, map_sum]
     rfl
