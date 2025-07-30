@@ -28,7 +28,10 @@ existence of the time unit of seconds, and construct all other time units from t
 
 /-- The choices of translationally-invariant metrics on the manifold `TimeTransMan`.
   Such a choice corresponds to a choice of units for time. -/
-def TimeUnit : Type := {x : ℝ | 0 < x}
+structure TimeUnit : Type where
+  /-- The underlying scale of the unit. -/
+  val : ℝ
+  property : 0 < val
 
 namespace TimeUnit
 
@@ -56,7 +59,7 @@ lemma div_eq_val (x y : TimeUnit) :
 @[simp]
 lemma div_pos (x y : TimeUnit) :
     (0 : ℝ) < x / y := by
-  simpa [div_eq_val] using  _root_.div_pos x.val_pos y.val_pos
+  simpa [div_eq_val] using _root_.div_pos x.val_pos y.val_pos
 
 @[simp]
 lemma div_self (x : TimeUnit) :
@@ -75,7 +78,7 @@ lemma div_symm (x y : TimeUnit) :
 -/
 
 /-- The scaling of a time unit by a positive real. -/
-def scale  (r : ℝ) (x : TimeUnit) (hr : 0 < r := by norm_num) : TimeUnit :=
+def scale (r : ℝ) (x : TimeUnit) (hr : 0 < r := by norm_num) : TimeUnit :=
   ⟨r * x.val, mul_pos hr x.val_pos⟩
 
 @[simp]
