@@ -98,14 +98,15 @@ lemma trace_of_mem_is_zero (A : lorentzAlgebra) : trace A.1 = 0 := by
   rw [trace_eq_sum_diagonal]
   have h_diag_zero : ∀ μ, A.1 μ μ = 0 := lorentzAlgebra.diag_comp A
   simp [h_diag_zero]
+
 namespace Matrix
 
 variable {n R ι : Type*} [Fintype n]-- [DecidableEq n]
 
 @[simp]
-lemma trace_reindex [Semiring R] [Fintype ι] [DecidableEq ι] (e : n ≃ ι) (A : Matrix n n R) :
-    trace (reindex e e A) = trace A := by
-  simp only [trace, diag_apply, reindex_apply]
+lemma trace_reindex [Semiring R] [Fintype ι] (e : n ≃ ι) (A : Matrix n n R) :
+    trace (A.submatrix e.symm e.symm) = trace A := by
+  simp only [trace, diag_apply, submatrix_apply]
   exact e.symm.sum_comp (fun i : n => A i i)
 
 variable {n R ι : Type*} [Fintype n] [DecidableEq n]
@@ -113,12 +114,13 @@ variable {n R ι : Type*} [Fintype n] [DecidableEq n]
 @[simp]
 lemma exp_reindex {k : Type*}
     [RCLike k] [Fintype ι] [DecidableEq ι] (e : n ≃ ι) (A : Matrix n n k) :
-    NormedSpace.exp k (reindex e e A) = reindex e e (NormedSpace.exp k A) := by
+    NormedSpace.exp k (A.submatrix e.symm e.symm) = reindex e e (NormedSpace.exp k A) := by
   let f := reindexAlgEquiv k k e
   have h_cont : Continuous f := f.toLinearEquiv.continuous_of_finiteDimensional
   exact (NormedSpace.map_exp k f.toAlgHom h_cont A).symm
 
 end Matrix
+
 open Matrix
 noncomputable section
 
@@ -132,7 +134,7 @@ theorem exp_isProper (A : lorentzAlgebra) :
   -- we reindex to Fin 4 to use the faster LinearOrder
   rw [← det_reindex_self e, ← exp_reindex e]
   convert det_exp_real (reindex e e A.1)
-  rw [trace_reindex e, trace_of_mem_is_zero A, Real.exp_zero]
+  erw [trace_reindex e, trace_of_mem_is_zero A, Real.exp_zero]
 
 /-- The exponential of an element of the Lorentz algebra is orthochronous. -/
 theorem exp_isOrthochronous (A : lorentzAlgebra) :

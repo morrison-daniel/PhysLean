@@ -7,6 +7,7 @@ import Mathlib.Analysis.Complex.Polynomial.Basic
 import Mathlib.Analysis.Normed.Algebra.MatrixExponential
 import PhysLean.Mathematics.DataStructures.Matrix.SchurTriangulation
 
+set_option linter.unusedVariables false
 
 /-!
 # Lie's Trace Formula
@@ -109,9 +110,9 @@ open scoped BigOperators Topology
 
 instance [UniformSpace 𝕂] : UniformSpace (Matrix m n 𝕂) := by unfold Matrix; infer_instance
 
-/-- If every term of a series is zero, then its sum is zero.                       -/
+/-- If every term of a series is zero, then its sum is zero. -/
 lemma tsum_eq_zero
-    {β : Type*} [TopologicalSpace β] [AddCommMonoid β] [ContinuousAdd β] [T2Space β]
+    {β : Type*} [TopologicalSpace β] [AddCommMonoid β]
     {f : ℕ → β} (h : ∀ n, f n = 0) :
     (∑' n, f n) = 0 := by
   rw [← h Nat.zero]
@@ -129,14 +130,11 @@ variable [RCLike 𝕂]--[IsAlgClosed 𝕂] [Fintype m] [DecidableEq m] [LinearOr
 
 /-- Apply a matrix `tsum` to a given entry.                                        -/
 lemma matrix_tsum_apply
-    [CompleteSpace 𝕂] {f : ℕ → Matrix m m 𝕂} (hf : Summable f) (i j : m) :
+    {f : ℕ → Matrix m m 𝕂} (hf : Summable f) (i j : m) :
     (∑' n, f n) i j = ∑' n, (f n) i j := by
   have h_row_summable : Summable (fun n ↦ (f n) i) := by
     have h := Pi.summable.1 hf
     exact h i
-  have h_entry_summable : Summable (fun n ↦ (f n) i j) := by
-    have h := Pi.summable.1 h_row_summable
-    exact h j
   have h₁ : ((∑' n, f n) : Matrix m m 𝕂) i = (∑' n, (f n) i) := by
     exact tsum_apply hf
   have h₂ : ((∑' n, (f n) i) : m → 𝕂) j = (∑' n, (f n) i j) := by
@@ -200,7 +198,7 @@ lemma exp_series_diag_term_eq {A : Matrix m m 𝕂} (hA : A.IsUpperTriangular)
 
 /-- The diagonal of the matrix exponential series equals the scalar exponential series -/
 lemma matrix_exp_series_diag_eq_scalar_series {A : Matrix m m 𝕂} (hA : A.IsUpperTriangular)
-    [CompleteSpace 𝕂] (i : m) :
+    (i : m) :
     (∑' n, ((n.factorial : 𝕂)⁻¹ • (A ^ n)) i i) = ∑' n, (n.factorial : 𝕂)⁻¹ • (A i i) ^ n := by
   exact tsum_congr (exp_series_diag_term_eq hA · i)
 
@@ -219,8 +217,9 @@ lemma det_of_isUpperTriangular {A : Matrix m m 𝕂}
     (hA : A.IsUpperTriangular) : A.det = ∏ i, A i i := by
   exact Matrix.det_of_upperTriangular hA
 
-lemma trace_of_isUpperTriangular {A : Matrix m m 𝕂}
-    (_hA : A.IsUpperTriangular) : A.trace = ∑ i, A i i := by
+omit [LinearOrder m] in
+lemma trace_of_isUpperTriangular {A : Matrix m m 𝕂} -- (_hA : A.IsUpperTriangular)
+   : A.trace = ∑ i, A i i := by
   rfl
 
 /-- The trace is invariant under unitary conjugation. -/
@@ -266,10 +265,11 @@ lemma det_exp_of_isUpperTriangular {A : Matrix m m 𝕂} (hA : IsUpperTriangular
     (NormedSpace.exp 𝕂 A).det = NormedSpace.exp 𝕂 A.trace := by
   have h_exp_upper : IsUpperTriangular (NormedSpace.exp 𝕂 A) :=
     isUpperTriangular_exp_of_isUpperTriangular hA
-  rw [det_of_isUpperTriangular h_exp_upper, trace_of_isUpperTriangular hA]
+  letI : LinearOrder m := by infer_instance
+  rw [det_of_isUpperTriangular h_exp_upper];
   have h_diag_exp : (NormedSpace.exp 𝕂 A).diag = fun i => NormedSpace.exp 𝕂 (A i i) :=
     diag_exp_of_isUpperTriangular hA
-  rw [← Finset.prod_exp_eq_exp_sum]
+  erw [← Finset.prod_exp_eq_exp_sum Finset.univ]
   exact congrArg Finset.univ.prod h_diag_exp
 
 /-- The exponential of a matrix commutes with unitary conjugation. -/
@@ -320,14 +320,13 @@ theorem det_exp {𝕂 m : Type*} [RCLike 𝕂] [IsAlgClosed 𝕂] [Fintype m] [L
 end DetExp
 
 -- `Matrix.map` commutes with an absolutely convergent series.
-lemma map_tsum {α β m n : Type*} [Fintype m] [Fintype n]
+lemma map_tsum {α β m n : Type*}
     [AddCommMonoid α] [AddCommMonoid β] [TopologicalSpace α] [TopologicalSpace β]
-    [ContinuousAdd α] [ContinuousAdd β] [T2Space α] [T2Space β]
+    [T2Space β]
     (f : α →+ β) (hf : Continuous f) {s : ℕ → Matrix m n α} (hs : Summable s) :
     (∑' k, s k).map f = ∑' k, (s k).map f := by
   let F : Matrix m n α →+ Matrix m n β := AddMonoidHom.mapMatrix f
   have hF : Continuous F := Continuous.matrix_map continuous_id hf
-  have hs' : Summable (fun k => F (s k)) := hs.map F hF
   exact (hs.hasSum.map F hF).tsum_eq.symm
 
 attribute [local instance] Matrix.linftyOpNormedAlgebra
@@ -343,7 +342,9 @@ lemma map_pow {α β m : Type*}
     rw [pow_zero, pow_zero, Matrix.map_one]; all_goals aesop
   | succ k ih =>
     rw [pow_succ, pow_succ, Matrix.map_mul, ih]
+
 end Matrix
+
 lemma NormedSpace.exp_map_algebraMap {n : Type*} [Fintype n] [DecidableEq n]
     (A : Matrix n n ℝ) :
     (exp ℝ A).map (algebraMap ℝ ℂ) = exp ℂ (A.map (algebraMap ℝ ℂ)) := by
@@ -363,7 +364,6 @@ lemma NormedSpace.exp_map_algebraMap {n : Type*} [Fintype n] [DecidableEq n]
   intro k
   erw [Matrix.map_smul, Matrix.map_pow]
   all_goals aesop
-
 section DetExp
 namespace Matrix
 /--
@@ -385,8 +385,10 @@ theorem det_exp_real {n : Type*} [Fintype n] [LinearOrder n]
     rfl
   rw [← h_det_comm] at h_complex
   rw [h_trace_comm] at h_complex
-  have h_exp_comm : Complex.exp ((algebraMap ℝ ℂ) A.trace) = (algebraMap ℝ ℂ) (Real.exp A.trace) := by
+  have h_exp_comm : Complex.exp ((algebraMap ℝ ℂ) A.trace) =
+      (algebraMap ℝ ℂ) (Real.exp A.trace) := by
     erw [← Complex.ofReal_exp]
-    simp_all only [Complex.coe_algebraMap, Algebra.id.map_eq_id, RingHom.id_apply, Complex.ofReal_exp, A_ℂ]
+    simp_all only [Complex.coe_algebraMap, Algebra.id.map_eq_id, RingHom.id_apply,
+      Complex.ofReal_exp, A_ℂ]
   rw [h_exp_comm] at h_complex
   exact Complex.ofReal_injective h_complex
