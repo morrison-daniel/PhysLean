@@ -6,7 +6,6 @@ Authors: Afiq Hatta
 import PhysLean.QuantumMechanics.OneDimension.Operators.Parity
 import PhysLean.SpaceAndTime.Space.VectorIdentities
 import PhysLean.SpaceAndTime.Time.Basic
-import Mathlib.Data.Complex.Trigonometric
 /-!
 
 # 1d Reflectionless Potential
@@ -18,7 +17,8 @@ This file contains
 
 ## TODO
 - Define creation and annihilation operators for reflectionless potentials
-- Write the proof of the general solution of the reflectionless potential using the creation and annihilation operators
+- Write the proof of the general solution of the reflectionless potential using the creation and
+annihilation operators
 - Show reflectionless properties
 -/
 
@@ -27,28 +27,37 @@ open Real
 open Space
 namespace OneDimension
 
-
+/-- A reflectionless potential is specified by three
+  real parameters: the mass of the particle `m`, a value of Planck's constant `ℏ`, the
+  parameter `κ`, as well as a positive integer family number `N`.
+  All of these parameters are assumed to be positive. --/
 structure ReflectionlessPotential where
-  /-- The potential function V(x) -/
+  /-- mass of the particle -/
   m : ℝ
+  /-- parameter of the reflectionless potential -/
   κ : ℝ
+  /-- Planck's constant -/
   ℏ : ℝ
+  /-- family number, positive integer -/
   N : ℕ
-  m_pos : 0 < m
-  κ_pos : 0 < κ
+  m_pos : 0 < m -- mass of the particle is positive
+  κ_pos : 0 < κ -- parameter of the reflectionless potential is positive
+  N_pos : 0 < N -- family number is positive
+  ℏ_pos : 0 < ℏ -- Planck's constant is positive
 
 namespace ReflectionlessPotential
 
 variable (Q : ReflectionlessPotential)
 
 /-!
-
 ## Theorems
 TODO: Add theorems about reflectionless potential - the main result is the actual 1d solution
 -/
 
+/-- Define the reflectionless potential as
+  V(x) = - (ℏ^2 * κ^2 * N * (N + 1)) / (2 * m * (cosh (κ * x)) ^ 2) --/
 noncomputable def reflectionlessPotential (x : ℝ) : ℝ :=
-  -( (Q.ℏ^2 * Q.κ^2 * Q.N * (Q.N + 1)) / ((2 : ℝ) * Q.m * (Real.cosh (Q.κ * x)) ^ 2))
+  - (Q.ℏ^2 * Q.κ^2 * Q.N * (Q.N + 1)) / ((2 : ℝ) * Q.m * (Real.cosh (Q.κ * x)) ^ 2)
 
 end ReflectionlessPotential
 end OneDimension
