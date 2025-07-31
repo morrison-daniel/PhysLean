@@ -44,8 +44,8 @@ import PhysLean.Mathematics.List.InsertIdx
 import PhysLean.Mathematics.List.InsertionSort
 import PhysLean.Mathematics.PiTensorProduct
 import PhysLean.Mathematics.RatComplexNum
-import PhysLean.Mathematics.SchurTriangulation
 import PhysLean.Mathematics.SO3.Basic
+import PhysLean.Mathematics.SchurTriangulation
 import PhysLean.Mathematics.SpecialFunctions.PhysHermite
 import PhysLean.Mathematics.VariationalCalculus.Basic
 import PhysLean.Mathematics.VariationalCalculus.HasVarAdjDeriv
