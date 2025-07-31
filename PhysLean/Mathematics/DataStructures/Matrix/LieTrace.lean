@@ -23,10 +23,12 @@ We give a higher priority to the canonical `1` and `*` instances coming
 from `Mathlib` so that every occurrence of `1 : Matrix _ _ _` and
 `A * B` uses the very same definitions.
 -/
-attribute [instance 100] Matrix.instHMulOfFintypeOfMulOfAddCommMonoid
-attribute [instance 100] Matrix.one
+attribute [local instance 100] Matrix.instHMulOfFintypeOfMulOfAddCommMonoid
+attribute [local instance 100] Matrix.one
+
 namespace Matrix
 namespace IsUpperTriangular
+
 variable {α k n R 𝕂 m : Type*}
 variable [LinearOrder n][CommRing α]
 variable [SMulZeroClass R α]
