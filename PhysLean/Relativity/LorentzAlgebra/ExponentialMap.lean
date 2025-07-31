@@ -90,7 +90,7 @@ instance [UniformSpace 𝕂] : UniformSpace (Matrix m n 𝕂) := by unfold Matri
 
 /-- The trace of a matrix equals the sum of its diagonal elements. -/
 lemma trace_eq_sum_diagonal (A : Matrix (Fin 1 ⊕ Fin 3) (Fin 1 ⊕ Fin 3) ℝ) :
-  trace A = ∑ i, A i i := by
+    trace A = ∑ i, A i i := by
   simp only [trace, diag_apply]
 
 /-- The trace of any element of the Lorentz algebra is zero. -/
@@ -128,7 +128,7 @@ attribute [local instance] Matrix.linftyOpNormedAlgebra
 
 /-- The exponential of an element of the Lorentz algebra is proper (has determinant 1). -/
 theorem exp_isProper (A : lorentzAlgebra) :
-  LorentzGroup.IsProper ⟨(NormedSpace.exp ℝ) A.1, exp_mem_lorentzGroup A⟩ := by
+    LorentzGroup.IsProper ⟨(NormedSpace.exp ℝ) A.1, exp_mem_lorentzGroup A⟩ := by
   simp only [LorentzGroup.IsProper, Subtype.coe_mk]
   let e : (Fin 1 ⊕ Fin 3) ≃ Fin 4 := finSumFinEquiv
   -- we reindex to Fin 4 to use the faster LinearOrder

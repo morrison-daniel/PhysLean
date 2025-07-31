@@ -7,8 +7,6 @@ import Mathlib.Analysis.Complex.Polynomial.Basic
 import Mathlib.Analysis.Normed.Algebra.MatrixExponential
 import PhysLean.Mathematics.DataStructures.Matrix.SchurTriangulation
 
-set_option linter.unusedVariables false
-
 /-!
 # Lie's Trace Formula
 
@@ -156,7 +154,7 @@ attribute [local instance] Matrix.instCompleteSpace
 
 /-- Summability of the exponential series for matrices -/
 lemma summable_exp_series [CompleteSpace 𝕂] (A : Matrix m m 𝕂) :
-  Summable (fun n => ((n.factorial : 𝕂)⁻¹) • (A ^ n)) := by
+    Summable (fun n => ((n.factorial : 𝕂)⁻¹) • (A ^ n)) := by
   letI : NormedAddCommGroup (Matrix m m 𝕂) := Matrix.linftyOpNormedAddCommGroup
   letI : NormedSpace 𝕂 (Matrix m m 𝕂) := Matrix.linftyOpNormedSpace
   exact NormedSpace.expSeries_summable' A
@@ -218,8 +216,7 @@ lemma det_of_isUpperTriangular {A : Matrix m m 𝕂}
   exact Matrix.det_of_upperTriangular hA
 
 omit [LinearOrder m] in
-lemma trace_of_isUpperTriangular {A : Matrix m m 𝕂} -- (_hA : A.IsUpperTriangular)
-   : A.trace = ∑ i, A i i := by
+lemma trace_of_isUpperTriangular {A : Matrix m m 𝕂} : A.trace = ∑ i, A i i := by
   rfl
 
 /-- The trace is invariant under unitary conjugation. -/
