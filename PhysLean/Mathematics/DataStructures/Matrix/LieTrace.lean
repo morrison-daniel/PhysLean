@@ -5,7 +5,7 @@ Authors: Matteo Cipollina
 -/
 import Mathlib.Analysis.Complex.Polynomial.Basic
 import Mathlib.Analysis.Normed.Algebra.MatrixExponential
-import PhysLean.Mathematics.DataStructures.Matrix.SchurTriangulation
+import PhysLean.Mathematics.SchurTriangulation
 
 /-!
 # Lie's Trace Formula
