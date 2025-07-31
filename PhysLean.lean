@@ -26,7 +26,6 @@ import PhysLean.Mathematics.Calculus.Divergence
 import PhysLean.Mathematics.DataStructures.FourTree.Basic
 import PhysLean.Mathematics.DataStructures.FourTree.UniqueMap
 import PhysLean.Mathematics.DataStructures.Matrix.LieTrace
-import PhysLean.Mathematics.DataStructures.Matrix.LieTraceReals
 import PhysLean.Mathematics.DataStructures.Matrix.SchurTriangulation
 import PhysLean.Mathematics.Distribution.Basic
 import PhysLean.Mathematics.Distribution.OfBounded

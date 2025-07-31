@@ -3,21 +3,11 @@ Copyright (c) 2025 Matteo Cipollina. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Matteo Cipollina
 -/
-import PhysLean.Mathematics.DataStructures.Matrix.LieTraceReals
-import PhysLean.Relativity.LorentzAlgebra.Basic
-import PhysLean.Relativity.LorentzGroup.Basic
-import PhysLean.Relativity.LorentzGroup.Proper
-import PhysLean.Relativity.LorentzGroup.Orthochronous.Basic
-import PhysLean.Relativity.LorentzGroup.Restricted.Basic
-import PhysLean.Relativity.LorentzGroup.Restricted.FromBoostRotation
-import Mathlib.Analysis.Normed.Algebra.MatrixExponential
 import Mathlib.Analysis.Normed.Field.Instances
 import Mathlib.Topology.Metrizable.CompletelyMetrizable
-import PhysLean.Mathematics.SO3.Basic
-import Mathlib.Algebra.Lie.OfAssociative
-import Mathlib.LinearAlgebra.UnitaryGroup
-import Mathlib.LinearAlgebra.Matrix.SpecialLinearGroup
-import Mathlib.Geometry.Manifold.Algebra.Monoid
+import PhysLean.Mathematics.DataStructures.Matrix.LieTrace
+import PhysLean.Relativity.LorentzAlgebra.Basic
+import PhysLean.Relativity.LorentzGroup.Restricted.Basic
 
 /-!
 # Exponential map from the Lorentz algebra to the restricted Lorentz group
@@ -90,7 +80,7 @@ theorem exp_mem_lorentzGroup (A : lorentzAlgebra) : (NormedSpace.exp ℝ) A.1 �
     _ = η * 1                            := by rw [NormedSpace.exp_zero]
     _ = η                                := by rw [mul_one]
 
-open Matrix
+open Matrix Complex
 open minkowskiMatrix
 
 noncomputable section
@@ -108,17 +98,41 @@ lemma trace_of_mem_is_zero (A : lorentzAlgebra) : trace A.1 = 0 := by
   rw [trace_eq_sum_diagonal]
   have h_diag_zero : ∀ μ, A.1 μ μ = 0 := lorentzAlgebra.diag_comp A
   simp [h_diag_zero]
+namespace Matrix
+
+variable {n R ι : Type*} [Fintype n]-- [DecidableEq n]
+
+@[simp]
+lemma trace_reindex [Semiring R] [Fintype ι] [DecidableEq ι] (e : n ≃ ι) (A : Matrix n n R) :
+    trace (reindex e e A) = trace A := by
+  simp only [trace, diag_apply, reindex_apply]
+  exact e.symm.sum_comp (fun i : n => A i i)
+
+variable {n R ι : Type*} [Fintype n] [DecidableEq n]
+
+@[simp]
+lemma exp_reindex {k : Type*}
+    [RCLike k] [Fintype ι] [DecidableEq ι] (e : n ≃ ι) (A : Matrix n n k) :
+    NormedSpace.exp k (reindex e e A) = reindex e e (NormedSpace.exp k A) := by
+  let f := reindexAlgEquiv k k e
+  have h_cont : Continuous f := f.toLinearEquiv.continuous_of_finiteDimensional
+  exact (NormedSpace.map_exp k f.toAlgHom h_cont A).symm
+
+end Matrix
+open Matrix
+noncomputable section
+
+attribute [local instance] Matrix.linftyOpNormedAlgebra
 
 /-- The exponential of an element of the Lorentz algebra is proper (has determinant 1). -/
-theorem exp_isProper (A : lorentzAlgebra) : LorentzGroup.IsProper ⟨(NormedSpace.exp ℝ) A.1, exp_mem_lorentzGroup A⟩ := by
-  unfold LorentzGroup.IsProper
-  simp only [Subtype.coe_mk]
-  have h_trace_zero : A.1.trace = 0 := trace_of_mem_is_zero A
-  letI : LinearOrder (Fin 1 ⊕ Fin 3) := Sum.Lex.linearOrder
-  have h_det_eq_exp_tr : (NormedSpace.exp ℝ A.1).det = Real.exp A.1.trace := by
-    letI : LinearOrder (Fin 1 ⊕ Fin 3) := Sum.Lex.linearOrder
-    exact Matrix.det_exp_real A.1
-  rw [h_det_eq_exp_tr, h_trace_zero, Real.exp_zero]
+theorem exp_isProper (A : lorentzAlgebra) :
+  LorentzGroup.IsProper ⟨(NormedSpace.exp ℝ) A.1, exp_mem_lorentzGroup A⟩ := by
+  simp only [LorentzGroup.IsProper, Subtype.coe_mk]
+  let e : (Fin 1 ⊕ Fin 3) ≃ Fin 4 := finSumFinEquiv
+  -- we reindex to Fin 4 to use the faster LinearOrder
+  rw [← det_reindex_self e, ← exp_reindex e]
+  convert det_exp_real (reindex e e A.1)
+  rw [trace_reindex e, trace_of_mem_is_zero A, Real.exp_zero]
 
 /-- The exponential of an element of the Lorentz algebra is orthochronous. -/
 theorem exp_isOrthochronous (A : lorentzAlgebra) :
@@ -149,7 +163,8 @@ theorem exp_isOrthochronous (A : lorentzAlgebra) :
       simp [one_smul] }
   have h_joined : Joined (1 : LorentzGroup 3) ⟨(NormedSpace.exp ℝ) A.1, exp_mem_lorentzGroup A⟩ :=
     ⟨exp_γ⟩
-  have h_connected : ⟨(NormedSpace.exp ℝ) A.1, exp_mem_lorentzGroup A⟩ ∈ connectedComponent (1 : LorentzGroup 3) :=
+  have h_connected : ⟨(NormedSpace.exp ℝ) A.1, exp_mem_lorentzGroup A⟩ ∈ connectedComponent
+      (1 : LorentzGroup 3) :=
     pathComponent_subset_component _ h_joined
   rw [← LorentzGroup.isOrthochronous_on_connected_component h_connected]
   exact LorentzGroup.id_isOrthochronous

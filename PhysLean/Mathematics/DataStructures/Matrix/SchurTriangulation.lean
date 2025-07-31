@@ -228,9 +228,8 @@ decreasing_by exact
 end LinearMap
 
 namespace Matrix
-/- IMPORTANT: existing `DecidableEq n` should take precedence over `LinearOrder.decidableEq`,
-a.k.a., `instDecidableEq_mathlib`. -/
-variable [RCLike 𝕜] [IsAlgClosed 𝕜] [Fintype n] [DecidableEq n] [LinearOrder n] (A : Matrix n n 𝕜)
+
+variable [RCLike 𝕜] [IsAlgClosed 𝕜] [Fintype n]  [LinearOrder n] (A : Matrix n n 𝕜)
 
 /--  This is `LinearMap.SchurTriangulationAux` adapted for matrices in the
 Euclidean space. -/

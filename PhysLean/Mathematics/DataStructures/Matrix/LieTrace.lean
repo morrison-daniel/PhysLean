@@ -301,7 +301,7 @@ lemma det_exp_unitary_conj (A : Matrix m m 𝕂) (U : unitaryGroup m 𝕂) :
 
 /-- The determinant of the exponential of a matrix is the exponential of its trace.
 This is also known as **Lie's trace formula**. -/
-theorem det_exp {𝕂 m : Type*} [RCLike 𝕂] [IsAlgClosed 𝕂] [Fintype m] [LinearOrder m]-- [DecidableEq m]
+theorem det_exp {𝕂 m : Type*} [RCLike 𝕂] [IsAlgClosed 𝕂] [Fintype m] [LinearOrder m]
     (A : Matrix m m 𝕂) :
     (NormedSpace.exp 𝕂 A).det = NormedSpace.exp 𝕂 A.trace := by
   let U := schurTriangulationUnitary A
@@ -365,12 +365,12 @@ lemma NormedSpace.exp_map_algebraMap {n : Type*} [Fintype n] [DecidableEq n]
   all_goals aesop
 
 section DetExp
-open Matrix
+namespace Matrix
 /--
 Lie's trace formula over ℝ: det(exp(A)) = exp(tr(A)) for any real matrix A.
 This is proved by transferring the result from ℂ using the naturality of polynomial identities.
 -/
-theorem det_exp_real {n : Type*} [Fintype n] [LinearOrder n]-- [DecidableEq m]
+theorem det_exp_real {n : Type*} [Fintype n] [LinearOrder n]
     (A : Matrix n n ℝ) : (NormedSpace.exp ℝ A).det = Real.exp A.trace := by
   let A_ℂ := A.map (algebraMap ℝ ℂ)
   have h_complex : (NormedSpace.exp ℂ A_ℂ).det = Complex.exp A_ℂ.trace := by
