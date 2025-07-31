@@ -67,11 +67,11 @@ TODO "HB6WN" "After TODO 'HB6VC', give `Space d` the necessary instances
 -/
 
 lemma inner_eq_sum {d} (p q : Space d) :
-    inner p q = ∑ i, p i * q i := by
-  simp only [PiLp.inner_apply, RCLike.inner_apply, conj_trivial]
-  congr
-  funext x
-  exact Lean.Grind.CommSemiring.mul_comm (q x) (p x)
+    inner ℝ p q = ∑ i, p.val i * q.val i := by
+  simp only [inner , PiLp.inner_apply, RCLike.inner_apply, conj_trivial]
+  apply Finset.sum_congr rfl
+  intro i hi
+  exact mul_comm (q.val i) (p.val i)
 
 /-!
 
