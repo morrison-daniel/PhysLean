@@ -141,14 +141,23 @@ lemma matrix_tsum_apply
     exact tsum_apply h_row_summable
   rw [h₁, h₂]
 
-private lemma Finset.prod_exp_eq_exp_sum [LinearOrder m] (s : Finset m) (f : m → 𝕂) :
+namespace Finset
+
+private lemma prod_exp_eq_exp_sum [LinearOrder m] (s : Finset m) (f : m → 𝕂) :
     ∏ i ∈ s, NormedSpace.exp 𝕂 (f i) = NormedSpace.exp 𝕂 (∑ i ∈ s, f i) := by
   letI : CompleteSpace 𝕂 := by infer_instance
   induction' s using Finset.induction with a s ha ih
   · simp [NormedSpace.exp_zero]
   · rw [Finset.prod_insert ha, Finset.sum_insert ha, NormedSpace.exp_add, ih]
 
-variable [Fintype m] [LinearOrder m]
+end Finset
+
+variable [Fintype m]
+
+lemma trace_of_isUpperTriangular {A : Matrix m m 𝕂} : A.trace = ∑ i, A i i := by
+  rfl
+
+variable [LinearOrder m]
 
 attribute [local instance] Matrix.linftyOpNormedAlgebra
 attribute [local instance] Matrix.linftyOpNormedRing
@@ -217,10 +226,6 @@ lemma det_of_isUpperTriangular {A : Matrix m m 𝕂}
     (hA : A.IsUpperTriangular) : A.det = ∏ i, A i i := by
   exact Matrix.det_of_upperTriangular hA
 
-omit [LinearOrder m] in
-lemma trace_of_isUpperTriangular {A : Matrix m m 𝕂} : A.trace = ∑ i, A i i := by
-  rfl
-
 /-- The trace is invariant under unitary conjugation. -/
 lemma trace_unitary_conj (A : Matrix m m 𝕂) (U : unitaryGroup m 𝕂) :
     trace ((U : Matrix m m 𝕂) * A * star (U : Matrix m m 𝕂)) = trace A := by
@@ -246,18 +251,14 @@ lemma det_unitary_conj (A : Matrix m m 𝕂) (U : unitaryGroup m 𝕂) :
     det ((U : Matrix m m 𝕂) * A * star (U : Matrix m m 𝕂))
         = det ((U : Matrix m m 𝕂) * A) * det (star (U : Matrix m m 𝕂)) := by
           exact det_mul ((U : Matrix m m 𝕂) * A) (star (U : Matrix m m 𝕂))
-    _ = det (U : Matrix m m 𝕂) * det A * det (star (U : Matrix m m 𝕂)) := by
-          rw [det_mul]
+    _ = det (U : Matrix m m 𝕂) * det A * det (star (U : Matrix m m 𝕂)) := by rw [det_mul]
     _ = det (U : Matrix m m 𝕂) * det A * star (det (U : Matrix m m 𝕂)) := by
           rw [← det_mul, ← det_conjTranspose]; rfl
-    _ = det A * (det (U : Matrix m m 𝕂) * star (det (U : Matrix m m 𝕂))) := by
-          ring
+    _ = det A * (det (U : Matrix m m 𝕂) * star (det (U : Matrix m m 𝕂))) := by ring
     _ = det A * (star (det (U : Matrix m m 𝕂)) * det (U : Matrix m m 𝕂)) := by
           rw [mul_comm (det (U : Matrix m m 𝕂)) (star (det (U : Matrix m m 𝕂)))]
-    _ = det A * 1 := by
-          rw [h_det_U]
-    _ = det A := by
-          rw [mul_one]
+    _ = det A * 1 := by rw [h_det_U]
+    _ = det A := by rw [mul_one]
 
 /-- Lie's trace formula for upper triangular matrices. -/
 lemma det_exp_of_isUpperTriangular {A : Matrix m m 𝕂} (hA : IsUpperTriangular A) :
@@ -290,10 +291,8 @@ lemma det_exp_unitary_conj (A : Matrix m m 𝕂) (U : unitaryGroup m 𝕂) :
   have h₁ : NormedSpace.exp 𝕂 ((U : Matrix m m 𝕂) * A * star (U : Matrix m m 𝕂)) =
       (U : Matrix m m 𝕂) * NormedSpace.exp 𝕂 A * star (U : Matrix m m 𝕂) := h_exp_conj
   have h₂ : (NormedSpace.exp 𝕂 ((U : Matrix m m 𝕂) * A * star (U : Matrix m m 𝕂))).det =
-      det ((U : Matrix m m 𝕂) * NormedSpace.exp 𝕂 A * star (U : Matrix m m 𝕂)) := by
-    simp [h₁]
-  have h₃ :
-      det ((U : Matrix m m 𝕂) * NormedSpace.exp 𝕂 A * star (U : Matrix m m 𝕂)) =
+      det ((U : Matrix m m 𝕂) * NormedSpace.exp 𝕂 A * star (U : Matrix m m 𝕂)) := by simp [h₁]
+  have h₃ : det ((U : Matrix m m 𝕂) * NormedSpace.exp 𝕂 A * star (U : Matrix m m 𝕂)) =
         (NormedSpace.exp 𝕂 A).det :=
     det_unitary_conj (NormedSpace.exp 𝕂 A) U
   simpa [h₂] using h₃
@@ -344,7 +343,9 @@ lemma map_pow {α β m : Type*}
 
 end Matrix
 
-lemma NormedSpace.exp_map_algebraMap {n : Type*} [Fintype n] [DecidableEq n]
+namespace NormedSpace
+
+lemma exp_map_algebraMap {n : Type*} [Fintype n] [DecidableEq n]
     (A : Matrix n n ℝ) :
     (exp ℝ A).map (algebraMap ℝ ℂ) = exp ℂ (A.map (algebraMap ℝ ℂ)) := by
   letI : SeminormedRing (Matrix n n ℝ) := Matrix.linftyOpSemiNormedRing
@@ -362,7 +363,16 @@ lemma NormedSpace.exp_map_algebraMap {n : Type*} [Fintype n] [DecidableEq n]
   apply tsum_congr
   intro k
   erw [Matrix.map_smul, Matrix.map_pow]
-  all_goals aesop
+  simp_all only [Complex.coe_algebraMap]
+  ext i j : 1
+  simp_all only [Matrix.smul_apply, Complex.real_smul, Complex.ofReal_inv, Complex.ofReal_natCast,
+    smul_eq_mul]
+  intro a
+  simp_all only [RingHom.toAddMonoidHom_eq_coe, smul_eq_mul, AddMonoidHom.coe_coe,
+    Complex.coe_algebraMap, Complex.ofReal_mul, Complex.ofReal_inv, Complex.ofReal_natCast,
+    Complex.real_smul]
+
+end NormedSpace
 section DetExp
 namespace Matrix
 /--
@@ -376,12 +386,10 @@ theorem det_exp_real {n : Type*} [Fintype n] [LinearOrder n]
     haveI : IsAlgClosed ℂ := Complex.isAlgClosed
     rw [Complex.exp_eq_exp_ℂ, ← Matrix.det_exp]
   have h_trace_comm : A_ℂ.trace = (algebraMap ℝ ℂ) A.trace := by
-    simp only [A_ℂ, trace, diag_map, map_sum]
-    rfl
+    simp only [A_ℂ, trace, diag_map, map_sum];rfl
   have h_det_comm : (algebraMap ℝ ℂ) ((NormedSpace.exp ℝ A).det) = (NormedSpace.exp ℂ A_ℂ).det := by
     rw [@RingHom.map_det]
-    rw [← NormedSpace.exp_map_algebraMap]
-    rfl
+    rw [← NormedSpace.exp_map_algebraMap]; rfl
   rw [← h_det_comm] at h_complex
   rw [h_trace_comm] at h_complex
   have h_exp_comm : Complex.exp ((algebraMap ℝ ℂ) A.trace) =
