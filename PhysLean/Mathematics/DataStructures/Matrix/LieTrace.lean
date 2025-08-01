@@ -38,19 +38,6 @@ lemma tsum_eq_zero
     (∑' n, f n) = 0 := by
   simp_all only [tsum_zero]
 
-namespace Finset
-
-variable [RCLike 𝕂] [LinearOrder m]
-
-private lemma prod_exp_eq_exp_sum (s : Finset m) (f : m → 𝕂) :
-    ∏ i ∈ s, NormedSpace.exp 𝕂 (f i) = NormedSpace.exp 𝕂 (∑ i ∈ s, f i) := by
-  letI : CompleteSpace 𝕂 := by infer_instance
-  induction' s using Finset.induction with a s ha ih
-  · simp [NormedSpace.exp_zero]
-  · rw [Finset.prod_insert ha, Finset.sum_insert ha, NormedSpace.exp_add, ih]
-
-end Finset
-
 /-!
  ### The determinant of the matrix exponential
  -/
@@ -96,7 +83,7 @@ lemma diag_mul_of_blockTriangular_id {A B : Matrix m m 𝕂}
   · intro; simp_all only [Finset.mem_univ, not_true_eq_false]
 
 /-- Powers of block triangular matrices are block triangular. -/
-lemma blockTriangular_pow {A : Matrix m m 𝕂} (hA : BlockTriangular A id) (k : ℕ) :
+lemma blockTriangular.pow {A : Matrix m m 𝕂} (hA : BlockTriangular A id) (k : ℕ) :
     BlockTriangular (A ^ k) id := by
   induction k with
   | zero => rw [pow_zero]; exact blockTriangular_one
@@ -108,7 +95,7 @@ lemma diag_pow_of_blockTriangular_id {A : Matrix m m 𝕂}
   induction k with
   | zero => rw [pow_zero, pow_zero]; simp [diag_one]
   | succ k ih =>
-    have h_pow_k : BlockTriangular (A ^ k) id := blockTriangular_pow hA k
+    have h_pow_k : BlockTriangular (A ^ k) id := blockTriangular.pow hA k
     rw [pow_succ, pow_succ, diag_mul_of_blockTriangular_id h_pow_k hA, ih]
 
 /-- The exponential of an upper-triangular matrix is upper-triangular. -/
@@ -173,7 +160,7 @@ lemma det_exp_of_blockTriangular_id {A : Matrix m m 𝕂} (hA : BlockTriangular 
     diag_exp_of_blockTriangular_id hA
   simp_rw [← diag_apply]
   simp_rw [h_diag_exp]
-  erw [← Finset.prod_exp_eq_exp_sum Finset.univ]
+  erw [← NormedSpace.exp_sum Finset.univ]
   congr 1
 
 /-- The trace is invariant under unitary conjugation. -/
