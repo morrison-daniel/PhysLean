@@ -168,7 +168,7 @@ lemma trace_unitary_conj (A : Matrix m m 𝕂) (U : unitaryGroup m 𝕂) :
 
 /-- The determinant is invariant under unitary conjugation. -/
 lemma det_unitary_conj (A : Matrix m m 𝕂) (U : unitaryGroup m 𝕂) :
-     det ((U : Matrix m m 𝕂) * A * star (U : Matrix m m 𝕂)) = det A := by
+    det ((U : Matrix m m 𝕂) * A * star (U : Matrix m m 𝕂)) = det A := by
   have h_det_U : det (U : Matrix m m 𝕂) * det (star (U : Matrix m m 𝕂)) = (1 : 𝕂) := by
     have h := congr_arg det (UnitaryGroup.star_mul_self U)
     rwa [det_mul, det_one, mul_comm] at h
