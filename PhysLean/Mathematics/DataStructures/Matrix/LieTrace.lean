@@ -64,11 +64,6 @@ lemma matrix_tsum_apply
 
 variable [Fintype m] [LinearOrder m]
 
-/-- Summability of the exponential series for matrices -/
-lemma summable_exp_series (A : Matrix m m 𝕂) :
-    Summable (fun n => ((n.factorial : 𝕂)⁻¹) • (A ^ n)) :=
-  NormedSpace.expSeries_summable' A
-
 /-- For upper-triangular matrices, the diagonal of a product is the product of the diagonals.
 This is a specific case of a more general property for block-triangular matrices. -/
 lemma diag_mul_of_blockTriangular_id {A B : Matrix m m 𝕂}
@@ -106,7 +101,7 @@ lemma blockTriangular_exp_of_blockTriangular_id
   rw [NormedSpace.exp_eq_tsum]
   let exp_series := fun n => ((n.factorial : 𝕂)⁻¹) • (A ^ n)
   change (∑' n, exp_series n) i j = 0
-  rw [matrix_tsum_apply (summable_exp_series A) i j]
+  rw [matrix_tsum_apply (NormedSpace.expSeries_summable' A) i j]
   apply tsum_eq_zero
   intro n
   have h_pow : BlockTriangular (A ^ n) id := by
@@ -146,7 +141,7 @@ theorem diag_exp_of_blockTriangular_id
     (NormedSpace.exp 𝕂 A).diag = fun i => NormedSpace.exp 𝕂 (A i i) := by
   funext i
   rw [NormedSpace.exp_eq_tsum (𝕂 := 𝕂), diag_apply]
-  simp_rw [matrix_tsum_apply (summable_exp_series A) i i]
+  simp_rw [matrix_tsum_apply (NormedSpace.expSeries_summable' A) i i]
   rw [matrix_exp_series_diag_eq_scalar_series hA i]
   rw [NormedSpace.exp_eq_tsum (𝕂 := 𝕂)]
 
@@ -173,7 +168,7 @@ lemma trace_unitary_conj (A : Matrix m m 𝕂) (U : unitaryGroup m 𝕂) :
 
 /-- The determinant is invariant under unitary conjugation. -/
 lemma det_unitary_conj (A : Matrix m m 𝕂) (U : unitaryGroup m 𝕂) :
-    det ((U : Matrix m m 𝕂) * A * star (U : Matrix m m 𝕂)) = det A := by
+     det ((U : Matrix m m 𝕂) * A * star (U : Matrix m m 𝕂)) = det A := by
   have h_det_U : det (U : Matrix m m 𝕂) * det (star (U : Matrix m m 𝕂)) = (1 : 𝕂) := by
     have h := congr_arg det (UnitaryGroup.star_mul_self U)
     rwa [det_mul, det_one, mul_comm] at h
