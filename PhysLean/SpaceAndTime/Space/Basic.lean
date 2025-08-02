@@ -39,7 +39,6 @@ structure Space (d : Nat) where
 
 namespace Space
 
-
 /-!
 
 ## Basic operations on `Space`.
@@ -50,9 +49,12 @@ noncomputable instance (d: ℕ): Inner ℝ (Space d) where
 
 /-!
 
-## Instances
+## Instances on `Space`
 
 -/
+
+noncomputable instance : VAdd (EuclideanSpace ℝ (Fin d)) (Space d) where
+  vadd v s := ⟨v + s.val⟩
 
 TODO "HB6YZ" "In the above documentation describe what an instance is, and why
   it is useful to have instances for `Space d`."
