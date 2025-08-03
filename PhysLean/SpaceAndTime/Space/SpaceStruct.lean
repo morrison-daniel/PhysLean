@@ -1,15 +1,20 @@
+/-
+Copyright (c) 2025 Joseph Tooby-Smith. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Joseph Tooby-Smith, Hou Run Feng
+-/
 import PhysLean.Meta.Informal.Basic
-import PhysLean.Meta.TODO.Basic
-import PhysLean.Meta.Linters.Sorry
-import Mathlib.Topology.ContinuousMap.CompactlySupported
-import Mathlib.Geometry.Manifold.IsManifold.Basic
 import Mathlib.MeasureTheory.Measure.Haar.InnerProductSpace
+/-!
 
-/--
-  This is a work in progress reimplmentation of `Space d` that abstracts over the underlying `EuclideanSpace`
+  # `SpaceStruct d`
+
+  This is a work in progress reimplmentation of `Space d`
+  that abstracts over the underlying `EuclideanSpace`
 
   `Space d` is planned to be deprecated in favor of `SpaceStruct d`.
-  Once the necessary components are migrated to be compatible with `SpaceStruct`, it will become the default implementation of `Space`
+  Once the necessary components are migrated to be compatible with `SpaceStruct`,
+  it will become the default implementation of `Space`
 -/
 structure SpaceStruct (d : ℕ) where
     val : EuclideanSpace ℝ (Fin d)
