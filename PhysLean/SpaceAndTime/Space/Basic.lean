@@ -32,8 +32,15 @@ TODO "HB6RR" "In the above documentation describe the notion of a type, and
 TODO "HB6VC" "Convert `Space` from an `abbrev` to a `def`."
 
 /-- The type `Space d` representes `d` dimensional Euclidean space.
-  The default value of `d` is `3`. Thus `Space = Space 3`. -/
-structure Space (d : ℕ) where
+  The default value of `d` is `3`. Thus `Space = Space 3`.
+
+-/
+abbrev Space (d : ℕ := 3) := EuclideanSpace ℝ (Fin d)
+
+/--
+  `Space d` is planned to be deprecated in favor of `SpaceStruct d`.
+  Once the necessary components are migrated to be compatible with `SpaceStruct`, it will become the default implementation of `Space`-/
+structure SpaceStruct (d : ℕ) where
     val : EuclideanSpace ℝ (Fin d)
 
 namespace Space
@@ -43,59 +50,12 @@ namespace Space
 ## Basic operations on `Space`.
 
 -/
-noncomputable instance {d : Nat} : Add (Space d) where
-  add x y := ⟨x.val + y.val⟩
-
-@[simp]
-lemma add_val {d: ℕ} (x y  : Space d) :
-    x + y = ⟨x.val + y.val⟩ := rfl
-
-instance {d : Nat} : Neg (Space d) where
-  neg x := ⟨ -x.val ⟩
-
-@[simp]
-lemma neg_val {d: ℕ} (x : Space d) :
-    (-x).val = -x.val := rfl
-
-noncomputable instance {d: ℕ} : Sub (Space d)
-  where sub x y := ⟨x.val - y.val⟩
-
-instance {d : Nat} : SMul ℝ (Space d) where
-   smul k x := ⟨k • x.val⟩
-
-instance {d : Nat} : Zero (Space d) := ⟨⟨ 0 ⟩⟩
-
-noncomputable instance (d: ℕ): Inner ℝ (Space d) where
-  inner x y := Inner.inner ℝ x.val y.val
-
-noncomputable instance : VAdd (EuclideanSpace ℝ (Fin d)) (Space d) where
-  vadd v s := ⟨v + s.val⟩
-
 /-!
 
 ## Instances on `Space`
 
 -/
 
-noncomputable instance {d : Nat} : AddGroup (Space d) where
-  add_assoc := by simp [add_assoc]
-  zero_add := fun ⟨x⟩ => by
-    show Space.mk (0 + x) = Space.mk x
-    rw [zero_add]
-  add_zero := fun ⟨x⟩ => by
-    show Space.mk (x + 0) = Space.mk x
-    rw [add_zero]
-  neg_add_cancel := fun ⟨x⟩ => by
-    show Space.mk (-x) + Space.mk x = Space.mk 0
-    show Space.mk (-x + x) = Space.mk 0
-    rw [add_comm (-x) x, add_neg_cancel]
-  nsmul n x := ⟨n • x.val⟩
-  zsmul n x := ⟨n • x.val⟩
-
-noncomputable instance {d: ℕ} : AddCommMonoid (Space d) where
-  add_comm := by simp [add_comm]
-
-noncomputable instance {d : Nat} : AddCommGroup (Space d) where
 
 TODO "HB6YZ" "In the above documentation describe what an instance is, and why
   it is useful to have instances for `Space d`."
@@ -110,11 +70,11 @@ TODO "HB6WN" "After TODO 'HB6VC', give `Space d` the necessary instances
 -/
 
 lemma inner_eq_sum {d} (p q : Space d) :
-    inner ℝ p q = ∑ i, p.val i * q.val i := by
-  simp only [inner , PiLp.inner_apply, RCLike.inner_apply, conj_trivial]
-  apply Finset.sum_congr rfl
-  intro i hi
-  exact mul_comm (q.val i) (p.val i)
+    inner ℝ p q = ∑ i, p i * q i := by
+  simp only [PiLp.inner_apply, RCLike.inner_apply, conj_trivial]
+  congr
+  funext x
+  exact Lean.Grind.CommSemiring.mul_comm (q x) (p x)
 
 /-!
 
