@@ -62,20 +62,20 @@ noncomputable def reflectionlessPotential (x : ℝ) : ℝ :=
   - (Q.ℏ^2 * Q.κ^2 * Q.N * (Q.N + 1)) / ((2 : ℝ) * Q.m * (Real.cosh (Q.κ * x)) ^ 2)
 
 /-- Define tanh(κ X) operator -/
-noncomputable def tanhKappaXOperator (ψ : ℝ → ℂ) : ℝ → ℂ :=
+noncomputable def tanhOperator (ψ : ℝ → ℂ) : ℝ → ℂ :=
   fun x => Real.tanh (Q.κ * x) * ψ x
 
 /-- Creation operator: a† as defined in https://arxiv.org/pdf/2411.14941
   a† = 1/√(2m) (P + iℏκ tanh(κX)) -/
 noncomputable def creationOperator (ψ : ℝ → ℂ) : ℝ → ℂ :=
   let factor : ℝ := 1 / Real.sqrt (2 * Q.m)
-  fun x => factor * (momentumOperator ψ x + Complex.I * Q.ℏ * Q.κ * Q.tanhKappaXOperator ψ x)
+  fun x => factor * (momentumOperator ψ x + Complex.I * Q.ℏ * Q.κ * Q.tanhOperator ψ x)
 
 /-- Annihilation operator: a as defined in https://arxiv.org/pdf/2411.14941
   a = 1/√(2m) (P - iℏκ tanh(κX)) -/
 noncomputable def annihilationOperator (ψ : ℝ → ℂ) : ℝ → ℂ :=
   let factor : ℝ := 1 / Real.sqrt (2 * Q.m)
-  fun x => factor * (momentumOperator ψ x - Complex.I * Q.ℏ * Q.κ * Q.tanhKappaXOperator ψ x)
+  fun x => factor * (momentumOperator ψ x - Complex.I * Q.ℏ * Q.κ * Q.tanhOperator ψ x)
 
 end ReflectionlessPotential
 end OneDimension
