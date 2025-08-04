@@ -15,7 +15,13 @@ import Mathlib.MeasureTheory.Measure.Haar.InnerProductSpace
   Once the necessary components are migrated to be compatible with `SpaceStruct`,
   it will become the default implementation of `Space`
 -/
-structure SpaceStruct (d : ℕ) where
+
+/--
+  The type `SpaceStruct d` representes `d` dimensional Euclidean space.
+  The default value of `d` is `3`. Thus `SpaceStuct = Spacestruct 3`.
+-/
+structure SpaceStruct (d : ℕ := 3) where
+    /-- The underlying EuclideanSpace associated `SpaceStruct d` -/
     val : EuclideanSpace ℝ (Fin d)
 
 /-!
