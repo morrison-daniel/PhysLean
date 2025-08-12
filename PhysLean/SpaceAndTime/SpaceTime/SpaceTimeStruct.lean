@@ -176,12 +176,44 @@ scoped notation "⟪" x ", " y "⟫" => Inner.inner ℝ x y
 @[simp]
 theorem inner_expand : ⟪x, y⟫ = ⟪x.time, y.time⟫ + ⟪x.space, y.space⟫ := rfl
 
-noncomputable instance : InnerProductSpace.Core ℝ (SpaceTimeStruct d) where
+noncomputable instance : NormedAddCommGroup (SpaceTimeStruct d) where
+  norm x := √⟪x, x⟫
+  dist_self x := sorry
+  dist_comm := sorry
+  dist_triangle := sorry
+  eq_of_dist_eq_zero := sorry
+
+noncomputable instance : InnerProductSpace ℝ (SpaceTimeStruct d) where
+  norm_smul_le := sorry
+  norm_sq_eq_re_inner := sorry
   conj_inner_symm := sorry
-  re_inner_nonneg := sorry
   add_left := sorry
   smul_left := sorry
-  definite := sorry
+
+/-!
+## Orthonormal Basis inherited from `Space` and `Time`
+
+`SpaceTime` has an orthonormal basis obtained by combining the bases of `Space` and `Time`
+-/
+
+noncomputable def basis : OrthonormalBasis (Fin (1 + d)) ℝ (SpaceTimeStruct d) where
+  repr := sorry
+
+/-!
+## Equivalence with `Lorentz.Vector` and Tensorial Instance
+
+Defines a linear equivalence with `Lorentz.Vector`, the tensor representation of spacetime.
+-/
+
+#check finSumFinEquiv
+
+/-
+noncomputable def toLVector : SpaceTimeStruct d ≃ₗ[ℝ] Lorentz.Vector d where
+  toFun x := sorry
+  map_add' := sorry
+  map_smul' := sorry
+  invFun := sorry
+-/
 
 /-!
 ## Minkowski Product
