@@ -37,7 +37,6 @@ or origin.
 /-- The type `Time` represents the time in a given (but arbitary) set of units, and
   with a given (but arbitary) choice of origin. -/
 @[ext]
-@[ext]
 structure Time where
   /-- The underlying real number associated with a point in time. -/
   val : ℝ
