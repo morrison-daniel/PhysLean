@@ -37,6 +37,7 @@ or origin.
 /-- The type `Time` represents the time in a given (but arbitary) set of units, and
   with a given (but arbitary) choice of origin. -/
 @[ext]
+@[ext]
 structure Time where
   /-- The underlying real number associated with a point in time. -/
   val : ℝ
@@ -51,13 +52,14 @@ lemma val_injective : Function.Injective val := by
 instance : NatCast Time where
   natCast n := ⟨n⟩
 
+/-- The casting of a natural number to an element of `Time`. This corresponds to a choice of
+(1) zero point in time, and (2) a choice of metric on time (defining `1`). -/
 instance {n : ℕ} : OfNat Time n where
   ofNat := ⟨n⟩
 
 instance : Coe ℝ Time where
   coe r := ⟨r⟩
 
-@[simp]
 lemma realCast_val {r : ℝ} : (r : Time).val = r := rfl
 
 instance : Inhabited Time where
@@ -82,7 +84,6 @@ lemma natCast_one : ((1 : ℕ) : Time) = 1 := rfl
 @[simp]
 lemma ofNat_val {n : ℕ} : val (OfNat.ofNat n : Time) = n := rfl
 
-@[simp]
 lemma one_ne_zero : (1 : Time) ≠ (0 : Time) := by
   by_contra h
   rw [Time.ext_iff, ofNat_val, ofNat_val] at h
