@@ -24,6 +24,8 @@ namespace TimeUnit
 lemma val_ne_zero (x : TimeUnit) : x.val ≠ 0 := by
   exact (ne_of_lt x.prop).symm
 
+lemma val_pos (x : TimeUnit) : 0 < x.val := x.prop
+
 def seconds : TimeUnit := ⟨1, one_pos⟩
 
 instance : Inhabited TimeUnit where
@@ -40,12 +42,5 @@ theorem ex1 : (60 : Time) • seconds = (1 : Time) • minutes := by
   rw [hsmul_val, hsmul_val, seconds, minutes, Time.ofNat_val, Time.ofNat_val]
   simp
 
-instance : Coe TimeUnit Time where
-  coe u := ⟨u.val⟩
-
-theorem ex2 : (60 : Time) = minutes := by
-  ext
-  rw [Time.ofNat_val, minutes]
-  simp
 
 end TimeUnit
