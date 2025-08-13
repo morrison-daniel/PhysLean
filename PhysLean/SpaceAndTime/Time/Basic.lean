@@ -62,12 +62,23 @@ lemma ext_of {t1 t2 : Time} (h : t1.val = t2.val) :
 
 -/
 
-/-- The zero point in `Time`. -/
-instance : Zero Time where
-  zero := ⟨0⟩
+instance : NatCast Time where natCast n := ⟨n⟩
+
+instance {n} : OfNat Time n where
+  ofNat := ⟨n⟩
 
 @[simp]
-lemma zero_val : (0 : Time).val = 0 := rfl
+lemma ofNat_val {n : ℕ} : val (OfNat.ofNat n) = n := rfl
+
+@[simp]
+lemma zero_eq_ofNat_zero : (0 : Time) = OfNat.ofNat 0 := rfl
+
+@[simp]
+lemma zero_val : val 0 = 0 := by
+  rw [ofNat_val]
+  norm_cast
+
+/-
 
 @[simp]
 lemma val_eq_zero (t : Time) : t.val = 0 ↔ t = 0 := by
@@ -332,5 +343,7 @@ lemma fderiv_val (t : Time) : fderiv ℝ Time.val t 1 = 1 := by
   change (fderiv ℝ toRealCLM t 1) = 1
   simp
   rfl
+
+-/
 
 end Time
