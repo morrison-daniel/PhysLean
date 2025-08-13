@@ -26,6 +26,7 @@ lemma val_ne_zero (x : TimeUnit) : x.val ≠ 0 := by
 
 lemma val_pos (x : TimeUnit) : 0 < x.val := x.prop
 
+/-- Seconds are defined as the unit of scale 1. -/
 def seconds : TimeUnit := ⟨1, one_pos⟩
 
 instance : Inhabited TimeUnit where
@@ -87,10 +88,21 @@ lemma scale_div_scale {r s : ℝ} (hr : 0 < r) (hs : 0 < s) :
 ## Assigning units to `Time`
 -/
 
+variable (t : Time) (u : TimeUnit)
+
 instance : HSMul Time TimeUnit ℝ where
   hSMul t u := t.val * u.val
 
-theorem hsmul_val (t : Time) (u : TimeUnit) : t • u = t.val * u.val := rfl
+theorem smul_eq : t • u = t.val * u.val := rfl
+
+@[simp]
+lemma smul_time_eq (r : ℝ) : (r • t) • u = r * (t • u) := by
+  simp [smul_eq, mul_assoc]
+
+@[simp]
+lemma smul_scale_eq {r : ℝ} (hr : 0 < r) : t • (scale r u hr) = r * (t • u) := by
+  simp [smul_eq]
+  ring
 
 /-!
 ## Specific choices of time units
@@ -164,3 +176,5 @@ lemma weeks_div_hours : weeks / hours = (168 : ℝ) := by
   simp [weeks, hours]; norm_num
 
 end TimeUnit
+
+#lint
