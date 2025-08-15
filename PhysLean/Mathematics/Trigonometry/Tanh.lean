@@ -56,5 +56,4 @@ lemma contDiff_tanh {n : ℕ} : ContDiff ℝ n Real.tanh := by
 
 /-- The nth derivative of Tanh(x) is a polynomial of Tanh(x) -/
 lemma iteratedDeriv_tanh_is_polynomial_of_tanh (n : ℕ) (x : ℝ) : ∃ P : Polynomial ℝ, ∀ x,
- iteratedDeriv n Real.tanh x =
-  P.eval (Real.tanh x) := by sorry
+    iteratedDeriv n Real.tanh x = P.eval (Real.tanh x) := by sorry
