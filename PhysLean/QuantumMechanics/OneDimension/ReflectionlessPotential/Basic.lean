@@ -8,6 +8,12 @@ import PhysLean.QuantumMechanics.OneDimension.Operators.Momentum
 import PhysLean.QuantumMechanics.OneDimension.Operators.Position
 import PhysLean.SpaceAndTime.Space.VectorIdentities
 import PhysLean.SpaceAndTime.Time.Basic
+import Mathlib.Data.NNReal.Defs
+import Mathlib.Data.Real.Basic
+import Mathlib.Algebra.Order.Field.Basic
+import Mathlib.Order.Basic
+import Mathlib.Analysis.Calculus.Deriv.MeanValue
+
 /-!
 
 # 1d Reflectionless Potential
@@ -27,6 +33,10 @@ annihilation operators
 namespace QuantumMechanics
 open Real
 open Space
+open SchwartzMap
+open HilbertSpace
+open NNReal
+open Field
 namespace OneDimension
 
 /-- A reflectionless potential is specified by three
@@ -55,6 +65,29 @@ variable (Q : ReflectionlessPotential)
 ## Theorems
 TODO: Add theorems about reflectionless potential - the main result is the actual 1d solution
 -/
+
+/-- tanh(x) is less than 1 for all x -/
+lemma tanh_le_one (x : ℝ) : Real.tanh x < 1 := by
+  rw [Real.tanh_eq_sinh_div_cosh]
+  rw [div_lt_one]
+  apply Real.sinh_lt_cosh
+  apply Real.cosh_pos
+
+/-- tanh(x) is greater than -1 for all x -/
+@[sorryful]
+lemma tanh_ge_minus_one (x : ℝ) : Real.tanh x > -1 := by
+  sorry
+
+/-- The absolute value of tanh is bounded by 1 -/
+@[sorryful]
+lemma abs_tanh_le_one (x: ℝ) : |Real.tanh x| < 1 := by
+  sorry
+
+/-- The derivative of tanh(x) is 1 - tanh(x)^2 -/
+@[sorryful]
+lemma deriv_tanh (x: ℝ) : deriv Real.tanh = fun x => 1 - Real.tanh x ^ 2 := by
+  sorry
+
 
 /-- Define the reflectionless potential as
   V(x) = - (ℏ^2 * κ^2 * N * (N + 1)) / (2 * m * (cosh (κ * x)) ^ 2) --/
