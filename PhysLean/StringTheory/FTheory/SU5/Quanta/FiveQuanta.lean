@@ -4,7 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Joseph Tooby-Smith
 -/
 import PhysLean.StringTheory.FTheory.SU5.Fluxes.NoExotics.ToList
-import PhysLean.StringTheory.FTheory.SU5U1.Charges.PhenoConstrained.Elems.Lemmas
+import PhysLean.Particles.SuperSymmetry.SU5.Charges.MinimallyAllowsTerm.OfFinset
+import PhysLean.StringTheory.FTheory.SU5.Charges.OfRationalSection
 /-!
 
 # Quanta of 5-d representations
@@ -35,7 +36,7 @@ properties thereof.
 -/
 namespace FTheory
 
-namespace SU5U1
+namespace SU5
 open SU5
 variable {I : CodimensionOneConfig}
 
@@ -953,6 +954,5 @@ lemma mem_ofChargesExpand_map_reduce_iff (c : Finset ℤ) (S : FiveQuanta) :
 
 end FiveQuanta
 
-end SU5U1
-
+end SU5
 end FTheory
