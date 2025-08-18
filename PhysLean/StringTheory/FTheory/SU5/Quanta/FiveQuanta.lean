@@ -6,6 +6,7 @@ Authors: Joseph Tooby-Smith
 import PhysLean.StringTheory.FTheory.SU5.Fluxes.NoExotics.ToList
 import PhysLean.Particles.SuperSymmetry.SU5.Charges.MinimallyAllowsTerm.OfFinset
 import PhysLean.StringTheory.FTheory.SU5.Charges.OfRationalSection
+import PhysLean.Particles.SuperSymmetry.SU5.Charges.Map
 /-!
 
 # Quanta of 5-d representations
@@ -249,7 +250,7 @@ variable [CommRing 𝓩]
   see equation (23) of arXiv:1401.5084.
 -/
 def anomalyCoefficent (F : FiveQuanta 𝓩) : 𝓩 × 𝓩 :=
-  ((F.map fun x => x.2.2 • x.1 ).sum, (F.map fun x => x.2.2 • (x.1 * x.1)).sum)
+  ((F.map fun x => x.2.2 • x.1).sum, (F.map fun x => x.2.2 • (x.1 * x.1)).sum)
 
 lemma anomalyCoefficent_of_reduce (F : FiveQuanta 𝓩) [DecidableEq 𝓩] :
     F.reduce.anomalyCoefficent = F.anomalyCoefficent := by
@@ -261,16 +262,14 @@ lemma anomalyCoefficent_of_reduce (F : FiveQuanta 𝓩) [DecidableEq 𝓩] :
       map_add' := by
         intros x y
         simp [add_mul, mul_add] }
-    have h1 := reduce_sum_eq_sum_toCharges F f
-    simpa [f] using h1
+    simpa [f] using reduce_sum_eq_sum_toCharges F f
   · let f : 𝓩 → ℤ × ℤ →+ 𝓩 := fun q5 => {
       toFun := fun x => x.2 • (q5 * q5)
       map_zero' := by simp
       map_add' := by
         intros x y
         simp [add_mul, mul_add] }
-    have h1 := reduce_sum_eq_sum_toCharges F f
-    simpa [f] using h1
+    simpa [f] using reduce_sum_eq_sum_toCharges F f
 
 end ACCs
 /-!
@@ -626,8 +625,6 @@ lemma mem_ofChargesExpand_of_noExotics_hasNoZero (F : FiveQuanta 𝓩) (c : Fins
     generalize F.toFluxesFive = FF at hf hS''
     exact FluxesFive.map_sum_add_of_mem_powerset_elemsNoExotics FF S hf hS''
 
-
-
 lemma exists_charges_of_mem_ofChargesExpand (c : Finset 𝓩) (F : FiveQuanta 𝓩)
     (h : F ∈ ofChargesExpand c) :
     ∃ q1 q2 q3 q4 q5 q6 : 𝓩,
@@ -718,7 +715,7 @@ lemma exists_charges_of_mem_ofChargesExpand (c : Finset 𝓩) (F : FiveQuanta �
   use q1, q2, q3, q4, q5, q6
   rw [h_F_split, hF₁, hF₂]
   rfl
-lemma exists_charges_le_of_mem_ofChargesExpand (c : Finset ℤ ) (F : FiveQuanta ℤ)
+lemma exists_charges_le_of_mem_ofChargesExpand (c : Finset ℤ) (F : FiveQuanta ℤ)
     (h : F ∈ ofChargesExpand c) :
     ∃ q1 q2 q3 q4 q5 q6 : ℤ,
       F = {(q1, 1, -1), (q2, 1, -1), (q3, 1, -1), (q4, 0, 1), (q5, 0, 1), (q6, 0, 1)} ∧
