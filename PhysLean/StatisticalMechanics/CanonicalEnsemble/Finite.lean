@@ -1,7 +1,7 @@
 /-
 Copyright (c) 2025 Joseph Tooby-Smith. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Joseph Tooby-Smith
+Authors: Joseph Tooby-Smith, Matteo Cipollina
 -/
 import PhysLean.StatisticalMechanics.CanonicalEnsemble.Basic
 /-!
@@ -16,7 +16,7 @@ probability of being in a given microstate, the mean energy, the entropy and
 the Helmholtz free energy.
 
 We also define the addition of two canonical ensembles, and prove results related
-to the properties of additions of canonical ensembles.
+to the properties of additions of canonical ensembles and of entropy.
 
 ## References
 
@@ -143,5 +143,69 @@ lemma entropy_of_fintype [IsFinite 𝓒] (T : Temperature) :
   rw [MeasureTheory.integral_fintype]
   simp [mul_comm]
   exact Integrable.of_finite
+
+/-- The partition function of a finite canonical ensemble is strictly positive.
+We require `[Nonempty ι]`; otherwise for an empty type the sum is zero. -/
+lemma partitionFunction_pos [IsFinite 𝓒] [Nonempty ι] (T : Temperature) :
+    0 < 𝓒.partitionFunction T := by
+  classical
+  rw [partitionFunction_of_fintype (𝓒:=𝓒) T]
+  obtain ⟨i₀⟩ := (inferInstance : Nonempty ι)
+  have hterm : 0 < Real.exp (- β T * 𝓒.energy i₀) := Real.exp_pos _
+  have hsingle :
+      Real.exp (- β T * 𝓒.energy i₀)
+        ≤ ∑ i, Real.exp (- β T * 𝓒.energy i) := by
+    simpa using
+      (Finset.single_le_sum
+        (s := Finset.univ)
+        (f := fun i : ι => Real.exp (- β T * 𝓒.energy i))
+        (fun _ _ => Real.exp_nonneg _)
+        (Finset.mem_univ i₀))
+  exact lt_of_lt_of_le hterm hsingle
+
+/-- Probabilities are non-negative. -/
+lemma probability_nonneg [IsFinite 𝓒] [Nonempty ι] (T : Temperature) (i : ι) :
+    0 ≤ 𝓒.probability T i := by
+  have hZpos : 0 < 𝓒.partitionFunction T := partitionFunction_pos (𝓒:=𝓒) (T:=T)
+  simp [probability, div_nonneg, Real.exp_nonneg, hZpos.le]
+
+/-- The sum of probabilities over all microstates is 1. -/
+lemma sum_probability_eq_one [IsFinite 𝓒] [Nonempty ι] (T : Temperature) :
+    ∑ i, 𝓒.probability T i = 1 := by
+  classical
+  simp_rw [probability]
+  rw [← Finset.sum_div, partitionFunction_of_fintype (𝓒:=𝓒) T]
+  have hZpos : 0 < 𝓒.partitionFunction T := partitionFunction_pos (𝓒:=𝓒) (T:=T)
+  have hne : (∑ i, Real.exp (- β T * 𝓒.energy i)) ≠ 0 := by
+    simpa [partitionFunction_of_fintype (𝓒:=𝓒) T] using hZpos.ne'
+  exact div_self hne
+
+/-- The entropy of a finite canonical ensemble is non-negative (Shannon entropy). -/
+lemma entropy_nonneg [IsFinite 𝓒] [Nonempty ι] (T : Temperature) :
+    0 ≤ 𝓒.entropy T := by
+  classical
+  rw [entropy_of_fintype]
+  apply mul_nonneg_of_nonpos_of_nonpos
+  · exact neg_nonpos.mpr kB_nonneg
+  · apply Finset.sum_nonpos
+    intro i _
+    have hP_nonneg := probability_nonneg 𝓒 (T:=T) i
+    have hP_le_one : 𝓒.probability T i ≤ 1 := by
+      rw [probability, div_le_one (partitionFunction_pos (𝓒:=𝓒) (T:=T))]
+      rw [partitionFunction_of_fintype (𝓒:=𝓒) T]
+      exact
+        (Finset.single_le_sum
+          (s := Finset.univ)
+          (f := fun j : ι => Real.exp (- β T * 𝓒.energy j))
+          (fun _ _ => Real.exp_nonneg _)
+          (Finset.mem_univ i))
+    by_cases hP_zero : 𝓒.probability T i = 0
+    · simp [hP_zero, log_zero]
+    · have hP_pos : 0 < 𝓒.probability T i :=
+        lt_of_le_of_ne' hP_nonneg (by simp [hP_zero])
+      have h_log_nonpos : log (𝓒.probability T i) ≤ 0 := by
+        have hlog := Real.log_le_log hP_pos hP_le_one
+        simpa using hlog
+      exact mul_nonpos_of_nonneg_of_nonpos hP_nonneg h_log_nonpos
 
 end CanonicalEnsemble
