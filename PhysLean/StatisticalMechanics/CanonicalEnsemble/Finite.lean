@@ -1,7 +1,7 @@
 /-
 Copyright (c) 2025 Joseph Tooby-Smith. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Joseph Tooby-Smith
+Authors: Matteo Cipollina, Joseph Tooby-Smith
 -/
 import PhysLean.StatisticalMechanics.CanonicalEnsemble.Basic
 /-!
@@ -97,6 +97,25 @@ instance [IsFinite 𝓒] : IsFiniteMeasure (𝓒.μ) := by
   rw [IsFinite.μ_eq_count]
   infer_instance
 
+/-- In the finite (counting) case a nonempty index type gives a nonzero measure. -/
+instance [IsFinite 𝓒] [Nonempty ι] : NeZero 𝓒.μ := by
+  classical
+  refine ⟨?_⟩
+  intro hμ
+  obtain ⟨i₀⟩ := (inferInstance : Nonempty ι)
+  have hone : 𝓒.μ {i₀} = 1 := by
+    simp [IsFinite.μ_eq_count (𝓒:=𝓒)]
+  simp_all only [Measure.coe_zero, Pi.zero_apply, zero_ne_one]
+
+/--
+Entropy of the finite canonical ensemble (Shannon entropy). -/
+noncomputable def entropy (T : Temperature) : ℝ :=
+  𝓒.differentialEntropy T
+
+omit [Fintype ι] [MeasurableSingletonClass ι] in
+@[simp] lemma entropy_eq_differentialEntropy (T : Temperature) :
+    𝓒.entropy T = 𝓒.differentialEntropy T := rfl
+
 lemma partitionFunction_of_fintype [IsFinite 𝓒] (T : Temperature) :
     𝓒.partitionFunction T = ∑ i, exp (- β T * 𝓒.energy i) := by
   rw [partitionFunction_eq_integral]
@@ -139,9 +158,58 @@ open Constants
 
 lemma entropy_of_fintype [IsFinite 𝓒] (T : Temperature) :
     𝓒.entropy T = - kB * ∑ i, 𝓒.probability T i * log (𝓒.probability T i) := by
-  simp [entropy]
+  simp [entropy, differentialEntropy]
   rw [MeasureTheory.integral_fintype]
   simp [mul_comm]
   exact Integrable.of_finite
+
+lemma probability_le_one [IsFinite 𝓒] [Nonempty ι] (T : Temperature) (i : ι) :
+    𝓒.probability T i ≤ 1 := by
+  classical
+  unfold probability
+  have hnum_le : Real.exp (- β T * 𝓒.energy i) ≤ 𝓒.partitionFunction T := by
+    rw [partitionFunction_of_fintype (𝓒:=𝓒) T]
+    simpa using
+      (Finset.single_le_sum
+        (s := Finset.univ)
+        (f := fun j : ι => Real.exp (- β T * 𝓒.energy j))
+        (by intro _ _; exact Real.exp_nonneg _)
+        (Finset.mem_univ i))
+  have hZpos :
+      0 < 𝓒.partitionFunction T :=
+    partitionFunction_pos (𝓒:=𝓒) (T:=T)
+  have := (div_le_div_iff_of_pos_right hZpos).mpr hnum_le
+  simpa [probability, div_self hZpos.ne'] using this
+
+/-- Finite specialization of the general strict positivity of the partition function. -/
+lemma partitionFunction_pos_finite [IsFinite 𝓒] [Nonempty ι] (T : Temperature) :
+    0 < 𝓒.partitionFunction T :=
+  partitionFunction_pos (𝓒:=𝓒) (T:=T)
+
+/-- Finite specialization of probability nonnegativity. -/
+lemma probability_nonneg_finite [IsFinite 𝓒] [Nonempty ι] (T : Temperature) (i : ι) :
+    0 ≤ 𝓒.probability T i :=
+  probability_nonneg (𝓒:=𝓒) (T:=T) i
+
+/-- The sum of probabilities over all microstates is 1. -/
+lemma sum_probability_eq_one [IsFinite 𝓒] [Nonempty ι] (T : Temperature) :
+    ∑ i, 𝓒.probability T i = 1 := by
+  classical
+  simp_rw [probability]
+  rw [← Finset.sum_div, partitionFunction_of_fintype (𝓒:=𝓒) T]
+  have hZpos : 0 < 𝓒.partitionFunction T := partitionFunction_pos (𝓒:=𝓒) (T:=T)
+  have hne : (∑ i, Real.exp (- β T * 𝓒.energy i)) ≠ 0 := by
+    simpa [partitionFunction_of_fintype (𝓒:=𝓒) T] using hZpos.ne'
+  exact div_self hne
+
+/-- The entropy of a finite canonical ensemble is non-negative (Shannon entropy). -/
+lemma entropy_nonneg [IsFinite 𝓒] [Nonempty ι] (T : Temperature) :
+    0 ≤ 𝓒.entropy T := by
+  have hInt :
+      Integrable (fun i => Real.log (𝓒.probability T i)) (𝓒.μProd T) := by
+    classical
+    simp [μProd_of_fintype, probability]
+  refine differentialEntropy_nonneg_of_prob_le_one (𝓒:=𝓒) (T:=T) hInt
+    (probability_le_one (𝓒:=𝓒) (T:=T))
 
 end CanonicalEnsemble
