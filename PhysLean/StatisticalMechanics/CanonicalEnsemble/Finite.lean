@@ -144,30 +144,34 @@ lemma entropy_of_fintype [IsFinite 𝓒] (T : Temperature) :
   simp [mul_comm]
   exact Integrable.of_finite
 
-/-- The partition function of a finite canonical ensemble is strictly positive.
-We require `[Nonempty ι]`; otherwise for an empty type the sum is zero. -/
-lemma partitionFunction_pos [IsFinite 𝓒] [Nonempty ι] (T : Temperature) :
-    0 < 𝓒.partitionFunction T := by
+
+lemma probability_le_one [IsFinite 𝓒] [Nonempty ι] (T : Temperature) (i : ι) :
+    𝓒.probability T i ≤ 1 := by
   classical
-  rw [partitionFunction_of_fintype (𝓒:=𝓒) T]
-  obtain ⟨i₀⟩ := (inferInstance : Nonempty ι)
-  have hterm : 0 < Real.exp (- β T * 𝓒.energy i₀) := Real.exp_pos _
-  have hsingle :
-      Real.exp (- β T * 𝓒.energy i₀)
-        ≤ ∑ i, Real.exp (- β T * 𝓒.energy i) := by
+  unfold probability
+  have hnum_le : Real.exp (- β T * 𝓒.energy i) ≤ 𝓒.partitionFunction T := by
+    rw [partitionFunction_of_fintype (𝓒:=𝓒) T]
     simpa using
       (Finset.single_le_sum
         (s := Finset.univ)
-        (f := fun i : ι => Real.exp (- β T * 𝓒.energy i))
-        (fun _ _ => Real.exp_nonneg _)
-        (Finset.mem_univ i₀))
-  exact lt_of_lt_of_le hterm hsingle
+        (f := fun j : ι => Real.exp (- β T * 𝓒.energy j))
+        (by intro _ _; exact Real.exp_nonneg _)
+        (Finset.mem_univ i))
+  have hZpos :
+      0 < 𝓒.partitionFunction T :=
+    partitionFunction_pos (𝓒:=𝓒) (T:=T)
+  have := (div_le_div_iff_of_pos_right hZpos).mpr hnum_le
+  simpa [probability, div_self hZpos.ne'] using this
 
-/-- Probabilities are non-negative. -/
-lemma probability_nonneg [IsFinite 𝓒] [Nonempty ι] (T : Temperature) (i : ι) :
-    0 ≤ 𝓒.probability T i := by
-  have hZpos : 0 < 𝓒.partitionFunction T := partitionFunction_pos (𝓒:=𝓒) (T:=T)
-  simp [probability, div_nonneg, Real.exp_nonneg, hZpos.le]
+/-- Finite specialization of the general strict positivity of the partition function. -/
+lemma partitionFunction_pos_finite [IsFinite 𝓒] [Nonempty ι] (T : Temperature) :
+    0 < 𝓒.partitionFunction T :=
+  partitionFunction_pos (𝓒:=𝓒) (T:=T)
+
+/-- Finite specialization of probability nonnegativity. -/
+lemma probability_nonneg_finite [IsFinite 𝓒] [Nonempty ι] (T : Temperature) (i : ι) :
+    0 ≤ 𝓒.probability T i :=
+  probability_nonneg (𝓒:=𝓒) (T:=T) i
 
 /-- The sum of probabilities over all microstates is 1. -/
 lemma sum_probability_eq_one [IsFinite 𝓒] [Nonempty ι] (T : Temperature) :
@@ -183,29 +187,10 @@ lemma sum_probability_eq_one [IsFinite 𝓒] [Nonempty ι] (T : Temperature) :
 /-- The entropy of a finite canonical ensemble is non-negative (Shannon entropy). -/
 lemma entropy_nonneg [IsFinite 𝓒] [Nonempty ι] (T : Temperature) :
     0 ≤ 𝓒.entropy T := by
-  classical
-  rw [entropy_of_fintype]
-  apply mul_nonneg_of_nonpos_of_nonpos
-  · exact neg_nonpos.mpr kB_nonneg
-  · apply Finset.sum_nonpos
-    intro i _
-    have hP_nonneg := probability_nonneg 𝓒 (T:=T) i
-    have hP_le_one : 𝓒.probability T i ≤ 1 := by
-      rw [probability, div_le_one (partitionFunction_pos (𝓒:=𝓒) (T:=T))]
-      rw [partitionFunction_of_fintype (𝓒:=𝓒) T]
-      exact
-        (Finset.single_le_sum
-          (s := Finset.univ)
-          (f := fun j : ι => Real.exp (- β T * 𝓒.energy j))
-          (fun _ _ => Real.exp_nonneg _)
-          (Finset.mem_univ i))
-    by_cases hP_zero : 𝓒.probability T i = 0
-    · simp [hP_zero, log_zero]
-    · have hP_pos : 0 < 𝓒.probability T i :=
-        lt_of_le_of_ne' hP_nonneg (by simp [hP_zero])
-      have h_log_nonpos : log (𝓒.probability T i) ≤ 0 := by
-        have hlog := Real.log_le_log hP_pos hP_le_one
-        simpa using hlog
-      exact mul_nonpos_of_nonneg_of_nonpos hP_nonneg h_log_nonpos
+  have hInt :
+      Integrable (fun i => Real.log (𝓒.probability T i)) (𝓒.μProd T) := by
+    classical
+    simp [μProd_of_fintype, probability]
+  refine entropy_nonneg_of_prob_le_one (𝓒:=𝓒) (T:=T) hInt (probability_le_one (𝓒:=𝓒) (T:=T))
 
 end CanonicalEnsemble
