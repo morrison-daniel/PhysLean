@@ -21,6 +21,9 @@ In this file we define the canonical ensemble, its partition function, the
 probability of being in a given microstate, the mean energy, the entropy and
 the Helmholtz free energy
 
+We also define the addition of two canonical ensembles, and prove results related
+to the properties of additions of canonical ensembles
+
 We develop a general measure-theoretic framework designed to be applicable to both classical
 continuous systems (like an ideal gas) and discrete systems (like a spin lattice).
 
@@ -86,6 +89,7 @@ structure CanonicalEnsemble (ι : Type) [MeasurableSpace ι] : Type where
   /-- Assumption that the phase space unit is positive. -/
   h_pos : 0 < phase_space_unit := by positivity
   energy_measurable : Measurable energy
+  /-- The measure on the indexing set of microstates. -/
   μ : MeasureTheory.Measure ι := by volume_tac
   [μ_sigmaFinite : SigmaFinite μ]
 
@@ -147,7 +151,8 @@ lemma congr_energy_comp_symmm (e : ι1 ≃ᵐ ι) :
   funext i
   simp [congr]
 
-/-- `nsmul n 𝓒` represents `n` non-interacting, distinguishable copies of the ensemble `𝓒`. -/
+/-- Scalar multiplication of `CanonicalEnsemble`, defined such that
+`nsmul n 𝓒` represents `n` non-interacting, distinguishable copies of the ensemble `𝓒`. -/
 noncomputable def nsmul (n : ℕ) (𝓒 : CanonicalEnsemble ι) : CanonicalEnsemble (Fin n → ι) where
   energy := fun f => ∑ i, 𝓒.energy (f i)
   dof := n * 𝓒.dof
@@ -286,7 +291,8 @@ instance (T : Temperature) : SigmaFinite (𝓒.μBolt T) :=
   inferInstanceAs
     (SigmaFinite (𝓒.μ.withDensity (fun i => ENNReal.ofReal (exp (- β T * 𝓒.energy i)))))
 
-@[simp] lemma μBolt_add (T : Temperature) :
+@[simp]
+lemma μBolt_add (T : Temperature) :
     (𝓒 + 𝓒1).μBolt T = (𝓒.μBolt T).prod (𝓒1.μBolt T) := by
   simp_rw [μBolt, μ_add]
   rw [MeasureTheory.prod_withDensity]
@@ -392,6 +398,7 @@ lemma mathematicalPartitionFunction_congr (e : ι1 ≃ᵐ ι) (T : Temperature) 
   rw [integral_map_equiv]
   simp
 
+/-- The `mathematicalPartitionFunction_nsmul` function of `n` copies of a canonical ensemble. -/
 lemma mathematicalPartitionFunction_nsmul (n : ℕ) (T : Temperature) :
     (nsmul n 𝓒).mathematicalPartitionFunction T = (𝓒.mathematicalPartitionFunction T) ^ n := by
   simp_rw [mathematicalPartitionFunction, μBolt_nsmul, measureReal_def, Measure.pi_univ]
@@ -427,6 +434,8 @@ lemma mathematicalPartitionFunction_comp_ofβ_apply (β : ℝ≥0) :
     (𝓒.μ.withDensity (fun i => ENNReal.ofReal (exp (- β * 𝓒.energy i)))).real Set.univ := by
   simp only [mathematicalPartitionFunction, μBolt, β_ofβ, neg_mul]
 
+/-- The partition function is strictly positive provided the underlying
+measure is non-zero and the Boltzmann measure is finite. -/
 lemma mathematicalPartitionFunction_pos (T : Temperature)
     [IsFiniteMeasure (𝓒.μBolt T)] [NeZero 𝓒.μ] :
     0 < 𝓒.mathematicalPartitionFunction T := by
@@ -585,7 +594,7 @@ lemma integrable_energy_nsmul (n : ℕ) (T : Temperature)
 
 /-!
 
-## Mean energy
+## The mean energy
 
 -/
 
@@ -638,7 +647,7 @@ lemma meanEnergy_nsmul (n : ℕ) (T : Temperature)
 
 /-!
 
-## Differential entropy
+## The differential entropy
 
 -/
 
