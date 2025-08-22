@@ -954,7 +954,8 @@ theorem differentialEntropy_eq_meanEnergy_sub_helmholtz_div_temp_add_correction
       simp
     calc
       Real.log Zmath
-          = Real.log (Zphys * 𝓒.phase_space_unit ^ 𝓒.dof) := by simp [hZdef, mul_comm, mul_left_comm, mul_assoc]
+          = Real.log (Zphys * 𝓒.phase_space_unit ^ 𝓒.dof) := by simp [hZdef, mul_comm,
+            mul_left_comm, mul_assoc]
       _ = Real.log Zphys + Real.log (𝓒.phase_space_unit ^ 𝓒.dof) := by
         have hx0 : Zphys ≠ 0 := ne_of_gt hx
         have hy0 : 𝓒.phase_space_unit ^ 𝓒.dof ≠ 0 := ne_of_gt hy
