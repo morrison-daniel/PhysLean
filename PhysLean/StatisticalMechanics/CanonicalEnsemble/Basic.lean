@@ -441,7 +441,6 @@ measure is non-zero and the Boltzmann measure is finite. -/
 lemma mathematicalPartitionFunction_pos (T : Temperature)
     [IsFiniteMeasure (𝓒.μBolt T)] [NeZero 𝓒.μ] :
     0 < 𝓒.mathematicalPartitionFunction T := by
-  have hμ : 𝓒.μBolt T ≠ 0 := (NeZero.ne (𝓒.μBolt T))
   simp [mathematicalPartitionFunction]
 
 open NNReal Constants
@@ -778,10 +777,6 @@ lemma differentialEntropy_eq_kB_beta_meanEnergy_add_kB_log_mathZ
     intro i
     have : 0 < Z := hZpos
     rw [probability, Real.log_div (exp_pos _).ne' this.ne', Real.log_exp]
-  have h_int_log :
-      Integrable (fun i => Real.log (𝓒.probability T i)) (𝓒.μProd T) := by
-    simp_rw [h_log_prob]
-    exact (hE.const_mul _).add (integrable_const _)
   unfold differentialEntropy
   rw [integral_congr_ae (ae_of_all _ h_log_prob)]
   have h_split :
@@ -795,10 +790,9 @@ lemma differentialEntropy_eq_kB_beta_meanEnergy_add_kB_log_mathZ
     (hE.const_mul _)
   rw [integral_add h_intE h_int1,
       integral_const_mul, meanEnergy, integral_const]
-  have hμ : (𝓒.μProd T) Set.univ = 1 := measure_univ
-  simp [hμ, mul_add, add_comm, add_left_comm, add_assoc, sub_eq_add_neg,
+  simp [mul_add, add_comm, add_left_comm, add_assoc, sub_eq_add_neg,
         mul_comm, mul_left_comm, mul_assoc, differentialEntropy, probability,
-       mul_comm, mul_left_comm, mul_assoc, h_int_log]
+       mul_comm, mul_left_comm, mul_assoc]
 
 /--  Auxiliary identity: `kB · β = 1 / T`.
 `β` is defined as `1 / (kB · T)` (see `Temperature.β`).
@@ -845,7 +839,6 @@ theorem thermodynamicEntropy_eq_differentialEntropy_sub_correction
     have h_log_pow :
         Real.log (𝓒.phase_space_unit ^ 𝓒.dof)
           = (𝓒.dof : ℝ) * Real.log 𝓒.phase_space_unit := by
-      have hne : (𝓒.phase_space_unit : ℝ) ≠ 0 := ne_of_gt 𝓒.h_pos
       simp
     simp [partitionFunction,
       Real.log_div hZ_pos.ne' h_pow_pos.ne', h_log_pow,
@@ -870,21 +863,14 @@ theorem thermodynamicEntropy_eq_differentialEntropy_sub_correction
         = 𝓒.differentialEntropy T
             - kB * 𝓒.dof * Real.log 𝓒.phase_space_unit := by
     simp_rw [hS, A]
-    have hDistrib :
-        kB * (Real.log (𝓒.mathematicalPartitionFunction T)
-              - (𝓒.dof : ℝ) * Real.log 𝓒.phase_space_unit)
-          =
-          kB * Real.log (𝓒.mathematicalPartitionFunction T)
-            - kB * (𝓒.dof : ℝ) * Real.log 𝓒.phase_space_unit := by
-      ring
-    simp [hDistrib, sub_eq_add_neg, add_comm, add_left_comm, add_assoc,
+    simp [sub_eq_add_neg, add_comm, add_left_comm, add_assoc,
       mul_comm, mul_left_comm, mul_assoc, U]
     ring
   exact hLHS.trans hRHS
 
-/-!
+/-
 
-## Helmholtz identity
+## Thermodynamic Identities
 
 -/
 
@@ -896,8 +882,17 @@ lemma log_probability
       = - (β T) * 𝓒.energy i - Real.log (𝓒.mathematicalPartitionFunction T) := by
   have hZpos := mathematicalPartitionFunction_pos (𝓒:=𝓒) (T:=T)
   unfold probability
-  have hnumpos : 0 < Real.exp (- (β T) * 𝓒.energy i) := Real.exp_pos _
   simp [Real.log_div, hZpos.ne', Real.log_exp, sub_eq_add_neg]
+
+
+/-- The Helmholtz free energy `F` is related to the mean energy `U` and the absolute
+thermodynamic entropy `S` by the fundamental identity `F = U - TS`. This theorem shows that
+the quantities defined in this framework correctly satisfy this principle of thermodynamics. -/
+theorem helmholtzFreeEnergy_eq_meanEnergy_sub_temp_mul_thermodynamicEntropy
+    (T : Temperature) (hT : 0 < T.val) :
+    𝓒.helmholtzFreeEnergy T = 𝓒.meanEnergy T - T.val * 𝓒.thermodynamicEntropy T hT := by
+  unfold thermodynamicEntropy
+  field_simp [hT.ne.symm]
 
 /-- **Theorem: Helmholtz identity with semi–classical correction term**.
 Physical identity (always true for `T > 0`):
@@ -909,7 +904,7 @@ Hence:
 This theorem gives the correct relation for the (mathematical / differential) entropy.
 (Removing the correction is only valid in normalized discrete cases
 with `dof = 0` (or `phase_space_unit = 1`).) -/
-theorem differentialEntropy_eq_meanEnergy_sub_helmholtz_div_temp_with_correction
+theorem differentialEntropy_eq_meanEnergy_sub_helmholtz_div_temp_add_correction
     (𝓒 : CanonicalEnsemble ι) (T : Temperature)
     [IsFiniteMeasure (𝓒.μBolt T)] [NeZero 𝓒.μ]
     (hT : 0 < T.val)
@@ -1001,7 +996,7 @@ lemma differentialEntropy_eq_meanEnergy_sub_helmholtz_div_temp
     𝓒.differentialEntropy T
       = (𝓒.meanEnergy T - 𝓒.helmholtzFreeEnergy T) / T.val := by
   have hmain :=
-    differentialEntropy_eq_meanEnergy_sub_helmholtz_div_temp_with_correction
+    differentialEntropy_eq_meanEnergy_sub_helmholtz_div_temp_add_correction
       (𝓒:=𝓒) (T:=T) hT hE
   rcases hNorm with hDof | hUnit
   · -- dof = 0
@@ -1010,5 +1005,3 @@ lemma differentialEntropy_eq_meanEnergy_sub_helmholtz_div_temp
     simp [hmain, hUnit]
 
 end CanonicalEnsemble
-
-#lint
