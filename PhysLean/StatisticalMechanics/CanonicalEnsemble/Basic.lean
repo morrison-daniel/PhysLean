@@ -61,6 +61,8 @@ This file distinguishes between:
   `helmholtzFreeEnergy`.
 - The connection between `thermodynamicEntropy` and `differentialEntropy`, showing
   they differ by a constant related to the `phase_space_unit`.
+- The relationship between `helmholtzFreeEnergy` and `thermodynamicEntropy`.
+- The Helmholtz identity: `F = U - TS`.
 
 ## References
 - L. D. Landau and E. M. Lifshitz, *Statistical Physics, Part 1*.
@@ -880,4 +882,133 @@ theorem thermodynamicEntropy_eq_differentialEntropy_sub_correction
     ring
   exact hLHS.trans hRHS
 
+/-!
+
+## Helmholtz identity
+
+-/
+
+/-- Pointwise logarithm of the Boltzmann probability. -/
+lemma log_probability
+    (𝓒 : CanonicalEnsemble ι) (T : Temperature)
+    [IsFiniteMeasure (𝓒.μBolt T)] [NeZero 𝓒.μ] (i : ι) :
+    Real.log (𝓒.probability T i)
+      = - (β T) * 𝓒.energy i - Real.log (𝓒.mathematicalPartitionFunction T) := by
+  have hZpos := mathematicalPartitionFunction_pos (𝓒:=𝓒) (T:=T)
+  unfold probability
+  have hnumpos : 0 < Real.exp (- (β T) * 𝓒.energy i) := Real.exp_pos _
+  simp [Real.log_div, hZpos.ne', Real.log_exp, sub_eq_add_neg]
+
+/-- **Theorem: Helmholtz identity with semi–classical correction term**.
+Physical identity (always true for `T > 0`):
+  (U - F)/T   = S_thermo
+and:
+  S_thermo = S_diff - kB * dof * log h.
+Hence:
+  S_diff = (U - F)/T + kB * dof * log h.
+This theorem gives the correct relation for the (mathematical / differential) entropy.
+(Removing the correction is only valid in normalized discrete cases
+with `dof = 0` (or `phase_space_unit = 1`).) -/
+theorem differentialEntropy_eq_meanEnergy_sub_helmholtz_div_temp_with_correction
+    (𝓒 : CanonicalEnsemble ι) (T : Temperature)
+    [IsFiniteMeasure (𝓒.μBolt T)] [NeZero 𝓒.μ]
+    (hT : 0 < T.val)
+    (hE : Integrable 𝓒.energy (𝓒.μProd T)) :
+    𝓒.differentialEntropy T
+      = (𝓒.meanEnergy T - 𝓒.helmholtzFreeEnergy T) / T.val
+        + kB * 𝓒.dof * Real.log 𝓒.phase_space_unit := by
+  classical
+  have hS :=
+    differentialEntropy_eq_kB_beta_meanEnergy_add_kB_log_mathZ (𝓒:=𝓒) (T:=T) hE
+  set E := 𝓒.meanEnergy T
+  set Zmath := 𝓒.mathematicalPartitionFunction T
+  set Zphys := 𝓒.partitionFunction T
+  have Tne : (T.val : ℝ) ≠ 0 := by exact_mod_cast (ne_of_gt hT)
+  have hkβ : kB * (T.β : ℝ) = 1 / (T.val : ℝ) := by
+    unfold Temperature.β
+    change kB * (1 / (kB * (T.val : ℝ))) = 1 / (T.val : ℝ)
+    field_simp [Constants.kB_neq_zero, Tne]
+  have hS' :
+      𝓒.differentialEntropy T = E / T.val + kB * Real.log Zmath := by
+    rw [hS, hkβ]
+    simp [E, div_eq_mul_inv, mul_comm, mul_left_comm, mul_assoc]
+
+  have hZdef : Zmath = Zphys * 𝓒.phase_space_unit ^ 𝓒.dof := by
+    unfold Zmath Zphys CanonicalEnsemble.partitionFunction
+    have hne : (𝓒.phase_space_unit ^ 𝓒.dof) ≠ 0 :=
+      pow_ne_zero _ (ne_of_gt 𝓒.h_pos)
+    simp [div_eq_mul_inv, mul_comm, mul_left_comm, mul_assoc, hne]
+  have hpow_pos : 0 < 𝓒.phase_space_unit ^ 𝓒.dof := pow_pos 𝓒.h_pos _
+  have hZmath_pos :
+      0 < Zmath := (mathematicalPartitionFunction_pos (𝓒:=𝓒) (T:=T))
+  have hZphys_pos :
+      0 < Zphys := by
+    have : Zphys = Zmath / 𝓒.phase_space_unit ^ 𝓒.dof := by
+      simp [Zphys, CanonicalEnsemble.partitionFunction, div_eq_mul_inv]
+      exact Or.symm (Or.inr rfl)
+    have hden_pos : 0 < 𝓒.phase_space_unit ^ 𝓒.dof := hpow_pos
+    simp [this, hZmath_pos, hden_pos]
+  have hlog :
+      Real.log Zmath
+        = Real.log Zphys + (𝓒.dof : ℝ) * Real.log 𝓒.phase_space_unit := by
+    have hx : 0 < Zphys := hZphys_pos
+    have hy : 0 < 𝓒.phase_space_unit ^ 𝓒.dof := hpow_pos
+    have hlog_pow :
+        Real.log (𝓒.phase_space_unit ^ 𝓒.dof)
+          = (𝓒.dof : ℝ) * Real.log 𝓒.phase_space_unit := by
+      simp
+    calc
+      Real.log Zmath
+          = Real.log (Zphys * 𝓒.phase_space_unit ^ 𝓒.dof) := by simp [hZdef, mul_comm, mul_left_comm, mul_assoc]
+      _ = Real.log Zphys + Real.log (𝓒.phase_space_unit ^ 𝓒.dof) := by
+        have hx0 : Zphys ≠ 0 := ne_of_gt hx
+        have hy0 : 𝓒.phase_space_unit ^ 𝓒.dof ≠ 0 := ne_of_gt hy
+        simpa [mul_comm, mul_left_comm, mul_assoc] using (Real.log_mul hx0 hy0)
+      _ = Real.log Zphys + (𝓒.dof : ℝ) * Real.log 𝓒.phase_space_unit := by simp [hlog_pow]
+  have hS_phys :
+      𝓒.differentialEntropy T
+        = E / T.val + kB * Real.log Zphys
+          + kB * (𝓒.dof : ℝ) * Real.log 𝓒.phase_space_unit := by
+    rw [hS', hlog]
+    ring
+  have hF :
+      𝓒.helmholtzFreeEnergy T = - kB * T.val * Real.log Zphys := rfl
+  have hEF :
+      (E - 𝓒.helmholtzFreeEnergy T) / T.val
+        = E / T.val + kB * Real.log Zphys := by
+    simp [hF, sub_eq_add_neg, division_def, mul_add,
+      add_comm, add_left_comm, add_assoc,
+      mul_comm, mul_left_comm, mul_assoc, E, Zphys, Tne]
+  calc
+    𝓒.differentialEntropy T
+        = (E / T.val + kB * Real.log Zphys)
+            + kB * (𝓒.dof : ℝ) * Real.log 𝓒.phase_space_unit := by
+              simp [hS_phys, add_comm, add_left_comm, add_assoc]
+    _ = (E - 𝓒.helmholtzFreeEnergy T) / T.val
+            + kB * 𝓒.dof * Real.log 𝓒.phase_space_unit := by
+              simp [hEF, E, Zphys, mul_comm, mul_left_comm, mul_assoc]
+
+/-- Discrete / normalized specialization of the previous theorem.
+If either `dof = 0` (no semiclassical correction) or `phase_space_unit = 1`
+(so `log h = 0`), the correction term vanishes and we recover the bare Helmholtz identity
+for the (differential) entropy. -/
+lemma differentialEntropy_eq_meanEnergy_sub_helmholtz_div_temp
+    (𝓒 : CanonicalEnsemble ι) (T : Temperature)
+    [IsFiniteMeasure (𝓒.μBolt T)] [NeZero 𝓒.μ]
+    (hT : 0 < T.val)
+    (hE : Integrable 𝓒.energy (𝓒.μProd T))
+    (hNorm : 𝓒.dof = 0 ∨ 𝓒.phase_space_unit = 1) :
+    𝓒.differentialEntropy T
+      = (𝓒.meanEnergy T - 𝓒.helmholtzFreeEnergy T) / T.val := by
+  have hmain :=
+    differentialEntropy_eq_meanEnergy_sub_helmholtz_div_temp_with_correction
+      (𝓒:=𝓒) (T:=T) hT hE
+  rcases hNorm with hDof | hUnit
+  · -- dof = 0
+    simp [hmain, hDof]
+  · -- phase_space_unit = 1 ⇒ log = 0
+    simp [hmain, hUnit]
+
 end CanonicalEnsemble
+
+#lint
