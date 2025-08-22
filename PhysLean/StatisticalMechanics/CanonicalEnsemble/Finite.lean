@@ -16,7 +16,7 @@ probability of being in a given microstate, the mean energy, the entropy and
 the Helmholtz free energy.
 
 We also define the addition of two canonical ensembles, and prove results related
-to the properties of additions of canonical ensembles and of entropy.
+to the properties of additions of canonical ensembles.
 
 ## References
 
@@ -97,6 +97,24 @@ instance [IsFinite 𝓒] : IsFiniteMeasure (𝓒.μ) := by
   rw [IsFinite.μ_eq_count]
   infer_instance
 
+/-- In the finite (counting) case a nonempty index type gives a nonzero measure. -/
+instance [IsFinite 𝓒] [Nonempty ι] : NeZero 𝓒.μ := by
+  classical
+  refine ⟨?_⟩
+  intro hμ
+  obtain ⟨i₀⟩ := (inferInstance : Nonempty ι)
+  have hzero : 𝓒.μ {i₀} = 0 := by simp [hμ]
+  have hone : 𝓒.μ {i₀} = 1 := by
+    simp [IsFinite.μ_eq_count (𝓒:=𝓒)]
+  simp_all only [Measure.coe_zero, Pi.zero_apply, zero_ne_one]
+
+noncomputable def entropy (T : Temperature) : ℝ :=
+  𝓒.differentialEntropy T
+
+omit [Fintype ι] [MeasurableSingletonClass ι] in
+@[simp] lemma entropy_eq_differentialEntropy (T : Temperature) :
+    𝓒.entropy T = 𝓒.differentialEntropy T := rfl
+
 lemma partitionFunction_of_fintype [IsFinite 𝓒] (T : Temperature) :
     𝓒.partitionFunction T = ∑ i, exp (- β T * 𝓒.energy i) := by
   rw [partitionFunction_eq_integral]
@@ -139,11 +157,10 @@ open Constants
 
 lemma entropy_of_fintype [IsFinite 𝓒] (T : Temperature) :
     𝓒.entropy T = - kB * ∑ i, 𝓒.probability T i * log (𝓒.probability T i) := by
-  simp [entropy]
+  simp [entropy, differentialEntropy]
   rw [MeasureTheory.integral_fintype]
   simp [mul_comm]
   exact Integrable.of_finite
-
 
 lemma probability_le_one [IsFinite 𝓒] [Nonempty ι] (T : Temperature) (i : ι) :
     𝓒.probability T i ≤ 1 := by
@@ -191,6 +208,6 @@ lemma entropy_nonneg [IsFinite 𝓒] [Nonempty ι] (T : Temperature) :
       Integrable (fun i => Real.log (𝓒.probability T i)) (𝓒.μProd T) := by
     classical
     simp [μProd_of_fintype, probability]
-  refine entropy_nonneg_of_prob_le_one (𝓒:=𝓒) (T:=T) hInt (probability_le_one (𝓒:=𝓒) (T:=T))
+  refine differentialEntropy_nonneg_of_prob_le_one (𝓒:=𝓒) (T:=T) hInt (probability_le_one (𝓒:=𝓒) (T:=T))
 
 end CanonicalEnsemble
