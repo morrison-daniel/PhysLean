@@ -70,8 +70,9 @@ This file distinguishes between:
 open MeasureTheory Real Temperature
 open scoped Temperature
 
-/-- A Canonical ensemble is described by a type `ι` of microstates, an energy function,
-  and physical constants needed to define dimensionless thermodynamic quantities. -/
+/-- A Canonical ensemble is described by a type `ι`, corresponding to the type of microstates,
+and a map `ι → ℝ` which associates which each microstate an energy
+and physical constants needed to define dimensionless thermodynamic quantities. -/
 structure CanonicalEnsemble (ι : Type) [MeasurableSpace ι] : Type where
   /-- The energy of associated with a mircrostate of the canonical ensemble. -/
   energy : ι → ℝ
