@@ -590,9 +590,6 @@ lemma meanEnergy_nsmul (n : ℕ) (T : Temperature)
 noncomputable def differentialEntropy (T : Temperature) : ℝ :=
   - kB * ∫ i, log (probability 𝓒 T i) ∂𝓒.μProd T
 
---@[deprecated differentialEntropy (since := "2025-08-22")]
---noncomputable def entropy (T : Temperature) : ℝ := differentialEntropy (𝓒:=𝓒) T
-
 /-- Probabilities are non-negative,
 assuming a positive partition function. -/
 lemma probability_nonneg
@@ -607,10 +604,6 @@ lemma probability_pos
     0 < 𝓒.probability T i := by
   have hZpos := partitionFunction_pos (𝓒:=𝓒) (T:=T)
   simp [probability, div_pos, Real.exp_pos, hZpos]
-
-/- TODO: A general normalisation statement (integral of the probability density = 1)
-is already encoded via `μProd` being a probability measure; the finite sum
-version lives in `Finite` : `sum_probability_eq_one`. -/
 
 /-- General entropy non-negativity under a pointwise upper bound `probability ≤ 1`.
 This assumption holds automatically in the finite/counting case (since sums bound each term),
