@@ -569,4 +569,81 @@ lemma meanEnergy_nsmul (n : ℕ) (T : Temperature)
 noncomputable def entropy (T : Temperature) : ℝ :=
   - kB * ∫ i, log (probability 𝓒 T i) ∂𝓒.μProd T
 
+lemma partitionFunction_comp_ofβ_apply (β : ℝ≥0) :
+    𝓒.partitionFunction (ofβ β) =
+    (𝓒.μ.withDensity (fun i => ENNReal.ofReal (exp (- β * 𝓒.energy i)))).real Set.univ := by
+  simp only [partitionFunction, μBolt, β_ofβ, neg_mul]
+
+/-- The partition function is strictly positive provided the underlying
+measure is non-zero and the Boltzmann measure is finite. -/
+lemma partitionFunction_pos
+    (T : Temperature) [IsFiniteMeasure (𝓒.μBolt T)] [NeZero 𝓒.μ] :
+    0 < 𝓒.partitionFunction T := by
+  have hnonneg := partitionFunction_nonneg (𝓒:=𝓒) T
+  have hne : 𝓒.partitionFunction T ≠ 0 := by
+    have hμ : 𝓒.μ ≠ 0 := NeZero.ne _
+    have hz :
+        𝓒.partitionFunction T = 0 ↔ 𝓒.μ = 0 :=
+      paritionFunction_eq_zero_iff (𝓒:=𝓒) (T:=T)
+    exact (not_congr hz).mpr hμ
+  exact lt_of_le_of_ne' hnonneg hne
+
+/-- Probabilities are non-negative,
+assuming a positive partition function. -/
+lemma probability_nonneg
+    (T : Temperature) [IsFiniteMeasure (𝓒.μBolt T)] [NeZero 𝓒.μ] (i : ι) :
+    0 ≤ 𝓒.probability T i := by
+  have hpos := partitionFunction_pos (𝓒:=𝓒) (T:=T)
+  simp [CanonicalEnsemble.probability, div_nonneg, Real.exp_nonneg, hpos.le]
+
+/-- Probabilities are strictly positive. -/
+lemma probability_pos
+    (T : Temperature) [IsFiniteMeasure (𝓒.μBolt T)] [NeZero 𝓒.μ] (i : ι) :
+    0 < 𝓒.probability T i := by
+  have hZpos := partitionFunction_pos (𝓒:=𝓒) (T:=T)
+  simp [probability, div_pos, Real.exp_pos, hZpos]
+
+/- A general normalisation statement (integral of the probability density = 1)
+is already encoded via `μProd` being a probability measure; the finite sum
+version lives in `Finite` : `sum_probability_eq_one`. -/
+
+/-- General entropy non-negativity under a pointwise upper bound `probability ≤ 1`.
+This assumption holds automatically in the finite/counting case (since sums bound each term),
+but can fail in general (continuous) settings; hence we separate it as a hypothesis.
+Finite case: see `CanonicalEnsemble.entropy_nonneg` in `Finite`. -/
+lemma entropy_nonneg_of_prob_le_one
+    (T : Temperature) [IsFiniteMeasure (𝓒.μBolt T)] [NeZero 𝓒.μ]
+    (hInt : Integrable (fun i => Real.log (𝓒.probability T i)) (𝓒.μProd T))
+    (hP_le_one : ∀ i, 𝓒.probability T i ≤ 1) :
+    0 ≤ 𝓒.entropy T := by
+  have hPoint :
+      (fun i => Real.log (𝓒.probability T i)) ≤ᵐ[𝓒.μProd T] fun _ => 0 := by
+    refine Filter.Eventually.of_forall ?_
+    intro i
+    have hpos := probability_pos (𝓒:=𝓒) (T:=T) i
+    have hle  := hP_le_one i
+    have hle' : 𝓒.probability T i ≤ Real.exp 0 := by
+      simpa [Real.exp_zero] using hle
+    exact (log_le_iff_le_exp hpos).mpr hle'
+  have hInt0 : Integrable (fun _ : ι => (0 : ℝ)) (𝓒.μProd T) := integrable_const _
+  have hIntLe : (∫ i, Real.log (𝓒.probability T i) ∂𝓒.μProd T)
+      ≤ (∫ _i, (0 : ℝ) ∂𝓒.μProd T) :=
+    integral_mono_ae hInt hInt0 hPoint
+  have hent :
+      𝓒.entropy T
+        = - kB * (∫ i, Real.log (𝓒.probability T i) ∂𝓒.μProd T) := rfl
+  have hkB : 0 ≤ kB := kB_nonneg
+  have : 0 ≤ - kB * (∫ i, Real.log (𝓒.probability T i) ∂𝓒.μProd T) := by
+    have hIle0 : (∫ i, Real.log (𝓒.probability T i) ∂𝓒.μProd T) ≤ 0 := by
+      simpa [integral_const] using hIntLe
+    exact (mul_nonneg_of_nonpos_of_nonpos (neg_nonpos.mpr hkB) hIle0)
+  simpa [hent]
+
+/-!
+NOTE: Without the hypothesis `∀ i, probability ≤ 1` the (differential) entropy
+`-kB * ∫ log p dP` can be negative in general continuous settings. The finite
+(counting measure) version supplies this bound automatically; see the file
+`Finite` for the unconditional `entropy_nonneg` in that context.
+-/
+
 end CanonicalEnsemble
