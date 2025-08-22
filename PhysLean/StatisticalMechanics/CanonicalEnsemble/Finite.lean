@@ -208,7 +208,7 @@ lemma entropy_nonneg [IsFinite 𝓒] [Nonempty ι] (T : Temperature) :
       Integrable (fun i => Real.log (𝓒.probability T i)) (𝓒.μProd T) := by
     classical
     simp [μProd_of_fintype, probability]
-  refine differentialEntropy_nonneg_of_prob_le_one (𝓒:=𝓒) (T:=T) hInt 
+  refine differentialEntropy_nonneg_of_prob_le_one (𝓒:=𝓒) (T:=T) hInt
     (probability_le_one (𝓒:=𝓒) (T:=T))
 
 end CanonicalEnsemble
