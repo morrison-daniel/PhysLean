@@ -76,7 +76,7 @@ instance [IsFinite 𝓒] (e : ι1 ≃ᵐ ι) : IsFinite (congr 𝓒 e) where
     intro s hs
     rw [@MeasurableEquiv.map_apply]
     rw [Measure.count_apply, Measure.count_apply]
-    simp
+    simp only [ENat.toENNReal_inj]
     rw [@MeasurableEquiv.preimage_symm]
     rw [← Set.Finite.cast_ncard_eq, ← Set.Finite.cast_ncard_eq]
     congr 1

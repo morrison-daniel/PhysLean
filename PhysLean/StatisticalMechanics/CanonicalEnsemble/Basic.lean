@@ -10,21 +10,19 @@ import PhysLean.Meta.Informal.SemiFormal
 import PhysLean.Meta.Linters.Sorry
 import Mathlib.Analysis.SpecialFunctions.Log.Summable
 import Mathlib.MeasureTheory.Integral.Prod
-import Mathlib.Tactic
 /-!
 
 # Canonical Ensemble: General Theory
+
+A canonical ensemble describes a physical system in thermal equilibrium with a heat bath at a
+fixed temperature.
 
 In this file we define the canonical ensemble, its partition function, the
 probability of being in a given microstate, the mean energy, the entropy and
 the Helmholtz free energy
 
-A canonical ensemble describes a physical system in thermal equilibrium with a heat bath at a
-fixed temperature.
-
-This file develops the general measure-theoretic framework for the canonical ensemble. It is
-designed to be applicable to both classical continuous systems (like an ideal gas) and discrete
-systems (like a spin lattice).
+We develop a general measure-theoretic framework designed to be applicable to both classical
+continuous systems (like an ideal gas) and discrete systems (like a spin lattice).
 
 ## The Semi-Classical Framework
 
@@ -167,18 +165,18 @@ abbrev microstates (𝓒 : CanonicalEnsemble ι) : Type := ι
 
 @[simp]
 lemma dof_add (𝓒1 : CanonicalEnsemble ι) (𝓒2 : CanonicalEnsemble ι1) :
-  (𝓒1 + 𝓒2).dof = 𝓒1.dof + 𝓒2.dof := rfl
+    (𝓒1 + 𝓒2).dof = 𝓒1.dof + 𝓒2.dof := rfl
 
 @[simp]
 lemma phase_space_unit_add (𝓒1 : CanonicalEnsemble ι) (𝓒2 : CanonicalEnsemble ι1) :
-  (𝓒1 + 𝓒2).phase_space_unit = 𝓒1.phase_space_unit := rfl
+    (𝓒1 + 𝓒2).phase_space_unit = 𝓒1.phase_space_unit := rfl
 
 @[simp]
 lemma dof_nsmul (n : ℕ) : (nsmul n 𝓒).dof = n * 𝓒.dof := rfl
 
 @[simp]
 lemma phase_space_unit_nsmul (n : ℕ) :
-  (nsmul n 𝓒).phase_space_unit = 𝓒.phase_space_unit := rfl
+    (nsmul n 𝓒).phase_space_unit = 𝓒.phase_space_unit := rfl
 
 @[simp]
 lemma dof_congr (e : ι1 ≃ᵐ ι) :
@@ -440,7 +438,6 @@ open NNReal Constants
 /-! ## The probability density -/
 
 /-- The probability density function of the canonical ensemble.
-
 Note: In the general measure-theoretic case, this is a density with respect to the
 underlying measure `𝓒.μ` and is not necessarily less than or equal to 1. In the
 case of a finite ensemble with the counting measure, this value corresponds to the
@@ -451,9 +448,9 @@ noncomputable def probability (T : Temperature) (i : ι) : ℝ :=
 /-! ## The probability measure -/
 
 lemma probability_add {T : Temperature} (i : ι × ι1) :
-  (𝓒 + 𝓒1).probability T i = 𝓒.probability T i.1 * 𝓒1.probability T i.2 := by
-simp [probability, mathematicalPartitionFunction_add, mul_add, Real.exp_add]
-ring
+    (𝓒 + 𝓒1).probability T i = 𝓒.probability T i.1 * 𝓒1.probability T i.2 := by
+  simp [probability, mathematicalPartitionFunction_add, mul_add, Real.exp_add]
+  ring
 
 @[simp]
 lemma probability_congr (e : ι1 ≃ᵐ ι) (T : Temperature) (i : ι1) :
@@ -650,6 +647,55 @@ is not absolute but depends on the choice of units for the measure. It can be ne
 See `thermodynamicEntropy` for the absolute physical quantity. -/
 noncomputable def differentialEntropy (T : Temperature) : ℝ :=
   - kB * ∫ i, log (probability 𝓒 T i) ∂𝓒.μProd T
+
+/-- Probabilities are non-negative,
+assuming a positive partition function. -/
+lemma probability_nonneg
+    (T : Temperature) [IsFiniteMeasure (𝓒.μBolt T)] [NeZero 𝓒.μ] (i : ι) :
+    0 ≤ 𝓒.probability T i := by
+  -- Use positivity of the (mathematical) partition function (already defined above)
+  have hpos := mathematicalPartitionFunction_pos (𝓒:=𝓒) (T:=T)
+  simp [CanonicalEnsemble.probability, div_nonneg, Real.exp_nonneg, hpos.le]
+
+/-- Probabilities are strictly positive. -/
+lemma probability_pos
+    (T : Temperature) [IsFiniteMeasure (𝓒.μBolt T)] [NeZero 𝓒.μ] (i : ι) :
+    0 < 𝓒.probability T i := by
+  have hZpos := mathematicalPartitionFunction_pos (𝓒:=𝓒) (T:=T)
+  simp [probability, div_pos, Real.exp_pos, hZpos]
+
+/-- General entropy non-negativity under a pointwise upper bound `probability ≤ 1`.
+This assumption holds automatically in the finite/counting case (since sums bound each term),
+but can fail in general (continuous) settings; hence we separate it as a hypothesis.
+Finite case: see `CanonicalEnsemble.entropy_nonneg` in `Finite`. -/
+lemma differentialEntropy_nonneg_of_prob_le_one
+    (T : Temperature) [IsFiniteMeasure (𝓒.μBolt T)] [NeZero 𝓒.μ]
+    (hInt : Integrable (fun i => Real.log (𝓒.probability T i)) (𝓒.μProd T))
+    (hP_le_one : ∀ i, 𝓒.probability T i ≤ 1) :
+    0 ≤ 𝓒.differentialEntropy T := by
+  have hPoint :
+      (fun i => Real.log (𝓒.probability T i)) ≤ᵐ[𝓒.μProd T] fun _ => 0 := by
+    refine Filter.Eventually.of_forall ?_
+    intro i
+    have hpos := probability_pos (𝓒:=𝓒) (T:=T) i
+    have hle  := hP_le_one i
+    have hle' : 𝓒.probability T i ≤ Real.exp 0 := by
+      simpa [Real.exp_zero] using hle
+    exact (log_le_iff_le_exp hpos).mpr hle'
+  have hInt0 : Integrable (fun _ : ι => (0 : ℝ)) (𝓒.μProd T) := integrable_const _
+  have hIntLe : (∫ i, Real.log (𝓒.probability T i) ∂𝓒.μProd T)
+      ≤ (∫ _i, (0 : ℝ) ∂𝓒.μProd T) :=
+    integral_mono_ae hInt hInt0 hPoint
+  have hent :
+      𝓒.differentialEntropy T
+        = - kB * (∫ i, Real.log (𝓒.probability T i) ∂𝓒.μProd T) := rfl
+  have hkB : 0 ≤ kB := kB_nonneg
+  have hIle0 : (∫ i, Real.log (𝓒.probability T i) ∂𝓒.μProd T) ≤ 0 := by
+    simpa [integral_const] using hIntLe
+  have hProd :
+      0 ≤ - kB * (∫ i, Real.log (𝓒.probability T i) ∂𝓒.μProd T) :=
+    mul_nonneg_of_nonpos_of_nonpos (neg_nonpos.mpr hkB) hIle0
+  simpa [hent] using hProd
 
 /-!
 
