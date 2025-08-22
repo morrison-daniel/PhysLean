@@ -1,7 +1,7 @@
 /-
 Copyright (c) 2025 Joseph Tooby-Smith. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Matteo Cipollina, Joseph Tooby-Smith
+Authors: Joseph Tooby-Smith
 -/
 import PhysLean.Thermodynamics.Temperature.Basic
 import Mathlib.MeasureTheory.Measure.ProbabilityMeasure
@@ -355,11 +355,6 @@ lemma paritionFunction_eq_zero_iff (T : Temperature) [IsFiniteMeasure (𝓒.μBo
 
 open NNReal Constants
 
-lemma partitionFunction_comp_ofβ_apply (β : ℝ≥0) :
-    𝓒.partitionFunction (ofβ β) =
-    (𝓒.μ.withDensity (fun i => ENNReal.ofReal (exp (- β * 𝓒.energy i)))).real Set.univ := by
-  simp only [partitionFunction, μBolt, β_ofβ, neg_mul]
-
 /-!
 
 ## The probability measure
@@ -603,7 +598,7 @@ lemma probability_pos
   have hZpos := partitionFunction_pos (𝓒:=𝓒) (T:=T)
   simp [probability, div_pos, Real.exp_pos, hZpos]
 
-/- A general normalisation statement (integral of the probability density = 1)
+/- TODO: A general normalisation statement (integral of the probability density = 1)
 is already encoded via `μProd` being a probability measure; the finite sum
 version lives in `Finite` : `sum_probability_eq_one`. -/
 
