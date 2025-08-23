@@ -12,63 +12,96 @@ import Mathlib.Analysis.SpecialFunctions.Log.Summable
 import Mathlib.MeasureTheory.Integral.Prod
 import Mathlib.Order.Filter.AtTopBot.Basic
 /-!
+# Canonical Ensemble: Core Definitions
 
-# Canonical Ensemble: General Theory
+A *canonical ensemble* describes a system in thermal equilibrium with a heat bath at fixed
+temperature `T`. This file gives a measure–theoretic, semi–classical formalization intended to
+work uniformly for discrete (counting measure) and continuous (Lebesgue–type) models.
 
-A canonical ensemble describes a physical system in thermal equilibrium with a heat bath at a
-fixed temperature.
+## 1. Semi–Classical Normalization
 
-In this file we define the canonical ensemble, its partition function, the
-probability of being in a given microstate, the mean energy, the entropy and
-the Helmholtz free energy
+Classical phase–space integrals produce *dimensionful* quantities. To obtain dimensionless
+thermodynamic objects (and an absolute entropy) we introduce:
 
-We also define the addition of two canonical ensembles, and prove results related
-to the properties of additions of canonical ensembles
+* `phase_space_unit : ℝ` (physically Planck's constant `h`);
+* `dof : ℕ` the number of degrees of freedom.
 
-We develop a general measure-theoretic framework designed to be applicable to both classical
-continuous systems (like an ideal gas) and discrete systems (like a spin lattice).
+The *physical* partition function is obtained from the *mathematical* one by dividing by
+`phase_space_unit ^ dof`. This yields the standard semi–classical correction preventing
+ambiguities such as the Gibbs paradox.
 
-## The Semi-Classical Framework
+## 2. Mathematical vs Physical Quantities
 
-In classical statistical mechanics quantities like the partition function and entropy must be
-dimensionless to be physically meaningful. A naive integration over a classical
-phase space yields dimensionful quantities, leading to ambiguities (e.g., the Gibbs paradox).
+We keep both layers:
 
-Following the "semi-classical" approach (see references) we introduce a constant with
-units of action (`phase_space_unit`, identified with Planck's constant `h`) and the number of
-degrees of freedom (`dof`) to correctly normalize the phase space volume.
+* Mathematical / raw:
+  - `mathematicalPartitionFunction (T)`   :  ∫ exp(-β E) dμ
+  - `probability` (density w.r.t. `μ`)
+  - `differentialEntropy` (can be negative, unit–dependent)
 
-This file distinguishes between:
-1.  **Mathematical quantities**: Raw results of integration over the given measure
-    (e.g., `mathematicalPartitionFunction`, `differentialEntropy`).
-2.  **Physical/Thermodynamic quantities**: Dimensionless, physically meaningful quantities derived
-    from the mathematical ones using the semi-classical normalization
-    (e.g., `partitionFunction`, `helmholtzFreeEnergy`, `thermodynamicEntropy`).
+* Physical / dimensionless:
+  - `partitionFunction`  :  `Z = Z_math / h^dof`
+  - `physicalProbability` : dimensionless density
+  - `helmholtzFreeEnergy` : `F = -kB T log Z`
+  - `thermodynamicEntropy` : absolute entropy `(U - F)/T = -kB ∫ ρ_phys log ρ_phys`
 
-## Main Definitions
+Each physical quantity is expressed explicitly in terms of its mathematical ancestor.
 
-- `CanonicalEnsemble`: The core structure, including `energy`, `dof`, and `phase_space_unit`.
-- `mathematicalPartitionFunction`: The raw integral of the Boltzmann factor, `∫ exp(-βE) dμ`.
-- `partitionFunction`: The dimensionless physical partition function, `Z = Z_math / h^dof`.
-- `probability`: The probability density function.
-- `meanEnergy`: The expectation value of the energy.
-- `differentialEntropy`: The entropy defined as `-k_B ∫ ρ log ρ dμ`, which can be negative.
-- `helmholtzFreeEnergy`: The physical free energy `F = -k_B T log(Z)`.
-- `thermodynamicEntropy`: The absolute physical entropy, defined via `S = (U - F) / T`.
+## 3. Core Structure
 
-## Key Theorems
+We assume `phase_space_unit > 0` and `μ` σ–finite. No probability assumption is imposed:
+normalization is recovered via the Boltzmann weighted measure.
 
-- The relationship between the mathematical `helmholtzMathematicalFreeEnergy` and the physical
-  `helmholtzFreeEnergy`.
-- The connection between `thermodynamicEntropy` and `differentialEntropy`, showing
-  they differ by a constant related to the `phase_space_unit`.
-- The relationship between `helmholtzFreeEnergy` and `thermodynamicEntropy`.
-- The Helmholtz identity: `F = U - TS`.
+## 4. Boltzmann & Probability Measures
 
-## References
-- L. D. Landau and E. M. Lifshitz, *Statistical Physics, Part 1*.
-- https://www.damtp.cam.ac.uk/user/tong/statphys/statmechhtml/S1.html#E23.
-- https://www.damtp.cam.ac.uk/user/tong/statphys/two.pdf
+* `μBolt T`  : Boltzmann (unnormalized) measure `withDensity exp(-β E)`
+* `μProd T`  : normalized probability measure (rescaled `μBolt T`)
+* `probability T i` : the density `exp(-β E(i)) / Z_math`
+* `physicalProbability` : `probability * (phase_space_unit ^ dof)`
+
+## 5. Energies & Entropies
+
+* `meanEnergy` : expectation of energy under `μProd`.
+* `differentialEntropy` : `-kB ∫ log(probability) dμProd`
+* `thermodynamicEntropy` : `-kB ∫ log(physicalProbability) dμProd`
+  (proved later to coincide with the textbook `(U - F)/T`).
+
+A helper lemma supplies positivity of the partition function under mild assumptions and
+non–negativity criteria for the entropy when `probability ≤ 1` (automatic in finite discrete
+settings, not in general continuous ones).
+
+## 6. Algebraic Operations
+
+We construct composite ensembles:
+
+* Addition `(𝓒₁ + 𝓒₂)` on product microstates: energies add, measures take product,
+  degrees of freedom add, and (physically) the same `phase_space_unit` is reused.
+* Multiplicity `nsmul n 𝓒`: `n` distinguishable, non–interacting copies (product of `n` copies).
+* Transport along measurable equivalences via `congr`.
+
+These operations respect partition functions, free energies, and (under suitable hypotheses)
+mean energies and integrability.
+
+## 7. Notational & Implementation Notes
+
+* We work over an arbitrary measurable type `ι`, allowing both finite and continuous models.
+* `β` is accessed through the `Temperature` structure (`T.β`).
+* Most positivity / finiteness conditions are hypotheses on lemmas instead of global axioms,
+  enabling reuse in formal derivations of fluctuation and response identities.
+
+## 8. References
+
+* L. D. Landau & E. M. Lifshitz, *Statistical Physics, Part 1*.
+* D. Tong, Cambridge Lecture Notes (sections on canonical ensemble).
+  - https://www.damtp.cam.ac.uk/user/tong/statphys/statmechhtml/S1.html
+  - https://www.damtp.cam.ac.uk/user/tong/statphys/two.pdf
+
+## 9. Roadmap
+
+Subsequent files (`Lemmas.lean`) prove:
+* Relations among entropies and free energies.
+* Fundamental identity `F = U - T S`.
+* Derivative (response) formulas: `U = -∂_β log Z`.
 -/
 
 open MeasureTheory Real Temperature
