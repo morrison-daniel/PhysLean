@@ -170,11 +170,11 @@ lemma mathematicalPartitionFunction_of_fintype [IsFinite 𝓒] (T : Temperature)
   · rw [IsFinite.μ_eq_count]
     exact Integrable.of_finite
 
-@[simp]
 lemma partitionFunction_of_fintype [IsFinite 𝓒] (T : Temperature) :
     𝓒.partitionFunction T = ∑ i, exp (- T.β * 𝓒.energy i) := by
   simp [partitionFunction, mathematicalPartitionFunction_of_fintype,
         IsFinite.dof_eq_zero, IsFinite.phase_space_unit_eq_one]
+
 @[simp]
 lemma μBolt_of_fintype (T : Temperature) [IsFinite 𝓒] (i : ι) :
     (𝓒.μBolt T).real {i} = Real.exp (- β T * 𝓒.energy i) := by
@@ -317,15 +317,9 @@ lemma shannonEntropy_eq_differentialEntropy [IsFinite 𝓒] (T : Temperature) :
 /-- In the finite, nonempty case the thermodynamic and Shannon entropies coincide.
 All semi-classical correction factors vanish (`dof = 0`, `phase_space_unit = 1`),
 so the absolute thermodynamic entropy reduces to the discrete Shannon form. -/
-theorem thermodynamicEntropy_eq_shannonEntropy [IsFinite 𝓒] [Nonempty ι]
+theorem thermodynamicEntropy_eq_shannonEntropy [IsFinite 𝓒]
     (T : Temperature) :-- (hT : 0 < T.val) :
     𝓒.thermodynamicEntropy T = 𝓒.shannonEntropy T := by
-  have h_phys :
-      (fun i => 𝓒.physicalProbability T i) = (fun i => 𝓒.probability T i) := by
-    funext i
-    simp [CanonicalEnsemble.physicalProbability,
-          IsFinite.dof_eq_zero (𝓒:=𝓒),
-          IsFinite.phase_space_unit_eq_one (𝓒:=𝓒), pow_zero]
   have h_thermo_eq_diff :
       𝓒.thermodynamicEntropy T = 𝓒.differentialEntropy T := by
     unfold CanonicalEnsemble.thermodynamicEntropy
