@@ -3,19 +3,18 @@ Copyright (c) 2025 Matteo Cipollina. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Matteo Cipollina, Joseph Tooby-Smith
 -/
-
 import PhysLean.StatisticalMechanics.CanonicalEnsemble.Basic
+/-!
+
+## Relations between Mathematical and Thermodynamic Quantities
+
+-/
 
 namespace CanonicalEnsemble
 open MeasureTheory Real Temperature Constants
 open scoped Constants ENNReal
 variable {ι ι1 : Type} [MeasurableSpace ι]
   [MeasurableSpace ι1] (𝓒 : CanonicalEnsemble ι) (𝓒1 : CanonicalEnsemble ι1)
-/-!
-
-## Relations between Mathematical and Thermodynamic Quantities
-
--/
 
 /-- An intermediate potential defined from the mathematical partition function. See
 `helmholtzFreeEnergy` for the physical thermodynamic quantity. -/

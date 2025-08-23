@@ -11,6 +11,7 @@ import PhysLean.Meta.Linters.Sorry
 import Mathlib.Analysis.SpecialFunctions.Log.Summable
 import Mathlib.MeasureTheory.Integral.Prod
 import Mathlib.Order.Filter.AtTopBot.Basic
+
 /-!
 
 # Canonical Ensemble: General Theory
@@ -1004,4 +1005,4 @@ noncomputable def thermodynamicEntropy (T : Temperature) : ℝ :=
 
 @[simp]
 lemma thermodynamicEntropy_def (T : Temperature) :
-  𝓒.thermodynamicEntropy T = -kB * ∫ i, Real.log (𝓒.physicalProbability T i) ∂ 𝓒.μProd T := rfl
+    𝓒.thermodynamicEntropy T = -kB * ∫ i, Real.log (𝓒.physicalProbability T i) ∂ 𝓒.μProd T := rfl
