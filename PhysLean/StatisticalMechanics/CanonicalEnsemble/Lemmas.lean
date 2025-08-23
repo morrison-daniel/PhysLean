@@ -1,4 +1,10 @@
-import PhysLean.StatisticalMechanics.CanonicalEnsemble.Defs
+/-
+Copyright (c) 2025 Matteo Cipollina. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Matteo Cipollina, Joseph Tooby-Smith
+-/
+
+import PhysLean.StatisticalMechanics.CanonicalEnsemble.Basic
 
 namespace CanonicalEnsemble
 open MeasureTheory Real Temperature Constants
