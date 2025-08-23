@@ -318,11 +318,33 @@ lemma shannonEntropy_eq_differentialEntropy [IsFinite 𝓒] (T : Temperature) :
 All semi-classical correction factors vanish (`dof = 0`, `phase_space_unit = 1`),
 so the absolute thermodynamic entropy reduces to the discrete Shannon form. -/
 theorem thermodynamicEntropy_eq_shannonEntropy [IsFinite 𝓒] [Nonempty ι]
-    (T : Temperature) (hT : 0 < T.val) :
-    𝓒.thermodynamicEntropy T hT = 𝓒.shannonEntropy T := by
-  have hE_int : Integrable 𝓒.energy (𝓒.μProd T) := Integrable.of_finite
-  rw [thermodynamicEntropy_eq_differentialEntropy_sub_correction 𝓒 T hT hE_int]
-  rw [shannonEntropy_eq_differentialEntropy]
-  simp [IsFinite.dof_eq_zero]
+    (T : Temperature) :-- (hT : 0 < T.val) :
+    𝓒.thermodynamicEntropy T = 𝓒.shannonEntropy T := by
+  have h_phys :
+      (fun i => 𝓒.physicalProbability T i) = (fun i => 𝓒.probability T i) := by
+    funext i
+    simp [CanonicalEnsemble.physicalProbability,
+          IsFinite.dof_eq_zero (𝓒:=𝓒),
+          IsFinite.phase_space_unit_eq_one (𝓒:=𝓒), pow_zero]
+  have h_thermo_eq_diff :
+      𝓒.thermodynamicEntropy T = 𝓒.differentialEntropy T := by
+    unfold CanonicalEnsemble.thermodynamicEntropy
+      CanonicalEnsemble.differentialEntropy
+    have h_log :
+        (fun i => Real.log (𝓒.physicalProbability T i))
+          = (fun i => Real.log (𝓒.probability T i)) := by
+      funext i
+      simp [CanonicalEnsemble.physicalProbability,
+            IsFinite.dof_eq_zero (𝓒:=𝓒),
+            IsFinite.phase_space_unit_eq_one (𝓒:=𝓒),
+            pow_zero]
+    simp_all only [physicalProbability_def, true_or]
+  have h_shannon :
+      𝓒.shannonEntropy T = 𝓒.differentialEntropy T :=
+    (shannonEntropy_eq_differentialEntropy (𝓒:=𝓒) T)
+  calc
+    𝓒.thermodynamicEntropy T
+        = 𝓒.differentialEntropy T := h_thermo_eq_diff
+    _ = 𝓒.shannonEntropy T := h_shannon.symm
 
 end CanonicalEnsemble

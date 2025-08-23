@@ -1146,9 +1146,9 @@ lemma thermodynamicEntropy_eq_differentialEntropy_sub_correction
           Real.log (𝓒.probability T i)
             + (𝓒.dof : ℝ) * Real.log 𝓒.phase_space_unit) := by
       funext i; exact h_log_phys_pt i
-    simp_all only [physicalProbability_def, neg_mul, enorm_neg, ne_eq, enorm_ne_top, not_false_eq_true,
-      integrable_const_enorm, integrable_add_iff_integrable_left', integrable_add_iff_integrable_right',
-      integrable_add_iff_integrable_right]
+    simp_all only [physicalProbability_def, neg_mul, enorm_neg, ne_eq, enorm_ne_top,
+      not_false_eq_true, integrable_const_enorm, integrable_add_iff_integrable_left',
+      integrable_add_iff_integrable_right', integrable_add_iff_integrable_right]
   have h_int_rewrite :
       ∫ i, Real.log (𝓒.physicalProbability T i) ∂ 𝓒.μProd T
         =
@@ -1163,17 +1163,18 @@ lemma thermodynamicEntropy_eq_differentialEntropy_sub_correction
       funext i; exact h_log_phys_pt i
     simp [h_eq]
     ring_nf
-    simp_all only [physicalProbability_def, neg_mul, enorm_neg, ne_eq, enorm_ne_top, not_false_eq_true,
-      integrable_const_enorm, integrable_add_iff_integrable_left', integrable_add_iff_integrable_right']
+    simp_all only [physicalProbability_def, neg_mul, enorm_neg, ne_eq, enorm_ne_top,
+      not_false_eq_true, integrable_const_enorm, integrable_add_iff_integrable_left',
+      integrable_add_iff_integrable_right']
   unfold thermodynamicEntropy differentialEntropy
   rw    [h_int_rewrite,
     integral_add h_int_log_prob h_int_const,
     integral_const, add_comm,
     mul_add, sub_eq_add_neg, mul_comm, mul_assoc]
   ring_nf
-  simp_all only [physicalProbability_def, neg_mul, enorm_neg, ne_eq, enorm_ne_top, not_false_eq_true,
-    integrable_const_enorm, integrable_add_iff_integrable_left', integrable_add_iff_integrable_right',
-    measureReal_univ_eq_one, smul_eq_mul, one_mul]
+  simp_all only [physicalProbability_def, neg_mul, enorm_neg, ne_eq, enorm_ne_top,
+    not_false_eq_true, integrable_const_enorm, integrable_add_iff_integrable_left',
+    integrable_add_iff_integrable_right', measureReal_univ_eq_one, smul_eq_mul, one_mul]
 
 /-- No semiclassical correction when `dof = 0`. -/
 lemma thermodynamicEntropy_eq_differentialEntropy_of_dof_zero
@@ -1186,8 +1187,8 @@ lemma thermodynamicEntropy_eq_differentialEntropy_of_dof_zero
       (T:=T) hT (hE:=hE)
   have : (kB : ℝ) * (𝓒.dof : ℝ) * Real.log 𝓒.phase_space_unit = 0 := by
     simp [h0]
-  simp_all only [thermodynamicEntropy_def, physicalProbability_def, pow_zero, mul_one, neg_mul, CharP.cast_eq_zero,
-    mul_zero, zero_mul, sub_zero]
+  simp_all only [thermodynamicEntropy_def, physicalProbability_def, pow_zero, mul_one, neg_mul,
+    CharP.cast_eq_zero, mul_zero, zero_mul, sub_zero]
 
 /-- No semiclassical correction when `phase_space_unit = 1`. -/
 lemma thermodynamicEntropy_eq_differentialEntropy_of_phase_space_unit_one
@@ -1202,8 +1203,8 @@ lemma thermodynamicEntropy_eq_differentialEntropy_of_phase_space_unit_one
   have hcorr :
       (kB : ℝ) * (𝓒.dof : ℝ) * Real.log 𝓒.phase_space_unit = 0 := by
     simp [this]
-  simp_all only [thermodynamicEntropy_def, physicalProbability_def, one_pow, mul_one, neg_mul, log_one, mul_zero,
-    sub_zero]
+  simp_all only [thermodynamicEntropy_def, physicalProbability_def, one_pow, mul_one, neg_mul,
+    log_one, mul_zero, sub_zero]
 /-
 
 ## Thermodynamic Identities
