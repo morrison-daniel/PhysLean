@@ -11,7 +11,6 @@ import PhysLean.Meta.Linters.Sorry
 import Mathlib.Analysis.SpecialFunctions.Log.Summable
 import Mathlib.MeasureTheory.Integral.Prod
 import Mathlib.Order.Filter.AtTopBot.Basic
-
 /-!
 
 # Canonical Ensemble: General Theory
