@@ -25,25 +25,26 @@ existence of the mass unit of kilograms, and construct all other mass units from
 
 -/
 
-open NNReal
-
 /-- The choices of translationally-invariant metrics on the mass-manifold.
   Such a choice corresponds to a choice of units for mass. -/
 structure MassUnit where
   /-- The underlying scale of the unit. -/
   val : ℝ
-  property : 0 < val
+  prop : 0 < val
 
 namespace MassUnit
 
 @[simp]
 lemma val_neq_zero (x : MassUnit) : x.val ≠ 0 := by
-  exact Ne.symm (ne_of_lt x.property)
+  exact Ne.symm (ne_of_lt x.prop)
 
-lemma val_pos (x : MassUnit) : 0 < x.val := x.property
+lemma val_pos (x : MassUnit) : 0 < x.val := x.prop
+
+/-- The default mass unit. -/
+def kilograms : MassUnit := ⟨1, one_pos⟩
 
 instance : Inhabited MassUnit where
-  default := ⟨1, by norm_num⟩
+  default := kilograms
 
 /-!
 
@@ -51,26 +52,23 @@ instance : Inhabited MassUnit where
 
 -/
 
-noncomputable instance : HDiv MassUnit MassUnit ℝ≥0 where
-  hDiv x t := ⟨x.val / t.val, div_nonneg (le_of_lt x.val_pos) (le_of_lt t.val_pos)⟩
+variable (x y : MassUnit)
 
-lemma div_eq_val (x y : MassUnit) :
-    x / y = (⟨x.val / y.val, div_nonneg (le_of_lt x.val_pos) (le_of_lt y.val_pos)⟩ : ℝ≥0) := rfl
+noncomputable instance : HDiv MassUnit MassUnit ℝ where
+  hDiv x y := x.val / y.val
 
-@[simp]
-lemma div_neq_zero (x y : MassUnit) : ¬ x / y = (0 : ℝ≥0) := by
-  rw [div_eq_val]
-  refine coe_ne_zero.mp ?_
-  simp
+lemma div_eq_div_val : x / y = x.val / y.val := rfl
 
 @[simp]
-lemma div_self (x : MassUnit) :
-    x / x = (1 : ℝ≥0) := by
-  simp [div_eq_val, x.val_neq_zero]
+lemma div_neq_zero : x / y ≠ 0 := by
+  simp [div_eq_div_val]
 
-lemma div_symm (x y : MassUnit) :
-    x / y = (y / x)⁻¹ := NNReal.eq <| by
-  rw [div_eq_val, inv_eq_one_div, div_eq_val]
+@[simp]
+lemma div_self : x / x = (1 : ℝ) := by
+  simp [div_eq_div_val, x.val_neq_zero]
+
+lemma div_symm : x / y = (y / x)⁻¹ := by
+  rw [div_eq_div_val, inv_eq_one_div, div_eq_div_val]
   simp
 
 /-!
@@ -84,24 +82,23 @@ def scale (r : ℝ) (x : MassUnit) (hr : 0 < r := by norm_num) : MassUnit :=
   ⟨r * x.val, mul_pos hr x.val_pos⟩
 
 @[simp]
-lemma scale_div_self (x : MassUnit) (r : ℝ) (hr : 0 < r) :
-    scale r x hr / x = (⟨r, le_of_lt hr⟩ : ℝ≥0) := by
-  simp [scale, div_eq_val]
+lemma scale_div_self (r : ℝ) (hr : 0 < r) :
+    scale r x hr / x = r := by
+  simp [scale, div_eq_div_val]
 
 @[simp]
-lemma scale_one (x : MassUnit) : scale 1 x = x := by
+lemma scale_one : scale 1 x = x := by
   simp [scale, mul_one]
 
 @[simp]
-lemma scale_div_scale (x1 x2 : MassUnit) {r1 r2 : ℝ} (hr1 : 0 < r1) (hr2 : 0 < r2) :
-    scale r1 x1 hr1 / scale r2 x2 hr2 = (⟨r1, le_of_lt hr1⟩ / ⟨r2, le_of_lt hr2⟩) * (x1 / x2) := by
-  refine NNReal.eq ?_
-  simp [scale, div_eq_val]
+lemma scale_div_scale {r s : ℝ} (hr : 0 < r) (hs : 0 < s) :
+    scale r x hr / scale s y hs = (r / s) * (x / y) := by
+  simp [scale, div_eq_div_val]
   field_simp
 
 @[simp]
-lemma scale_scale (x : MassUnit) (r1 r2 : ℝ) (hr1 : 0 < r1) (hr2 : 0 < r2) :
-    scale r1 (scale r2 x hr2) hr1 = scale (r1 * r2) x (mul_pos hr1 hr2) := by
+lemma scale_scale {r s : ℝ} (hr : 0 < r) (hs : 0 < s) (hrs : 0 < r * s) :
+    scale r (scale s x hs) hr = scale (r * s) x hrs := by
   simp [scale]
   ring
 
@@ -116,9 +113,6 @@ We choose to axiomise the existence of the mass unit of kilograms.
 We need an axiom since this relates something to something in the physical world.
 
 -/
-
-/-- The axiom corresponding to the definition of a mass unit of kilograms. -/
-axiom kilograms : MassUnit
 
 /-- The mass unit of a microgram (10^(-9) of a kilogram). -/
 noncomputable def micrograms : MassUnit := scale ((1/10) ^ 9) kilograms
@@ -163,13 +157,13 @@ noncomputable def nominalSolarMasses : MassUnit := scale (1.988416e30) kilograms
 
 -/
 
-lemma pounds_div_ounces : pounds / ounces = (16 : ℝ≥0) := NNReal.eq <| by
+lemma pounds_div_ounces : pounds / ounces = (16 : ℝ) := by
   simp [pounds, ounces]; norm_num
 
-lemma shortTons_div_kilograms : shortTons / kilograms = (907.18474 : ℝ≥0) := NNReal.eq <| by
+lemma shortTons_div_kilograms : shortTons / kilograms = (907.18474 : ℝ) := by
   simp [shortTons, kilograms, pounds]; norm_num
 
-lemma longTons_div_kilograms : longTons / kilograms = (1016.0469088 : ℝ≥0) := NNReal.eq <| by
+lemma longTons_div_kilograms : longTons / kilograms = (1016.0469088 : ℝ) := by
   simp [longTons, kilograms, pounds]; norm_num
 
 end MassUnit

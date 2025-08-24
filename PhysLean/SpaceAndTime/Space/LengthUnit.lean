@@ -29,73 +29,72 @@ existence of the length unit of meters, and construct all other length units fro
 structure LengthUnit where
   /-- The underlying scale of the unit. -/
   val : ℝ
-  property : 0 < val
+  prop : 0 < val
 
 namespace LengthUnit
 
 @[simp]
-lemma val_neq_zero (x : LengthUnit) : x.val ≠ 0 := by
-  exact Ne.symm (ne_of_lt x.property)
+lemma val_ne_zero (x : LengthUnit) : x.val ≠ 0 := by
+  exact (ne_of_lt x.prop).symm
 
-lemma val_pos (x : LengthUnit) : 0 < x.val := x.property
+lemma val_pos (x : LengthUnit) : 0 < x.val := x.prop
+
+/-- Seconds are defined as the unit of scale 1. -/
+def meters : LengthUnit := ⟨1, one_pos⟩
 
 instance : Inhabited LengthUnit where
-  default := ⟨1, by norm_num⟩
+  default := meters
 
 /-!
-
 ## Division of LengthUnit
-
 -/
 
-open NNReal
+noncomputable instance : HDiv LengthUnit LengthUnit ℝ where
+  hDiv x y := x.val / y.val
 
-noncomputable instance : HDiv LengthUnit LengthUnit ℝ≥0 where
-  hDiv x t := ⟨x.val / t.val, div_nonneg (le_of_lt x.val_pos) (le_of_lt t.val_pos)⟩
+variable (x y : LengthUnit)
 
-lemma div_eq_val (x y : LengthUnit) :
-    (x / y) = (⟨x.val / y.val, div_nonneg (le_of_lt x.val_pos) (le_of_lt y.val_pos)⟩ : ℝ≥0) := rfl
-
-@[simp]
-lemma div_neq_zero (x y : LengthUnit) : ¬ x / y = (0 : ℝ≥0) := by
-  rw [div_eq_val]
-  refine coe_ne_zero.mp ?_
-  simp
+lemma div_eq_div_val : x / y = x.val / y.val := rfl
 
 @[simp]
-lemma div_self (x : LengthUnit) :
-    x / x = (1 : ℝ≥0) := by
-  simp [div_eq_val, x.val_neq_zero]
+lemma div_neq_zero : x / y ≠ 0 := by
+  simp [div_eq_div_val]
 
-lemma div_symm (x y : LengthUnit) :
-    x / y = (y / x)⁻¹ := NNReal.eq <| by
-  rw [div_eq_val, inv_eq_one_div, div_eq_val]
+@[simp]
+lemma div_self : x / x = (1 : ℝ) := by
+  simp [div_eq_div_val]
+
+lemma div_inv_eq_div : (x / y)⁻¹ = y / x := by
+  rw [inv_eq_one_div, div_eq_div_val, div_eq_div_val]
   simp
 
 /-!
-
-## The scaling of a length unit
-
+## The scaling of a time unit
 -/
 
-/-- The scaling of a length unit by a positive real. -/
+/-- The scaling of a time unit by a positive real. -/
 def scale (r : ℝ) (x : LengthUnit) (hr : 0 < r := by norm_num) : LengthUnit :=
   ⟨r * x.val, mul_pos hr x.val_pos⟩
 
-@[simp]
-lemma scale_div_self (x : LengthUnit) (r : ℝ) (hr : 0 < r) :
-    scale r x hr / x = (⟨r, le_of_lt hr⟩ : ℝ≥0) := by
-  simp [scale, div_eq_val]
+lemma scale_mul {r s : ℝ} (hr : 0 < r) (hs : 0 < s) (hrs : 0 < r*s) :
+    scale (r * s) x hrs = scale r (scale s x hs) hr := by
+  simp [scale, mul_assoc]
 
 @[simp]
-lemma scale_one (x : LengthUnit) : scale 1 x = x := by
+lemma val_scale {r : ℝ} (hr : 0 < r := by norm_num) : (scale r x hr).val = r * x.val := rfl
+
+@[simp]
+lemma scale_div_self {r : ℝ} (hr : 0 < r) : (scale r x hr) / x = r := by
+  simp [scale, div_eq_div_val]
+
+@[simp]
+lemma scale_one : scale 1 x = x := by
   simp [scale, mul_one]
 
 @[simp]
-lemma scale_div_scale (x1 x2 : LengthUnit) {r1 r2 : ℝ} (hr1 : 0 < r1) (hr2 : 0 < r2) :
-    scale r1 x1 hr1 / scale r2 x2 hr2 = (⟨r1, le_of_lt hr1⟩ / ⟨r2, le_of_lt hr2⟩) * (x1 / x2) := by
-  refine NNReal.eq ?_
-  simp [scale, div_eq_val]
+lemma scale_div_scale {r s : ℝ} (hr : 0 < r) (hs : 0 < s) :
+    scale r x hr / scale s y hs = (r / s) * (x / y) := by
+  simp [scale, div_eq_div_val]
   field_simp
 
 /-!
@@ -109,9 +108,6 @@ We choose to axiomise the existence of the length unit of meters.
 We need an axiom since this relates something to something in the physical world.
 
 -/
-
-/-- The axiom corresponding to the definition of a length unit of meters. -/
-axiom meters : LengthUnit
 
 /-- The length unit of femtometers (10⁻¹⁵ of a meter). -/
 noncomputable def femtometers : LengthUnit := scale ((1/10) ^ (15)) meters
@@ -181,11 +177,9 @@ TODO "ITXJV" "For each unit of charge give the reference the literature where it
 -/
 
 /-- There are exactly 1760 yards in a mile. -/
-lemma miles_div_yards : miles / yards = (⟨1760, by norm_num⟩ : ℝ≥0) :=
-  NNReal.eq <| by simp [miles, yards]; norm_num
+lemma miles_div_yards : miles / yards = (1760 : ℝ) := by simp [miles, yards]; norm_num
 
 /-- There are exactly 220 yards in a furlong. -/
-lemma furlongs_div_yards : furlongs / yards = (⟨220, by norm_num⟩ : ℝ≥0) := NNReal.eq <| by
-  simp [furlongs, yards]; norm_num
+lemma furlongs_div_yards : furlongs / yards = (220 : ℝ) := by simp [furlongs, yards]; norm_num
 
 end LengthUnit

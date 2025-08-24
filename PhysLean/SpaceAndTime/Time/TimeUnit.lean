@@ -5,103 +5,106 @@ Authors: Joseph Tooby-Smith
 -/
 import Mathlib.Geometry.Manifold.Diffeomorph
 import PhysLean.SpaceAndTime.Time.Basic
+
 /-!
-
 # Units on time
-
-A unit of time corresponds to a choice of translationally-invariant
-metric on the time manifold `TimeTransMan`. Such a choice is (non-canonically) equivalent to a
-choice of positive real number. We define the type `TimeUnit` to be equivalent to the
-positive reals.
-
-On `TimeUnit` there is an instance of division giving a real number, corresponding to the
-ratio of the two scales of time unit.
-
-We define `HasTimeDimension` to be a property of a function from `TimeUnit` to a type `M`
-which is a function that scales with the time unit with respect to the rational power `d`.
-
-To define specific time units, we first axiomise the existence of a
-a given time unit, and then construct all other time units from it. We choose to axiomise the
-existence of the time unit of seconds, and construct all other time units from that.
-
 -/
-
-open NNReal
 
 /-- The choices of translationally-invariant metrics on the manifold `TimeTransMan`.
   Such a choice corresponds to a choice of units for time. -/
 structure TimeUnit : Type where
   /-- The underlying scale of the unit. -/
   val : ℝ
-  property : 0 < val
+  /-- The timescale must be positive. -/
+  prop : 0 < val
 
 namespace TimeUnit
 
 @[simp]
-lemma val_neq_zero (x : TimeUnit) : x.val ≠ 0 := by
-  exact Ne.symm (ne_of_lt x.property)
+lemma val_ne_zero (x : TimeUnit) : x.val ≠ 0 := by
+  exact (ne_of_lt x.prop).symm
 
-lemma val_pos (x : TimeUnit) : 0 < x.val := x.property
+lemma val_pos (x : TimeUnit) : 0 < x.val := x.prop
+
+/-- Seconds are defined as the unit of scale 1. -/
+def seconds : TimeUnit := ⟨1, one_pos⟩
 
 instance : Inhabited TimeUnit where
-  default := ⟨1, by norm_num⟩
+  default := seconds
 
 /-!
-
 ## Division of TimeUnit
-
 -/
 
-noncomputable instance : HDiv TimeUnit TimeUnit ℝ≥0 where
-  hDiv x t := ⟨x.val / t.val, div_nonneg (le_of_lt x.val_pos) (le_of_lt t.val_pos)⟩
+noncomputable instance : HDiv TimeUnit TimeUnit ℝ where
+  hDiv x y := x.val / y.val
 
-lemma div_eq_val (x y : TimeUnit) :
-    x / y = (⟨x.val / y.val, div_nonneg (le_of_lt x.val_pos) (le_of_lt y.val_pos)⟩ : ℝ≥0) := rfl
+variable (x y : TimeUnit)
 
-@[simp]
-lemma div_neq_zero (x y : TimeUnit) : ¬ x / y = (0 : ℝ≥0) := by
-  rw [div_eq_val]
-  refine coe_ne_zero.mp ?_
-  simp
+lemma div_eq_div_val : x / y = x.val / y.val := rfl
 
 @[simp]
-lemma div_self (x : TimeUnit) :
-    x / x = (1 : ℝ≥0) := by
-  simp [div_eq_val, x.val_neq_zero]
+lemma div_neq_zero : x / y ≠ 0 := by
+  simp [div_eq_div_val]
 
-lemma div_symm (x y : TimeUnit) :
-    x / y = (y / x)⁻¹ := NNReal.eq <| by
-  rw [div_eq_val, inv_eq_one_div, div_eq_val]
+@[simp]
+lemma div_self : x / x = (1 : ℝ) := by
+  simp [div_eq_div_val]
+
+lemma div_inv_eq_div : (x / y)⁻¹ = y / x := by
+  rw [inv_eq_one_div, div_eq_div_val, div_eq_div_val]
   simp
 
 /-!
-
 ## The scaling of a time unit
-
 -/
 
 /-- The scaling of a time unit by a positive real. -/
 def scale (r : ℝ) (x : TimeUnit) (hr : 0 < r := by norm_num) : TimeUnit :=
   ⟨r * x.val, mul_pos hr x.val_pos⟩
 
-@[simp]
-lemma scale_div_self (x : TimeUnit) (r : ℝ) (hr : 0 < r) :
-    scale r x hr / x = (⟨r, le_of_lt hr⟩ : ℝ≥0) := by
-  simp [scale, div_eq_val]
+lemma scale_mul {r s : ℝ} (hr : 0 < r) (hs : 0 < s) (hrs : 0 < r*s) :
+    scale (r * s) x hrs = scale r (scale s x hs) hr := by
+  simp [scale, mul_assoc]
 
 @[simp]
-lemma scale_one (x : TimeUnit) : scale 1 x = x := by
+lemma val_scale {r : ℝ} (hr : 0 < r := by norm_num) : (scale r x hr).val = r * x.val := rfl
+
+@[simp]
+lemma scale_div_self {r : ℝ} (hr : 0 < r) : (scale r x hr) / x = r := by
+  simp [scale, div_eq_div_val]
+
+@[simp]
+lemma scale_one : scale 1 x = x := by
   simp [scale, mul_one]
 
 @[simp]
-lemma scale_div_scale (x1 x2 : TimeUnit) {r1 r2 : ℝ} (hr1 : 0 < r1) (hr2 : 0 < r2) :
-    scale r1 x1 hr1 / scale r2 x2 hr2 = (⟨r1, le_of_lt hr1⟩ / ⟨r2, le_of_lt hr2⟩) * (x1 / x2) := by
-  refine NNReal.eq ?_
-  simp [scale, div_eq_val]
+lemma scale_div_scale {r s : ℝ} (hr : 0 < r) (hs : 0 < s) :
+    scale r x hr / scale s y hs = (r / s) * (x / y) := by
+  simp [scale, div_eq_div_val]
   field_simp
 
 /-!
+## Assigning units to `Time`
+-/
 
+variable (t : Time) (u : TimeUnit)
+
+instance : HSMul Time TimeUnit ℝ where
+  hSMul t u := t.val * u.val
+
+theorem smul_eq : t • u = t.val * u.val := rfl
+
+@[simp]
+lemma smul_time_eq (r : ℝ) : (r • t) • u = r * (t • u) := by
+  simp [smul_eq, mul_assoc]
+
+@[simp]
+lemma smul_scale_eq {r : ℝ} (hr : 0 < r) : t • (scale r u hr) = r * (t • u) := by
+  simp [smul_eq]
+  ring
+
+/-!
 ## Specific choices of time units
 
 To define a specific time units, we must first axiomise the existence of a
@@ -109,11 +112,7 @@ a given time unit, and then construct all other time units from it.
 We choose to axiomise the existence of the time unit of seconds.
 
 We need an axiom since this relates something to something in the physical world.
-
 -/
-
-/-- The axiom corresponding to the definition of a time unit of seconds. -/
-axiom seconds : TimeUnit
 
 /-- The time unit of femtoseconds (10⁻¹⁵ of a second). -/
 noncomputable def femtoseconds : TimeUnit := scale ((1/10) ^ (15)) seconds
@@ -149,31 +148,31 @@ noncomputable def days : TimeUnit := scale (24 * 60 * 60) seconds
 noncomputable def weeks : TimeUnit := scale (7 * 24 * 60 * 60) seconds
 
 /-!
-
 ## Relations between time units
-
 -/
 
-lemma minutes_div_seconds : minutes / seconds = (60 : ℝ≥0) := NNReal.eq <| by simp [minutes]
+lemma minutes_div_seconds : minutes / seconds = (60 : ℝ) := by
+  simp [minutes]
 
-lemma hours_div_seconds : hours / seconds = (3600 : ℝ≥0) := NNReal.eq <| by
+lemma hours_div_seconds : hours / seconds = (3600 : ℝ) := by
   simp [hours]; norm_num
 
-lemma days_div_seconds : days / seconds = (86400 : ℝ≥0) := NNReal.eq <| by
+lemma days_div_seconds : days / seconds = (86400 : ℝ) := by
   simp [days]; norm_num
 
-lemma weeks_div_seconds : weeks / seconds = (604800 : ℝ≥0) := NNReal.eq <| by
+lemma weeks_div_seconds : weeks / seconds = (604800 : ℝ) := by
   simp [weeks]; norm_num
 
-lemma days_div_minutes : days / minutes = (1440 : ℝ≥0) := NNReal.eq <| by
+lemma days_div_minutes : days / minutes = (1440 : ℝ) := by
   simp [days, minutes]; norm_num
 
-lemma weeks_div_minutes : weeks / minutes = (10080 : ℝ≥0) := NNReal.eq <| by
+lemma weeks_div_minutes : weeks / minutes = (10080 : ℝ) := by
   simp [weeks, minutes]; norm_num
 
-lemma days_div_hours : days / hours = (24 : ℝ≥0) := NNReal.eq <| by simp [hours, days]; norm_num
+lemma days_div_hours : days / hours = (24 : ℝ) := by
+  simp [hours, days]; norm_num
 
-lemma weeks_div_hours : weeks / hours = (168 : ℝ≥0) := NNReal.eq <| by
+lemma weeks_div_hours : weeks / hours = (168 : ℝ) := by
   simp [weeks, hours]; norm_num
 
 end TimeUnit

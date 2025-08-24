@@ -30,26 +30,26 @@ existence of the charge unit of the coulomb, and construct all other charge unit
 
 -/
 
-open NNReal
-
 /-- The choices of translationally-invariant metrics on the charge-manifold.
   Such a choice corresponds to a choice of units for charge.
   This assumes that an orientation has already being picked on the charge manifold. -/
 structure ChargeUnit where
   /-- The underlying scale of the unit. -/
   val : ℝ
-  property : 0 < val
+  prop : 0 < val
 
 namespace ChargeUnit
 
 @[simp]
-lemma val_neq_zero (x : ChargeUnit) : x.val ≠ 0 := by
-  exact Ne.symm (ne_of_lt x.property)
+lemma val_ne_zero (x : ChargeUnit) : x.val ≠ 0 := by
+  exact Ne.symm (ne_of_lt x.prop)
 
-lemma val_pos (x : ChargeUnit) : 0 < x.val := x.property
+lemma val_pos (x : ChargeUnit) : 0 < x.val := x.prop
+
+def coulombs : ChargeUnit := ⟨1, one_pos⟩
 
 instance : Inhabited ChargeUnit where
-  default := ⟨1, by norm_num⟩
+  default := coulombs
 
 /-!
 
@@ -57,26 +57,24 @@ instance : Inhabited ChargeUnit where
 
 -/
 
-noncomputable instance : HDiv ChargeUnit ChargeUnit ℝ≥0 where
-  hDiv x t := ⟨x.val / t.val, div_nonneg (le_of_lt x.val_pos) (le_of_lt t.val_pos)⟩
+variable (x y : ChargeUnit)
 
-lemma div_eq_val (x y : ChargeUnit) :
-    x / y = (⟨x.val / y.val, div_nonneg (le_of_lt x.val_pos) (le_of_lt y.val_pos)⟩ : ℝ≥0) := rfl
+noncomputable instance : HDiv ChargeUnit ChargeUnit ℝ where
+  hDiv x y := x.val / y.val
+
+lemma div_eq_div_val : x / y = x.val / y.val := rfl
 
 @[simp]
-lemma div_neq_zero (x y : ChargeUnit) : ¬ x / y = (0 : ℝ≥0) := by
-  rw [div_eq_val]
-  refine coe_ne_zero.mp ?_
+lemma div_ne_zero : x / y ≠ 0 := by
+  rw [div_eq_div_val]
   simp
 
 @[simp]
-lemma div_self (x : ChargeUnit) :
-    x / x = (1 : ℝ≥0) := by
-  simp [div_eq_val, x.val_neq_zero]
+lemma div_self : x / x = (1 : ℝ) := by
+  simp [div_eq_div_val, x.val_ne_zero]
 
-lemma div_symm (x y : ChargeUnit) :
-    x / y = (y / x)⁻¹ := NNReal.eq <| by
-  rw [div_eq_val, inv_eq_one_div, div_eq_val]
+lemma div_symm :  x / y = (y / x)⁻¹ := by
+  rw [div_eq_div_val, inv_eq_one_div, div_eq_div_val]
   simp
 
 /-!
@@ -90,24 +88,22 @@ def scale (r : ℝ) (x : ChargeUnit) (hr : 0 < r := by norm_num) : ChargeUnit :=
   ⟨r * x.val, mul_pos hr x.val_pos⟩
 
 @[simp]
-lemma scale_div_self (x : ChargeUnit) (r : ℝ) (hr : 0 < r) :
-    scale r x hr / x = (⟨r, le_of_lt hr⟩ : ℝ≥0) := by
-  simp [scale, div_eq_val]
+lemma scale_div_self (r : ℝ) (hr : 0 < r) : scale r x hr / x = r := by
+  simp [scale, div_eq_div_val]
 
 @[simp]
-lemma scale_one (x : ChargeUnit) : scale 1 x = x := by
+lemma scale_one : scale 1 x = x := by
   simp [scale, mul_one]
 
 @[simp]
-lemma scale_div_scale (x1 x2 : ChargeUnit) {r1 r2 : ℝ} (hr1 : 0 < r1) (hr2 : 0 < r2) :
-    scale r1 x1 hr1 / scale r2 x2 hr2 = (⟨r1, le_of_lt hr1⟩ / ⟨r2, le_of_lt hr2⟩) * (x1 / x2) := by
-  refine NNReal.eq ?_
-  simp [scale, div_eq_val]
+lemma scale_div_scale {r s : ℝ} (hr : 0 < r) (hs : 0 < s) :
+    scale r x hr / scale s y hs = (r / s) * (x / y) := by
+  simp [scale, div_eq_div_val]
   field_simp
 
 @[simp]
-lemma scale_scale (x : ChargeUnit) (r1 r2 : ℝ) (hr1 : 0 < r1) (hr2 : 0 < r2) :
-    scale r1 (scale r2 x hr2) hr1 = scale (r1 * r2) x (mul_pos hr1 hr2) := by
+lemma scale_scale {r s : ℝ} (hr : 0 < r) (hs : 0 < s) (hrs : 0 < r * s) :
+    scale r (scale s x hs) hr = scale (r * s) x hrs := by
   simp [scale]
   ring
 
@@ -122,9 +118,6 @@ We choose to axiomise the existence of the charge unit of coulomb.
 We need an axiom since this relates something to something in the physical world.
 
 -/
-
-/-- The axiom corresponding to the definition of a charge unit of coulomb. -/
-axiom coulombs : ChargeUnit
 
 /-- The charge unit of a elementryCharge (1.602176634×10−19 coulomb). -/
 noncomputable def elementaryCharge : ChargeUnit := scale (1.602176634e-19) coulombs
