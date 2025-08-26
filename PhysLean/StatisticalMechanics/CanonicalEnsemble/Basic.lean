@@ -368,7 +368,7 @@ lemma μBolt_nsmul [SigmaFinite 𝓒.μ] (n : ℕ) (T : Temperature) :
     rw [ih]
     exact MeasureTheory.measurePreserving_piFinSuccAbove (fun _ => 𝓒.μBolt T) 0
 
-  lemma μBolt_ne_zero_of_μ_ne_zero (T : Temperature) (h : 𝓒.μ ≠ 0) :
+lemma μBolt_ne_zero_of_μ_ne_zero (T : Temperature) (h : 𝓒.μ ≠ 0) :
     𝓒.μBolt T ≠ 0 := by
   simp [μBolt] at ⊢ h
   rw [Measure.ext_iff'] at ⊢ h
