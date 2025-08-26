@@ -28,7 +28,7 @@ noncomputable def twoState (E : ℝ) : CanonicalEnsemble (Fin 2) where
   energy := fun | 0 => 0 | 1 => E
   dof := 0
   μ := Measure.count
-  energy_measurable := by fun_prop
+  energyMeasurable := by fun_prop
 
 instance {E} : IsFinite (twoState E) where
   μ_eq_count := rfl
