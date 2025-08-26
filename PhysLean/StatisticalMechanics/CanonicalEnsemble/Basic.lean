@@ -234,7 +234,7 @@ lemma μ_add : (𝓒 + 𝓒1).μ = 𝓒.μ.prod 𝓒1.μ := rfl
 lemma μ_nsmul (n : ℕ) : (nsmul n 𝓒).μ = MeasureTheory.Measure.pi fun _ => 𝓒.μ := rfl
 
 lemma μ_nsmul_zero_eq : (nsmul 0 𝓒).μ = Measure.pi (fun _ => 0) := by
-  simp [nsmul, μ_nsmul]
+  simp [nsmul]
   congr
   funext x
   exact Fin.elim0 x
@@ -460,7 +460,7 @@ lemma mathematicalPartitionFunction_eq_zero_iff (T : Temperature) [IsFiniteMeasu
     exact exp_pos (-(T.β * 𝓒.energy i))
   change 𝓒.μ s = 0 ↔ 𝓒.μ = 0
   rw [h]
-  simp only [Measure.measure_univ_eq_zero, s]
+  simp only [Measure.measure_univ_eq_zero]
   fun_prop
 
 open NNReal
@@ -619,7 +619,7 @@ lemma integrable_energy_nsmul (n : ℕ) (T : Temperature)
     Integrable (nsmul n 𝓒).energy ((nsmul n 𝓒).μProd T) := by
   induction n with
   | zero =>
-    simp [nsmul, μProd_nsmul]
+    simp [nsmul]
   | succ n ih =>
     rw [nsmul_succ]
     apply integrable_energy_congr
@@ -672,7 +672,7 @@ lemma meanEnergy_nsmul (n : ℕ) (T : Temperature)
     (nsmul n 𝓒).meanEnergy T = n * 𝓒.meanEnergy T := by
   induction n with
   | zero =>
-    simp [nsmul, meanEnergy, μProd_nsmul]
+    simp [nsmul, meanEnergy]
   | succ n ih =>
     rw [nsmul_succ, meanEnergy_congr, meanEnergy_add, ih]
     simp only [Nat.cast_add, Nat.cast_one]
@@ -721,7 +721,7 @@ lemma differentialEntropy_nonneg_of_prob_le_one
     refine Filter.Eventually.of_forall ?_
     intro i
     have hpos := probability_pos (𝓒:=𝓒) (T:=T) i
-    have hle  := hP_le_one i
+    have hle := hP_le_one i
     have hle' : 𝓒.probability T i ≤ Real.exp 0 := by
       simpa [Real.exp_zero] using hle
     exact (log_le_iff_le_exp hpos).mpr hle'
