@@ -48,7 +48,7 @@ inherently discrete and dimensionless, so we require `dof = 0` and
 class IsFinite (𝓒 : CanonicalEnsemble ι) [Fintype ι] : Prop where
   μ_eq_count : 𝓒.μ = Measure.count
   dof_eq_zero : 𝓒.dof = 0
-  phase_space_unit_eq_one : 𝓒.phase_space_unit = 1
+  phase_space_unit_eq_one : 𝓒.phaseSpaceunit = 1
 
 instance [IsFinite 𝓒] [IsFinite 𝓒1] : IsFinite (𝓒 + 𝓒1) where
   μ_eq_count := by
