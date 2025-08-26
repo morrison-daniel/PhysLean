@@ -24,7 +24,7 @@ calculus identities for the canonical ensemble.
    * Fundamental link:
        `thermodynamicEntropy = differentialEntropy - kB * dof * log h`
      (semi–classical correction term).
-   * Specializations removing the correction when `dof = 0` or `phase_space_unit = 1`.
+   * Specializations removing the correction when `dof = 0` or `phaseSpaceUnit = 1`.
 
 3. Fundamental Thermodynamic Identity
    * Proof of `F = U - T S_thermo`.
@@ -41,7 +41,7 @@ calculus identities for the canonical ensemble.
   domain β > 0.
 * Assumptions (finiteness, integrability) are parameterized to keep lemmas reusable.
 * Semi–classical correction appears systematically as
-    `kB * dof * log phase_space_unit`.
+    `kB * dof * log phaseSpaceUnit`.
 
 ## References
 
@@ -50,9 +50,13 @@ Same references as `Basic.lean` (Landau–Lifshitz; Tong), especially the identi
 
 -/
 set_option linter.unusedVariables.funArgs false
+
 namespace CanonicalEnsemble
+
 open MeasureTheory Real Temperature Constants
+
 open scoped Constants ENNReal
+
 variable {ι ι1 : Type} [MeasurableSpace ι]
   [MeasurableSpace ι1] (𝓒 : CanonicalEnsemble ι) (𝓒1 : CanonicalEnsemble ι1)
 
@@ -232,8 +236,8 @@ lemma thermodynamicEntropy_eq_differentialEntropy_of_phase_space_unit_one
 -/
 
 /-- The Helmholtz free energy `F` is related to the mean energy `U` and the absolute
-thermodynamic entropy `S` by the fundamental identity `F = U - TS`. This theorem shows that
-the statistically-defined quantities in this framework correctly satisfy this cornerstone of
+thermodynamic entropy `S` by the identity `F = U - TS`. This theorem shows that the
+statistically-defined quantities in this framework correctly satisfy this principle of
 thermodynamics. -/
 theorem helmholtzFreeEnergy_eq_meanEnergy_sub_temp_mul_thermodynamicEntropy
     (T : Temperature) (hT : 0 < T.val)
@@ -324,7 +328,7 @@ Hence:
   S_diff = (U - F)/T + kB * dof * log h.
 This theorem gives the correct relation for the (mathematical / differential) entropy.
 (Removing the correction is only valid in normalized discrete cases
-with `dof = 0` (or `phase_space_unit = 1`).) -/
+with `dof = 0` (or `phaseSpaceUnit = 1`).) -/
 theorem differentialEntropy_eq_meanEnergy_sub_helmholtz_div_temp_add_correction
     (𝓒 : CanonicalEnsemble ι) (T : Temperature)
     [IsFiniteMeasure (𝓒.μBolt T)] [NeZero 𝓒.μ]
@@ -403,7 +407,7 @@ theorem differentialEntropy_eq_meanEnergy_sub_helmholtz_div_temp_add_correction
               rw [hEF]
 
 /-- Discrete / normalized specialization of the previous theorem.
-If either `dof = 0` (no semiclassical correction) or `phase_space_unit = 1`
+If either `dof = 0` (no semiclassical correction) or `phaseSpaceUnit = 1`
 (so `log h = 0`), the correction term vanishes and we recover the bare Helmholtz identity
 for the (differential) entropy. -/
 lemma differentialEntropy_eq_meanEnergy_sub_helmholtz_div_temp
@@ -418,10 +422,8 @@ lemma differentialEntropy_eq_meanEnergy_sub_helmholtz_div_temp
     differentialEntropy_eq_meanEnergy_sub_helmholtz_div_temp_add_correction
       (𝓒:=𝓒) (T:=T) hT hE
   rcases hNorm with hDof | hUnit
-  · -- dof = 0
-    simp [hmain, hDof]
-  · -- phase_space_unit = 1 ⇒ log = 0
-    simp [hmain, hUnit]
+  · simp [hmain, hDof]
+  · simp [hmain, hUnit]
 
 /-- Chain rule convenience lemma for `log ∘ f` on a set. -/
 lemma hasDerivWithinAt_log_comp
@@ -441,8 +443,7 @@ lemma hasDerivWithinAt_log_comp'
 
 lemma integral_bolt_eq_integral_mul_exp
     {ι} [MeasurableSpace ι] (𝓒 : CanonicalEnsemble ι) (T : Temperature)
-    (φ : ι → ℝ) : --(hφm : Measurable φ)
-    --(h_int : Integrable (fun x => φ x * Real.exp (-T.β * 𝓒.energy x)) 𝓒.μ) :
+    (φ : ι → ℝ) :
     ∫ x, φ x ∂ 𝓒.μBolt T
       = ∫ x, φ x * Real.exp (-T.β * 𝓒.energy x) ∂ 𝓒.μ := by
   unfold μBolt
@@ -474,6 +475,7 @@ lemma integral_energy_bolt
       = ∫ x, 𝓒.energy x * Real.exp (-T.β * 𝓒.energy x) ∂ 𝓒.μ := by
   exact integral_bolt_eq_integral_mul_exp 𝓒 T 𝓒.energy
 
+/-- The mean energy can be expressed as a ratio of integrals. -/
 lemma meanEnergy_eq_ratio_of_integrals
     (𝓒 : CanonicalEnsemble ι) (T : Temperature) :
     𝓒.meanEnergy T =
@@ -578,15 +580,17 @@ lemma meanEnergy_eq_neg_deriv_log_mathZ_of_beta
           rw [h_deriv_log]
 
 open Set
+
 open scoped Topology Filter ENNReal Constants
 
 -- we keep this linter here and below for potential use where stronger assumptions ae needed
 set_option linter.unusedVariables false in
+
 /-- Helper: equality (on `Set.Ioi 0`) between the β–parametrized logarithm of the
 physical partition function and the β–parametrized logarithm of the *mathematical*
 partition function up to the (β–independent) semiclassical correction. This is used only
 to identify derivatives (the correction drops).
-Added hypothesis `h_fin` giving finiteness of the Boltzmann measure for every β > 0
+We add the hypothesis `h_fin` giving finiteness of the Boltzmann measure for every β > 0
 (as needed to ensure the mathematical partition function is strictly positive). -/
 private lemma log_phys_eq_log_math_sub_const_on_Ioi
     (𝓒 : CanonicalEnsemble ι) [NeZero 𝓒.μ]

@@ -23,11 +23,11 @@ work uniformly for discrete (counting measure) and continuous (Lebesgue–type) 
 Classical phase–space integrals produce *dimensionful* quantities. To obtain dimensionless
 thermodynamic objects (and an absolute entropy) we introduce:
 
-* `phase_space_unit : ℝ` (physically Planck's constant `h`);
+* `phaseSpaceUnit : ℝ` (physically Planck's constant `h`);
 * `dof : ℕ` the number of degrees of freedom.
 
 The *physical* partition function is obtained from the *mathematical* one by dividing by
-`phase_space_unit ^ dof`. This yields the standard semi–classical correction preventing
+`phaseSpaceUnit ^ dof`. This yields the standard semi–classical correction preventing
 ambiguities such as the Gibbs paradox.
 
 ## 2. Mathematical vs Physical Quantities
@@ -49,7 +49,7 @@ Each physical quantity is expressed explicitly in terms of its mathematical ance
 
 ## 3. Core Structure
 
-We assume `phase_space_unit > 0` and `μ` σ–finite. No probability assumption is imposed:
+We assume `phaseSpaceUnit > 0` and `μ` σ–finite. No probability assumption is imposed:
 normalization is recovered via the Boltzmann weighted measure.
 
 ## 4. Boltzmann & Probability Measures
@@ -75,7 +75,7 @@ settings, not in general continuous ones).
 We construct composite ensembles:
 
 * Addition `(𝓒₁ + 𝓒₂)` on product microstates: energies add, measures take product,
-  degrees of freedom add, and (physically) the same `phase_space_unit` is reused.
+  degrees of freedom add, and (physically) the same `phaseSpaceUnit` is reused.
 * Multiplicity `nsmul n 𝓒`: `n` distinguishable, non–interacting copies (product of `n` copies).
 * Transport along measurable equivalences via `congr`.
 
@@ -93,7 +93,7 @@ mean energies and integrability.
 
 * L. D. Landau & E. M. Lifshitz, *Statistical Physics, Part 1*.
 * D. Tong, Cambridge Lecture Notes (sections on canonical ensemble).
-  - https://www.damtp.cam.ac.uk/user/tong/statphys/statmechhtml/S1.html
+  - https://www.damtp.cam.ac.uk/user/tong/statphys/one.pdf
   - https://www.damtp.cam.ac.uk/user/tong/statphys/two.pdf
 
 ## 9. Roadmap
@@ -124,7 +124,7 @@ structure CanonicalEnsemble (ι : Type) [MeasurableSpace ι] : Type where
   phaseSpaceunit : ℝ := 1
   /-- Assumption that the phase space unit is positive. -/
   hPos : 0 < phaseSpaceunit := by positivity
-  energyMeasurable : Measurable energy
+  energy_measurable : Measurable energy
   /-- The measure on the indexing set of microstates. -/
   μ : MeasureTheory.Measure ι := by volume_tac
   [μ_sigmaFinite : SigmaFinite μ]
@@ -144,7 +144,7 @@ lemma ext {𝓒 𝓒' : CanonicalEnsemble ι} (h_energy : 𝓒.energy = 𝓒'.en
   cases 𝓒; cases 𝓒'; simp_all
 
 @[fun_prop]
-lemma energy_measurable' : Measurable 𝓒.energy := 𝓒.energyMeasurable
+lemma energy_measurable' : Measurable 𝓒.energy := 𝓒.energy_measurable
 
 /-- The addition of two `CanonicalEnsemble`. The degrees of freedom are added.
 Note: This is only physically meaningful if the two systems share the same `phase_space_unit`. -/
@@ -157,7 +157,7 @@ noncomputable instance {ι1 ι2 : Type} [MeasurableSpace ι1] [MeasurableSpace �
     phaseSpaceunit := 𝓒1.phaseSpaceunit
     hPos := 𝓒1.hPos
     μ := 𝓒1.μ.prod 𝓒2.μ
-    energyMeasurable := by fun_prop
+    energy_measurable := by fun_prop
   }
 
 /-- The canonical ensemble with no microstates. -/
@@ -165,7 +165,7 @@ def empty : CanonicalEnsemble Empty where
   energy := isEmptyElim
   dof := 0
   μ := 0
-  energyMeasurable := by fun_prop
+  energy_measurable := by fun_prop
 
 /-- Given a measurable equivalence `e : ι1 ≃ᵐ ι`, this is the corresponding canonical ensemble
 on `ι1`. The physical properties (`dof`, `phase_space_unit`) are unchanged. -/
@@ -175,7 +175,7 @@ noncomputable def congr (e : ι1 ≃ᵐ ι) : CanonicalEnsemble ι1 where
   phaseSpaceunit := 𝓒.phaseSpaceunit
   hPos := 𝓒.hPos
   μ := 𝓒.μ.map e.symm
-  energyMeasurable := by
+  energy_measurable := by
     apply Measurable.comp
     · fun_prop
     · exact MeasurableEquiv.measurable e
@@ -195,7 +195,7 @@ noncomputable def nsmul (n : ℕ) (𝓒 : CanonicalEnsemble ι) : CanonicalEnsem
   phaseSpaceunit := 𝓒.phaseSpaceunit
   hPos := 𝓒.hPos
   μ := MeasureTheory.Measure.pi fun _ => 𝓒.μ
-  energyMeasurable := by fun_prop
+  energy_measurable := by fun_prop
 
 set_option linter.unusedVariables false in
 /-- The microstates of a canonical ensemble. -/
@@ -692,8 +692,7 @@ See `thermodynamicEntropy` for the absolute physical quantity. -/
 noncomputable def differentialEntropy (T : Temperature) : ℝ :=
   - kB * ∫ i, log (probability 𝓒 T i) ∂𝓒.μProd T
 
-/-- Probabilities are non-negative,
-assuming a positive partition function. -/
+/-- Probabilities are non-negative, assuming a positive partition function. -/
 lemma probability_nonneg
     (T : Temperature) [IsFiniteMeasure (𝓒.μBolt T)] [NeZero 𝓒.μ] (i : ι) :
     0 ≤ 𝓒.probability T i := by
@@ -745,7 +744,7 @@ lemma differentialEntropy_nonneg_of_prob_le_one
 ## Thermodynamic Quantities
 
 These are the dimensionless physical quantities derived from the mathematical definitions
-by incorporating the phase space volume `𝓒.phase_space_unit ^ 𝓒.dof`.
+by incorporating the phase space volume `𝓒.phaseSpaceUnit ^ 𝓒.dof`.
 -/
 
 open Constants
@@ -917,8 +916,7 @@ lemma physicalProbability_def (T : Temperature) (i : ι) :
 lemma physicalProbability_measurable (T : Temperature) :
     Measurable (𝓒.physicalProbability T) := by
   let c : ℝ := (𝓒.phaseSpaceunit ^ 𝓒.dof) / 𝓒.mathematicalPartitionFunction T
-  have h_energy_meas : Measurable fun i => 𝓒.energy i := 𝓒.energyMeasurable
-
+  have h_energy_meas : Measurable fun i => 𝓒.energy i := 𝓒.energy_measurable
   have h_mul_meas : Measurable fun i => (-(T.β : ℝ)) * 𝓒.energy i := by
     simpa [mul_comm] using h_energy_meas.const_mul (-(T.β : ℝ))
   have h_exp_meas : Measurable fun i => Real.exp (-(T.β : ℝ) * 𝓒.energy i) :=
