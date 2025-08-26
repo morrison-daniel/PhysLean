@@ -423,14 +423,6 @@ lemma differentialEntropy_eq_meanEnergy_sub_helmholtz_div_temp
   · -- phase_space_unit = 1 ⇒ log = 0
     simp [hmain, hUnit]
 
-open scoped Topology ENNReal
-
-/-- Positivity of `β` from positivity of temperature. -/
-lemma beta_pos (T : Temperature) (hT_pos : 0 < T.val) : 0 < (T.β : ℝ) := by
-  unfold Temperature.β
-  have h_prod : 0 < (kB : ℝ) * T.val := mul_pos kB_pos hT_pos
-  simpa [Temperature.β] using inv_pos.mpr h_prod
-
 /-- Chain rule convenience lemma for `log ∘ f` on a set. -/
 lemma hasDerivWithinAt_log_comp
     {f : ℝ → ℝ} {f' : ℝ} {s : Set ℝ} {x : ℝ}
@@ -522,7 +514,7 @@ lemma meanEnergy_eq_ratio_of_integrals
 see: Tong (§1.3.2, §1.3.3), L&L (§31, implicitly, and §36)
 Here the derivative is a `derivWithin` over `Set.Ioi 0`
 since `β > 0`. -/
-theorem meanEnergy_eq_neg_deriv_log_mathZ_of_beta
+lemma meanEnergy_eq_neg_deriv_log_mathZ_of_beta
     (𝓒 : CanonicalEnsemble ι) (T : Temperature)
     (hT_pos : 0 < T.val) [IsFiniteMeasure (𝓒.μBolt T)] [NeZero 𝓒.μ]
     (h_deriv :

@@ -903,9 +903,9 @@ lemma helmholtzFreeEnergy_nsmul
     _ = n * 𝓒.helmholtzFreeEnergy T := by
           simp [helmholtzFreeEnergy, mul_comm, mul_left_comm, mul_assoc]
 
-/-- The dimensionless physical probability density. This is obtained by dividing the
-phase space measure by the fundamental unit `h^dof`, making the probability
-density `ρ_phys = ρ_math * h^dof` dimensionless. -/
+/-- The dimensionless physical probability density. This is is the probability density w.r.t. the
+measure, obtained by dividing the phase space measure by the fundamental unit `h^dof`, making the
+probability density `ρ_phys = ρ_math * h^dof` dimensionless. -/
 noncomputable def physicalProbability (T : Temperature) (i : ι) : ℝ :=
   𝓒.probability T i * (𝓒.phase_space_unit ^ 𝓒.dof)
 
