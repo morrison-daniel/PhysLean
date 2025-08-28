@@ -11,7 +11,8 @@ import Mathlib
 
 ### Canonical Ensemble: Fluctuations and Heat Capacity
 This file develops the theory of fluctuations in the canonical ensemble, focusing on the
-energy variance and its relation to the heat capacity, establishing the Fluctuation-Dissipation Theorem.
+energy variance and its relation to the heat capacity, establishing the Fluctuation-Dissipation 
+Theorem.
 -/
 
 namespace CanonicalEnsemble
@@ -115,9 +116,9 @@ This version assumes the relationship Var(E) = -dU/dβ holds.
 -/
 theorem fluctuation_dissipation_energy_parametric
     (T : Temperature) (hT_pos : 0 < T.val)
-    (h_Var_eq_neg_dUdβ : 𝓒.energyVariance T = - derivWithin (𝓒.meanEnergy_Beta) (Set.Ioi 0) (T.β : ℝ))
-    (hU_deriv : DifferentiableWithinAt ℝ (𝓒.meanEnergy_Beta) (Set.Ioi 0) (T.β : ℝ))
-    :
+    (h_Var_eq_neg_dUdβ : 𝓒.energyVariance T = - derivWithin (𝓒.meanEnergy_Beta) 
+    (Set.Ioi 0) (T.β : ℝ))
+    (hU_deriv : DifferentiableWithinAt ℝ (𝓒.meanEnergy_Beta) (Set.Ioi 0) (T.β : ℝ)) :
     𝓒.heatCapacity T = 𝓒.energyVariance T / (kB * (T.val : ℝ)^2) := by
   let dUdβ := derivWithin (𝓒.meanEnergy_Beta) (Set.Ioi 0) (T.β : ℝ)
   have hCV_eq_dUdβ_mul :
@@ -341,7 +342,8 @@ lemma deriv_meanEnergyBetaReal' (b : ℝ) :
 /-- The derivative of the mean energy with respect to β equals the negative of the energy variance
 for finite systems: (∂U/∂β) = -Var(E). This rigorously proves the analytical condition required
 for the Fluctuation-Dissipation Theorem in the finite case. -/
-lemma derivWithin_meanEnergy_Beta_eq_neg_variance [IsFinite 𝓒] (T : Temperature) (hT_pos : 0 < T.val) :
+lemma derivWithin_meanEnergy_Beta_eq_neg_variance [IsFinite 𝓒] 
+    (T : Temperature) (hT_pos : 0 < T.val) :
     derivWithin 𝓒.meanEnergy_Beta (Set.Ioi 0) (T.β : ℝ) = - 𝓒.energyVariance T := by
   let β₀ := (T.β : ℝ)
   have hβ₀_pos : 0 < β₀ := by
