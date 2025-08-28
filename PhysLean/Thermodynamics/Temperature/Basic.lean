@@ -265,7 +265,6 @@ open Constants
 open Set
 open scoped ENNReal
 
--- Helper function kept (noncomputable because of Real.toNNReal).
 noncomputable def Beta_fun_T (t : ℝ) : ℝ :=
   ((Temperature.ofNNReal (Real.toNNReal t)).β : ℝ)
 
