@@ -92,7 +92,8 @@ lemma iteratedDeriv_tanh_is_polynomial_of_tanh (n : ℕ) : ∃ P : Polynomial �
     use Polynomial.derivative P * (1 - Polynomial.X^2)
     intro x
     rw [deriv_comp, Polynomial.deriv, deriv_tanh]
-    simp
+    simp only [Polynomial.eval_mul, Polynomial.eval_sub, Polynomial.eval_one, Polynomial.eval_pow,
+      Polynomial.eval_X]
     case h.hh =>
       have h': Real.tanh = (sinh / cosh) := by
         funext x
@@ -106,10 +107,11 @@ lemma iteratedDeriv_tanh_is_polynomial_of_tanh (n : ℕ) : ∃ P : Polynomial �
       apply Polynomial.differentiableAt
 
 /-- For a polynomial P, show it's bounded on any bounded interval -/
-lemma polynomial_bounded_on_interval (P : Polynomial ℝ) (a b : ℝ):
-  ∃ M : ℝ, ∀ x : ℝ, x ∈ Set.Icc a b → |P.eval x| ≤ M := by
+lemma polynomial_bounded_on_interval (P : Polynomial ℝ) (a b : ℝ) :
+    ∃ M : ℝ, ∀ x : ℝ, x ∈ Set.Icc a b → |P.eval x| ≤ M := by
   -- Polynomials are continuous
-  have hcont : Continuous (fun x => P.eval x) := P.continuous  -- Closed bounded intervals are compact
+  have hcont : Continuous (fun x => P.eval x) := P.continuous
+  -- Closed bounded intervals are compact
   have hcompact : IsCompact (Set.Icc a b) := isCompact_Icc
   -- Continuous functions on compact sets are bounded
   obtain ⟨M, hM⟩ := hcompact.exists_bound_of_continuousOn hcont.continuousOn
@@ -118,7 +120,7 @@ lemma polynomial_bounded_on_interval (P : Polynomial ℝ) (a b : ℝ):
 
 /-- For a polynomial P, show that P (tanh x) is bounded on the real line -/
 theorem polynomial_tanh_bounded (P : Polynomial ℝ) :
-  ∃ C : ℝ, ∀ x : ℝ, |P.eval (Real.tanh x)| ≤ C := by
+    ∃ C : ℝ, ∀ x : ℝ, |P.eval (Real.tanh x)| ≤ C := by
   -- Since tanh maps to (-1, 1), it maps to [-1+ε, 1-ε] for any ε > 0
   -- But more directly, tanh maps to (-1, 1) ⊆ [-1, 1]
   have h_range : ∀ x : ℝ, Real.tanh x ∈ Set.Icc (-1) 1 := by
@@ -134,7 +136,7 @@ theorem polynomial_tanh_bounded (P : Polynomial ℝ) :
 
 /-- The nth derivative of tanh is bounded on the real line -/
 theorem iteratedDeriv_tanh_bounded (n : ℕ) :
-  ∃ C : ℝ, ∀ x : ℝ, |iteratedDeriv n Real.tanh x| ≤ C := by
+    ∃ C : ℝ, ∀ x : ℝ, |iteratedDeriv n Real.tanh x| ≤ C := by
   obtain ⟨P, hP⟩ := iteratedDeriv_tanh_is_polynomial_of_tanh n
   obtain ⟨C, hC⟩ := polynomial_tanh_bounded P
   use C
@@ -144,8 +146,8 @@ theorem iteratedDeriv_tanh_bounded (n : ℕ) :
 
 /-- tanh is infinitely differentiable -/
 lemma contDiff_top_tanh:  ContDiff ℝ ∞ Real.tanh := by
-  rw [contDiff_infty]
-  apply contDiff_tanh
+    rw [contDiff_infty]
+    apply contDiff_tanh
 
 /-- tanh has temperate growth -/
 theorem tanh_hasTemperateGrowth : Function.HasTemperateGrowth Real.tanh := by
