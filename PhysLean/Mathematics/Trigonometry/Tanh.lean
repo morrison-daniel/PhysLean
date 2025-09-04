@@ -118,7 +118,7 @@ lemma polynomial_bounded_on_interval (P : Polynomial ℝ) (a b : ℝ) :
   exact hM
 
 /-- For a polynomial P, show that P (tanh x) is bounded on the real line -/
-theorem polynomial_tanh_bounded (P : Polynomial ℝ) :
+lemma polynomial_tanh_bounded (P : Polynomial ℝ) :
     ∃ C : ℝ, ∀ x : ℝ, |P.eval (Real.tanh x)| ≤ C := by
   -- Since tanh maps to (-1, 1), it maps to [-1+ε, 1-ε] for any ε > 0
   -- But more directly, tanh maps to (-1, 1) ⊆ [-1, 1]
@@ -134,7 +134,7 @@ theorem polynomial_tanh_bounded (P : Polynomial ℝ) :
   exact hM (Real.tanh x) (h_range x)
 
 /-- The nth derivative of tanh is bounded on the real line -/
-theorem iteratedDeriv_tanh_bounded (n : ℕ) :
+lemma iteratedDeriv_tanh_bounded (n : ℕ) :
     ∃ C : ℝ, ∀ x : ℝ, |iteratedDeriv n Real.tanh x| ≤ C := by
   obtain ⟨P, hP⟩ := iteratedDeriv_tanh_is_polynomial_of_tanh n
   obtain ⟨C, hC⟩ := polynomial_tanh_bounded P
@@ -149,7 +149,7 @@ lemma contDiff_top_tanh:  ContDiff ℝ ∞ Real.tanh := by
     apply contDiff_tanh
 
 /-- tanh has temperate growth -/
-theorem tanh_hasTemperateGrowth : Function.HasTemperateGrowth Real.tanh := by
+lemma tanh_hasTemperateGrowth : Function.HasTemperateGrowth Real.tanh := by
   constructor
   · apply contDiff_top_tanh
   · intro n
@@ -167,7 +167,7 @@ theorem tanh_hasTemperateGrowth : Function.HasTemperateGrowth Real.tanh := by
     exact hC x
 
 /-- Iterated derivative for scaled tanh is differentiable -/
-theorem iteratedDeriv_tanh_differentiable (n : ℕ) : Differentiable ℝ (iteratedDeriv n tanh) := by
+lemma iteratedDeriv_tanh_differentiable (n : ℕ) : Differentiable ℝ (iteratedDeriv n tanh) := by
   have h : ContDiff ℝ (n + 1) tanh := by
     apply contDiff_tanh
   apply h.differentiable_iteratedDeriv
@@ -176,14 +176,14 @@ theorem iteratedDeriv_tanh_differentiable (n : ℕ) : Differentiable ℝ (iterat
   norm_cast
 
 /-- Norm of Iterated derivative for scaled tanh is equal to the norm of its Fderiv -/
-theorem tanh_kx_iteratedDeriv_norm_eq_iteratedFDeriv_norm (n : ℕ) (x : ℝ) :
+lemma tanh_const_mul_iteratedDeriv_norm_eq_iteratedFDeriv_norm (n : ℕ) (x : ℝ) :
     ‖iteratedFDeriv ℝ n (fun x => tanh (κ * x)) x‖
     = |iteratedDeriv n (fun x => tanh (κ * x)) x| := by
   rw [← iteratedFDerivWithin_univ, ← iteratedDerivWithin_univ, ← norm_eq_abs,
       norm_iteratedFDerivWithin_eq_norm_iteratedDerivWithin]
 
 /-- Iterated derivative for scaled tanh -/
-theorem iteratedDeriv_tanh_kx (n : ℕ) (κ : ℝ) : ∀ x : ℝ,
+lemma iteratedDeriv_tanh_const_mul (n : ℕ) (κ : ℝ) : ∀ x : ℝ,
     iteratedDeriv n (fun y => Real.tanh (κ * y)) x = κ^n * (iteratedDeriv n Real.tanh) (κ * x) := by
   induction n with
   | zero =>
@@ -216,7 +216,7 @@ theorem iteratedDeriv_tanh_kx (n : ℕ) (κ : ℝ) : ∀ x : ℝ,
     fun_prop
 
 /-- tanh(κx) has temperate growth -/
-theorem scaled_tanh_hasTemperateGrowth (κ : ℝ) :
+lemma tanh_const_mul_hasTemperateGrowth (κ : ℝ) :
     Function.HasTemperateGrowth (fun x => Real.tanh (κ * x)) := by
   constructor
   · have h : (fun x => Real.tanh (κ * x)) = (Real.tanh ∘ (fun x => κ * x)) :=
@@ -233,7 +233,7 @@ theorem scaled_tanh_hasTemperateGrowth (κ : ℝ) :
     use 0
     use D * (|κ| ^ n)
     intro x
-    rw [tanh_kx_iteratedDeriv_norm_eq_iteratedFDeriv_norm, iteratedDeriv_tanh_kx]
+    rw [tanh_const_mul_iteratedDeriv_norm_eq_iteratedFDeriv_norm, iteratedDeriv_tanh_const_mul]
     field_simp
     rw [abs_mul, abs_pow, mul_comm, mul_comm, mul_comm D (|κ| ^ n)]
     apply mul_le_mul_of_nonneg_left
