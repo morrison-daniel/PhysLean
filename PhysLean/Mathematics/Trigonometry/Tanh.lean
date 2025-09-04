@@ -177,14 +177,14 @@ theorem iteratedDeriv_tanh_differentiable (n : ℕ) : Differentiable ℝ (iterat
 
 /-- Norm of Iterated derivative for scaled tanh is equal to the norm of its Fderiv -/
 theorem tanh_kx_iteratedDeriv_norm_eq_iteratedFDeriv_norm (n : ℕ) (x : ℝ) :
-      ‖iteratedFDeriv ℝ n (fun x => tanh (κ * x)) x‖
-      = |iteratedDeriv n (fun x => tanh (κ * x)) x| := by
+    ‖iteratedFDeriv ℝ n (fun x => tanh (κ * x)) x‖
+    = |iteratedDeriv n (fun x => tanh (κ * x)) x| := by
   rw [← iteratedFDerivWithin_univ, ← iteratedDerivWithin_univ, ← norm_eq_abs,
       norm_iteratedFDerivWithin_eq_norm_iteratedDerivWithin]
 
 /-- Iterated derivative for scaled tanh -/
 theorem iteratedDeriv_tanh_kx (n : ℕ) (κ : ℝ) : ∀ x : ℝ,
-  iteratedDeriv n (fun y => Real.tanh (κ * y)) x = κ^n * (iteratedDeriv n Real.tanh) (κ * x) := by
+    iteratedDeriv n (fun y => Real.tanh (κ * y)) x = κ^n * (iteratedDeriv n Real.tanh) (κ * x) := by
   induction n with
   | zero =>
     rw [iteratedDeriv_zero]
@@ -196,17 +196,17 @@ theorem iteratedDeriv_tanh_kx (n : ℕ) (κ : ℝ) : ∀ x : ℝ,
       funext x
       rw [ih]
     rw [h']
-    simp
+    simp only [deriv_const_mul_field']
     have h'': (fun x => iteratedDeriv n tanh (κ * x)) =
         (iteratedDeriv n tanh) ∘ (fun x => κ * x) := by
       funext x
       simp
     rw [h'']
     intro x
-    rw [deriv_comp, ←iteratedDeriv_succ]
+    rw [deriv_comp, ← iteratedDeriv_succ]
     have h''': deriv (fun x => κ * x) = fun x => κ := by
       funext x
-      rw [deriv_const_mul, ←Function.id_def]
+      rw [deriv_const_mul, ← Function.id_def]
       field_simp
       apply differentiable_id
     rw [h''']
@@ -238,4 +238,4 @@ theorem scaled_tanh_hasTemperateGrowth (κ : ℝ) :
     rw [abs_mul, abs_pow, mul_comm, mul_comm, mul_comm D (|κ| ^ n)]
     apply mul_le_mul_of_nonneg_left
     apply hD
-    simp
+    simp only [abs_nonneg, pow_nonneg]
