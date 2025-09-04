@@ -6,7 +6,6 @@ Authors: Afiq Hatta
 import Mathlib.Analysis.Calculus.Deriv.Polynomial
 import Mathlib.Analysis.Distribution.SchwartzSpace
 import Mathlib.Topology.Algebra.Polynomial
-
 /-!
 # Properties of Tanh
 We want to prove that the reflectionless potential is a Schwartz map.
@@ -166,3 +165,77 @@ theorem tanh_hasTemperateGrowth : Function.HasTemperateGrowth Real.tanh := by
     rw [h_equiv]
     simp only [pow_zero, mul_one]
     exact hC x
+
+/-- Iterated derivative for scaled tanh is differentiable -/
+theorem iteratedDeriv_tanh_differentiable (n : ℕ) : Differentiable ℝ (iteratedDeriv n tanh) := by
+  have h : ContDiff ℝ (n + 1) tanh := by
+    apply contDiff_tanh
+  apply h.differentiable_iteratedDeriv
+  have h' : n < n + 1 := by
+    apply Nat.lt_add_one
+  norm_cast
+
+/-- Norm of Iterated derivative for scaled tanh is equal to the norm of its Fderiv -/
+theorem tanh_kx_iteratedDeriv_norm_eq_iteratedFDeriv_norm (n : ℕ) (x : ℝ) :
+      ‖iteratedFDeriv ℝ n (fun x => tanh (κ * x)) x‖
+      = |iteratedDeriv n (fun x => tanh (κ * x)) x| := by
+  rw [← iteratedFDerivWithin_univ, ← iteratedDerivWithin_univ, ← norm_eq_abs,
+      norm_iteratedFDerivWithin_eq_norm_iteratedDerivWithin]
+
+/-- Iterated derivative for scaled tanh -/
+theorem iteratedDeriv_tanh_kx (n : ℕ) (κ : ℝ) : ∀ x : ℝ,
+  iteratedDeriv n (fun y => Real.tanh (κ * y)) x = κ^n * (iteratedDeriv n Real.tanh) (κ * x) := by
+  induction n with
+  | zero =>
+    rw [iteratedDeriv_zero]
+    field_simp
+  | succ n ih =>
+    rw [iteratedDeriv_succ]
+    have h' : iteratedDeriv n (fun y => tanh (κ * y)) =
+        fun x => κ ^ n * iteratedDeriv n tanh (κ * x) := by
+      funext x
+      rw [ih]
+    rw [h']
+    simp
+    have h'': (fun x => iteratedDeriv n tanh (κ * x)) =
+        (iteratedDeriv n tanh) ∘ (fun x => κ * x) := by
+      funext x
+      simp
+    rw [h'']
+    intro x
+    rw [deriv_comp, ←iteratedDeriv_succ]
+    have h''': deriv (fun x => κ * x) = fun x => κ := by
+      funext x
+      rw [deriv_const_mul, ←Function.id_def]
+      field_simp
+      apply differentiable_id
+    rw [h''']
+    field_simp
+    ring
+    apply iteratedDeriv_tanh_differentiable
+    fun_prop
+
+/-- tanh(κx) has temperate growth -/
+theorem scaled_tanh_hasTemperateGrowth (κ : ℝ) :
+    Function.HasTemperateGrowth (fun x => Real.tanh (κ * x)) := by
+  constructor
+  · have h : (fun x => Real.tanh (κ * x)) = (Real.tanh ∘ (fun x => κ * x)) :=
+      rfl
+    have h' : ContDiff ℝ ∞ (fun x => κ * x) := by
+      have h'': (fun x : ℝ => κ * x) = fun x => κ • x := rfl
+      rw [contDiff_infty, h'']
+      intro n
+      apply contDiff_const_smul
+    rw [h]
+    apply ContDiff.comp contDiff_top_tanh h'
+  · intro n
+    obtain ⟨D, hD⟩ := iteratedDeriv_tanh_bounded n
+    use 0
+    use D * (|κ| ^ n)
+    intro x
+    rw [tanh_kx_iteratedDeriv_norm_eq_iteratedFDeriv_norm, iteratedDeriv_tanh_kx]
+    field_simp
+    rw [abs_mul, abs_pow, mul_comm, mul_comm, mul_comm D (|κ| ^ n)]
+    apply mul_le_mul_of_nonneg_left
+    apply hD
+    simp
