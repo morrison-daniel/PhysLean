@@ -3,9 +3,8 @@ Copyright (c) 2025 Kenny Lau. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Kenny Lau
 -/
-
 import Mathlib.Analysis.Distribution.FourierSchwartz
-
+import PhysLean.Meta.TODO.Basic
 /-!
 # Distributions
 
@@ -195,6 +194,10 @@ def fderivD [FiniteDimensional ℝ E] : (E →d[𝕜] F) →ₗ[𝕜] (E →d[�
 lemma fderivD_apply [FiniteDimensional ℝ E] (u : E →d[𝕜] F) (η : 𝓢(E, 𝕜)) (v : E) :
     fderivD 𝕜 u η v = - u (SchwartzMap.evalCLM (𝕜 := 𝕜) v (SchwartzMap.fderivCLM 𝕜 η)) := by
   rfl
+
+TODO "01-09-25-JTS" "For distributions, prove that the derivative fderivD commutes with
+  integrals and sums. This may require defining the integral of families of distributions
+  although it is expected this will follow from the definition of a distribution."
 
 end fderiv
 
