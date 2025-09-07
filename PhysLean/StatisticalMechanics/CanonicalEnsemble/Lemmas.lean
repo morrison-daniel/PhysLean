@@ -758,7 +758,7 @@ theorem energyVariance_eq_meanSquareEnergy_sub_meanEnergy_sq
           simp [hμReal, sub_eq_add_neg, add_comm, mul_comm]
           ring_nf
 
-/-! ## Heat capacity and parametric FDT (general interface) -/
+/-! ## Heat capacity and parametric FDT -/
 
 -- We define functions from ℝ to handle derivatives smoothly, using Real.toNNReal
 
@@ -784,7 +784,6 @@ lemma heatCapacity_eq_deriv_meanEnergy_beta
     𝓒.heatCapacity T
       = (derivWithin (𝓒.meanEnergy_Beta) (Set.Ioi 0) (T.β : ℝ))
         * (-1 / (kB * (T.val : ℝ)^2)) := by
-  -- same proof as before
   unfold heatCapacity meanEnergy_T
   have h_U_eq_comp : (𝓒.meanEnergy_T) = fun t : ℝ => (𝓒.meanEnergy_Beta) (betaFromReal t) := by
     funext t

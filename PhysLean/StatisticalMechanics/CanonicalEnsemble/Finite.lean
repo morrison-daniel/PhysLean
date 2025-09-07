@@ -385,6 +385,8 @@ lemma energyVariance_of_fintype
 
 /-! ## β-parameterization for finite systems -/
 
+/-- The finite-sum partition function as a real function of the inverse temperature `b = β`,
+defined by `Z(b) = ∑ i exp (-b * 𝓒.energy i)`. -/
 noncomputable def mathematicalPartitionFunctionBetaReal (b : ℝ) : ℝ :=
   ∑ i, Real.exp (-b * 𝓒.energy i)
 
@@ -394,26 +396,29 @@ lemma mathematicalPartitionFunctionBetaReal_pos [Nonempty ι] (b : ℝ) :
   · intro i _; exact Real.exp_pos _
   · exact Finset.univ_nonempty
 
+/-- For inverse temperature `b = β`, the (real-valued) Boltzmann probability of microstate `i`,
+given by `exp (-b * E i) / Z(b)` where `Z(b) = ∑ i exp (-b * E i)`. -/
 noncomputable def probabilityBetaReal (b : ℝ) (i : ι) : ℝ :=
   Real.exp (-b * 𝓒.energy i) / 𝓒.mathematicalPartitionFunctionBetaReal b
 
-noncomputable def meanEnergyBetaReal' (b : ℝ) : ℝ :=
+/-- The mean energy as a function of inverse temperature `b = β` in the finite case,
+defined by `U(b) = ∑ i, E i * p_b i` with `p_b i = exp (-b * E i) / Z(b)` and `Z(b) = ∑ i, exp (-b * E i)`. -/
+noncomputable def meanEnergyBetaReal (b : ℝ) : ℝ :=
   ∑ i, 𝓒.energy i * 𝓒.probabilityBetaReal b i
 
 lemma meanEnergy_Beta_eq_finite [MeasurableSingletonClass ι] [IsFinite 𝓒] (b : ℝ) (hb : 0 < b) :
-    𝓒.meanEnergy_Beta b = 𝓒.meanEnergyBetaReal' b := by
+    𝓒.meanEnergy_Beta b = 𝓒.meanEnergyBetaReal b := by
   let T := Temperature.ofβ (Real.toNNReal b)
   have hT_beta : (T.β : ℝ) = b := by
     simp [T, Real.toNNReal_of_nonneg hb.le]
-  rw [CanonicalEnsemble.meanEnergy_Beta, meanEnergy_of_fintype 𝓒 T, meanEnergyBetaReal']
+  rw [CanonicalEnsemble.meanEnergy_Beta, meanEnergy_of_fintype 𝓒 T, meanEnergyBetaReal]
   refine Finset.sum_congr rfl fun i _ => ?_
   simp [CanonicalEnsemble.probability, probabilityBetaReal,
         mathematicalPartitionFunction_of_fintype, mathematicalPartitionFunctionBetaReal, hT_beta]
 
 lemma differentiable_meanEnergyBetaReal
-    [Nonempty ι] [MeasurableSingletonClass ι]
-    [IsFinite 𝓒] : Differentiable ℝ 𝓒.meanEnergyBetaReal' := by
-  unfold meanEnergyBetaReal' probabilityBetaReal mathematicalPartitionFunctionBetaReal
+    [Nonempty ι] : Differentiable ℝ 𝓒.meanEnergyBetaReal := by
+  unfold meanEnergyBetaReal probabilityBetaReal mathematicalPartitionFunctionBetaReal
   refine Differentiable.fun_sum (by
     intro i _
     refine (Differentiable.div ?_ ?_ ?_).const_mul (𝓒.energy i)
@@ -429,6 +434,8 @@ lemma differentiable_mathematicalPartitionFunctionBetaReal :
   unfold mathematicalPartitionFunctionBetaReal
   refine Differentiable.fun_sum ?_; intro i _; simp
 
+/-- The numerator in the finite-sum expression of the mean energy as a function of the inverse temperature `b = β`,
+namely `∑ i, E i * exp (-b * E i)` (so that `U(b) = meanEnergyNumerator b / Z(b)`). -/
 noncomputable def meanEnergyNumerator (b : ℝ) : ℝ :=
   ∑ i, 𝓒.energy i * Real.exp (-b * 𝓒.energy i)
 
@@ -452,29 +459,17 @@ lemma deriv_meanEnergyNumerator (b : ℝ) :
 
 variable [Nonempty ι]
 
-lemma differentiable_meanEnergyBetaReal' : Differentiable ℝ 𝓒.meanEnergyBetaReal' := by
-  let Z := 𝓒.mathematicalPartitionFunctionBetaReal
-  let Num := 𝓒.meanEnergyNumerator
-  have h_eq : 𝓒.meanEnergyBetaReal' = fun b => Num b / Z b := by
-    funext b
-    unfold meanEnergyBetaReal' probabilityBetaReal Num Z mathematicalPartitionFunctionBetaReal
-    simp [mul_div_assoc, Finset.sum_div, meanEnergyNumerator]
-  rw [h_eq]
-  exact Differentiable.div (differentiable_meanEnergyNumerator 𝓒)
-    (differentiable_mathematicalPartitionFunctionBetaReal 𝓒)
-    (fun x => (mathematicalPartitionFunctionBetaReal_pos 𝓒 x).ne')
-
-lemma deriv_meanEnergyBetaReal' (b : ℝ) :
-    deriv 𝓒.meanEnergyBetaReal' b =
-    (𝓒.meanEnergyBetaReal' b)^2 - ∑ i, (𝓒.energy i)^2 * 𝓒.probabilityBetaReal b i := by
+lemma deriv_meanEnergyBetaReal (b : ℝ) :
+    deriv 𝓒.meanEnergyBetaReal b =
+    (𝓒.meanEnergyBetaReal b)^2 - ∑ i, (𝓒.energy i)^2 * 𝓒.probabilityBetaReal b i := by
   let Z := 𝓒.mathematicalPartitionFunctionBetaReal
   let Num := 𝓒.meanEnergyNumerator
   have hZ_diff := (differentiable_mathematicalPartitionFunctionBetaReal 𝓒) b
   have hN_diff := (differentiable_meanEnergyNumerator 𝓒) b
   have hZ_ne_zero : Z b ≠ 0 := (mathematicalPartitionFunctionBetaReal_pos 𝓒 b).ne'
-  have hU_eq_div : 𝓒.meanEnergyBetaReal' = fun x => Num x / Z x := by
+  have hU_eq_div : 𝓒.meanEnergyBetaReal = fun x => Num x / Z x := by
     funext x
-    unfold meanEnergyBetaReal' probabilityBetaReal Num Z mathematicalPartitionFunctionBetaReal
+    unfold meanEnergyBetaReal probabilityBetaReal Num Z mathematicalPartitionFunctionBetaReal
     simp [meanEnergyNumerator, Finset.sum_div, mul_div_assoc]
   have hquot' : deriv (fun x => Num x / Z x) b =
       (deriv Num b * Z b - Num b * deriv Z b) / (Z b)^2 := by
@@ -516,14 +511,14 @@ lemma derivWithin_meanEnergy_Beta_eq_neg_variance
     derivWithin 𝓒.meanEnergy_Beta (Set.Ioi 0) (T.β : ℝ) = - 𝓒.energyVariance T := by
   let β₀ := (T.β : ℝ)
   have hβ₀_pos : 0 < β₀ := beta_pos T hT_pos
-  have h_eq_on : Set.EqOn 𝓒.meanEnergy_Beta 𝓒.meanEnergyBetaReal' (Set.Ioi 0) := by
+  have h_eq_on : Set.EqOn 𝓒.meanEnergy_Beta 𝓒.meanEnergyBetaReal (Set.Ioi 0) := by
     intro b hb; exact meanEnergy_Beta_eq_finite 𝓒 b hb
   rw [derivWithin_congr h_eq_on (h_eq_on hβ₀_pos)]
-  have h_diff : DifferentiableAt ℝ 𝓒.meanEnergyBetaReal' β₀ :=
-    (differentiable_meanEnergyBetaReal' 𝓒) β₀
+  have h_diff : DifferentiableAt ℝ 𝓒.meanEnergyBetaReal β₀ :=
+    (differentiable_meanEnergyBetaReal 𝓒) β₀
   rw [h_diff.derivWithin (uniqueDiffOn_Ioi 0 β₀ hβ₀_pos)]
-  rw [deriv_meanEnergyBetaReal' 𝓒 β₀]
-  have h_U_eq : 𝓒.meanEnergyBetaReal' β₀ = 𝓒.meanEnergy T := by
+  rw [deriv_meanEnergyBetaReal 𝓒 β₀]
+  have h_U_eq : 𝓒.meanEnergyBetaReal β₀ = 𝓒.meanEnergy T := by
     rw [← meanEnergy_Beta_eq_finite 𝓒 β₀ hβ₀_pos]
     simp [CanonicalEnsemble.meanEnergy_Beta]
     simp_all only [NNReal.coe_pos, toNNReal_coe, ofβ_β, β₀]
@@ -544,9 +539,9 @@ theorem fluctuation_dissipation_theorem_finite
   have hβ₀_pos : 0 < (T.β : ℝ) := beta_pos T hT_pos
   let β₀ := (T.β : ℝ)
   have h_diff_U_beta : DifferentiableWithinAt ℝ 𝓒.meanEnergy_Beta (Set.Ioi 0) β₀ := by
-    have h_eq_on : Set.EqOn 𝓒.meanEnergy_Beta 𝓒.meanEnergyBetaReal' (Set.Ioi 0) := by
+    have h_eq_on : Set.EqOn 𝓒.meanEnergy_Beta 𝓒.meanEnergyBetaReal (Set.Ioi 0) := by
       intro b hb; exact meanEnergy_Beta_eq_finite 𝓒 b hb
-    have h_diff' := (differentiable_meanEnergyBetaReal' 𝓒) (T.β : ℝ)
+    have h_diff' := (differentiable_meanEnergyBetaReal 𝓒) (T.β : ℝ)
     exact DifferentiableWithinAt.congr_of_eventuallyEq h_diff'.differentiableWithinAt
       (eventuallyEq_nhdsWithin_of_eqOn h_eq_on) (h_eq_on hβ₀_pos)
   have h_Var_eq_neg_dUdβ := derivWithin_meanEnergy_Beta_eq_neg_variance 𝓒 T hT_pos
