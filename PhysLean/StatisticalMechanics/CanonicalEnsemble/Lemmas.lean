@@ -721,4 +721,26 @@ theorem meanEnergy_eq_neg_deriv_log_Z_of_beta
       (𝓒:=𝓒) (T:=T) hT_pos h_integrable h_fin
   rw [h_dw]; exact h_math
 
+  simp [probability, hZne, div_eq_mul_inv, mul_comm, mul_left_comm, mul_assoc]
+  have hExp :
+      Real.exp (- (T.β : ℝ) * 𝓒.energy s') *
+          (Real.exp (- (T.β : ℝ) * 𝓒.energy s))⁻¹
+        = Real.exp (-(T.β : ℝ) * (𝓒.energy s' - 𝓒.energy s)) := by
+    calc
+      Real.exp (- (T.β : ℝ) * 𝓒.energy s') *
+          (Real.exp (- (T.β : ℝ) * 𝓒.energy s))⁻¹
+          = Real.exp (- (T.β : ℝ) * 𝓒.energy s') /
+              Real.exp (- (T.β : ℝ) * 𝓒.energy s) := by
+                simp [div_eq_mul_inv]
+      _ = Real.exp ((- (T.β : ℝ) * 𝓒.energy s')
+              - (- (T.β : ℝ) * 𝓒.energy s)) := by
+                simpa [sub_eq_add_neg] using
+                  (Real.exp_sub
+                    (- (T.β : ℝ) * 𝓒.energy s')
+                    (- (T.β : ℝ) * 𝓒.energy s)).symm
+      _ = Real.exp (-(T.β : ℝ) * (𝓒.energy s' - 𝓒.energy s)) := by
+            ring_nf
+  simpa [mul_comm] using hExp
+end Ratios
+
 end CanonicalEnsemble
