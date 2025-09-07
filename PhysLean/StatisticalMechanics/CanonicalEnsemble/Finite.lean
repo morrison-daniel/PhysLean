@@ -112,11 +112,10 @@ instance [IsFinite 𝓒] (n : ℕ) : IsFinite (nsmul n 𝓒) where
   μ_eq_count := by
     induction n with
     | zero =>
-      classical
       haveI : Subsingleton (Fin 0 → ι) := ⟨by intro f g; funext i; exact Fin.elim0 i⟩
       have h_cases :
           ∀ s : Set (Fin 0 → ι), s = ∅ ∨ s = Set.univ := by
-        intro s; classical
+        intro s;
         by_cases hne : s.Nonempty
         · right
           ext x; constructor
@@ -135,7 +134,6 @@ instance [IsFinite 𝓒] (n : ℕ) : IsFinite (nsmul n 𝓒) where
       · subst hs
         simp [CanonicalEnsemble.nsmul, IsFinite.μ_eq_count (𝓒:=𝓒)]
     | succ n ih =>
-      classical
       haveI : IsFinite (nsmul n 𝓒) := {
         μ_eq_count := ih
         dof_eq_zero := by
@@ -162,7 +160,6 @@ instance [IsFinite 𝓒] : IsFiniteMeasure (𝓒.μ) := by
 
 /-- In the finite (counting) case a nonempty index type gives a nonzero measure. -/
 instance [IsFinite 𝓒] [Nonempty ι] : NeZero 𝓒.μ := by
-  classical
   refine ⟨?_⟩
   intro hμ
   obtain ⟨i₀⟩ := (inferInstance : Nonempty ι)
@@ -236,7 +233,8 @@ lemma entropy_of_fintype (T : Temperature) :
     𝓒.shannonEntropy T = - kB * ∑ i, 𝓒.probability T i * log (𝓒.probability T i) := by
   simp [shannonEntropy]
 
-lemma probability_le_one [MeasurableSingletonClass ι] [IsFinite 𝓒] [Nonempty ι] (T : Temperature) (i : ι) :
+lemma probability_le_one
+    [MeasurableSingletonClass ι] [IsFinite 𝓒] [Nonempty ι] (T : Temperature) (i : ι) :
     𝓒.probability T i ≤ 1 := by
   unfold probability
   have hnum_le :
@@ -250,7 +248,6 @@ lemma probability_le_one [MeasurableSingletonClass ι] [IsFinite 𝓒] [Nonempty
         (Finset.mem_univ i))
   have hZpos :
       0 < 𝓒.mathematicalPartitionFunction T := by
-    classical
     rw [mathematicalPartitionFunction_of_fintype (𝓒:=𝓒) T]
     obtain ⟨j₀⟩ := (inferInstance : Nonempty ι)
     have hterm_pos : 0 < Real.exp (- β T * 𝓒.energy j₀) := Real.exp_pos _
@@ -274,24 +271,25 @@ lemma mathematicalPartitionFunction_pos_finite
   simpa using (CanonicalEnsemble.mathematicalPartitionFunction_pos (𝓒:=𝓒) T)
 
 /-- Finite specialization: strict positivity of the (physical) partition function. -/
-lemma partitionFunction_pos_finite [MeasurableSingletonClass ι] [IsFinite 𝓒] [Nonempty ι] (T : Temperature) :
+lemma partitionFunction_pos_finite
+    [MeasurableSingletonClass ι] [IsFinite 𝓒] [Nonempty ι] (T : Temperature) :
     0 < 𝓒.partitionFunction T := by
   simpa [partitionFunction, IsFinite.dof_eq_zero (𝓒:=𝓒),
         IsFinite.phase_space_unit_eq_one (𝓒:=𝓒), pow_zero]
     using mathematicalPartitionFunction_pos_finite (𝓒:=𝓒) (T:=T)
 
 /-- Finite specialization: non-negativity (indeed positivity) of probabilities. -/
-lemma probability_nonneg_finite [MeasurableSingletonClass ι] [IsFinite 𝓒] [Nonempty ι] (T : Temperature) (i : ι) :
+lemma probability_nonneg_finite
+    [MeasurableSingletonClass ι] [IsFinite 𝓒] [Nonempty ι] (T : Temperature) (i : ι) :
     0 ≤ 𝓒.probability T i := by
-  classical
   unfold probability
   have hZpos := mathematicalPartitionFunction_pos_finite (𝓒:=𝓒) (T:=T)
   exact div_nonneg (Real.exp_nonneg _) hZpos.le
 
 /-- The sum of probabilities over all microstates is 1. -/
-lemma sum_probability_eq_one [MeasurableSingletonClass ι] [IsFinite 𝓒] [Nonempty ι] (T : Temperature) :
+lemma sum_probability_eq_one
+    [MeasurableSingletonClass ι] [IsFinite 𝓒] [Nonempty ι] (T : Temperature) :
     ∑ i, 𝓒.probability T i = 1 := by
-  classical
   simp_rw [probability]
   rw [← Finset.sum_div]
   have hZdef := mathematicalPartitionFunction_of_fintype (𝓒:=𝓒) T
@@ -303,7 +301,6 @@ lemma sum_probability_eq_one [MeasurableSingletonClass ι] [IsFinite 𝓒] [None
 /-- The entropy of a finite canonical ensemble (Shannon entropy) is non-negative. -/
 lemma entropy_nonneg [MeasurableSingletonClass ι] [IsFinite 𝓒] [Nonempty ι] (T : Temperature) :
     0 ≤ 𝓒.shannonEntropy T := by
-  classical
   unfold shannonEntropy
   set p : ι → ℝ := fun i => 𝓒.probability T i
   have h_term_le_zero :
@@ -333,7 +330,8 @@ lemma entropy_nonneg [MeasurableSingletonClass ι] [IsFinite 𝓒] [Nonempty ι]
   simpa [p, shannonEntropy, mul_comm, mul_left_comm, mul_assoc, neg_mul,
         sub_eq_add_neg] using this
 
-lemma shannonEntropy_eq_differentialEntropy [MeasurableSingletonClass ι] [IsFinite 𝓒] (T : Temperature) :
+lemma shannonEntropy_eq_differentialEntropy
+    [MeasurableSingletonClass ι] [IsFinite 𝓒] (T : Temperature) :
     𝓒.shannonEntropy T = 𝓒.differentialEntropy T := by
   simp [shannonEntropy, differentialEntropy, integral_fintype, μProd_of_fintype]
 
@@ -377,7 +375,8 @@ lemma meanSquareEnergy_of_fintype [MeasurableSingletonClass ι] [IsFinite 𝓒] 
   simp [μProd_of_fintype, mul_comm]
   exact Integrable.of_finite
 
-lemma energyVariance_of_fintype [MeasurableSingletonClass ι] [IsFinite 𝓒] [Nonempty ι] (T : Temperature) :
+lemma energyVariance_of_fintype
+    [MeasurableSingletonClass ι] [IsFinite 𝓒] [Nonempty ι] (T : Temperature) :
     𝓒.energyVariance T = (∑ i, (𝓒.energy i)^2 * 𝓒.probability T i) - (𝓒.meanEnergy T)^2 := by
   have hE_int := Integrable.of_finite (f := 𝓒.energy) (μ := 𝓒.μProd T)
   have hE2_int := Integrable.of_finite (f := fun i => (𝓒.energy i)^2) (μ := 𝓒.μProd T)
@@ -411,7 +410,9 @@ lemma meanEnergy_Beta_eq_finite [MeasurableSingletonClass ι] [IsFinite 𝓒] (b
   simp [CanonicalEnsemble.probability, probabilityBetaReal,
         mathematicalPartitionFunction_of_fintype, mathematicalPartitionFunctionBetaReal, hT_beta]
 
-lemma differentiable_meanEnergyBetaReal [Nonempty ι] [MeasurableSingletonClass ι] [IsFinite 𝓒] : Differentiable ℝ 𝓒.meanEnergyBetaReal' := by
+lemma differentiable_meanEnergyBetaReal
+    [Nonempty ι] [MeasurableSingletonClass ι]
+    [IsFinite 𝓒] : Differentiable ℝ 𝓒.meanEnergyBetaReal' := by
   unfold meanEnergyBetaReal' probabilityBetaReal mathematicalPartitionFunctionBetaReal
   refine Differentiable.fun_sum (by
     intro i _
@@ -524,7 +525,8 @@ lemma derivWithin_meanEnergy_Beta_eq_neg_variance
   rw [deriv_meanEnergyBetaReal' 𝓒 β₀]
   have h_U_eq : 𝓒.meanEnergyBetaReal' β₀ = 𝓒.meanEnergy T := by
     rw [← meanEnergy_Beta_eq_finite 𝓒 β₀ hβ₀_pos]
-    simp [CanonicalEnsemble.meanEnergy_Beta]; simp_all only [NNReal.coe_pos, toNNReal_coe, ofβ_β, β₀]
+    simp [CanonicalEnsemble.meanEnergy_Beta]
+    simp_all only [NNReal.coe_pos, toNNReal_coe, ofβ_β, β₀]
   have h_prob_eq (i : ι) : 𝓒.probabilityBetaReal β₀ i = 𝓒.probability T i := by
     unfold probabilityBetaReal CanonicalEnsemble.probability
     congr 1
@@ -536,7 +538,8 @@ lemma derivWithin_meanEnergy_Beta_eq_neg_variance
   ring
 
 /-- FDT for finite canonical ensembles: C_V = Var(E) / (k_B T²). -/
-theorem fluctuation_dissipation_theorem_finite [MeasurableSingletonClass ι] [𝓒.IsFinite] (T : Temperature) (hT_pos : 0 < T.val) :
+theorem fluctuation_dissipation_theorem_finite
+    [MeasurableSingletonClass ι] [𝓒.IsFinite] (T : Temperature) (hT_pos : 0 < T.val) :
     𝓒.heatCapacity T = 𝓒.energyVariance T / (kB * (T.val : ℝ)^2) := by
   have hβ₀_pos : 0 < (T.β : ℝ) := beta_pos T hT_pos
   let β₀ := (T.β : ℝ)
@@ -548,7 +551,7 @@ theorem fluctuation_dissipation_theorem_finite [MeasurableSingletonClass ι] [�
       (eventuallyEq_nhdsWithin_of_eqOn h_eq_on) (h_eq_on hβ₀_pos)
   have h_Var_eq_neg_dUdβ := derivWithin_meanEnergy_Beta_eq_neg_variance 𝓒 T hT_pos
   exact CanonicalEnsemble.fluctuation_dissipation_energy_parametric 𝓒 T hT_pos
-    (by aesop) h_diff_U_beta
+    (by simp_all only [NNReal.coe_pos, neg_neg, β₀]) h_diff_U_beta
 
 end FluctuationsFinite
 
