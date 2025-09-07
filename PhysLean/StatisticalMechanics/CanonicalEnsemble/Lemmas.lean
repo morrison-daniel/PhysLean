@@ -786,9 +786,9 @@ lemma heatCapacity_eq_deriv_meanEnergy_beta
         * (-1 / (kB * (T.val : ℝ)^2)) := by
   -- same proof as before
   unfold heatCapacity meanEnergy_T
-  have h_U_eq_comp : (𝓒.meanEnergy_T) = fun t : ℝ => (𝓒.meanEnergy_Beta) (Beta_fun_T t) := by
+  have h_U_eq_comp : (𝓒.meanEnergy_T) = fun t : ℝ => (𝓒.meanEnergy_Beta) (betaFromReal t) := by
     funext t
-    dsimp [meanEnergy_T, meanEnergy_Beta, Beta_fun_T]
+    dsimp [meanEnergy_T, meanEnergy_Beta, betaFromReal]
     simp
   let dUdβ := derivWithin (𝓒.meanEnergy_Beta) (Set.Ioi 0) (T.β : ℝ)
   have h_chain := chain_rule_T_beta (F:=𝓒.meanEnergy_Beta) (F':=dUdβ) T hT_pos hU_deriv
