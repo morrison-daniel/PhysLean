@@ -114,10 +114,12 @@ noncomputable def creationOperatorSchwartz (Q : ReflectionlessPotential) : 𝓢(
   toFun ψ := (1 / Real.sqrt (2 * Q.m)) • momentumOperatorSchwartz ψ +
     ((Complex.I * Q.ℏ * Q.κ) / Real.sqrt (2 * Q.m)) • Q.tanhOperatorSchwartz ψ
   map_add' ψ1 ψ2 := by
-    simp
+    simp only [Nat.ofNat_nonneg, Real.sqrt_mul, one_div, mul_inv_rev, map_add, smul_add,
+      Complex.ofReal_mul]
     abel
   map_smul' ψ1 ψ2 := by
-    simp
+    simp only [Nat.ofNat_nonneg, Real.sqrt_mul, one_div, mul_inv_rev, map_smul, Complex.ofReal_mul,
+      RingHom.id_apply, smul_add]
     rw [smul_comm]
     nth_rewrite 1 [smul_comm ψ1 ((Complex.I * ↑Q.ℏ * ↑Q.κ) / (√2 * √Q.m))]
     rfl
@@ -130,10 +132,12 @@ noncomputable def annihilationOperatorSchwartz (Q : ReflectionlessPotential) : �
   toFun ψ := (1 / Real.sqrt (2 * Q.m)) • momentumOperatorSchwartz ψ -
     ((Complex.I * Q.ℏ * Q.κ) / Real.sqrt (2 * Q.m)) • Q.tanhOperatorSchwartz ψ
   map_add' ψ1 ψ2 := by
-    simp
+    simp only [Nat.ofNat_nonneg, Real.sqrt_mul, one_div, mul_inv_rev, map_add, smul_add,
+      Complex.ofReal_mul]
     abel
   map_smul' ψ1 ψ2 := by
-    simp
+    simp only [Nat.ofNat_nonneg, Real.sqrt_mul, one_div, mul_inv_rev, map_smul, Complex.ofReal_mul,
+      RingHom.id_apply]
     rw [smul_sub, smul_comm]
     nth_rewrite 1 [smul_comm ψ1 ((Complex.I * ↑Q.ℏ * ↑Q.κ) / (√2 * √Q.m))]
     rfl
