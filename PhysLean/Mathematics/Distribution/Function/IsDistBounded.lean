@@ -193,6 +193,18 @@ lemma IsDistBounded.pow {dm1 : ℕ} (n : ℤ) (hn : - dm1 ≤ n) :
     simp
 
 @[fun_prop]
+lemma IsDistBounded.pow_shift {dm1 : ℕ} (n : ℤ)
+    (g : EuclideanSpace ℝ (Fin dm1.succ)) (hn : - dm1 ≤ n) :
+    IsDistBounded (dm1 := dm1) (fun x => ‖x - g‖ ^ n) := by
+  refine ⟨1, fun _ => 1, fun _ => (- g), fun _ => n, ?_, ?_, ?_⟩
+  · simp
+  · simp
+    exact hn
+  · intro x
+    simp
+    rfl
+
+@[fun_prop]
 lemma IsDistBounded.inv {n : ℕ} :
     IsDistBounded (dm1 := n.succ) (fun x => ‖x‖⁻¹) := by
   convert IsDistBounded.pow (dm1 := n.succ) (-1) (by simp) using 1
@@ -356,7 +368,7 @@ lemma intergrable_pow {dm1 : ℕ} (p: ℤ) (r : ℕ) (p_bound : -dm1 ≤ p)
       invPowMeasure := by
     have hr1 (x : EuclideanSpace ℝ (Fin dm1.succ)) :
         ‖((1 + ‖x - v‖) ^ (q + m))⁻¹‖ = ((1 + ‖x - v‖) ^ (q + m))⁻¹ := by
-      simp only [Nat.succ_eq_add_one, norm_inv, norm_pow, Real.norm_eq_abs, inv_inj, abs_nonneg]
+      simp only [Nat.succ_eq_add_one, norm_inv, norm_pow, Real.norm_eq_abs, inv_inj]
       rw [abs_of_nonneg (by positivity)]
     apply integrable_of_le_of_pow_mul_le (C₁ := 1) (C₂ :=2 ^ (q + m - 1) * (‖v‖ ^ (q + m) + 1))
     · simp
