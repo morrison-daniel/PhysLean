@@ -8,6 +8,8 @@ import PhysLean.QuantumMechanics.OneDimension.Operators.Momentum
 import PhysLean.QuantumMechanics.OneDimension.Operators.Position
 import PhysLean.SpaceAndTime.Space.VectorIdentities
 import PhysLean.SpaceAndTime.Time.Basic
+import PhysLean.Mathematics.Trigonometry.Tanh
+import PhysLean.Meta.Linters.Sorry
 /-!
 
 # 1d Reflectionless Potential
@@ -69,6 +71,31 @@ noncomputable def reflectionlessPotential (x : ℝ) : ℝ :=
 noncomputable def tanhOperator (ψ : ℝ → ℂ) : ℝ → ℂ :=
   fun x => Real.tanh (Q.κ * x) * ψ x
 
+/-- Pointwise multiplication by a function of temperate growth -/
+noncomputable def mulByTemperateGrowth {g : ℝ → ℂ} (hg : g.HasTemperateGrowth) :
+    𝓢(ℝ, ℂ) →L[ℂ] 𝓢(ℝ, ℂ) :=
+  bilinLeftCLM (ContinuousLinearMap.mul ℂ ℂ) hg
+
+-- First, you need a theorem that the scaled tanh has temperate growth
+theorem scaled_tanh_hasTemperateGrowth (κ : ℝ) :
+    Function.HasTemperateGrowth (fun x => (Real.tanh (κ * x))) := by
+  exact tanh_const_mul_hasTemperateGrowth κ
+
+-- Scaled tanh embedded into the complex numbers has temperate growth
+@[sorryful]
+theorem scaled_tanh_complex_hasTemperateGrowth (κ : ℝ) :
+    Function.HasTemperateGrowth (fun x => (Real.tanh (κ * x) : ℂ)) := by
+  sorry
+
+/-- Define tanh(κ X) multiplication pointwise as a Schwartz map -/
+noncomputable def tanhOperatorSchwartz (Q : ReflectionlessPotential) :
+    𝓢(ℝ, ℂ) →L[ℂ] 𝓢(ℝ, ℂ) := by
+  -- We need to handle the Real → Complex coercion
+  let scaled_tanh_complex : ℝ → ℂ := fun x => (Real.tanh (Q.κ * x) : ℂ)
+  have h2 : Function.HasTemperateGrowth scaled_tanh_complex
+    := scaled_tanh_complex_hasTemperateGrowth Q.κ
+  exact bilinLeftCLM (ContinuousLinearMap.mul ℂ ℂ) h2
+
 /-- Creation operator: a† as defined in https://arxiv.org/pdf/2411.14941
   a† = 1/√(2m) (P + iℏκ tanh(κX)) -/
 noncomputable def creationOperator (ψ : ℝ → ℂ) : ℝ → ℂ :=
@@ -80,6 +107,38 @@ noncomputable def creationOperator (ψ : ℝ → ℂ) : ℝ → ℂ :=
 noncomputable def annihilationOperator (ψ : ℝ → ℂ) : ℝ → ℂ :=
   let factor : ℝ := 1 / Real.sqrt (2 * Q.m)
   fun x => factor * (momentumOperator ψ x - Complex.I * Q.ℏ * Q.κ * Q.tanhOperator ψ x)
+
+/-- creation operator defined as a Schwartz map -/
+noncomputable def creationOperatorSchwartz (Q : ReflectionlessPotential) : 𝓢(ℝ, ℂ) →L[ℂ] 𝓢(ℝ, ℂ)
+    where
+  toFun ψ := (1 / Real.sqrt (2 * Q.m)) • momentumOperatorSchwartz ψ +
+    ((Complex.I * Q.ℏ * Q.κ) / Real.sqrt (2 * Q.m)) • Q.tanhOperatorSchwartz ψ
+  map_add' ψ1 ψ2 := by
+    simp
+    abel
+  map_smul' ψ1 ψ2 := by
+    simp
+    rw [smul_comm]
+    nth_rewrite 1 [smul_comm ψ1 ((Complex.I * ↑Q.ℏ * ↑Q.κ) / (√2 * √Q.m))]
+    rfl
+  cont := by
+    fun_prop
+
+/-- annihilation operator defined as a Schwartz map -/
+noncomputable def annihilationOperatorSchwartz (Q : ReflectionlessPotential) : 𝓢(ℝ, ℂ) →L[ℂ] 𝓢(ℝ, ℂ)
+    where
+  toFun ψ := (1 / Real.sqrt (2 * Q.m)) • momentumOperatorSchwartz ψ -
+    ((Complex.I * Q.ℏ * Q.κ) / Real.sqrt (2 * Q.m)) • Q.tanhOperatorSchwartz ψ
+  map_add' ψ1 ψ2 := by
+    simp
+    abel
+  map_smul' ψ1 ψ2 := by
+    simp
+    rw [smul_sub, smul_comm]
+    nth_rewrite 1 [smul_comm ψ1 ((Complex.I * ↑Q.ℏ * ↑Q.κ) / (√2 * √Q.m))]
+    rfl
+  cont := by
+    fun_prop
 
 end ReflectionlessPotential
 end OneDimension
