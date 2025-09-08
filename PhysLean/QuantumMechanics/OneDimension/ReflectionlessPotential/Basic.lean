@@ -88,12 +88,13 @@ theorem scaled_tanh_complex_hasTemperateGrowth (κ : ℝ) :
   sorry
 
 /-- Define tanh(κ X) multiplication pointwise as a Schwartz map -/
+@[sorryful]
 noncomputable def tanhOperatorSchwartz (Q : ReflectionlessPotential) :
     𝓢(ℝ, ℂ) →L[ℂ] 𝓢(ℝ, ℂ) := by
   -- We need to handle the Real → Complex coercion
   let scaled_tanh_complex : ℝ → ℂ := fun x => (Real.tanh (Q.κ * x) : ℂ)
-  have h2 : Function.HasTemperateGrowth scaled_tanh_complex
-    := scaled_tanh_complex_hasTemperateGrowth Q.κ
+  have h2 : Function.HasTemperateGrowth scaled_tanh_complex :=
+    scaled_tanh_complex_hasTemperateGrowth Q.κ
   exact bilinLeftCLM (ContinuousLinearMap.mul ℂ ℂ) h2
 
 /-- Creation operator: a† as defined in https://arxiv.org/pdf/2411.14941
@@ -109,6 +110,7 @@ noncomputable def annihilationOperator (ψ : ℝ → ℂ) : ℝ → ℂ :=
   fun x => factor * (momentumOperator ψ x - Complex.I * Q.ℏ * Q.κ * Q.tanhOperator ψ x)
 
 /-- creation operator defined as a Schwartz map -/
+@[sorryful]
 noncomputable def creationOperatorSchwartz (Q : ReflectionlessPotential) : 𝓢(ℝ, ℂ) →L[ℂ] 𝓢(ℝ, ℂ)
     where
   toFun ψ := (1 / Real.sqrt (2 * Q.m)) • momentumOperatorSchwartz ψ +
@@ -127,6 +129,7 @@ noncomputable def creationOperatorSchwartz (Q : ReflectionlessPotential) : 𝓢(
     fun_prop
 
 /-- annihilation operator defined as a Schwartz map -/
+@[sorryful]
 noncomputable def annihilationOperatorSchwartz (Q : ReflectionlessPotential) : 𝓢(ℝ, ℂ) →L[ℂ] 𝓢(ℝ, ℂ)
     where
   toFun ψ := (1 / Real.sqrt (2 * Q.m)) • momentumOperatorSchwartz ψ -
