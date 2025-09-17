@@ -245,10 +245,55 @@ lemma T𝓭_temperature : T𝓭.temperature = 0 := by rfl
 /-- The dimension corresponding to mass. -/
 def M𝓭 : Dimension := ⟨0, 0, 1, 0, 0⟩
 
+@[simp]
+lemma M𝓭_length : M𝓭.length = 0 := by rfl
+
+@[simp]
+lemma M𝓭_time : M𝓭.time = 0 := by rfl
+
+@[simp]
+lemma M𝓭_mass : M𝓭.mass = 1 := by rfl
+
+@[simp]
+lemma M𝓭_charge : M𝓭.charge = 0 := by rfl
+
+@[simp]
+lemma M𝓭_temperature : M𝓭.temperature = 0 := by rfl
+
 /-- The dimension corresponding to charge. -/
 def C𝓭 : Dimension := ⟨0, 0, 0, 1, 0⟩
 
+@[simp]
+lemma C𝓭_length : C𝓭.length = 0 := by rfl
+
+@[simp]
+lemma C𝓭_time : C𝓭.time = 0 := by rfl
+
+@[simp]
+lemma C𝓭_mass : C𝓭.mass = 0 := by rfl
+
+@[simp]
+lemma C𝓭_charge : C𝓭.charge = 1 := by rfl
+
+@[simp]
+lemma C𝓭_temperature : C𝓭.temperature = 0 := by rfl
+
 /-- The dimension corresponding to temperature. -/
 def Θ𝓭 : Dimension := ⟨0, 0, 0, 0, 1⟩
+
+@[simp]
+lemma Θ𝓭_length : Θ𝓭.length = 0 := by rfl
+
+@[simp]
+lemma Θ𝓭_time : Θ𝓭.time = 0 := by rfl
+
+@[simp]
+lemma Θ𝓭_mass : Θ𝓭.mass = 0 := by rfl
+
+@[simp]
+lemma Θ𝓭_charge : Θ𝓭.charge = 0 := by rfl
+
+@[simp]
+lemma Θ𝓭_temperature : Θ𝓭.temperature = 1 := by rfl
 
 end Dimension
