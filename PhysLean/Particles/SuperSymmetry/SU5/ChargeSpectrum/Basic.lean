@@ -9,20 +9,57 @@ import Mathlib.Data.Finset.Sort
 import PhysLean.Particles.SuperSymmetry.SU5.Potential
 /-!
 
-# Charges
+# Charge Spectrum
 
-In this module we give the data structure for a charges
-associated with the matter content of the SU(5) GUT model, assuming
-only 5-bar and 10d representations.
+## i. Overview
 
-These charges are permitted to sit within any type `𝓩` which is usually taken
-to be `ℤ` (for `U(1)` charges) or multiples thereof.
+In this module we define the charge spectrum of a `SU(5)` SUSY GUT theory with
+additional charges (usually `U(1)`) satisfying the condition of:
+- The optional existence of a `Hd` particle in the `bar 5` representation.
+- The optional existence of a `Hu` particle in the `5` representation.
+- The optional existence of matter in the `bar 5` representation.
+- The optional existence of matter in the `10` representation.
+
+The charge spectrum contains the information of the *uniqe* charges of each type of particle
+present in theory. Importantly, the charge spectrum does not contain information
+about the multiplicity of those charges.
+
+With just the charge spectrum of the theory it is possible to put a number of constraints
+on the theory, most notably phenomenological constraints.
+
+By keeping the presence of `Hd` and `Hu` optional, we can define a number of useful properties
+of the charge spectrum, which can help in searching for viable theories.
+
+## ii. Key results
+
+- `ChargeSpectrum 𝓩` : The type of charge spectra with charges of type `𝓩`, which is usually
+  `ℤ`.
+
+## iii. Table of Content
+
+- A. The definition of the charge spectrum
+- B. The subset relation
+- C. The empty charge spectrum
+- D. The cardinality of a charge spectrum
+- E. The power set of a charge spectrum
+- F. Finite sets of charge spectra with values
+
+## iv. References
+
+There are no known references for charge spectra in the literature.
+They were created specifically for the purpose of PhysLean.
 
 -/
 
 namespace SuperSymmetry
 
 namespace SU5
+
+/-!
+
+## A. The definition of the charge spectrum
+
+-/
 
 /-- The type such that an element corresponds to the collection of
   charges associated with the matter content of the theory.
@@ -36,23 +73,25 @@ namespace SU5
 - `ℤ × ℤ` in the case of `U(1) × U(1)`,
 - `Fin 2` in the case of `ℤ₂` etc.
 -/
-def Charges (𝓩 : Type := ℤ) : Type := Option 𝓩 × Option 𝓩 × Finset 𝓩 × Finset 𝓩
+def ChargeSpectrum (𝓩 : Type := ℤ) : Type := Option 𝓩 × Option 𝓩 × Finset 𝓩 × Finset 𝓩
 
-namespace Charges
+namespace ChargeSpectrum
 
 variable {𝓩 : Type}
 
-/-- The explicit casting of a term of type `Charges 𝓩` to a term of
-  `Option 𝓩 × Option 𝓩 × Finset 𝓩 × Finset 𝓩`. -/
-def toProd (x : Charges 𝓩) : Option 𝓩 × Option 𝓩 × Finset 𝓩 × Finset 𝓩 := x
+/-!
 
-lemma eq_of_parts {x y : Charges 𝓩} (h1 : x.1 = y.1) (h2 : x.2.1 = y.2.1)
+### A.1. Extensionality properties
+
+-/
+
+lemma eq_of_parts {x y : ChargeSpectrum 𝓩} (h1 : x.1 = y.1) (h2 : x.2.1 = y.2.1)
     (h3 : x.2.2.1 = y.2.2.1) (h4 : x.2.2.2 = y.2.2.2) : x = y := by
   match x, y with
   | (x1, x2, x3, x4), (y1, y2, y3, y4) =>
     simp_all
 
-lemma eq_iff {x y : Charges 𝓩} :
+lemma eq_iff {x y : ChargeSpectrum 𝓩} :
     x = y ↔ x.1 = y.1 ∧ x.2.1 = y.2.1 ∧ x.2.2.1 = y.2.2.1 ∧ x.2.2.2 = y.2.2.2 := by
   constructor
   · intro h
@@ -63,14 +102,30 @@ lemma eq_iff {x y : Charges 𝓩} :
 
 /-!
 
-## Basic instances on the type `Charges 𝓩`.
+### A.2. Relation to products
 
 -/
 
-instance [DecidableEq 𝓩] : DecidableEq (Charges 𝓩) := inferInstanceAs
+/-- The explicit casting of a term of type `Charges 𝓩` to a term of
+  `Option 𝓩 × Option 𝓩 × Finset 𝓩 × Finset 𝓩`. -/
+def toProd (x : ChargeSpectrum 𝓩) : Option 𝓩 × Option 𝓩 × Finset 𝓩 × Finset 𝓩 := x
+
+/-!
+
+### A.3. Decidability
+
+-/
+
+instance [DecidableEq 𝓩] : DecidableEq (ChargeSpectrum 𝓩) := inferInstanceAs
   (DecidableEq (Option 𝓩 × Option 𝓩 × Finset 𝓩 × Finset 𝓩))
 
-unsafe instance [Repr 𝓩] : Repr (Charges 𝓩) where
+/-!
+
+### A.4. Rendering
+
+-/
+
+unsafe instance [Repr 𝓩] : Repr (ChargeSpectrum 𝓩) where
   reprPrec x _ := match x with
     | (qHd, qHu, Q5, Q10) =>
       let s1 := reprStr qHd
@@ -81,34 +136,30 @@ unsafe instance [Repr 𝓩] : Repr (Charges 𝓩) where
 
 /-!
 
-## Subsest relation
+## B. The subset relation
+
+We define a `HasSubset` and `HasSSubset` instance on `ChargeSpectrum 𝓩`.
 
 -/
 
-instance hasSubset : HasSubset (Charges 𝓩) where
+instance hasSubset : HasSubset (ChargeSpectrum 𝓩) where
   Subset x y := x.1.toFinset ⊆ y.1.toFinset ∧
     x.2.1.toFinset ⊆ y.2.1.toFinset ∧
     x.2.2.1 ⊆ y.2.2.1 ∧
     x.2.2.2 ⊆ y.2.2.2
 
-instance hasSSubset : HasSSubset (Charges 𝓩) where
+instance hasSSubset : HasSSubset (ChargeSpectrum 𝓩) where
   SSubset x y := x ⊆ y ∧ x ≠ y
 
-instance subsetDecidable [DecidableEq 𝓩] (x y : Charges 𝓩) : Decidable (x ⊆ y) := instDecidableAnd
+instance subsetDecidable [DecidableEq 𝓩] (x y : ChargeSpectrum 𝓩) : Decidable (x ⊆ y) :=
+  instDecidableAnd
 
-lemma subset_def {x y : Charges 𝓩} : x ⊆ y ↔ x.1.toFinset ⊆ y.1.toFinset ∧
+lemma subset_def {x y : ChargeSpectrum 𝓩} : x ⊆ y ↔ x.1.toFinset ⊆ y.1.toFinset ∧
     x.2.1.toFinset ⊆ y.2.1.toFinset ∧ x.2.2.1 ⊆ y.2.2.1 ∧ x.2.2.2 ⊆ y.2.2.2 := by
   rfl
 
 @[simp, refl]
-lemma subset_refl (x : Charges 𝓩) : x ⊆ x := by
-  constructor
-  · rfl
-  · constructor
-    · rfl
-    · constructor
-      · rfl
-      · rfl
+lemma subset_refl (x : ChargeSpectrum 𝓩) : x ⊆ x := ⟨by rfl, by rfl, by rfl, by rfl⟩
 
 lemma _root_.Option.toFinset_inj {x y : Option 𝓩} :
     x = y ↔ x.toFinset = y.toFinset := by
@@ -122,10 +173,10 @@ lemma _root_.Option.toFinset_inj {x y : Option 𝓩} :
   | some _, none => simp [Option.toFinset]
   | some _, some _ => simp [Option.toFinset]
 
-lemma subset_trans {x y z : Charges 𝓩} (hxy : x ⊆ y) (hyz : y ⊆ z) : x ⊆ z := by
+lemma subset_trans {x y z : ChargeSpectrum 𝓩} (hxy : x ⊆ y) (hyz : y ⊆ z) : x ⊆ z := by
   simp_all [Subset]
 
-lemma subset_antisymm {x y : Charges 𝓩} (hxy : x ⊆ y) (hyx : y ⊆ x) : x = y := by
+lemma subset_antisymm {x y : ChargeSpectrum 𝓩} (hxy : x ⊆ y) (hyx : y ⊆ x) : x = y := by
   rw [Subset] at hxy hyx
   dsimp [hasSubset] at hxy hyx
   rcases x with ⟨x1, x2, x3, x4⟩
@@ -139,19 +190,19 @@ lemma subset_antisymm {x y : Charges 𝓩} (hxy : x ⊆ y) (hyx : y ⊆ x) : x =
 
 /-!
 
-## The empty charges
+## C. The empty charge spectrum
 
 -/
 
-instance emptyInst : EmptyCollection (Charges 𝓩) where
+instance emptyInst : EmptyCollection (ChargeSpectrum 𝓩) where
   emptyCollection := (none, none, {}, {})
 
 @[simp]
-lemma empty_subset (x : Charges 𝓩) : ∅ ⊆ x := by
+lemma empty_subset (x : ChargeSpectrum 𝓩) : ∅ ⊆ x := by
   simp [Subset, emptyInst]
 
 @[simp]
-lemma subset_of_empty_iff_empty {x : Charges 𝓩} :
+lemma subset_of_empty_iff_empty {x : ChargeSpectrum 𝓩} :
     x ⊆ ∅ ↔ x = ∅ := by
   constructor
   · intro h
@@ -163,37 +214,37 @@ lemma subset_of_empty_iff_empty {x : Charges 𝓩} :
     simp
 
 @[simp]
-lemma empty_qHd : (∅ : Charges 𝓩).1 = none := by
+lemma empty_qHd : (∅ : ChargeSpectrum 𝓩).1 = none := by
   simp [emptyInst]
 
 @[simp]
-lemma empty_qHu : (∅ : Charges 𝓩).2.1 = none := by
+lemma empty_qHu : (∅ : ChargeSpectrum 𝓩).2.1 = none := by
   simp [emptyInst]
 
 @[simp]
-lemma empty_Q5 : (∅ : Charges 𝓩).2.2.1 = ∅ := by
+lemma empty_Q5 : (∅ : ChargeSpectrum 𝓩).2.2.1 = ∅ := by
   simp [emptyInst]
 
 @[simp]
-lemma empty_Q10 : (∅ : Charges 𝓩).2.2.2 = ∅ := by
+lemma empty_Q10 : (∅ : ChargeSpectrum 𝓩).2.2.2 = ∅ := by
   simp [emptyInst]
 
 /-!
 
-## Card
+## D. The cardinality of a charge spectrum
 
 -/
 
 /-- The cardinality of a `Charges` is defined to be the sum of the cardinalities
   of each of the underlying finite sets of charges, with `Option ℤ` turned to finsets. -/
-def card (x : Charges 𝓩) : Nat :=
+def card (x : ChargeSpectrum 𝓩) : Nat :=
   x.1.toFinset.card + x.2.1.toFinset.card + x.2.2.1.card + x.2.2.2.card
 
 @[simp]
-lemma card_empty : card (∅ : Charges 𝓩) = 0 := by
+lemma card_empty : card (∅ : ChargeSpectrum 𝓩) = 0 := by
   simp [card, emptyInst]
 
-lemma card_mono {x y : Charges 𝓩} (h : x ⊆ y) : card x ≤ card y := by
+lemma card_mono {x y : ChargeSpectrum 𝓩} (h : x ⊆ y) : card x ≤ card y := by
   simp [hasSubset] at h
   have h1 := Finset.card_le_card h.1
   have h2 := Finset.card_le_card h.2.1
@@ -202,7 +253,7 @@ lemma card_mono {x y : Charges 𝓩} (h : x ⊆ y) : card x ≤ card y := by
   simp [card]
   omega
 
-lemma eq_of_subset_card {x y : Charges 𝓩} (h : x ⊆ y) (hcard : card x = card y) : x = y := by
+lemma eq_of_subset_card {x y : ChargeSpectrum 𝓩} (h : x ⊆ y) (hcard : card x = card y) : x = y := by
   simp [card] at hcard
   have h1 := Finset.card_le_card h.1
   have h2 := Finset.card_le_card h.2.1
@@ -227,7 +278,7 @@ lemma eq_of_subset_card {x y : Charges 𝓩} (h : x ⊆ y) (hcard : card x = car
 
 /-!
 
-## Powerset
+## E. The power set of a charge spectrum
 
 -/
 
@@ -255,11 +306,11 @@ lemma _root_.Option.mem_powerset_iff {x : Option 𝓩} (y : Option 𝓩) :
 
 /-- The powerset of a charge . Given a charge `x : Charges`
   it's powerset is the finite set of all `Charges` which are subsets of `x`. -/
-def powerset (x : Charges 𝓩) : Finset (Charges 𝓩) :=
+def powerset (x : ChargeSpectrum 𝓩) : Finset (ChargeSpectrum 𝓩) :=
   x.1.powerset.product <| x.2.1.powerset.product <| x.2.2.1.powerset.product <| x.2.2.2.powerset
 
 @[simp]
-lemma mem_powerset_iff_subset {x y : Charges 𝓩} :
+lemma mem_powerset_iff_subset {x y : ChargeSpectrum 𝓩} :
     x ∈ powerset y ↔ x ⊆ y := by
   cases x
   cases y
@@ -267,19 +318,19 @@ lemma mem_powerset_iff_subset {x y : Charges 𝓩} :
   rw [Finset.mem_product]
   simp_all [Subset]
 
-lemma self_mem_powerset (x : Charges 𝓩) :
+lemma self_mem_powerset (x : ChargeSpectrum 𝓩) :
     x ∈ powerset x := by simp
 
-lemma empty_mem_powerset (x : Charges 𝓩) :
+lemma empty_mem_powerset (x : ChargeSpectrum 𝓩) :
     ∅ ∈ powerset x := by simp
 
 @[simp]
 lemma powerset_of_empty :
-    powerset (∅ : Charges 𝓩) = {∅} := by
+    powerset (∅ : ChargeSpectrum 𝓩) = {∅} := by
   ext x
   simp
 
-lemma powerset_mono {x y : Charges 𝓩} :
+lemma powerset_mono {x y : ChargeSpectrum 𝓩} :
     powerset x ⊆ powerset y ↔ x ⊆ y := by
   constructor
   · intro h
@@ -291,7 +342,7 @@ lemma powerset_mono {x y : Charges 𝓩} :
     intro h1
     exact subset_trans h1 h
 
-lemma min_exists_inductive (S : Finset (Charges 𝓩)) (hS : S ≠ ∅) :
+lemma min_exists_inductive (S : Finset (ChargeSpectrum 𝓩)) (hS : S ≠ ∅) :
     (n : ℕ) → (hn : S.card = n) →
     ∃ y ∈ S, powerset y ∩ S = {y}
   | 0, h => by simp_all
@@ -356,19 +407,19 @@ lemma min_exists_inductive (S : Finset (Charges 𝓩)) (hS : S ≠ ∅) :
         subst hzy
         simp_all
 
-lemma min_exists (S : Finset (Charges 𝓩)) (hS : S ≠ ∅) :
+lemma min_exists (S : Finset (ChargeSpectrum 𝓩)) (hS : S ≠ ∅) :
     ∃ y ∈ S, powerset y ∩ S = {y} := min_exists_inductive S hS S.card rfl
 
 /-!
 
-## ofFinset
+## F. Finite sets of charge spectra with values
 
 -/
 
 /-- Given `S5 S10 : Finset 𝓩` the finite set of charges associated with
   for which the 5-bar representation charges sit in `S5` and
   the 10d representation charges sit in `S10`. -/
-def ofFinset (S5 S10 : Finset 𝓩) : Finset (Charges 𝓩) :=
+def ofFinset (S5 S10 : Finset 𝓩) : Finset (ChargeSpectrum 𝓩) :=
   let SqHd := {none} ∪ S5.map ⟨Option.some, Option.some_injective 𝓩⟩
   let SqHu := {none} ∪ S5.map ⟨Option.some, Option.some_injective 𝓩⟩
   let SQ5 := S5.powerset
@@ -396,7 +447,7 @@ lemma qHu_mem_ofFinset (S5 S10 : Finset 𝓩) (z : 𝓩) (x1 : Option 𝓩) (x2 
   simp_all
 
 lemma mem_ofFinset_Q5_subset (S5 S10 : Finset 𝓩)
-    {x : Charges 𝓩} (hx : x ∈ ofFinset S5 S10) :
+    {x : ChargeSpectrum 𝓩} (hx : x ∈ ofFinset S5 S10) :
     x.2.2.1 ⊆ S5 := by
   rw [ofFinset] at hx
   cases x
@@ -406,7 +457,7 @@ lemma mem_ofFinset_Q5_subset (S5 S10 : Finset 𝓩)
   exact hx.2.2.1
 
 lemma mem_ofFinset_Q10_subset (S5 S10 : Finset 𝓩)
-    {x : Charges 𝓩} (hx : x ∈ ofFinset S5 S10) :
+    {x : ChargeSpectrum 𝓩} (hx : x ∈ ofFinset S5 S10) :
     x.2.2.2 ⊆ S10 := by
   rw [ofFinset] at hx
   cases x
@@ -416,7 +467,7 @@ lemma mem_ofFinset_Q10_subset (S5 S10 : Finset 𝓩)
   exact hx.2.2.2
 
 lemma mem_ofFinset_antitone (S5 S10 : Finset 𝓩)
-    {x y : Charges 𝓩} (h : x ⊆ y) (hy : y ∈ ofFinset S5 S10) :
+    {x y : ChargeSpectrum 𝓩} (h : x ⊆ y) (hy : y ∈ ofFinset S5 S10) :
     x ∈ ofFinset S5 S10 := by
   have hoption (x : Option 𝓩) (S : Finset 𝓩) :
       x ∈ ({none} : Finset (Option 𝓩)) ∪ S.map ⟨Option.some, Option.some_injective 𝓩⟩ ↔
@@ -435,7 +486,7 @@ lemma mem_ofFinset_antitone (S5 S10 : Finset 𝓩)
   simp only [hoption, Finset.mem_powerset] at hy ⊢
   exact ⟨h.1.trans hy.1, h.2.1.trans hy.2.1, h.2.2.1.trans hy.2.2.1, h.2.2.2.trans hy.2.2.2⟩
 
-lemma mem_ofFinset_iff {S5 S10 : Finset 𝓩} {x : Charges 𝓩} :
+lemma mem_ofFinset_iff {S5 S10 : Finset 𝓩} {x : ChargeSpectrum 𝓩} :
     x ∈ ofFinset S5 S10 ↔ x.1.toFinset ⊆ S5 ∧ x.2.1.toFinset ⊆ S5 ∧
       x.2.2.1 ⊆ S5 ∧ x.2.2.2 ⊆ S10 := by
   match x with
@@ -458,12 +509,12 @@ lemma ofFinset_subset_of_subset {S5 S5' S10 S10' : Finset 𝓩}
   rw [mem_ofFinset_iff] at hx ⊢
   exact ⟨hx.1.trans h5, hx.2.1.trans h5, hx.2.2.1.trans h5, hx.2.2.2.trans h10⟩
 
-lemma ofFinset_univ [Fintype 𝓩] (x : Charges 𝓩) :
+lemma ofFinset_univ [Fintype 𝓩] (x : ChargeSpectrum 𝓩) :
     x ∈ ofFinset (Finset.univ : Finset 𝓩) (Finset.univ : Finset 𝓩) := by
   rw [mem_ofFinset_iff]
   simp
 
-end Charges
+end ChargeSpectrum
 
 end SU5
 
