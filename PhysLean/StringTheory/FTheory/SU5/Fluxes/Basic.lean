@@ -61,10 +61,11 @@ See the conditions in equation 26 - 28 of [1].
 ## ii. Key results
 
 The above theory is implemented by defining two data structures:
-- `FluxesTen` of type `Multiset (ℤ × ℤ)`
+- `Fluxes` : The data of the fluxes `(M, N)` carried by a matter field.
+- `FluxesTen` of type `Multiset Fluxes`
   which contains the chirality `M` and hypercharge fluxes
   `N` of the 10d-matter curves.
-- `FluxesFive` of type `Multiset (ℤ × ℤ)`
+- `FluxesFive` of type `Multiset Fluxes`
   which contains the chirality `M` and hypercharge fluxes
   `N` of the 5-bar-matter curves (excluding the higges).
 
@@ -73,39 +74,44 @@ they can be derived from other data structures.
 
 ## iii. Table of contents
 
-- A. Fluxes of the 5d matter representation
-  - A.1. Deciability instance on `FluxesFive`
-  - A.2. The proposition for no element to be zero
-  - A.3. The SM representation `D = (bar 3,1)_{1/3}`
-    - A.3.1. Chiral indices of `D`
-    - A.3.2. The number of chiral `D`
-    - A.3.3. The number of anti-chiral `D`
-    - A.3.4. Relation between number of chiral and anti-chiral `D`
-  - A.4. The SM representation `L = (1,2)_{-1/2}`
-    - A.4.1. Chiral indices of `L`
-    - A.4.2. The number of chiral `L`
-    - A.4.3. The number of anti-chiral `L`
-    - A.4.4. Relation between number of chiral and anti-chiral `L`
-  - A.5. No exotics from the 5-bar matter fields
-- B. Fluxes of the 10d matter representation
-  - B.1. Deciability instance on `FluxesTen`
+- A. Fluxes
+  - A.1. Extensionality lemma for the fluxes
+  - A.2. The zero flux
+  - A.3. Addition of fluxes
+  - A.4. The instance of an additive commutative monoid on fluxes
+- B. Fluxes of the 5d matter representation
+  - B.1. Deciability instance on `FluxesFive`
   - B.2. The proposition for no element to be zero
-  - B.3. The SM representation `Q = (3,2)_{1/6}`
-    - B.3.1. Chiral indices of `Q`
-    - B.3.2. The number of chiral `Q`
-    - B.3.3. The number of anti-chiral `Q`
-    - B.3.4. Relation between number of chiral and anti-chiral `Q`
-  - B.4. The SM representation `U = (bar 3,1)_{-2/3}`
-    - B.4.1. Chiral indices of `U`
-    - B.4.2. The number of chiral `U`
-    - B.4.3. The number of anti-chiral `U`
-    - B.4.4. Relation between number of chiral and anti-chiral `Q`
-  - B.5. The SM representation `E = (1,1)_{1}`
-    - B.5.1. Chiral indices of `E`
-    - B.5.2. The number of chiral `E`
-    - B.5.3. The number of anti-chiral `E`
-    - B.5.4. Relation between number of chiral and anti-chiral `E`
-  - B.6. No exotics from the 10d matter fields
+  - B.3. The SM representation `D = (bar 3,1)_{1/3}`
+    - B.3.1. Chiral indices of `D`
+    - B.3.2. The number of chiral `D`
+    - B.3.3. The number of anti-chiral `D`
+    - B.3.4. Relation between number of chiral and anti-chiral `D`
+  - B.4. The SM representation `L = (1,2)_{-1/2}`
+    - B.4.1. Chiral indices of `L`
+    - B.4.2. The number of chiral `L`
+    - B.4.3. The number of anti-chiral `L`
+    - B.4.4. Relation between number of chiral and anti-chiral `L`
+  - B.5. No exotics from the 5-bar matter fields
+- C. Fluxes of the 10d matter representation
+  - C.1. Deciability instance on `FluxesTen`
+  - C.2. The proposition for no element to be zero
+  - C.3. The SM representation `Q = (3,2)_{1/6}`
+    - C.3.1. Chiral indices of `Q`
+    - C.3.2. The number of chiral `Q`
+    - C.3.3. The number of anti-chiral `Q`
+    - C.3.4. Relation between number of chiral and anti-chiral `Q`
+  - C.4. The SM representation `U = (bar 3,1)_{-2/3}`
+    - C.4.1. Chiral indices of `U`
+    - C.4.2. The number of chiral `U`
+    - C.4.3. The number of anti-chiral `U`
+    - C.4.4. Relation between number of chiral and anti-chiral `Q`
+  - C.5. The SM representation `E = (1,1)_{1}`
+    - C.5.1. Chiral indices of `E`
+    - C.5.2. The number of chiral `E`
+    - C.5.3. The number of anti-chiral `E`
+    - C.5.4. Relation between number of chiral and anti-chiral `E`
+  - C.6. No exotics from the 10d matter fields
 
 ## iv. References
 
@@ -119,53 +125,128 @@ namespace SU5
 
 /-!
 
-## A. Fluxes of the 5d matter representation
+## A. Fluxes
+
+To each matter curve we associate a pair of integers `(M, N)`,
+the former of which is the chirality flux and the latter the hypercharge flux.
+
+-/
+
+/-- The data of the fluxes carried by a matter field. -/
+structure Fluxes where
+  /-- The chirality flux. -/
+  M : ℤ
+  /-- The hypercharge flux. -/
+  N : ℤ
+deriving DecidableEq, Repr
+
+namespace Fluxes
+
+/-!
+
+### A.1. Extensionality lemma for the fluxes
+
+-/
+
+lemma ext_iff {f1 f2 : Fluxes} : f1 = f2 ↔ f1.M = f2.M ∧ f1.N = f2.N := by
+  cases f1; cases f2; simp
+
+instance : Zero Fluxes := ⟨0, 0⟩
+
+/-!
+
+### A.2. The zero flux
+
+-/
+
+@[simp]
+lemma zero_M : (0 : Fluxes).M = 0 := rfl
+
+@[simp]
+lemma zero_N : (0 : Fluxes).N = 0 := rfl
+
+/-!
+
+### A.3. Addition of fluxes
+
+-/
+
+instance : Add Fluxes where
+  add f1 f2 := ⟨f1.M + f2.M, f1.N + f2.N⟩
+
+@[simp]
+lemma add_M (f1 f2 : Fluxes) : (f1 + f2).M = f1.M + f2.M := rfl
+
+@[simp]
+lemma add_N (f1 f2 : Fluxes) : (f1 + f2).N = f1.N + f2.N := rfl
+
+/-!
+
+### A.4. The instance of an additive commutative monoid on fluxes
+
+-/
+
+instance : AddCommMonoid Fluxes where
+  add_assoc f1 f2 f3 := Fluxes.ext_iff.mpr <| by simp only [add_M, add_N]; ring_nf; simp
+  zero_add f := Fluxes.ext_iff.mpr <| by simp
+  add_zero f := Fluxes.ext_iff.mpr <| by simp
+  add_comm f1 f2 := Fluxes.ext_iff.mpr <| by simp only [add_M, add_N]; ring_nf; simp
+  nsmul n f := ⟨n * f.M, n * f.N⟩
+  nsmul_zero f := Fluxes.ext_iff.mpr <| by simp
+  nsmul_succ n f := Fluxes.ext_iff.mpr <| by
+    simp only [Nat.cast_add, Nat.cast_one, add_M, add_N]; ring_nf; simp
+
+end Fluxes
+
+/-!
+
+## B. Fluxes of the 5d matter representation
 
 -/
 
 /-- The fluxes `(M, N)` of the 5-bar matter curves of a theory. -/
-abbrev FluxesFive : Type := Multiset (ℤ × ℤ)
+abbrev FluxesFive : Type := Multiset Fluxes
 
 namespace FluxesFive
 
 /-!
 
-### A.1. Deciability instance on `FluxesFive`
+### B.1. Deciability instance on `FluxesFive`
 
 -/
 
 instance : DecidableEq FluxesFive :=
-  inferInstanceAs (DecidableEq (Multiset (ℤ × ℤ)))
+  inferInstanceAs (DecidableEq (Multiset Fluxes))
 
 /-!
 
-### A.2. The proposition for no element to be zero
+### B.2. The proposition for no element to be zero
 
 -/
 
 /-- The proposition on `FluxesFive` such that `(0, 0)` is not in `F`
   and as such each component in `F` leads to chiral matter. -/
-abbrev HasNoZero (F : FluxesFive) : Prop := (0, 0) ∉ F
+abbrev HasNoZero (F : FluxesFive) : Prop := 0 ∉ F
 
 /-!
 
-### A.3. The SM representation `D = (bar 3,1)_{1/3}`
+### B.3. The SM representation `D = (bar 3,1)_{1/3}`
 
 -/
 
 /-!
 
-#### A.3.1. Chiral indices of `D`
+#### B.3.1. Chiral indices of `D`
 
 -/
 
 /-- The multiset of chiral indices of the representation `D = (bar 3,1)_{1/3}`
   arrising from the matter 5d representations. -/
-def chiralIndicesOfD (F : FluxesFive) : Multiset ℤ := F.map (fun f => f.1)
+def chiralIndicesOfD (F : FluxesFive) : Multiset ℤ := F.map (fun f => f.M)
 
 /-!
 
-#### A.3.2. The number of chiral `D`
+#### B.3.2. The number of chiral `D`
 
 -/
 
@@ -176,7 +257,7 @@ def numChiralD (F : FluxesFive) : ℤ :=
 
 /-!
 
-#### A.3.3. The number of anti-chiral `D`
+#### B.3.3. The number of anti-chiral `D`
 
 -/
 
@@ -187,7 +268,7 @@ def numAntiChiralD (F : FluxesFive) : ℤ :=
 
 /-!
 
-#### A.3.4. Relation between number of chiral and anti-chiral `D`
+#### B.3.4. Relation between number of chiral and anti-chiral `D`
 
 -/
 
@@ -202,23 +283,23 @@ lemma numChiralD_eq_sum_sub_numAntiChiralD (F : FluxesFive) :
 
 /-!
 
-### A.4. The SM representation `L = (1,2)_{-1/2}`
+### B.4. The SM representation `L = (1,2)_{-1/2}`
 
 -/
 
 /-!
 
-#### A.4.1. Chiral indices of `L`
+#### B.4.1. Chiral indices of `L`
 
 -/
 
 /-- The multiset of chiral indices of the representation `L = (1,2)_{-1/2}`
   arrising from the matter 5d representations. -/
-def chiralIndicesOfL (F : FluxesFive) : Multiset ℤ := F.map (fun f => f.1 + f.2)
+def chiralIndicesOfL (F : FluxesFive) : Multiset ℤ := F.map (fun f => f.M + f.N)
 
 /-!
 
-#### A.4.2. The number of chiral `L`
+#### B.4.2. The number of chiral `L`
 
 -/
 
@@ -229,7 +310,7 @@ def numChiralL (F : FluxesFive) : ℤ :=
 
 /-!
 
-#### A.4.3. The number of anti-chiral `L`
+#### B.4.3. The number of anti-chiral `L`
 
 -/
 
@@ -240,7 +321,7 @@ def numAntiChiralL (F : FluxesFive) : ℤ :=
 
 /-!
 
-#### A.4.4. Relation between number of chiral and anti-chiral `L`
+#### B.4.4. Relation between number of chiral and anti-chiral `L`
 
 -/
 
@@ -255,7 +336,7 @@ lemma numChiralL_eq_sum_sub_numAntiChiralL (F : FluxesFive) :
 
 /-!
 
-### A.5. No exotics from the 5-bar matter fields
+### B.5. No exotics from the 5-bar matter fields
 
 -/
 
@@ -274,53 +355,53 @@ end FluxesFive
 
 /-!
 
-## B. Fluxes of the 10d matter representation
+## C. Fluxes of the 10d matter representation
 
 -/
 
 /-- The fluxes `(M, N)` of the 10d matter curves of a theory. -/
-abbrev FluxesTen : Type := Multiset (ℤ × ℤ)
+abbrev FluxesTen : Type := Multiset Fluxes
 
 namespace FluxesTen
 
 /-!
 
-### B.1. Deciability instance on `FluxesTen`
+### C.1. Deciability instance on `FluxesTen`
 
 -/
 
 instance : DecidableEq FluxesTen :=
-  inferInstanceAs (DecidableEq (Multiset (ℤ × ℤ)))
+  inferInstanceAs (DecidableEq (Multiset Fluxes))
 
 /-!
 
-### B.2. The proposition for no element to be zero
+### C.2. The proposition for no element to be zero
 
 -/
 
 /-- The proposition on `FluxesTen` such that `(0, 0)` is not in `F`
   and as such each component in `F` leads to chiral matter. -/
-abbrev HasNoZero (F : FluxesTen) : Prop := (0, 0) ∉ F
+abbrev HasNoZero (F : FluxesTen) : Prop := 0 ∉ F
 
 /-!
 
-### B.3. The SM representation `Q = (3,2)_{1/6}`
+### C.3. The SM representation `Q = (3,2)_{1/6}`
 
 -/
 
 /-!
 
-#### B.3.1. Chiral indices of `Q`
+#### C.3.1. Chiral indices of `Q`
 
 -/
 
 /-- The multiset of chiral indices of the representation `Q = (3,2)_{1/6}`
   arrising from the matter 10d representations, corresponding to `M`. -/
-def chiralIndicesOfQ (F : FluxesTen) : Multiset ℤ := F.map (fun f => f.1)
+def chiralIndicesOfQ (F : FluxesTen) : Multiset ℤ := F.map (fun f => f.M)
 
 /-!
 
-#### B.3.2. The number of chiral `Q`
+#### C.3.2. The number of chiral `Q`
 
 -/
 
@@ -330,7 +411,7 @@ def numChiralQ (F : FluxesTen) : ℤ := ((chiralIndicesOfQ F).filter (fun x => 0
 
 /-!
 
-#### B.3.3. The number of anti-chiral `Q`
+#### C.3.3. The number of anti-chiral `Q`
 
 -/
 
@@ -340,7 +421,7 @@ def numAntiChiralQ (F : FluxesTen) : ℤ := ((chiralIndicesOfQ F).filter (fun x 
 
 /-!
 
-#### B.3.4. Relation between number of chiral and anti-chiral `Q`
+#### C.3.4. Relation between number of chiral and anti-chiral `Q`
 
 -/
 
@@ -355,23 +436,23 @@ lemma numChiralQ_eq_sum_sub_numAntiChiralQ (F : FluxesTen) :
 
 /-!
 
-### B.4. The SM representation `U = (bar 3,1)_{-2/3}`
+### C.4. The SM representation `U = (bar 3,1)_{-2/3}`
 
 -/
 
 /-!
 
-#### B.4.1. Chiral indices of `U`
+#### C.4.1. Chiral indices of `U`
 
 -/
 
 /-- The multiset of chiral indices of the representation `U = (bar 3,1)_{-2/3}`
   arrising from the matter 10d representations, corresponding to `M - N` -/
-def chiralIndicesOfU (F : FluxesTen) : Multiset ℤ := F.map (fun f => f.1 - f.2)
+def chiralIndicesOfU (F : FluxesTen) : Multiset ℤ := F.map (fun f => f.M - f.N)
 
 /-!
 
-#### B.4.2. The number of chiral `U`
+#### C.4.2. The number of chiral `U`
 
 -/
 
@@ -381,7 +462,7 @@ def numChiralU (F : FluxesTen) : ℤ := ((chiralIndicesOfU F).filter (fun x => 0
 
 /-!
 
-#### B.4.3. The number of anti-chiral `U`
+#### C.4.3. The number of anti-chiral `U`
 
 -/
 
@@ -391,7 +472,7 @@ def numAntiChiralU (F : FluxesTen) : ℤ := ((chiralIndicesOfU F).filter (fun x 
 
 /-
 
-#### B.4.4. Relation between number of chiral and anti-chiral `Q`
+#### C.4.4. Relation between number of chiral and anti-chiral `Q`
 
 -/
 
@@ -405,23 +486,23 @@ lemma numChiralU_eq_sum_sub_numAntiChiralU (F : FluxesTen) :
   simp [chiralIndicesOfU, numChiralU, numAntiChiralU]
 /-!
 
-### B.5. The SM representation `E = (1,1)_{1}`
+### C.5. The SM representation `E = (1,1)_{1}`
 
 -/
 
 /-!
 
-#### B.5.1. Chiral indices of `E`
+#### C.5.1. Chiral indices of `E`
 
 -/
 
 /-- The multiset of chiral indices of the representation `E = (1,1)_{1}`
   arrising from the matter 10d representations, corresponding to `M + N` -/
-def chiralIndicesOfE (F : FluxesTen) : Multiset ℤ := F.map (fun f => f.1 + f.2)
+def chiralIndicesOfE (F : FluxesTen) : Multiset ℤ := F.map (fun f => f.M + f.N)
 
 /-!
 
-#### B.5.2. The number of chiral `E`
+#### C.5.2. The number of chiral `E`
 
 -/
 
@@ -431,7 +512,7 @@ def numChiralE (F : FluxesTen) : ℤ := ((chiralIndicesOfE F).filter (fun x => 0
 
 /-!
 
-#### B.5.3. The number of anti-chiral `E`
+#### C.5.3. The number of anti-chiral `E`
 
 -/
 
@@ -441,7 +522,7 @@ def numAntiChiralE (F : FluxesTen) : ℤ := ((chiralIndicesOfE F).filter (fun x 
 
 /-!
 
-#### B.5.4. Relation between number of chiral and anti-chiral `E`
+#### C.5.4. Relation between number of chiral and anti-chiral `E`
 
 -/
 
@@ -456,7 +537,7 @@ lemma numChiralE_eq_sum_sub_numAntiChiralE (F : FluxesTen) :
 
 /-!
 
-### B.6. No exotics from the 10d matter fields
+### C.6. No exotics from the 10d matter fields
 
 -/
 
