@@ -401,7 +401,8 @@ noncomputable def probabilityBetaReal (b : ℝ) (i : ι) : ℝ :=
   Real.exp (-b * 𝓒.energy i) / 𝓒.mathematicalPartitionFunctionBetaReal b
 
 /-- The mean energy as a function of inverse temperature `b = β` in the finite case,
-defined by `U(b) = ∑ i, E i * p_b i` with `p_b i = exp (-b * E i) / Z(b)` and `Z(b) = ∑ i, exp (-b * E i)`. -/
+defined by `U(b) = ∑ i, E i * p_b i` with `p_b i = exp (-b * E i) / Z(b)` and `Z(b) = ∑ i,
+exp (-b * E i)`. -/
 noncomputable def meanEnergyBetaReal (b : ℝ) : ℝ :=
   ∑ i, 𝓒.energy i * 𝓒.probabilityBetaReal b i
 
@@ -433,7 +434,8 @@ lemma differentiable_mathematicalPartitionFunctionBetaReal :
   unfold mathematicalPartitionFunctionBetaReal
   refine Differentiable.fun_sum ?_; intro i _; simp
 
-/-- The numerator in the finite-sum expression of the mean energy as a function of the inverse temperature `b = β`,
+/-- The numerator in the finite-sum expression of the mean energy as a function of the
+inverse temperature `b = β`,
 namely `∑ i, E i * exp (-b * E i)` (so that `U(b) = meanEnergyNumerator b / Z(b)`). -/
 noncomputable def meanEnergyNumerator (b : ℝ) : ℝ :=
   ∑ i, 𝓒.energy i * Real.exp (-b * 𝓒.energy i)
