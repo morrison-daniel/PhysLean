@@ -6,7 +6,6 @@ Authors: Matteo Cipollina, Joseph Tooby-Smith
 import Mathlib.Algebra.Lie.OfAssociative
 import Mathlib.Topology.Algebra.Module.ModuleTopology
 import PhysLean.StatisticalMechanics.CanonicalEnsemble.Lemmas
-import PhysLean.StatisticalMechanics.CanonicalEnsemble.Lemmas
 /-!
 # Finite Canonical Ensemble
 
