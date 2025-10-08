@@ -36,21 +36,24 @@ namespace Vector
 open TensorSpecies
 open Tensor
 
-instance {d} : AddCommMonoid (Vector d) := inferInstanceAs (AddCommMonoid (Fin 1 ⊕ Fin d → ℝ))
+instance {d} : AddCommMonoid (Vector d) :=
+  inferInstanceAs (AddCommMonoid (EuclideanSpace ℝ (Fin 1 ⊕ Fin d)))
 
-instance {d} : Module ℝ (Vector d) := inferInstanceAs (Module ℝ (Fin 1 ⊕ Fin d → ℝ))
+instance {d} : Module ℝ (Vector d) :=
+  inferInstanceAs (Module ℝ (EuclideanSpace ℝ (Fin 1 ⊕ Fin d)))
 
-instance {d} : AddCommGroup (Vector d) := inferInstanceAs (AddCommGroup (Fin 1 ⊕ Fin d → ℝ))
+instance {d} : AddCommGroup (Vector d) :=
+  inferInstanceAs (AddCommGroup (EuclideanSpace ℝ (Fin 1 ⊕ Fin d)))
 
 instance {d} : FiniteDimensional ℝ (Vector d) :=
   inferInstanceAs (FiniteDimensional ℝ (Fin 1 ⊕ Fin d → ℝ))
 
 instance isNormedAddCommGroup (d : ℕ) : NormedAddCommGroup (Vector d) :=
-    inferInstanceAs (NormedAddCommGroup (Fin 1 ⊕ Fin d → ℝ))
+    inferInstanceAs (NormedAddCommGroup (EuclideanSpace ℝ (Fin 1 ⊕ Fin d)))
 
 instance isNormedSpace (d : ℕ) :
     NormedSpace ℝ (Vector d) :=
-  inferInstanceAs (NormedSpace ℝ (Fin 1 ⊕ Fin d → ℝ))
+  inferInstanceAs (NormedSpace ℝ (EuclideanSpace ℝ (Fin 1 ⊕ Fin d)))
 
 /-- The instance of a `ChartedSpace` on `Vector d`. -/
 instance : ChartedSpace (Vector d) (Vector d) := chartedSpaceSelf (Vector d)
@@ -69,6 +72,25 @@ lemma apply_add {d : ℕ} (v w : Vector d) (i : Fin 1 ⊕ Fin d) :
 @[simp]
 lemma apply_sub {d : ℕ} (v w : Vector d) (i : Fin 1 ⊕ Fin d) :
     (v - w) i = v i - w i := by rfl
+
+lemma apply_sum {d : ℕ} {ι : Type} [Fintype ι] (f : ι → Vector d) (i : Fin 1 ⊕ Fin d) :
+    (∑ j, f j) i = ∑ j, f j i := by
+  let P (ι : Type) [Fintype ι] :=  ∀  (f : ι → Vector d) (i : Fin 1 ⊕ Fin d),
+    (∑ j : ι, f j) i = ∑ j, f j i
+  revert i f
+  change P ι
+  apply Fintype.induction_empty_option
+  · intro ι1 ι2 _ e h1
+    dsimp [P]
+    intro f i
+    have h' := h1 (f ∘ e) i
+    simp at h'
+    rw [← @e.sum_comp, ← @e.sum_comp, h']
+  · intro f i
+    simp
+    rfl
+  · intro ι _ h f i
+    rw [Fintype.sum_option, apply_add, h, Fintype.sum_option]
 
 @[simp]
 lemma neg_apply {d : ℕ} (v : Vector d) (i : Fin 1 ⊕ Fin d) :
@@ -165,6 +187,20 @@ lemma toTensor_basis_eq_tensor_basis {d : ℕ} (μ : Fin 1 ⊕ Fin d) :
   rw [← toTensor_symm_basis]
   simp
 
+lemma basis_eq_map_tensor_basis {d} : basis =
+    ((Tensor.basis
+    (S := realLorentzTensor d) ![Color.up]).map toTensor.symm).reindex indexEquiv := by
+  ext μ
+  rw [← toTensor_symm_basis]
+  simp
+
+lemma tensor_basis_map_eq_basis_reindex {d} :
+    (Tensor.basis (S := realLorentzTensor d) ![Color.up]).map toTensor.symm =
+    basis.reindex indexEquiv.symm := by
+  rw [basis_eq_map_tensor_basis]
+  ext μ
+  simp
+
 lemma tensor_basis_repr_toTensor_apply {d : ℕ} (p : Vector d) (μ : ComponentIdx ![Color.up]) :
     (Tensor.basis ![Color.up]).repr (toTensor p) μ =
     p (indexEquiv μ) := by
@@ -210,7 +246,9 @@ lemma smul_eq_sum {d : ℕ} (i : Fin 1 ⊕ Fin d) (Λ : LorentzGroup d) (p : Vec
       enter [1, 2]
       change Λ.1 *ᵥ (p 0)
     rw [contrBasisFin_repr_apply]
-    conv_lhs => simp [indexEquiv]
+    conv_lhs => simp only [Fin.isValue, Nat.succ_eq_add_one, Nat.reduceAdd, indexEquiv,
+      cons_val_zero, Fin.cast_eq_self, Equiv.symm_trans_apply, Equiv.symm_symm,
+      Equiv.coe_fn_symm_mk, Equiv.symm_apply_apply, ContrMod.mulVec_val]
     rw [mulVec_eq_sum]
     simp only [Finset.sum_apply]
     congr
@@ -244,17 +282,14 @@ lemma smul_eq_mulVec {d} (Λ : LorentzGroup d) (p : Vector d) :
   simp only [op_smul_eq_smul, Finset.sum_apply, Pi.smul_apply, transpose_apply, smul_eq_mul,
     mul_comm]
 
-@[simp]
 lemma smul_add {d : ℕ} (Λ : LorentzGroup d) (p q : Vector d) :
-    Λ • (p + q) = Λ • p + Λ • q := by
-  rw [smul_eq_mulVec, smul_eq_mulVec, smul_eq_mulVec, Matrix.mulVec_add]
+    Λ • (p + q) = Λ • p + Λ • q := by simp
 
 @[simp]
 lemma smul_sub {d : ℕ} (Λ : LorentzGroup d) (p q : Vector d) :
     Λ • (p - q) = Λ • p - Λ • q := by
   rw [smul_eq_mulVec, smul_eq_mulVec, smul_eq_mulVec, Matrix.mulVec_sub]
 
-@[simp]
 lemma smul_zero {d : ℕ} (Λ : LorentzGroup d) :
     Λ • (0 : Vector d) = 0 := by
   rw [smul_eq_mulVec, Matrix.mulVec_zero]
@@ -274,6 +309,36 @@ lemma _root_.LorentzGroup.eq_of_action_vector_eq {d : ℕ}
     Λ = Λ' := by
   apply LorentzGroup.eq_of_mulVec_eq
   simpa only [smul_eq_mulVec] using fun x => h x
+
+/-- The Lorentz action on vectors as a continuous linear map. -/
+def actionCLM {d : ℕ} (Λ : LorentzGroup d) :
+    Vector d →L[ℝ] Vector d :=
+  LinearMap.toContinuousLinearMap
+    { toFun := fun v => Λ • v
+      map_add' := smul_add Λ
+      map_smul' := fun c v => by
+        simp only [Nat.succ_eq_add_one, Nat.reduceAdd, RingHom.id_apply]
+        funext i
+        simp [smul_eq_sum]
+        ring_nf
+        congr
+        rw [Finset.mul_sum]
+        congr
+        funext j
+        ring}
+
+lemma actionCLM_apply {d : ℕ} (Λ : LorentzGroup d) (p : Vector d) :
+    actionCLM Λ p = Λ • p := rfl
+
+lemma smul_basis {d : ℕ} (Λ : LorentzGroup d) (μ : Fin 1 ⊕ Fin d) :
+    Λ • basis μ = ∑ ν, Λ.1 ν μ • basis ν := by
+  funext i
+  rw [smul_eq_sum]
+  simp only [basis_apply, mul_ite, mul_one, mul_zero, Finset.sum_ite_eq, Finset.mem_univ,
+    ↓reduceIte]
+  trans ∑ ν, ((Λ.1 ν μ • basis ν) i)
+  · simp
+  rw [Fintype.sum_apply]
 
 /-!
 

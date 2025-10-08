@@ -29,8 +29,12 @@ def chargeDistribution (q : ℝ) : ChargeDistribution 1 := q • diracDelta ℝ 
   this corresponds to the distribution formed by the function `|x|` multiplied by a
   scalar. -/
 def electricPotential (q ε : ℝ) : StaticElectricPotential 1 :=
-  - Distribution.ofBounded (fun x => (q/(2 * ε)) • ‖x‖)
-  ⟨0, |q/(2 * ε)|, 1, by simp [-norm_div]⟩ (by fun_prop)
+  - Distribution.ofFunction (fun x => (q/(2 * ε)) • ‖x‖)
+  (by
+    apply IsDistBounded.const_smul
+    convert IsDistBounded.pow (n := 1) (by simp)
+    simp)
+  (by fun_prop)
 
 @[simp]
 lemma electricPotential_eq_zero_of_ε_eq_zero (q : ℝ) :
@@ -86,7 +90,7 @@ lemma electricField_eq_heavisideStep (q ε : ℝ) :
       rw [electricPotential]
       simp only [Nat.succ_eq_add_one, Nat.reduceAdd, smul_eq_mul, Fin.isValue,
         ContinuousLinearMap.neg_apply, neg_inj]
-      rw [ofBounded_apply]
+      rw [ofFunction_apply]
       rfl
     /- Pulling out the scalar `q/(2 * ε)` gives
       `- ∫ x, dη/dx • (q/(2 * ε) |x|) = - q/(2 * ε) ∫ x, dη/dx • |x|`.
@@ -110,8 +114,9 @@ lemma electricField_eq_heavisideStep (q ε : ℝ) :
       · ring
       change Integrable (fun x : EuclideanSpace ℝ (Fin 1) =>
         ((SchwartzMap.evalCLM (𝕜 := ℝ) (basis 0)) ((fderivCLM ℝ) η)) x • ‖x‖)
-      apply bounded_integrable
-      · exact ⟨0, 1, 1, by simp⟩
+      apply IsDistBounded.schwartzMap_smul_integrable
+      · convert IsDistBounded.pow (n := 1) (by simp)
+        simp
       · fun_prop
     /- In the first of these integrals `|x|=x` whilst in the second `|x| = -x` giving
       us
@@ -163,7 +168,7 @@ lemma electricField_eq_heavisideStep (q ε : ℝ) :
         (oneEquiv_symm_measurableEmbedding)]
       rw [← oneEquiv_symm_measurePreserving.setIntegral_preimage_emb
         (oneEquiv_symm_measurableEmbedding)]
-      congr
+      congr 3
       · simp only [Fin.isValue, smul_eq_mul, compCLMOfContinuousLinearEquiv_apply]
         funext x
         congr 1
@@ -176,7 +181,8 @@ lemma electricField_eq_heavisideStep (q ε : ℝ) :
         fin_cases i
         simp only [Fin.isValue, Fin.zero_eta, basis_self, oneEquivCLE]
         rfl
-      · simp only [Fin.reduceLast, Fin.isValue, Set.preimage_compl, Set.preimage_setOf_eq, s]
+      · congr
+        simp only [Fin.reduceLast, Fin.isValue, Set.preimage_compl, Set.preimage_setOf_eq, s]
         ext x
         simp [oneEquiv_symm_apply]
       · simp only [Fin.isValue, smul_eq_mul, mul_neg, compCLMOfContinuousLinearEquiv_apply]
@@ -365,11 +371,13 @@ lemma gaussLaw (q ε : ℝ) : (electricField q ε).GaussLaw ε (chargeDistributi
     (1 / 2) • constD 1 (basis 0)))) η =
     ((1 / ε) • q • diracDelta ℝ 0) η
   haveI : SMulZeroClass ℝ ((Space 1)→d[ℝ] ℝ) := by infer_instance
+  simp only [Nat.succ_eq_add_one, Nat.reduceAdd, Fin.isValue, one_div, map_smul, map_sub,
+    divD_constD, ContinuousLinearMap.coe_smul', ContinuousLinearMap.coe_sub', Pi.smul_apply,
+    Pi.sub_apply, ContinuousLinearMap.zero_apply, smul_eq_mul, mul_zero, sub_zero, diracDelta_apply]
   field_simp
-  left
+  congr 1
   rw [divD_apply_eq_sum_fderivD]
-  simp only [Finset.univ_unique, Fin.default_eq_zero, Fin.isValue, Nat.reduceAdd,
-    Finset.sum_singleton]
+  simp only [Finset.univ_unique, Fin.default_eq_zero, Fin.isValue, Finset.sum_singleton]
   rw [fderivD_apply]
   simp only [Fin.isValue, ContinuousLinearMap.smulRight_apply, PiLp.neg_apply, PiLp.smul_apply,
     basis_self, smul_eq_mul, mul_one]

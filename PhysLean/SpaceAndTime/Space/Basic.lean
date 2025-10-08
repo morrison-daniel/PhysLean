@@ -70,6 +70,10 @@ lemma inner_eq_sum {d} (p q : Space d) :
   funext x
   exact Lean.Grind.CommSemiring.mul_comm (q x) (p x)
 
+@[simp]
+lemma sum_apply {ι : Type} [Fintype ι] (f : ι → Space d) (i : Fin d) :
+    (∑ x, f x) i = ∑ x, f x i := by
+  erw [Finset.sum_apply]
 /-!
 
 ## Basis
@@ -173,7 +177,7 @@ lemma deriv_eq_fderiv_basis [AddCommGroup M] [Module ℝ M] [TopologicalSpace M]
     (μ : Fin d) (f : Space d → M) (x : Space d) :
     deriv μ f x = fderiv ℝ f x (basis μ) := by
   rw [deriv_eq]
-  congr
+  congr 1
   funext i
   simp only [EuclideanSpace.single_apply, basis_apply]
   congr 1

@@ -184,33 +184,24 @@ lemma orthogonal_polynomial_of_mem_orthogonal (f : ℝ → ℂ) (hf : MemHS f)
     (hOrth : ∀ n : ℕ, ⟪HilbertSpace.mk (Q.eigenfunction_memHS n), HilbertSpace.mk hf⟫_ℂ = 0)
     (P : Polynomial ℤ) :
     ∫ x : ℝ, (P (x /Q.ξ)) * (f x * Real.exp (- x^2 / (2 * Q.ξ^2))) = 0 := by
-  have h1 := polynomial_mem_physHermite_span P
-  rw [Finsupp.mem_span_range_iff_exists_finsupp] at h1
-  obtain ⟨a, ha⟩ := h1
-  have h2 : (fun x => ↑(P (x /Q.ξ)) *
-    (f x * ↑(Real.exp (- x ^ 2 / (2 * Q.ξ^2)))))
-    = (fun x => ∑ r ∈ a.support, a r * (physHermite r (x/Q.ξ)) *
-    (f x * Real.exp (- x ^ 2 / (2 * Q.ξ^2)))) := by
+  obtain ⟨a, ha⟩ := Finsupp.mem_span_range_iff_exists_finsupp.mp <|
+    polynomial_mem_physHermite_span P
+  have h2 : (fun x => ↑(P (x /Q.ξ)) * (f x * ↑(Real.exp (- x ^ 2 / (2 * Q.ξ^2)))))
+      = (fun x => ∑ r ∈ a.support, a r * (physHermite r (x/Q.ξ)) *
+      (f x * Real.exp (- x ^ 2 / (2 * Q.ξ^2)))) := by
     funext x
     rw [← ha]
-    rw [← Finset.sum_mul]
-    congr
-    rw [Finsupp.sum]
-    simp
-  rw [h2]
-  rw [MeasureTheory.integral_finset_sum]
+    simp [← Finset.sum_mul, Finsupp.sum]
+  rw [h2, MeasureTheory.integral_finset_sum]
   · apply Finset.sum_eq_zero
     intro x hx
-    simp only [mul_assoc, Complex.ofReal_exp, Complex.ofReal_div, Complex.ofReal_neg,
-      Complex.ofReal_mul, Complex.ofReal_pow, Complex.ofReal_ofNat]
-    rw [MeasureTheory.integral_const_mul]
-    simp only [_root_.mul_eq_zero, Complex.ofReal_eq_zero]
-    right
-    rw [← Q.orthogonal_physHermite_of_mem_orthogonal f hf hOrth x]
-    congr
-    funext x
     simp only [Complex.ofReal_exp, Complex.ofReal_div, Complex.ofReal_neg, Complex.ofReal_pow,
-      Complex.ofReal_mul, Complex.ofReal_ofNat]
+      Complex.ofReal_mul, Complex.ofReal_ofNat, mul_assoc, integral_const_mul, _root_.mul_eq_zero,
+      Complex.ofReal_eq_zero]
+    right
+    simp only [Complex.ofReal_exp, Complex.ofReal_div, Complex.ofReal_neg, Complex.ofReal_pow,
+      Complex.ofReal_mul, Complex.ofReal_ofNat,
+      ← Q.orthogonal_physHermite_of_mem_orthogonal f hf hOrth x]
   · /- Integrablility -/
     intro i hi
     have hf' : (fun x => ↑(a i) * ↑(physHermite i (x /Q.ξ)) *
@@ -222,9 +213,7 @@ lemma orthogonal_polynomial_of_mem_orthogonal (f : ℝ → ℂ) (hf : MemHS f)
         Complex.ofReal_mul, Complex.ofReal_pow, Complex.ofReal_ofNat, Pi.smul_apply,
         Complex.real_smul]
       ring
-    rw [hf']
-    apply Integrable.smul
-    exact Q.mul_physHermite_integrable f hf i
+    exact hf' ▸ (MeasureTheory.Integrable.smul _ (Q.mul_physHermite_integrable f hf i))
 
 /-- If `f` is a function `ℝ → ℂ` satisfying `MemHS f` such that it is orthogonal
   to all `eigenfunction n` then it is orthogonal to
@@ -371,7 +360,7 @@ lemma orthogonal_exp_of_mem_orthogonal (f : ℝ → ℂ) (hf : MemHS f)
       rw [h1]
       by_cases hf : norm (f y) = 0
       · simp [hf]
-      rw [_root_.mul_le_mul_right]
+      rw [mul_le_mul_iff_left₀]
       · have h1 := Real.sum_le_exp_of_nonneg (x := |c * y|) (abs_nonneg (c * y)) n
         refine le_trans ?_ h1
         have h2 : norm (∑ i ∈ range n, (Complex.I * (↑c * ↑y)) ^ i / ↑i !) ≤
@@ -427,7 +416,7 @@ lemma orthogonal_exp_of_mem_orthogonal (f : ℝ → ℂ) (hf : MemHS f)
   apply tendsto_nhds_unique h1'
   rw [tendsto_const_nhds_iff]
 
-open FourierTransform MeasureTheory Real Lp Memℒp Filter Complex Topology
+open FourierTransform MeasureTheory Real Lp MemLp Filter Complex Topology
   ComplexInnerProductSpace ComplexConjugate
 
 /-- If `f` is a function `ℝ → ℂ` satisfying `MemHS f` such that it is orthogonal
@@ -468,6 +457,7 @@ lemma zero_of_orthogonal_mk (f : ℝ → ℂ) (hf : MemHS f)
     left
     congr
     field_simp
+    simp
   have h1 : eLpNorm (fun x => f x * Real.exp (- x^2 / (2 * Q.ξ^2))) 2 volume = 0 := by
     rw [← plancherel_theorem]
     rw [Q.fourierIntegral_zero_of_mem_orthogonal f hf hOrth]

@@ -35,6 +35,14 @@ lemma γ_zero : γ 0 = 1 := by simp [γ]
 @[simp]
 lemma γ_neg (β : ℝ) : γ (-β) = γ β := by simp [γ]
 
+@[simp]
+lemma γ_det_not_zero (β : ℝ) (hβ : |β| < 1) : (1 - β^2) ≠ 0 := by
+  rw [abs_lt] at hβ
+  by_contra hn
+  have h1 : β ^ 2 = 1 := by linear_combination (norm := ring) (-hn)
+  simp at h1
+  aesop
+
 /-- The Lorentz boost with in the space direction `i` with speed `β` with
   `|β| < 1`. -/
 def boost (i : Fin d) (β : ℝ) (hβ : |β| < 1) : LorentzGroup d :=
@@ -85,7 +93,9 @@ where
         · subst hk
           simp only [Fin.isValue, ↓reduceIte, one_apply_eq]
           ring_nf
-          field_simp [γ, hb1, hb2]
+          simp [γ]
+          rw [hb1]
+          field_simp
         · simp only [Fin.isValue, hk, ↓reduceIte]
           by_cases hk' : k = Sum.inr i
           · simp only [hk', ↓reduceIte, Fin.isValue, ne_eq, reduceCtorEq, not_false_eq_true,
@@ -122,7 +132,9 @@ where
             simp only [Fin.isValue, reduceCtorEq, ↓reduceIte, neg_mul, one_mul, neg_neg, and_true,
               and_self, one_apply_eq]
             ring_nf
-            field_simp [γ, hb1, hb2]
+            simp [γ]
+            rw [hb1]
+            field_simp
           · rw [one_apply]
             simp only [Fin.isValue, reduceCtorEq, ↓reduceIte, Sum.inr.injEq, hk, and_true, and_self,
               neg_mul, one_mul, neg_neg, zero_add]
