@@ -25,7 +25,6 @@ PhysLean/Electromagnetism/FieldStrength/Basic.lean
 PhysLean/Electromagnetism/FieldStrength/Derivative.lean
 PhysLean/Electromagnetism/Homogeneous.lean
 PhysLean/Electromagnetism/MaxwellEquations.lean
-PhysLean/Electromagnetism/Wave.lean
 PhysLean/Mathematics/Calculus/AdjFDeriv.lean
 PhysLean/Mathematics/Calculus/Divergence.lean
 PhysLean/Mathematics/DataStructures/FourTree/Basic.lean
@@ -293,8 +292,6 @@ PhysLean/SpaceAndTime/Space/Distributions.lean
 PhysLean/SpaceAndTime/Space/LengthUnit.lean
 PhysLean/SpaceAndTime/Space/SpaceStruct.lean
 PhysLean/SpaceAndTime/Space/Translations.lean
-PhysLean/SpaceAndTime/Space/VectorIdentities.lean
-PhysLean/SpaceAndTime/SpaceTime/Basic.lean
 PhysLean/SpaceAndTime/SpaceTime/TimeSlice.lean
 PhysLean/SpaceAndTime/Time/Basic.lean
 PhysLean/SpaceAndTime/Time/TimeMan.lean
