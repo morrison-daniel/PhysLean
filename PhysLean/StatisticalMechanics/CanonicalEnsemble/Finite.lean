@@ -447,14 +447,59 @@ lemma differentiable_meanEnergyNumerator :
 
 lemma deriv_mathematicalPartitionFunctionBetaReal (b : ℝ) :
     deriv 𝓒.mathematicalPartitionFunctionBetaReal b = -𝓒.meanEnergyNumerator b := by
+  classical
   unfold mathematicalPartitionFunctionBetaReal meanEnergyNumerator
-  field_simp [deriv_sum, mul_comm, Finset.sum_neg_distrib]
+  have h_each (i : ι) :
+      HasDerivAt (fun b => Real.exp (-b * 𝓒.energy i))
+        (-𝓒.energy i * Real.exp (-b * 𝓒.energy i)) b := by
+    have h_lin : HasDerivAt (fun b => (-𝓒.energy i) * b) (-𝓒.energy i) b := by
+      simpa using (hasDerivAt_id b).const_mul (-𝓒.energy i)
+    have h_exp :
+        HasDerivAt (fun b => Real.exp ((-𝓒.energy i) * b))
+          (Real.exp ((-𝓒.energy i) * b) * (-𝓒.energy i)) b := h_lin.exp
+    have h_eq :
+        (fun b => Real.exp (-b * 𝓒.energy i))
+          = (fun b => Real.exp ((-𝓒.energy i) * b)) := by
+      funext x; ring_nf
+    simpa [h_eq, mul_comm, mul_left_comm, mul_assoc]
+      using h_exp
+  have h_sum :
+      HasDerivAt (fun b => ∑ i, Real.exp (-b * 𝓒.energy i))
+        (∑ i, -𝓒.energy i * Real.exp (-b * 𝓒.energy i)) b :=
+    HasDerivAt.fun_sum fun i a => h_each i
+  have h_deriv := h_sum.deriv
+  simpa [Finset.sum_neg_distrib] using h_deriv
 
 lemma deriv_meanEnergyNumerator (b : ℝ) :
-    deriv 𝓒.meanEnergyNumerator b = -∑ i, (𝓒.energy i)^2 * Real.exp (-b * 𝓒.energy i) := by
+    deriv 𝓒.meanEnergyNumerator b =
+      -∑ i, (𝓒.energy i)^2 * Real.exp (-b * 𝓒.energy i) := by
+  classical
   unfold meanEnergyNumerator
-  field_simp [deriv_sum, mul_comm, pow_two]
-  simp [mul_assoc]
+  have h_each (i : ι) :
+      HasDerivAt (fun b => 𝓒.energy i * Real.exp (-b * 𝓒.energy i))
+        (-(𝓒.energy i)^2 * Real.exp (-b * 𝓒.energy i)) b := by
+    have h_lin : HasDerivAt (fun b => (-𝓒.energy i) * b) (-𝓒.energy i) b := by
+      simpa using (hasDerivAt_id b).const_mul (-𝓒.energy i)
+    have h_exp' :
+        HasDerivAt (fun b => Real.exp ((-𝓒.energy i) * b))
+          (Real.exp ((-𝓒.energy i) * b) * (-𝓒.energy i)) b := h_lin.exp
+    have h_eq :
+        (fun b => Real.exp (-b * 𝓒.energy i))
+          = (fun b => Real.exp ((-𝓒.energy i) * b)) := by
+      funext x; ring_nf
+    have h_exp :
+        HasDerivAt (fun b => Real.exp (-b * 𝓒.energy i))
+          (-𝓒.energy i * Real.exp (-b * 𝓒.energy i)) b := by
+      simpa [h_eq, mul_comm, mul_left_comm, mul_assoc] using h_exp'
+    have h_prod := h_exp.const_mul (𝓒.energy i)
+    simpa [sq, mul_comm, mul_left_comm, mul_assoc] using h_prod
+  have h_sum :
+      HasDerivAt (fun b => ∑ i, 𝓒.energy i * Real.exp (-b * 𝓒.energy i))
+        (∑ i, -(𝓒.energy i)^2 * Real.exp (-b * 𝓒.energy i)) b :=
+    HasDerivAt.fun_sum fun i a => h_each i
+  have h_deriv := h_sum.deriv
+  simpa [Finset.sum_neg_distrib, pow_two, mul_comm, mul_left_comm, mul_assoc]
+    using h_deriv
 
 /-! Quotient rule: dU/db = U^2 - ⟨E^2⟩_β -/
 
@@ -472,8 +517,9 @@ lemma deriv_meanEnergyBetaReal (b : ℝ) :
     funext x
     unfold meanEnergyBetaReal probabilityBetaReal Num Z mathematicalPartitionFunctionBetaReal
     simp [meanEnergyNumerator, Finset.sum_div, mul_div_assoc]
-  have hquot' : deriv (fun x => Num x / Z x) b =
-      (deriv Num b * Z b - Num b * deriv Z b) / (Z b)^2 := by
+  have hquot' :
+      deriv (fun x => Num x / Z x) b =
+        (deriv Num b * Z b - Num b * deriv Z b) / (Z b)^2 := by
     simpa using deriv_div hN_diff hZ_diff hZ_ne_zero
   have hquot'' := hquot'
   have hnum := deriv_meanEnergyNumerator (𝓒 := 𝓒) b
@@ -491,7 +537,7 @@ lemma deriv_meanEnergyBetaReal (b : ℝ) :
       ∑ i, (𝓒.energy i)^2 * (Real.exp (-b * 𝓒.energy i) / Z b)
           = ∑ i, ((𝓒.energy i)^2 * Real.exp (-b * 𝓒.energy i)) / Z b := by
             refine Finset.sum_congr rfl ?_
-            intro i hi
+            intro i _
             simpa [mul_comm, mul_left_comm, mul_assoc] using
               (mul_div_assoc ((𝓒.energy i)^2) (Real.exp (-(b * 𝓒.energy i))) (Z b)).symm
       _ = (∑ i, (𝓒.energy i)^2 * Real.exp (-b * 𝓒.energy i)) / Z b := by
@@ -499,7 +545,20 @@ lemma deriv_meanEnergyBetaReal (b : ℝ) :
   have h2 :
       deriv (fun x => Num x / Z x) b =
         (Num b / Z b)^2 - (∑ i, (𝓒.energy i)^2 * Real.exp (-b * 𝓒.energy i)) / Z b := by
-    rw [h₁]; field_simp [hZ_ne_zero]; ring
+    rw [h₁]
+    field_simp [hZ_ne_zero, pow_two, sub_eq_add_neg]
+    all_goals
+      have hsym :
+          (∑ i, (𝓒.energy i)^2 * Real.exp (-(𝓒.energy i * b)))
+            = (∑ i, (𝓒.energy i)^2 * Real.exp (-(b * 𝓒.energy i))) := by
+        refine Finset.sum_congr rfl ?_; intro i _; simp [mul_comm]
+      try
+        (first
+          | simpa [hsym, pow_two, mul_comm, mul_left_comm, mul_assoc]
+          | simp [pow_two, mul_comm, mul_assoc])
+      exact
+        neg_add_eq_sub (Z b * ∑ x, 𝓒.energy x * (𝓒.energy x * rexp (-(b * 𝓒.energy x))))
+          (Num b * Num b)
   have htarget :
       deriv (fun x => Num x / Z x) b =
         (Num b / Z b)^2 - ∑ i, (𝓒.energy i)^2 * 𝓒.probabilityBetaReal b i := by
