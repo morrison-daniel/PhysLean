@@ -36,7 +36,7 @@ def electricPotential (q ε : ℝ) : StaticElectricPotential 1 :=
 lemma electricPotential_eq_zero_of_ε_eq_zero (q : ℝ) :
     electricPotential q 0 = 0 := by
   ext x
-  simp [electricPotential, ofBounded_apply]
+  simp [electricPotential]
 
 /-- An electric field corresponding to a charge distribution of a point particle,
   defined as the negative of the gradient of `electricPotential q ε`.

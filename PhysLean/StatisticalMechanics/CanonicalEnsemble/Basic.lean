@@ -641,7 +641,6 @@ noncomputable def meanSquareEnergy (T : Temperature) : ℝ :=
 noncomputable def energyVariance (T : Temperature) : ℝ :=
   ∫ i, (𝓒.energy i - 𝓒.meanEnergy T)^2 ∂ 𝓒.μProd T
 
-
 lemma meanEnergy_add {T : Temperature}
     [IsFiniteMeasure (𝓒1.μBolt T)] [IsFiniteMeasure (𝓒.μBolt T)]
     [NeZero 𝓒.μ] [NeZero 𝓒1.μ]

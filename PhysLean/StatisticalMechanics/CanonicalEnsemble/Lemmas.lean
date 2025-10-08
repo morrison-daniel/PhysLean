@@ -573,9 +573,6 @@ open Set
 
 open scoped Topology Filter ENNReal Constants
 
--- we keep this linter here and below for potential use where stronger assumptions ae needed
-set_option linter.unusedVariables false in
-
 /-- Helper: equality (on `Set.Ioi 0`) between the β–parametrized logarithm of the
 physical partition function and the β–parametrized logarithm of the *mathematical*
 partition function up to the (β–independent) semiclassical correction. This is used only
@@ -586,10 +583,7 @@ lemma log_phys_eq_log_math_sub_const_on_Ioi
     (𝓒 : CanonicalEnsemble ι) [NeZero 𝓒.μ]
     (h_fin :
       ∀ β > 0,
-        IsFiniteMeasure (𝓒.μBolt (Temperature.ofβ (Real.toNNReal β))))
-    (h_const :
-        (𝓒.dof : ℝ) * Real.log 𝓒.phaseSpaceunit =
-        (𝓒.dof : ℝ) * Real.log 𝓒.phaseSpaceunit := rfl) :
+        IsFiniteMeasure (𝓒.μBolt (Temperature.ofβ (Real.toNNReal β)))) :
     Set.EqOn
       (fun β : ℝ =>
         Real.log (𝓒.partitionFunction (Temperature.ofβ (Real.toNNReal β))))
@@ -636,15 +630,11 @@ lemma log_phys_eq_log_math_sub_const_on_Ioi
     ring
   simpa [sub_eq_add_neg, add_comm, add_left_comm, add_assoc] using this
 
-set_option linter.unusedVariables false in
 /-- Derivative equality needed in `meanEnergy_eq_neg_deriv_log_Z_of_beta`.
 Adds `h_fin` (finiteness of the Boltzmann measure for every β > 0). -/
 lemma derivWithin_log_phys_eq_derivWithin_log_math
     (𝓒 : CanonicalEnsemble ι) (T : Temperature)
-    (hT_pos : 0 < T.val)
-    [IsFiniteMeasure (𝓒.μBolt T)] [NeZero 𝓒.μ]
-    (h_integrable :
-        ∀ β > 0, Integrable (fun i => Real.exp (-β * 𝓒.energy i)) 𝓒.μ)
+    (hT_pos : 0 < T.val) [NeZero 𝓒.μ]
     (h_fin :
         ∀ β > 0,
           IsFiniteMeasure (𝓒.μBolt (Temperature.ofβ (Real.toNNReal β)))) :
@@ -664,10 +654,7 @@ lemma derivWithin_log_phys_eq_derivWithin_log_math
         (fun β : ℝ =>
           Real.log (∫ i, Real.exp (-β * 𝓒.energy i) ∂ 𝓒.μ) - C)
         (Set.Ioi (0:ℝ)) :=
-    log_phys_eq_log_math_sub_const_on_Ioi (𝓒:=𝓒) (h_fin:=h_fin) rfl
-  have h_const_deriv :
-      derivWithin (fun _ : ℝ => C) (Set.Ioi 0) (T.β : ℝ) = 0 := by
-    simp
+    log_phys_eq_log_math_sub_const_on_Ioi (𝓒:=𝓒) (h_fin:=h_fin)
   set F_phys :=
     fun β : ℝ => Real.log (𝓒.partitionFunction (ofβ (Real.toNNReal β))) with hF_phys
   set F_math :=
@@ -689,7 +676,6 @@ lemma derivWithin_log_phys_eq_derivWithin_log_math
     simp [F_math, sub_eq_add_neg]; rw [@derivWithin_add_const]
   simpa [F_phys, F_math] using h_congr.trans h_sub
 
-set_option linter.unusedVariables false in
 /-- The mean energy can also be expressed as the negative derivative of the logarithm of the
 *physical* partition function with respect to β. This follows from the fact that the physical and
 mathematical partition functions differ only by a constant factor, which vanishes upon
@@ -697,8 +683,6 @@ differentiation. -/
 theorem meanEnergy_eq_neg_deriv_log_Z_of_beta
     (𝓒 : CanonicalEnsemble ι) (T : Temperature)
     (hT_pos : 0 < T.val) [IsFiniteMeasure (𝓒.μBolt T)] [NeZero 𝓒.μ]
-    (h_integrable :
-        ∀ β > 0, Integrable (fun i => Real.exp (-β * 𝓒.energy i)) 𝓒.μ)
     (h_fin :
         ∀ β > 0,
           IsFiniteMeasure (𝓒.μBolt (Temperature.ofβ (Real.toNNReal β))))
@@ -715,7 +699,7 @@ theorem meanEnergy_eq_neg_deriv_log_Z_of_beta
     𝓒.meanEnergy_eq_neg_deriv_log_mathZ_of_beta T hT_pos h_deriv
   have h_dw :=
     derivWithin_log_phys_eq_derivWithin_log_math
-      (𝓒:=𝓒) (T:=T) hT_pos h_integrable h_fin
+      (𝓒:=𝓒) (T:=T) hT_pos h_fin
   rw [h_dw]; exact h_math
 
 end Ratios
