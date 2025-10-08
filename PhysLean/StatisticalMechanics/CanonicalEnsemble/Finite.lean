@@ -407,11 +407,11 @@ noncomputable def meanEnergyBetaReal (b : ℝ) : ℝ :=
   ∑ i, 𝓒.energy i * 𝓒.probabilityBetaReal b i
 
 lemma meanEnergy_Beta_eq_finite [MeasurableSingletonClass ι] [IsFinite 𝓒] (b : ℝ) (hb : 0 < b) :
-    𝓒.meanEnergy_Beta b = 𝓒.meanEnergyBetaReal b := by
+    𝓒.meanEnergyBeta b = 𝓒.meanEnergyBetaReal b := by
   let T := Temperature.ofβ (Real.toNNReal b)
   have hT_beta : (T.β : ℝ) = b := by
     simp [T, Real.toNNReal_of_nonneg hb.le]
-  rw [CanonicalEnsemble.meanEnergy_Beta, meanEnergy_of_fintype 𝓒 T, meanEnergyBetaReal]
+  rw [meanEnergyBeta, meanEnergy_of_fintype 𝓒 T, meanEnergyBetaReal]
   refine Finset.sum_congr rfl fun i _ => ?_
   simp [CanonicalEnsemble.probability, probabilityBetaReal,
         mathematicalPartitionFunction_of_fintype, mathematicalPartitionFunctionBetaReal, hT_beta]
@@ -509,10 +509,10 @@ lemma deriv_meanEnergyBetaReal (b : ℝ) :
 /-- (∂U/∂β) = -Var(E) for finite systems. -/
 lemma derivWithin_meanEnergy_Beta_eq_neg_variance
     [MeasurableSingletonClass ι][𝓒.IsFinite] (T : Temperature) (hT_pos : 0 < T.val) :
-    derivWithin 𝓒.meanEnergy_Beta (Set.Ioi 0) (T.β : ℝ) = - 𝓒.energyVariance T := by
+    derivWithin 𝓒.meanEnergyBeta (Set.Ioi 0) (T.β : ℝ) = - 𝓒.energyVariance T := by
   let β₀ := (T.β : ℝ)
   have hβ₀_pos : 0 < β₀ := beta_pos T hT_pos
-  have h_eq_on : Set.EqOn 𝓒.meanEnergy_Beta 𝓒.meanEnergyBetaReal (Set.Ioi 0) := by
+  have h_eq_on : Set.EqOn 𝓒.meanEnergyBeta 𝓒.meanEnergyBetaReal (Set.Ioi 0) := by
     intro b hb; exact meanEnergy_Beta_eq_finite 𝓒 b hb
   rw [derivWithin_congr h_eq_on (h_eq_on hβ₀_pos)]
   have h_diff : DifferentiableAt ℝ 𝓒.meanEnergyBetaReal β₀ :=
@@ -521,7 +521,7 @@ lemma derivWithin_meanEnergy_Beta_eq_neg_variance
   rw [deriv_meanEnergyBetaReal 𝓒 β₀]
   have h_U_eq : 𝓒.meanEnergyBetaReal β₀ = 𝓒.meanEnergy T := by
     rw [← meanEnergy_Beta_eq_finite 𝓒 β₀ hβ₀_pos]
-    simp [CanonicalEnsemble.meanEnergy_Beta]
+    simp [meanEnergyBeta]
     simp_all only [NNReal.coe_pos, toNNReal_coe, ofβ_β, β₀]
   have h_prob_eq (i : ι) : 𝓒.probabilityBetaReal β₀ i = 𝓒.probability T i := by
     unfold probabilityBetaReal CanonicalEnsemble.probability
@@ -539,8 +539,8 @@ theorem fluctuation_dissipation_theorem_finite
     𝓒.heatCapacity T = 𝓒.energyVariance T / (kB * (T.val : ℝ)^2) := by
   have hβ₀_pos : 0 < (T.β : ℝ) := beta_pos T hT_pos
   let β₀ := (T.β : ℝ)
-  have h_diff_U_beta : DifferentiableWithinAt ℝ 𝓒.meanEnergy_Beta (Set.Ioi 0) β₀ := by
-    have h_eq_on : Set.EqOn 𝓒.meanEnergy_Beta 𝓒.meanEnergyBetaReal (Set.Ioi 0) := by
+  have h_diff_U_beta : DifferentiableWithinAt ℝ 𝓒.meanEnergyBeta (Set.Ioi 0) β₀ := by
+    have h_eq_on : Set.EqOn 𝓒.meanEnergyBeta 𝓒.meanEnergyBetaReal (Set.Ioi 0) := by
       intro b hb; exact meanEnergy_Beta_eq_finite 𝓒 b hb
     have h_diff' := (differentiable_meanEnergyBetaReal 𝓒) (T.β : ℝ)
     exact DifferentiableWithinAt.congr_of_eventuallyEq h_diff'.differentiableWithinAt
