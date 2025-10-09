@@ -75,7 +75,7 @@ lemma apply_sub {d : ℕ} (v w : Vector d) (i : Fin 1 ⊕ Fin d) :
 
 lemma apply_sum {d : ℕ} {ι : Type} [Fintype ι] (f : ι → Vector d) (i : Fin 1 ⊕ Fin d) :
     (∑ j, f j) i = ∑ j, f j i := by
-  let P (ι : Type) [Fintype ι] :=  ∀  (f : ι → Vector d) (i : Fin 1 ⊕ Fin d),
+  let P (ι : Type) [Fintype ι] := ∀ (f : ι → Vector d) (i : Fin 1 ⊕ Fin d),
     (∑ j : ι, f j) i = ∑ j, f j i
   revert i f
   change P ι
@@ -87,7 +87,7 @@ lemma apply_sum {d : ℕ} {ι : Type} [Fintype ι] (f : ι → Vector d) (i : Fi
     simp at h'
     rw [← @e.sum_comp, ← @e.sum_comp, h']
   · intro f i
-    simp
+    simp only [Finset.univ_eq_empty, Finset.sum_empty]
     rfl
   · intro ι _ h f i
     rw [Fintype.sum_option, apply_add, h, Fintype.sum_option]
