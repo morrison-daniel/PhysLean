@@ -18,6 +18,7 @@ import PhysLean.Cosmology.FLRW.Basic
 import PhysLean.Electromagnetism.Basic
 import PhysLean.Electromagnetism.Charge.ChargeUnit
 import PhysLean.Electromagnetism.Constant
+import PhysLean.Electromagnetism.CurrentDensity
 import PhysLean.Electromagnetism.Electrostatics.Basic
 import PhysLean.Electromagnetism.Electrostatics.OneDimension.PointParticle
 import PhysLean.Electromagnetism.Electrostatics.OneDimension.Vacuum
@@ -26,8 +27,10 @@ import PhysLean.Electromagnetism.Electrostatics.ThreeDimension.InfinitePlane
 import PhysLean.Electromagnetism.Electrostatics.ThreeDimension.PointParticle
 import PhysLean.Electromagnetism.FieldStrength.Basic
 import PhysLean.Electromagnetism.FieldStrength.Derivative
+import PhysLean.Electromagnetism.Hamiltonian
 import PhysLean.Electromagnetism.Homogeneous
 import PhysLean.Electromagnetism.KineticTerm
+import PhysLean.Electromagnetism.Lagrangian
 import PhysLean.Electromagnetism.LorentzAction
 import PhysLean.Electromagnetism.MaxwellEquations
 import PhysLean.Electromagnetism.Potential
