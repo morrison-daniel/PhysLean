@@ -224,7 +224,8 @@ informal_lemma intermediate_axis_instability where
   deps := [``RigidBody]
 
 /-- If a rigid body is confined to planar motion, its dynamics reduce to a two-dimensional problem:
-    the inertia reduces to a scalar moment and rotation is described by a single angular velocity. -/
+    the inertia reduces to a scalar moment and rotation is described 
+    by a single angular velocity. -/
 informal_lemma reduction_to_two_body where
   tag := "LL32-RTB"
   deps := [``RigidBody]
