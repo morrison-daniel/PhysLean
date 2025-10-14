@@ -122,7 +122,7 @@ informal_lemma rotational_equation_inertial where
 
 /-- The kinetic energy decomposes into translational and rotational parts: T = (1/2) M |V|² + (1/2) ω ⋅ I_CM ω. 
     Here V is the velocity of the centre of mass and I_CM is the inertia tensor about that point. -/
-    informal_lemma kinetic_energy_decomposition where
+informal_lemma kinetic_energy_decomposition where
   tag := "LL32-TK"
   deps := [``RigidBody]
 
