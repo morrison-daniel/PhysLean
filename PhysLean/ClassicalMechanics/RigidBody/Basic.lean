@@ -62,11 +62,6 @@ informal_definition kineticEnergy where
   tag := "MEYBM"
   deps := [``RigidBody]
 
-/-- The kinetic energy of a rigid body. -/
-informal_definition kineticEnergy where
-  tag := "MEYBM"
-  deps := [``RigidBody]
-
 /-- We can describe the motion of rigid body with a fixed (inertial) coordinate system (X,Y,Z)
     and a moving system (x₁,x₂,x₃) rigidly attached to the body. -/
 informal_definition coordinate_system where
@@ -184,14 +179,14 @@ informal_definition rotating_frame_derivative where
       (dA/dt)_inertial = (dA/dt)_rotating + Ω × A.
     Here Ω is the angular velocity of the rotating frame. -/
 informal_lemma transport_law_inertial_rotating where
-  tag := "LL36.L.transport"
+  tag := "LL36-Ltransport"
   deps := [``RigidBody]
 
 /-- For linear momentum, the relation between inertial and rotating derivatives is
       (dP/dt)_inertial = d'P/dt + Ω × P.
     So, d'P/dt + Ω × P = F which is the linear-momentum equation in the rotating frame. -/
 informal_lemma transport_law_for_momentum where
-  tag := "LL32.L.transportP"
+  tag := "LL32-transportP"
   deps := [``RigidBody]
 
 /-- For angular momentum, the relation between inertial and rotating derivatives is
@@ -200,8 +195,8 @@ informal_lemma transport_law_for_momentum where
       d'M/dt + Ω × M = K,
     the angular-momentum equation in the rotating frame. -/
 informal_lemma transport_law_for_angular_momentum where
-  tag := "LL32.L.transportM"
-  deps := [``RigidBody, "LL36.L.transport"]
+  tag := "LL32-transportM"
+  deps := [``RigidBody]
 
 /-- When motion is described in body-fixed principal axes (I₁, I₂, I₃ diagonal), the equations of
     rotational motion (Euler’s equations) are:
