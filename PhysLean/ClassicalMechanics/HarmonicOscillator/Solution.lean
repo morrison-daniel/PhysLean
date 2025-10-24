@@ -110,7 +110,7 @@ lemma InitialConditions.ext {IC₁ IC₂ : InitialConditions} (h1 : IC₁.x₀ =
 
 ### A.2. Relation to other types of initial conditions
 
-We relate the inital condition given by an initial position and an initial velocity
+We relate the initial condition given by an initial position and an initial velocity
 to other specifications of initial conditions. This is currently not implemented,
 and is a TODO.
 
@@ -307,7 +307,7 @@ lemma trajectory_velocity_at_zero (IC : InitialConditions) : ∂ₜ (IC.trajecto
 
 ## C. Trajectories and Equation of motion
 
-The trajectories satsify the equation of motion for the harmonic oscillator.
+The trajectories satisfy the equation of motion for the harmonic oscillator.
 
 -/
 
@@ -341,7 +341,7 @@ for the given initial conditions. This is currently a TODO.
 /-- The trajectories to the equation of motion for a given set of initial conditions
   are unique.
 
-  Semiformal implmentation:
+  Semiformal implementation:
   - One may needed the added condition of smoothness on `x` here.
   - `EquationOfMotion` needs defining before this can be proved. -/
 @[sorryful]
@@ -353,7 +353,7 @@ lemma trajectories_unique (IC : InitialConditions) (x : Time → Space 1) :
 
 ## D. The energy of the trajectories
 
-For a given set of initial conditions, the enrgy of the trajectory is constant,
+For a given set of initial conditions, the energy of the trajectory is constant,
 due to the conservation of energy. Here we show it's value.
 
 -/
@@ -369,7 +369,7 @@ lemma trajectory_energy (IC : InitialConditions) : S.energy (IC.trajectory S) =
 
 ## E. The trajectories at zero velocity
 
-We study the properties of the trajectories when the vleocity is zero.
+We study the properties of the trajectories when the velocity is zero.
 
 -/
 
@@ -425,7 +425,7 @@ lemma tan_time_eq_of_trajectory_velocity_eq_zero (IC : InitialConditions) (t : T
 
 ### E.2. A time when the velocity is zero
 
-We show that as long as the inital position is non-zero, then at
+We show that as long as the initial position is non-zero, then at
 the time `arctan (IC.v₀ 0 / (S.ω * IC.x₀ 0)) / S.ω` the velocity is zero.
 
 -/
