@@ -3,7 +3,8 @@ Copyright (c) 2025 Joseph Tooby-Smith. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Joseph Tooby-Smith
 -/
-import PhysLean.Electromagnetism.CurrentDensity
+import PhysLean.Electromagnetism.Dynamics.CurrentDensity
+import PhysLean.Electromagnetism.Kinematics.MagneticField
 /-!
 
 # The Lagrangian in electromagnetism
@@ -11,8 +12,13 @@ import PhysLean.Electromagnetism.CurrentDensity
 ## i. Overview
 
 In this module we define the Lagrangian density for the electromagnetic field in
-presence of a current density. We prover properties of this lagrangian density,
+presence of a current density. We prove properties of this lagrangian density,
 and find it's variational gradient.
+
+The lagrangian density is given by
+`L = -1/(4 μ₀) F_{μν} F^{μν} - A_μ J^μ`
+
+In this implementation we set `μ₀ = 1`. It is a TODO to introduce this constant.
 
 ## ii. Key results
 
@@ -37,6 +43,7 @@ and find it's variational gradient.
 ## iv. References
 
 - https://quantummechanics.ucsd.edu/ph130a/130_notes/node452.html
+- https://ph.qmul.ac.uk/sites/default/files/EMT10new.pdf
 
 -/
 
@@ -62,7 +69,7 @@ attribute [-simp] Nat.succ_eq_add_one
 ## A. The Lagrangian density
 
 The lagrangian density for the electromagnetic field in presence of a current density `J` is
-`L = 1/4 F_{μν} F^{μν} - A_μ J^μ`
+`L = -1/(4 μ₀) F_{μν} F^{μν} - A_μ J^μ`
 
 -/
 
@@ -179,13 +186,14 @@ lemma gradLagrangian_eq_sum_fieldStrengthMatrix (A : ElectromagneticPotential d)
   refine Finset.sum_congr rfl (fun ν _ => ?_)
   rw [smul_smul, ← sub_smul, ← mul_sub, ← smul_smul]
   exact hA
-open Time
 
 /-!
 
 ### B.6. The lagrangian gradient recovering Gauss's and Ampère laws
+
 -/
 
+open Time
 lemma gradLagrangian_eq_electricField_magneticField (A : ElectromagneticPotential 3)
     (hA : ContDiff ℝ ∞ A) (J : LorentzCurrentDensity 3)
     (hJ : ContDiff ℝ ∞ J) (x : SpaceTime) :
