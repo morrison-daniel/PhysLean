@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Joseph Tooby-Smith
 -/
 import PhysLean.Meta.Informal.Basic
+import PhysLean.SpaceAndTime.Space.Basic
 import Mathlib.MeasureTheory.Measure.Haar.InnerProductSpace
 import Mathlib.Topology.ContinuousMap.CompactlySupported
 import Mathlib.Geometry.Manifold.IsManifold.Basic
@@ -348,6 +349,12 @@ lemma deriv_neg [NormedAddCommGroup M] [NormedSpace ℝ M] (f : Time → M) :
     ∂ₜ (-f) t = -∂ₜ f t := by
   rw [deriv, fderiv_neg]
   rfl
+
+@[simp]
+lemma deriv_const [NormedAddCommGroup M] [NormedSpace ℝ M] (m : M) :
+    ∂ₜ (fun _ => m) t = 0 := by
+  rw [deriv]
+  simp
 
 @[fun_prop]
 lemma val_differentiable : Differentiable ℝ Time.val := by

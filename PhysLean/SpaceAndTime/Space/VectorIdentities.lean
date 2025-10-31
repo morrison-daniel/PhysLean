@@ -70,6 +70,7 @@ show their action on basic functions, and prove vector calculus identities
   - D.4. The divergence distributes over scalar multiplication
   - D.5. The divergence of a linear map is a linear map
 - E. Properties of the Laplacian operator
+- F. Properites of derivatives of time
 
 ## iv. References
 
@@ -909,3 +910,23 @@ lemma laplacian_eq_div_of_grad (f : Space → ℝ) :
 open InnerProductSpace
 
 end Space
+
+/-!
+
+## F. Properites of derivatives of time
+
+-/
+
+namespace Time
+lemma deriv_lorentzVector {d : ℕ} {f : Time → Lorentz.Vector d}
+    (hf : Differentiable ℝ f) (t : Time) (i : Fin 1 ⊕ Fin d) :
+    deriv (fun t => f t i) t = deriv (fun t => f t) t i := by
+  rw [deriv_eq]
+  change fderiv ℝ (EuclideanSpace.proj i ∘ fun x => f x) t 1 = _
+  rw [fderiv_comp]
+  · simp
+    rw [← deriv_eq]
+  · fun_prop
+  · fun_prop
+
+  end Time
