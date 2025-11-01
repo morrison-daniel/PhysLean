@@ -24,12 +24,6 @@ allowing it to be used in tensorial expressions.
 - `SpaceTime d` : The type corresponding to `d+1` dimensional spacetime.
 - `toTimeAndSpace` : A continuous linear equivalence between `SpaceTime d`
   and `Time × Space d`.
-- `deriv` : The derivative of a function `SpaceTime d → M` along the `μ` coordinate.
-- `deriv_sum_inr` : The derivative along a spatial coordinate in terms of the
-  derivative on `Space d`.
-- `deriv_sum_inl` : The derivative along the temporal coordinate in terms of the
-  derivative on `Time`.
-- `innerProductSpace` : The Euclidean inner product structure on `SpaceTime d`.
 
 ## iii. Table of contents
 
@@ -46,20 +40,13 @@ allowing it to be used in tensorial expressions.
     - B.3.3. `toTimeAndSpace` acting on spatial basis vectors
     - B.3.4. `toTimeAndSpace` acting on the temporal basis vectors
 - C. Continuous linear map to coordinates
-- D. Derivatives of functions on `SpaceTime d`
-  - D.1. The definition of the derivative
-  - D.2. Basic equality lemmas
-  - D.3. Derivative of the zero function
-  - D.4. The derivative of a function composed with a Lorentz transformation
-  - D.5. Spacetime derivatives in terms of time and space derivatives
-- E. Measures on `SpaceTime d`
-  - E.1. Instance of a measurable space
-  - E.2. Instance of a borel space
-  - E.3. Definition of an inner product space structure on `SpaceTime d`
-  - E.4. Instance of a measure space
-  - E.5. Volume measure is positive on non-empty open sets
-  - E.6. Volume measure is a finite measure on compact sets
-  - E.7. Volume measure is an additive Haar measure
+- D. Measures on `SpaceTime d`
+  - D.1. Instance of a measurable space
+  - D.2. Instance of a borel space
+  - D.4. Instance of a measure space
+  - D.5. Volume measure is positive on non-empty open sets
+  - D.6. Volume measure is a finite measure on compact sets
+  - D.7. Volume measure is an additive Haar measure
 
 ## iv. References
 
@@ -325,168 +312,17 @@ def coordCLM (μ : Fin 1 ⊕ Fin d) : SpaceTime d →L[ℝ] ℝ where
     simp
   cont := by
     fun_prop
-/-!
-
-## D. Derivatives of functions on `SpaceTime d`
-
--/
 
 /-!
 
-### D.1. The definition of the derivative
-
--/
-
-/-- The derivative of a function `SpaceTime d → ℝ` along the `μ` coordinate. -/
-noncomputable def deriv {M : Type} [AddCommGroup M] [Module ℝ M] [TopologicalSpace M]
-    {d : ℕ} (μ : Fin 1 ⊕ Fin d) (f : SpaceTime d → M) : SpaceTime d → M :=
-  fun y => fderiv ℝ f y (Lorentz.Vector.basis μ)
-
-@[inherit_doc deriv]
-scoped notation "∂_" => deriv
-
-/-!
-
-### D.2. Basic equality lemmas
-
--/
-
-variable {M : Type} [AddCommGroup M] [Module ℝ M] [TopologicalSpace M]
-lemma deriv_eq {d : ℕ} (μ : Fin 1 ⊕ Fin d) (f : SpaceTime d → M) (y : SpaceTime d) :
-    ∂_ μ f y =
-    fderiv ℝ f y (Lorentz.Vector.basis μ) := by
-  rfl
-
-lemma deriv_apply_eq {d : ℕ} (μ ν : Fin 1 ⊕ Fin d) (f : SpaceTime d → Lorentz.Vector d)
-    (hf : Differentiable ℝ f)
-    (y : SpaceTime d) :
-    ∂_ μ f y ν = fderiv ℝ (fun x => f x ν) y (Lorentz.Vector.basis μ) := by
-  rw [deriv_eq]
-  rw [fderiv_pi]
-  rfl
-  fun_prop
-
-@[simp]
-lemma deriv_coord {d : ℕ} (μ ν : Fin 1 ⊕ Fin d) :
-    ∂_ μ (fun x => x ν) = if μ = ν then 1 else 0 := by
-  change ∂_ μ (coordCLM ν) = _
-  funext x
-  rw [deriv_eq]
-  simp only [ContinuousLinearMap.fderiv]
-  simp [coordCLM]
-  split_ifs
-  rfl
-  rfl
-
-/-!
-
-### D.3. Derivative of the zero function
-
--/
-
-@[simp]
-lemma deriv_zero {d : ℕ} (μ : Fin 1 ⊕ Fin d) : SpaceTime.deriv μ (fun _ => (0 : ℝ)) = 0 := by
-  ext y
-  rw [SpaceTime.deriv_eq]
-  simp
-
-attribute [-simp] Fintype.sum_sum_type
-
-/-!
-
-### D.4. The derivative of a function composed with a Lorentz transformation
-
--/
-
-lemma deriv_comp_lorentz_action {M : Type} [NormedAddCommGroup M] [NormedSpace ℝ M] {d : ℕ}
-    (μ : Fin 1 ⊕ Fin d)
-    (f : SpaceTime d → M) (hf : Differentiable ℝ f) (Λ : LorentzGroup d)
-    (x : SpaceTime d) :
-    ∂_ μ (fun x => f (Λ • x)) x = ∑ ν, Λ.1 ν μ • ∂_ ν f (Λ • x) := by
-  change fderiv ℝ (f ∘ Lorentz.Vector.actionCLM Λ) x (Lorentz.Vector.basis μ) = _
-  rw [fderiv_comp]
-  simp only [Lorentz.Vector.actionCLM_apply, Nat.succ_eq_add_one, Nat.reduceAdd,
-    ContinuousLinearMap.fderiv, ContinuousLinearMap.coe_comp', Function.comp_apply]
-    -- Fintype.sum_sum_type
-  rw [Lorentz.Vector.smul_basis]
-  simp
-  rfl
-  · fun_prop
-  · fun_prop
-
-/-!
-
-### D.5. Spacetime derivatives in terms of time and space derivatives
-
--/
-
-lemma deriv_sum_inr {d : ℕ} {M : Type} [NormedAddCommGroup M] [NormedSpace ℝ M]
-    (c : SpeedOfLight) (f : SpaceTime d → M)
-    (hf : Differentiable ℝ f) (x : SpaceTime d) (i : Fin d) :
-    ∂_ (Sum.inr i) f x
-    = Space.deriv i (fun y => f ((toTimeAndSpace c).symm ((toTimeAndSpace c x).1, y)))
-      (toTimeAndSpace c x).2 := by
-  rw [deriv_eq, Space.deriv_eq]
-  conv_rhs => rw [fderiv_comp' _ (by fun_prop) (by fun_prop)]
-  simp only [Prod.mk.eta, ContinuousLinearEquiv.symm_apply_apply, ContinuousLinearMap.coe_comp',
-    Function.comp_apply]
-  congr 1
-  rw [fderiv_comp']
-  simp only [Prod.mk.eta, toTimeAndSpace_symm_fderiv, ContinuousLinearMap.coe_comp',
-    ContinuousLinearEquiv.coe_coe, Function.comp_apply]
-  change _ = (toTimeAndSpace c).symm ((fderiv ℝ ((toTimeAndSpace c x).1, ·) (toTimeAndSpace c x).2)
-    (EuclideanSpace.single i 1))
-  rw [DifferentiableAt.fderiv_prodMk]
-  simp only [fderiv_fun_const, Pi.zero_apply, fderiv_id', ContinuousLinearMap.prod_apply,
-    ContinuousLinearMap.zero_apply, ContinuousLinearMap.coe_id', id_eq]
-  trans (toTimeAndSpace c).symm (0, Space.basis i)
-  · rw [← toTimeAndSpace_basis_inr (c := c)]
-    simp
-  · congr
-    rw [Space.basis]
-    simp
-  repeat' fun_prop
-
-lemma deriv_sum_inl {d : ℕ} {M : Type} [NormedAddCommGroup M]
-    [NormedSpace ℝ M] (c : SpeedOfLight) (f : SpaceTime d → M)
-    (hf : Differentiable ℝ f) (x : SpaceTime d) :
-    ∂_ (Sum.inl 0) f x
-    = (1/(c : ℝ)) • Time.deriv (fun t => f ((toTimeAndSpace c).symm (t, (toTimeAndSpace c x).2)))
-      (toTimeAndSpace c x).1 := by
-  rw [deriv_eq, Time.deriv_eq]
-  conv_rhs => rw [fderiv_comp' _ (by fun_prop) (by fun_prop)]
-  simp only [Fin.isValue, Prod.mk.eta, ContinuousLinearEquiv.symm_apply_apply,
-    ContinuousLinearMap.coe_comp', Function.comp_apply]
-  trans
-    (fderiv ℝ f x)
-      ((1 / c.val) • (fderiv ℝ (fun t => (toTimeAndSpace c).symm (t, ((toTimeAndSpace c) x).2))
-      ((toTimeAndSpace c) x).1) 1)
-  swap
-  · exact ContinuousLinearMap.map_smul_of_tower (fderiv ℝ f x) (1 / c.val) _
-  congr 1
-
-  rw [fderiv_comp']
-  simp only [Fin.isValue, Prod.mk.eta, toTimeAndSpace_symm_fderiv, ContinuousLinearMap.coe_comp',
-    ContinuousLinearEquiv.coe_coe, Function.comp_apply]
-  rw [DifferentiableAt.fderiv_prodMk]
-  simp only [Fin.isValue, fderiv_id', fderiv_fun_const, Pi.zero_apply,
-    ContinuousLinearMap.prod_apply, ContinuousLinearMap.coe_id', id_eq,
-    ContinuousLinearMap.zero_apply]
-  rw [← map_smul]
-  rw [← toTimeAndSpace_basis_inl' (c := c)]
-  simp only [Fin.isValue, ContinuousLinearEquiv.symm_apply_apply]
-  repeat' fun_prop
-
-/-!
-
-## E. Measures on `SpaceTime d`
+## D. Measures on `SpaceTime d`
 
 -/
 open MeasureTheory
 
 /-!
 
-### E.1. Instance of a measurable space
+### D.1. Instance of a measurable space
 
 -/
 
@@ -494,7 +330,7 @@ instance {d : ℕ} : MeasurableSpace (SpaceTime d) := borel (SpaceTime d)
 
 /-!
 
-### E.2. Instance of a borel space
+### D.2. Instance of a borel space
 
 -/
 
@@ -503,17 +339,7 @@ instance {d : ℕ} : BorelSpace (SpaceTime d) where
 
 /-!
 
-### E.3. Definition of an inner product space structure on `SpaceTime d`
-
--/
-
-/-- The Euclidean inner product structure on `SpaceTime`. -/
-instance innerProductSpace (d : ℕ) : InnerProductSpace ℝ (SpaceTime d) :=
-  inferInstanceAs (InnerProductSpace ℝ (EuclideanSpace ℝ (Fin 1 ⊕ Fin d)))
-
-/-!
-
-### E.4. Instance of a measure space
+### D.4. Instance of a measure space
 
 -/
 
@@ -522,7 +348,7 @@ instance {d : ℕ} : MeasureSpace (SpaceTime d) where
 
 /-!
 
-### E.5. Volume measure is positive on non-empty open sets
+### D.5. Volume measure is positive on non-empty open sets
 
 -/
 
@@ -531,7 +357,7 @@ instance {d : ℕ} : (volume (α := SpaceTime d)).IsOpenPosMeasure :=
 
 /-!
 
-### E.6. Volume measure is a finite measure on compact sets
+### D.6. Volume measure is a finite measure on compact sets
 
 -/
 
@@ -540,7 +366,7 @@ instance {d : ℕ} : IsFiniteMeasureOnCompacts (volume (α := SpaceTime d)) :=
 
 /-!
 
-### E.7. Volume measure is an additive Haar measure
+### D.7. Volume measure is an additive Haar measure
 
 -/
 
