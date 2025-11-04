@@ -5,6 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 import PhysLean.SpaceAndTime.Space.Derivatives.Basic
 import PhysLean.SpaceAndTime.Time.Derivatives
+import PhysLean.SpaceAndTime.SpaceTime.LorentzAction
 /-!
 
 # Derivatives on SpaceTime
@@ -34,6 +35,7 @@ distributions on `SpaceTime d`.
   - A.5. Spacetime derivatives in terms of time and space derivatives
 - B. Derivatives of distributions
   - B.1. Commutation of derivatives of distributions
+  - B.2. Lorentz group action on derivatives of distributions
 
 ## iv. References
 
@@ -262,6 +264,76 @@ lemma distDeriv_commute {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
   · have h1 := smooth κ 2
     fun_prop
   · fun_prop
+
+/-!
+
+### B.2. Lorentz group action on derivatives of distributions
+
+We now show how the Lorentz group action on distributions interacts with derivatives.
+
+-/
+
+variable
+    {c : Fin n → realLorentzTensor.Color} {M : Type} [NormedAddCommGroup M]
+      [NormedSpace ℝ M] [Tensorial (realLorentzTensor d) c M] [T2Space M]
+
+lemma _root_.SchwartzMap.sum_apply {α : Type} [NormedAddCommGroup α]
+    [NormedSpace ℝ α]
+    {ι : Type} [Fintype ι]
+    (f : ι → 𝓢(α, ℝ)) (x : α) :
+    (∑ i, f i) x = ∑ i, f i x := by
+  let P (ι : Type) [Fintype ι] := ∀ (f : ι → 𝓢(α, ℝ)),
+    (∑ i, f i) x = ∑ i, f i x
+  revert f
+  change P ι
+  apply Fintype.induction_empty_option
+  · intro ι1 ι2 _ e h1 f
+    rw [← @e.sum_comp, ← @e.sum_comp, h1]
+  · simp [P]
+  · intro a _ ih f
+    simp [Fintype.sum_option]
+    rw [ih]
+
+lemma distDeriv_comp_lorentz_action {μ : Fin 1 ⊕ Fin d} (Λ : LorentzGroup d)
+    (f : (SpaceTime d) →d[ℝ] M) :
+    distDeriv μ (Λ • f) = ∑ ν, Λ⁻¹.1 ν μ • (Λ • distDeriv ν f) := by
+  symm
+  trans (∑ ν, Λ • Λ⁻¹.1 ν μ • (distDeriv ν) f)
+  · congr
+    funext i
+    rw [SMulCommClass.smul_comm]
+  trans Λ • (∑ ν, Λ⁻¹.1 ν μ • (distDeriv ν) f)
+  · exact Eq.symm Finset.smul_sum
+  ext η
+  rw [lorentzGroup_smul_dist_apply, distDeriv_apply, fderivD_apply,
+    lorentzGroup_smul_dist_apply]
+  rw [← smul_neg]
+  congr
+  rw [ContinuousLinearMap.sum_apply]
+  simp only [ContinuousLinearMap.coe_smul', Pi.smul_apply]
+  conv_lhs =>
+    enter [2, x]
+    rw [distDeriv_apply, fderivD_apply]
+    simp only [smul_neg]
+    rw [← map_smul]
+  rw [Finset.sum_neg_distrib]
+  congr
+  rw [← map_sum]
+  congr
+  /- Reduced to Schwartz maps -/
+  ext x
+  rw [SchwartzMap.sum_apply]
+  symm
+  simp [schwartzAction_apply]
+  change ∂_ μ η (Λ • x) = ∑ ν, Λ⁻¹.1 ν μ • ∂_ ν (schwartzAction Λ⁻¹ η) (x)
+  obtain ⟨η, rfl⟩ := schwartzAction_surjective Λ η
+  simp only [Nat.succ_eq_add_one, Nat.reduceAdd, smul_eq_mul]
+  rw [schwartzAction_mul_apply]
+  simp only [inv_mul_cancel, map_one, ContinuousLinearMap.one_apply]
+  change ∂_ μ (fun x => η (Λ⁻¹ • x)) (Λ • x) = _
+  rw [deriv_comp_lorentz_action]
+  simp only [Nat.succ_eq_add_one, Nat.reduceAdd, inv_smul_smul, smul_eq_mul]
+  exact SchwartzMap.differentiable η
 
 end SpaceTime
 
