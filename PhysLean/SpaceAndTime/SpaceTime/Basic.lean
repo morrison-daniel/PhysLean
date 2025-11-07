@@ -28,6 +28,14 @@ allowing it to be used in tensorial expressions.
 ## iii. Table of contents
 
 - A. The definition of `SpaceTime d`
+- C. Continuous linear map to coordinates
+- D. Measures on `SpaceTime d`
+  - D.1. Instance of a measurable space
+  - D.2. Instance of a borel space
+  - D.4. Instance of a measure space
+  - D.5. Volume measure is positive on non-empty open sets
+  - D.6. Volume measure is a finite measure on compact sets
+  - D.7. Volume measure is an additive Haar measure
 - B. Maps to and from `Space` and `Time`
   - B.1. Linear map to `Space d`
     - B.1.1. Explicit expansion of map to space
@@ -39,14 +47,15 @@ allowing it to be used in tensorial expressions.
     - B.3.2. Derivative of the inverse of `toTimeAndSpace`
     - B.3.3. `toTimeAndSpace` acting on spatial basis vectors
     - B.3.4. `toTimeAndSpace` acting on the temporal basis vectors
-- C. Continuous linear map to coordinates
-- D. Measures on `SpaceTime d`
-  - D.1. Instance of a measurable space
-  - D.2. Instance of a borel space
-  - D.4. Instance of a measure space
-  - D.5. Volume measure is positive on non-empty open sets
-  - D.6. Volume measure is a finite measure on compact sets
-  - D.7. Volume measure is an additive Haar measure
+  - B.4. Time space basis
+    - B.4.1. Elements of the basis
+    - B.4.2. Equivalence adjusting time basis vector
+    - B.4.3. Determinant of the equivalence
+    - B.4.4. Time space basis expressed in terms of the Lorentz basis
+    - B.4.5. The additive Haar measure associated to the time space basis
+  - B.5. Integrals over `SpaceTime d`
+    - B.5.1. Measure preserving property of `toTimeAndSpace.symm`
+    - B.5.2. Integrals over `SpaceTime d` expressed as integrals over `Time` and `Space d`
 
 ## iv. References
 
@@ -74,6 +83,100 @@ open Matrix
 open Complex
 open ComplexConjugate
 open TensorSpecies
+
+/-!
+
+## C. Continuous linear map to coordinates
+
+-/
+
+/-- For a given `μ : Fin (1 + d)` `coord μ p` is the coordinate of
+  `p` in the direction `μ`.
+
+  This is denoted `𝔁 μ p`, where `𝔁` is typed with `\MCx`. -/
+def coord {d : ℕ} (μ : Fin (1 + d)) : SpaceTime d →ₗ[ℝ] ℝ where
+  toFun x := x (finSumFinEquiv.symm μ)
+  map_add' x1 x2 := by
+    simp
+  map_smul' c x := by
+    simp
+
+@[inherit_doc coord]
+scoped notation "𝔁" => coord
+
+lemma coord_apply {d : ℕ} (μ : Fin (1 + d)) (y : SpaceTime d) :
+    𝔁 μ y = y (finSumFinEquiv.symm μ) := by
+  rfl
+
+/-- The continuous linear map from a point in space time to one of its coordinates. -/
+def coordCLM (μ : Fin 1 ⊕ Fin d) : SpaceTime d →L[ℝ] ℝ where
+  toFun x := x μ
+  map_add' x1 x2 := by
+    simp
+  map_smul' c x := by
+    simp
+  cont := by
+    fun_prop
+
+/-!
+
+## D. Measures on `SpaceTime d`
+
+-/
+open MeasureTheory
+
+/-!
+
+### D.1. Instance of a measurable space
+
+-/
+
+instance {d : ℕ} : MeasurableSpace (SpaceTime d) := borel (SpaceTime d)
+
+/-!
+
+### D.2. Instance of a borel space
+
+-/
+
+instance {d : ℕ} : BorelSpace (SpaceTime d) where
+  measurable_eq := by rfl
+
+/-!
+
+### D.4. Instance of a measure space
+
+-/
+
+instance {d : ℕ} : MeasureSpace (SpaceTime d) where
+  volume := Lorentz.Vector.basis.addHaar
+
+/-!
+
+### D.5. Volume measure is positive on non-empty open sets
+
+-/
+
+instance {d : ℕ} : (volume (α := SpaceTime d)).IsOpenPosMeasure :=
+  inferInstanceAs ((Lorentz.Vector.basis.addHaar).IsOpenPosMeasure)
+
+/-!
+
+### D.6. Volume measure is a finite measure on compact sets
+
+-/
+
+instance {d : ℕ} : IsFiniteMeasureOnCompacts (volume (α := SpaceTime d)) :=
+  inferInstanceAs (IsFiniteMeasureOnCompacts (Lorentz.Vector.basis.addHaar))
+
+/-!
+
+### D.7. Volume measure is an additive Haar measure
+
+-/
+
+instance {d : ℕ} : Measure.IsAddHaarMeasure (volume (α := SpaceTime d)) :=
+  inferInstanceAs (Measure.IsAddHaarMeasure (Lorentz.Vector.basis.addHaar))
 
 /-!
 
@@ -281,97 +384,270 @@ lemma toTimeAndSpace_basis_inl' {d : ℕ} {c : SpeedOfLight} :
 
 /-!
 
-## C. Continuous linear map to coordinates
+### B.4. Time space basis
 
 -/
 
-/-- For a given `μ : Fin (1 + d)` `coord μ p` is the coordinate of
-  `p` in the direction `μ`.
+/-- The basis of `SpaceTime` where the first component is `(c, 0, 0, ...)` instead
+of `(1, 0, 0, ....).`-/
+def timeSpaceBasis {d : ℕ} (c : SpeedOfLight := 1) :
+    Module.Basis (Fin 1 ⊕ Fin d) ℝ (SpaceTime d) where
+  repr := (toTimeAndSpace (d := d) c).toLinearEquiv.trans <|
+      (Time.basis.toBasis.prod (Space.basis (d := d)).toBasis).repr
 
-  This is denoted `𝔁 μ p`, where `𝔁` is typed with `\MCx`. -/
-def coord {d : ℕ} (μ : Fin (1 + d)) : SpaceTime d →ₗ[ℝ] ℝ where
-  toFun x := x (finSumFinEquiv.symm μ)
-  map_add' x1 x2 := by
-    simp
+/-!
+
+#### B.4.1. Elements of the basis
+
+-/
+
+@[simp]
+lemma timeSpaceBasis_apply_inl {d : ℕ} (c : SpeedOfLight) :
+    timeSpaceBasis (d := d) c (Sum.inl 0) = c.val • Lorentz.Vector.basis (Sum.inl 0) := by
+  simp [timeSpaceBasis]
+  apply (toTimeAndSpace (d := d) c).injective
+  simp only [ContinuousLinearEquiv.apply_symm_apply, Fin.isValue, map_smul]
+  rw [@toTimeAndSpace_basis_inl]
+  simp only [one_div, Prod.smul_mk, smul_zero, Prod.mk.injEq, and_true]
+  ext
+  simp
+
+@[simp]
+lemma timeSpaceBasis_apply_inr {d : ℕ} (c : SpeedOfLight) (i : Fin d) :
+    timeSpaceBasis (d := d) c (Sum.inr i) = Lorentz.Vector.basis (Sum.inr i) := by
+  simp [timeSpaceBasis]
+  apply (toTimeAndSpace (d := d) c).injective
+  simp only [ContinuousLinearEquiv.apply_symm_apply]
+  rw [toTimeAndSpace_basis_inr]
+
+/-!
+
+#### B.4.2. Equivalence adjusting time basis vector
+
+-/
+
+/-- The equivalence on of `SpaceTime` taking `(1, 0, 0, ...)` to
+of `(c, 0, 0, ....)` and keeping all other components the same. -/
+def timeSpaceBasisEquiv {d : ℕ} (c : SpeedOfLight) :
+    SpaceTime d ≃L[ℝ] SpaceTime d where
+  toFun x := fun μ =>
+    match μ with
+    | Sum.inl 0 => c.val * x (Sum.inl 0)
+    | Sum.inr i => x (Sum.inr i)
+  invFun x := fun μ =>
+    match μ with
+    | Sum.inl 0 => (1 / c.val) * x (Sum.inl 0)
+    | Sum.inr i => x (Sum.inr i)
+  left_inv x := by
+    funext μ
+    match μ with
+    | Sum.inl 0 =>
+      field_simp
+    | Sum.inr i =>
+      rfl
+  right_inv x := by
+    funext μ
+    match μ with
+    | Sum.inl 0 =>
+      field_simp
+    | Sum.inr i =>
+      rfl
+  map_add' x y := by
+    funext μ
+    match μ with
+    | Sum.inl 0 =>
+      simp only [Fin.isValue, Lorentz.Vector.apply_add]
+      ring
+    | Sum.inr i =>
+      simp
   map_smul' c x := by
-    simp
+    funext μ
+    match μ with
+    | Sum.inl 0 =>
+      simp only [Fin.isValue, Lorentz.Vector.apply_smul, RingHom.id_apply]
+      ring
+    | Sum.inr i =>
+      simp
+  continuous_invFun := by
+    simp only [one_div, Fin.isValue]
+    apply continuous_pi
+    intro μ
+    match μ with
+    | Sum.inl 0 =>
+      simp only [Fin.isValue]
+      fun_prop
+    | Sum.inr i =>
+      simp only
+      fun_prop
+  continuous_toFun := by
+    apply continuous_pi
+    intro μ
+    match μ with
+    | Sum.inl 0 =>
+      simp only [Fin.isValue]
+      fun_prop
+    | Sum.inr i =>
+      simp only
+      fun_prop
 
-@[inherit_doc coord]
-scoped notation "𝔁" => coord
+/-!
 
-lemma coord_apply {d : ℕ} (μ : Fin (1 + d)) (y : SpaceTime d) :
-    𝔁 μ y = y (finSumFinEquiv.symm μ) := by
+#### B.4.3. Determinant of the equivalence
+
+-/
+
+lemma det_timeSpaceBasisEquiv {d : ℕ} (c : SpeedOfLight) :
+    (timeSpaceBasisEquiv (d := d) c).det = c.val := by
+  rw [@LinearEquiv.coe_det]
+  let e := toTimeAndSpace (d := d) c
+  trans LinearMap.det (e.toLinearMap ∘ₗ (timeSpaceBasisEquiv (d := d) c).toLinearMap ∘ₗ
+    e.symm.toLinearMap)
+  · simp only [ContinuousLinearEquiv.toLinearEquiv_symm, LinearMap.det_conj]
+  have h1 : e.toLinearMap ∘ₗ (timeSpaceBasisEquiv (d := d) c).toLinearMap ∘ₗ
+    e.symm.toLinearMap = (c.val • LinearMap.id).prodMap LinearMap.id := by
+    apply LinearMap.ext
+    intro tx
+    simp [e, timeSpaceBasisEquiv, toTimeAndSpace]
+    apply And.intro
+    · ext
+      simp
+    · funext i
+      simp [space]
+  rw [h1]
+  rw [LinearMap.det_prodMap]
+  simp
+
+/-!
+
+#### B.4.4. Time space basis expressed in terms of the Lorentz basis
+
+-/
+
+lemma timeSpaceBasis_eq_map_basis {d : ℕ} (c : SpeedOfLight) :
+    timeSpaceBasis (d := d) c =
+    Module.Basis.map (Lorentz.Vector.basis (d := d)) (timeSpaceBasisEquiv c).toLinearEquiv := by
+  ext μ
+  match μ with
+  | Sum.inl 0 =>
+    simp [timeSpaceBasisEquiv]
+    funext ν
+    match ν with
+    | Sum.inl 0 => simp
+    | Sum.inr i => simp
+  | Sum.inr i =>
+    simp [timeSpaceBasisEquiv]
+    funext ν
+    match ν with
+    | Sum.inl 0 => simp
+    | Sum.inr j => simp
+
+/-!
+
+#### B.4.5. The additive Haar measure associated to the time space basis
+
+-/
+
+lemma timeSpaceBasis_addHaar {d : ℕ} (c : SpeedOfLight := 1) :
+    (timeSpaceBasis (d := d) c).addHaar = (ENNReal.ofReal (c⁻¹)) • volume := by
+  rw [timeSpaceBasis_eq_map_basis c, ← Module.Basis.map_addHaar]
+  have h1 := MeasureTheory.Measure.map_linearMap_addHaar_eq_smul_addHaar
+    (f := (timeSpaceBasisEquiv (d := d) c).toLinearMap) (μ := Lorentz.Vector.basis.addHaar)
+    (by simp [← LinearEquiv.coe_det, det_timeSpaceBasisEquiv])
+  simp at h1
+  rw [h1]
+  simp [← LinearEquiv.coe_det, det_timeSpaceBasisEquiv]
+  congr
+  simp
+
+/-!
+### B.5. Integrals over `SpaceTime d`
+
+-/
+
+/-!
+
+#### B.5.1. Measure preserving property of `toTimeAndSpace.symm`
+
+-/
+
+open MeasureTheory
+lemma toTimeAndSpace_symm_measurePreserving {d : ℕ} (c : SpeedOfLight) :
+    MeasurePreserving (toTimeAndSpace c).symm (volume.prod (volume (α := Space d)))
+    (ENNReal.ofReal c⁻¹ • volume) := by
+  have h : volume (α := SpaceTime d) = Lorentz.Vector.basis.addHaar := rfl
+  refine { measurable := ?_, map_eq := ?_ }
+  · fun_prop
+  rw [Space.volume_eq_addHaar, Time.volume_eq_basis_addHaar, ← Module.Basis.prod_addHaar,
+    Module.Basis.map_addHaar]
+  rw [← timeSpaceBasis_addHaar c]
   rfl
 
-/-- The continuous linear map from a point in space time to one of its coordinates. -/
-def coordCLM (μ : Fin 1 ⊕ Fin d) : SpaceTime d →L[ℝ] ℝ where
-  toFun x := x μ
-  map_add' x1 x2 := by
-    simp
-  map_smul' c x := by
-    simp
-  cont := by
-    fun_prop
-
 /-!
 
-## D. Measures on `SpaceTime d`
-
--/
-open MeasureTheory
-
-/-!
-
-### D.1. Instance of a measurable space
+#### B.5.2. Integrals over `SpaceTime d` expressed as integrals over `Time` and `Space d`
 
 -/
 
-instance {d : ℕ} : MeasurableSpace (SpaceTime d) := borel (SpaceTime d)
+lemma spaceTime_integral_eq_time_space_integral {M} [NormedAddCommGroup M]
+    [NormedSpace ℝ M] {d : ℕ} (c : SpeedOfLight)
+    (f : SpaceTime d → M) :
+    ∫ x : SpaceTime d, f x ∂(volume) =
+    c.val • ∫ tx : Time × Space d, f ((toTimeAndSpace c).symm tx) ∂(volume.prod volume) := by
+  symm
+  have h1 : ∫ tx : Time × Space d, f ((toTimeAndSpace c).symm tx) ∂(volume.prod volume)
+    = ∫ x : SpaceTime d, f x ∂((ENNReal.ofReal (c⁻¹)) • volume) := by
+    apply MeasureTheory.MeasurePreserving.integral_comp
+    · refine { measurable := ?_, map_eq := ?_ }
+      · fun_prop
+      have hs : volume (α := Space d) = Space.basis.toBasis.addHaar := by
+        exact Space.volume_eq_addHaar
+      have ht : volume (α := Time) = Time.basis.toBasis.addHaar := by
+        exact Time.volume_eq_basis_addHaar
+      rw [hs, ht]
+      rw [← Module.Basis.prod_addHaar]
+      rw [Module.Basis.map_addHaar]
+      rw [← timeSpaceBasis_addHaar c]
+      congr
+    · refine Measurable.measurableEmbedding ?_ ?_
+      · fun_prop
+      · exact ContinuousLinearEquiv.injective (toTimeAndSpace c).symm
+  rw [h1]
+  simp
 
-/-!
+lemma spaceTime_integrable_iff_space_time_integrable {M} [NormedAddCommGroup M]
+    {d : ℕ} (c : SpeedOfLight)
+    (f : SpaceTime d → M) :
+    Integrable f volume ↔ Integrable (f ∘ ((toTimeAndSpace c).symm)) (volume.prod volume) := by
+  symm
+  trans Integrable f (ENNReal.ofReal (c⁻¹) • volume); swap
+  · rw [MeasureTheory.integrable_smul_measure]
+    · simp
+    · simp
+  apply MeasureTheory.MeasurePreserving.integrable_comp_emb
+  · exact toTimeAndSpace_symm_measurePreserving c
+  · refine Measurable.measurableEmbedding ?_ ?_
+    · fun_prop
+    · exact ContinuousLinearEquiv.injective (toTimeAndSpace c).symm
 
-### D.2. Instance of a borel space
+lemma spaceTime_integral_eq_time_integral_space_integral {M} [NormedAddCommGroup M]
+    [NormedSpace ℝ M] {d : ℕ} (c : SpeedOfLight)
+    (f : SpaceTime d → M)
+    (h : Integrable f volume) :
+    ∫ x : SpaceTime d, f x =
+    c.val • ∫ t : Time, ∫ x : Space d, f ((toTimeAndSpace c).symm (t, x)) := by
+  rw [spaceTime_integral_eq_time_space_integral, MeasureTheory.integral_prod]
+  rw [spaceTime_integrable_iff_space_time_integrable] at h
+  exact h
 
--/
-
-instance {d : ℕ} : BorelSpace (SpaceTime d) where
-  measurable_eq := by rfl
-
-/-!
-
-### D.4. Instance of a measure space
-
--/
-
-instance {d : ℕ} : MeasureSpace (SpaceTime d) where
-  volume := Lorentz.Vector.basis.addHaar
-
-/-!
-
-### D.5. Volume measure is positive on non-empty open sets
-
--/
-
-instance {d : ℕ} : (volume (α := SpaceTime d)).IsOpenPosMeasure :=
-  inferInstanceAs ((Lorentz.Vector.basis.addHaar).IsOpenPosMeasure)
-
-/-!
-
-### D.6. Volume measure is a finite measure on compact sets
-
--/
-
-instance {d : ℕ} : IsFiniteMeasureOnCompacts (volume (α := SpaceTime d)) :=
-  inferInstanceAs (IsFiniteMeasureOnCompacts (Lorentz.Vector.basis.addHaar))
-
-/-!
-
-### D.7. Volume measure is an additive Haar measure
-
--/
-
-instance {d : ℕ} : Measure.IsAddHaarMeasure (volume (α := SpaceTime d)) :=
-  inferInstanceAs (Measure.IsAddHaarMeasure (Lorentz.Vector.basis.addHaar))
+lemma spaceTime_integral_eq_space_integral_time_integral {M} [NormedAddCommGroup M]
+    [NormedSpace ℝ M] {d : ℕ} (c : SpeedOfLight)
+    (f : SpaceTime d → M)
+    (h : Integrable f volume) :
+    ∫ x : SpaceTime d, f x =
+    c.val • ∫ x : Space d, ∫ t : Time, f ((toTimeAndSpace c).symm (t, x)) := by
+  rw [spaceTime_integral_eq_time_space_integral, MeasureTheory.integral_prod_symm]
+  rw [spaceTime_integrable_iff_space_time_integrable] at h
+  exact h
 
 end SpaceTime
 
