@@ -39,9 +39,10 @@ in the standard directions.
     - A.9.1. Differentiability of the norm squared function
     - A.9.2. Derivative of the norm squared function
   - A.10. Derivative of the inner product
-    - A.11.1. Differentiability of the inner product function
-    - A.11.2. Derivative of the inner product function
-  - A.12. Differentiability of derivatives
+    - A.10.1. Differentiability of the inner product function
+    - A.10.2. Derivative of the inner product function
+    - A.10.3. Derivative of the inner product on one side
+  - A.11. Differentiability of derivatives
 - B. Derivatives of distributions on `Space d`
   - B.1. The definition
   - B.2. Basic equality
@@ -300,7 +301,7 @@ open InnerProductSpace
 
 /-!
 
-#### A.11.1. Differentiability of the inner product function
+#### A.10.1. Differentiability of the inner product function
 
 -/
 
@@ -312,7 +313,7 @@ lemma inner_differentiable {d : ℕ} :
 
 /-!
 
-#### A.11.2. Derivative of the inner product function
+#### A.10.2. Derivative of the inner product function
 
 -/
 
@@ -323,7 +324,32 @@ lemma deriv_eq_inner_self (x : Space d) (i : Fin d) :
 
 /-!
 
-### A.12. Differentiability of derivatives
+#### A.10.3. Derivative of the inner product on one side
+
+-/
+
+@[simp]
+lemma deriv_inner_left {d} (x1 x2 : Space d) (i : Fin d) :
+    deriv i (fun x => ⟪x, x2⟫_ℝ) x1 = x2 i := by
+  rw [deriv_eq_fderiv_basis]
+  rw [fderiv_inner_apply]
+  simp only [fderiv_fun_const, Pi.zero_apply, ContinuousLinearMap.zero_apply, inner_zero_right,
+    fderiv_id', ContinuousLinearMap.coe_id', id_eq, basis_inner, zero_add]
+  · fun_prop
+  · fun_prop
+
+@[simp]
+lemma deriv_inner_right {d} (x1 x2 : Space d) (i : Fin d) :
+    deriv i (fun x => ⟪x1, x⟫_ℝ) x2 = x1 i := by
+  rw [deriv_eq_fderiv_basis]
+  rw [fderiv_inner_apply]
+  simp only [fderiv_id', ContinuousLinearMap.coe_id', id_eq, inner_basis, fderiv_fun_const,
+    Pi.ofNat_apply, ContinuousLinearMap.zero_apply, inner_zero_left, add_zero]
+  · fun_prop
+  · fun_prop
+/-!
+
+### A.11. Differentiability of derivatives
 
 -/
 

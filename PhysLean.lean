@@ -31,14 +31,13 @@ import PhysLean.Electromagnetism.Kinematics.FieldStrength
 import PhysLean.Electromagnetism.Kinematics.MagneticField
 import PhysLean.Electromagnetism.Kinematics.ScalarPotential
 import PhysLean.Electromagnetism.Kinematics.VectorPotential
-import PhysLean.Electromagnetism.MaxwellEquations
 import PhysLean.Electromagnetism.PointParticle.FiniteCollection
 import PhysLean.Electromagnetism.PointParticle.OneDimension
 import PhysLean.Electromagnetism.PointParticle.ThreeDimension
 import PhysLean.Electromagnetism.Vacuum.Constant
-import PhysLean.Electromagnetism.Vacuum.Homogeneous
+import PhysLean.Electromagnetism.Vacuum.HarmonicWave
+import PhysLean.Electromagnetism.Vacuum.IsPlaneWave
 import PhysLean.Electromagnetism.Vacuum.OneDimension
-import PhysLean.Electromagnetism.Vacuum.Wave
 import PhysLean.Mathematics.Calculus.AdjFDeriv
 import PhysLean.Mathematics.Calculus.Divergence
 import PhysLean.Mathematics.DataStructures.FourTree.Basic
