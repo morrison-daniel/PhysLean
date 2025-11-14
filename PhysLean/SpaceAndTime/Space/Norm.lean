@@ -5,6 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 import PhysLean.SpaceAndTime.Space.DistOfFunction
 import PhysLean.SpaceAndTime.Space.Derivatives.Grad
+import PhysLean.SpaceAndTime.Space.Derivatives.Div
 import Mathlib.MeasureTheory.Measure.Lebesgue.VolumeOfBalls
 import Mathlib.Analysis.InnerProductSpace.NormPow
 import Mathlib.Analysis.Calculus.FDeriv.Norm
@@ -17,12 +18,20 @@ import Mathlib.Analysis.Calculus.FDeriv.Norm
 The main content of this file is defining `Space.normPowerSeries`, a power series which is
 differentiable everywhere, and which tends to the norm in the limit as `n → ∞`.
 
+We use properties of this power series to prove various results about distributions involving norms.
+
 ## ii. Key results
 
 - `normPowerSeries` : A power series which is differentiable everywhere, and in the limit
   as `n → ∞` tends to `‖x‖`.
 - `normPowerSeries_differentiable` : The power series is differentiable everywhere.
 - `normPowerSeries_tendsto` : The power series tends to the norm in the limit as `n → ∞`.
+- `distGrad_distOfFunction_norm_zpow` : The gradient of the distribution defined by a power of the
+  norm.
+- `distGrad_distOfFunction_log_norm` : The gradient of the distribution defined by the logarithm
+  of the norm.
+- `distDiv_inv_pow_eq_dim` : The divergence of the distribution defined by the
+  inverse power of the norm propotional to the Dirac delta distribution.
 
 ## iii. Table of contents
 
@@ -36,8 +45,14 @@ differentiable everywhere, and which tends to the norm in the limit as `n → �
   - A.7. The `IsDistBounded` property of the norm power series
   - A.8. Differentiability of functions
   - A.9. Derivatives of functions
-  - A.10. Gradients of distributions
+  - A.10. Gradients of distributions based on powers
+    - A.10.1. The limits of gradients of distributions based on powers
+  - A.11. Gradients of distributions based on logs
+    - A.11.1. The limits of gradients of distributions based on logs
 - B. Distributions involving norms
+  - B.1. The gradient of distributions based on powers
+  - B.2. The gradient of distributions based on logs
+  - B.3. Divergence equal dirac delta
 
 ## iv. References
 
@@ -263,6 +278,34 @@ lemma normPowerSeries_zpow_le_norm_sq_add_one {d} (n : ℕ) (m : ℤ) (x : Space
     refine pow_le_pow_left₀ (by simp) ?_ (m + 1)
     exact norm_le_normPowerSeries n x
 
+lemma normPowerSeries_inv_le {d} (n : ℕ) (x : Space d) (hx : x ≠ 0) :
+    (normPowerSeries n x)⁻¹ ≤ ‖x‖⁻¹ := by
+  refine inv_anti₀ ?_ ?_
+  · positivity
+  apply Real.le_sqrt_of_sq_le
+  simp only [one_div, le_add_iff_nonneg_right, inv_nonneg]
+  positivity
+
+lemma normPowerSeries_log_le_normPowerSeries {d} (n : ℕ) (x : Space d) :
+    |Real.log (normPowerSeries n x)| ≤ (normPowerSeries n x)⁻¹ + (normPowerSeries n x) := by
+  have h1 := Real.neg_inv_le_log (x := (normPowerSeries n x)) (by simp)
+  have h2 := Real.log_le_rpow_div (x := (normPowerSeries n x)) (by simp) (ε := 1) (by positivity)
+  simp_all
+  rw [abs_le']
+  generalize Real.log ‖x‖ = r at *
+  apply And.intro
+  · apply h2.trans
+    simp
+  · rw [neg_le]
+    apply le_trans _ h1
+    simp
+lemma normPowerSeries_log_le {d} (n : ℕ) (x : Space d) (hx : x ≠ 0) :
+    |Real.log (normPowerSeries n x)| ≤ ‖x‖⁻¹ + (‖x‖ + 1) := by
+  apply le_trans (normPowerSeries_log_le_normPowerSeries n x) ?_
+  apply add_le_add
+  · exact normPowerSeries_inv_le n x hx
+  · exact normPowerSeries_le_norm_sq_add_one n x
+
 /-!
 
 ### A.7. The `IsDistBounded` property of the norm power series
@@ -344,17 +387,7 @@ lemma IsDistBounded.normPowerSeries_log {d : ℕ} (n : ℕ) :
       apply add_nonneg
       · simp
       · simp)]
-    have h1 := Real.neg_inv_le_log (x := (normPowerSeries n x)) (by simp)
-    have h2 := Real.log_le_rpow_div (x := (normPowerSeries n x)) (by simp) (ε := 1) (by positivity)
-    simp_all
-    rw [abs_le']
-    generalize Real.log ‖x‖ = r at *
-    apply And.intro
-    · apply h2.trans
-      simp
-    · rw [neg_le]
-      apply le_trans _ h1
-      simp
+    exact normPowerSeries_log_le_normPowerSeries n x
 
 /-!
 
@@ -450,7 +483,7 @@ lemma fderiv_log_normPowerSeries {d : ℕ} {n : ℕ} (x y : Space d) :
 
 /-!
 
-### A.10. Gradients of distributions
+### A.10. Gradients of distributions based on powers
 
 -/
 
@@ -487,37 +520,11 @@ lemma gradient_dist_normPowerSeries_zpow {d : ℕ} {n : ℕ} (m : ℤ) :
   rw [real_inner_comm]
   ring
 
-lemma gradient_dist_normPowerSeries_log {d : ℕ} {n : ℕ} :
-    distGrad (distOfFunction (fun x : Space d => Real.log (normPowerSeries n x)) (by fun_prop)) =
-    distOfFunction (fun x : Space d => ((normPowerSeries n x) ^ (- 2 : ℤ)) • x)
-    (by fun_prop) := by
-  ext1 η
-  apply ext_inner_right ℝ
-  intro y
-  simp [distGrad_inner_eq]
-  rw [Distribution.fderivD_apply, distOfFunction_apply, distOfFunction_inner]
-  calc _
-    _ = - ∫ (x : Space d), fderiv ℝ η x y * Real.log (normPowerSeries n x) := by
-      rfl
-    _ = ∫ (x : Space d), η x * fderiv ℝ (fun x => Real.log (normPowerSeries n x)) x y := by
-      rw [integral_mul_fderiv_eq_neg_fderiv_mul_of_integrable]
-      · fun_prop
-      · refine IsDistBounded.integrable_space_mul ?_ η
-        conv => enter [1, x]; rw [fderiv_log_normPowerSeries]
-        fun_prop
-      · fun_prop
-      · exact η.differentiable
-      · fun_prop
-    _ = ∫ (x : Space d), η x * (⟪y, x⟫_ℝ * (normPowerSeries n x) ^ (- 2 : ℤ)) := by
-      congr
-      funext x
-      rw [fderiv_log_normPowerSeries]
-  congr
-  funext x
-  simp [inner_smul_left_eq_smul]
-  left
-  rw [real_inner_comm]
-  ring
+/-!
+
+#### A.10.1. The limits of gradients of distributions based on powers
+
+-/
 
 lemma gradient_dist_normPowerSeries_zpow_tendsTo_distGrad_norm {d : ℕ} (m : ℤ)
     (hm : - (d.succ - 1 : ℕ) ≤ m) (η : 𝓢(Space d.succ, ℝ))
@@ -665,9 +672,190 @@ lemma gradient_dist_normPowerSeries_zpow_tendsTo {d : ℕ} (m : ℤ) (hm : - (d.
     convert h1 using 3
     · ring
     · ring
+
+/-!
+
+### A.11. Gradients of distributions based on logs
+
+-/
+
+lemma gradient_dist_normPowerSeries_log {d : ℕ} {n : ℕ} :
+    distGrad (distOfFunction (fun x : Space d => Real.log (normPowerSeries n x)) (by fun_prop)) =
+    distOfFunction (fun x : Space d => ((normPowerSeries n x) ^ (- 2 : ℤ)) • x)
+    (by fun_prop) := by
+  ext1 η
+  apply ext_inner_right ℝ
+  intro y
+  simp [distGrad_inner_eq]
+  rw [Distribution.fderivD_apply, distOfFunction_apply, distOfFunction_inner]
+  calc _
+    _ = - ∫ (x : Space d), fderiv ℝ η x y * Real.log (normPowerSeries n x) := by
+      rfl
+    _ = ∫ (x : Space d), η x * fderiv ℝ (fun x => Real.log (normPowerSeries n x)) x y := by
+      rw [integral_mul_fderiv_eq_neg_fderiv_mul_of_integrable]
+      · fun_prop
+      · refine IsDistBounded.integrable_space_mul ?_ η
+        conv => enter [1, x]; rw [fderiv_log_normPowerSeries]
+        fun_prop
+      · fun_prop
+      · exact η.differentiable
+      · fun_prop
+    _ = ∫ (x : Space d), η x * (⟪y, x⟫_ℝ * (normPowerSeries n x) ^ (- 2 : ℤ)) := by
+      congr
+      funext x
+      rw [fderiv_log_normPowerSeries]
+  congr
+  funext x
+  simp [inner_smul_left_eq_smul]
+  left
+  rw [real_inner_comm]
+  ring
+
+/-!
+
+#### A.11.1. The limits of gradients of distributions based on logs
+
+-/
+
+lemma gradient_dist_normPowerSeries_log_tendsTo_distGrad_norm {d : ℕ}
+    (η : 𝓢(Space d.succ.succ, ℝ)) (y : EuclideanSpace ℝ (Fin d.succ.succ)) :
+    Filter.Tendsto (fun n =>
+    ⟪(distGrad (distOfFunction
+    (fun x : Space d.succ.succ => Real.log (normPowerSeries n x)) (by fun_prop))) η, y⟫_ℝ)
+    Filter.atTop
+    (𝓝 (⟪distGrad (distOfFunction (fun x : Space d.succ.succ => Real.log ‖x‖)
+    (by fun_prop)) η, y⟫_ℝ)) := by
+  simp [distGrad_inner_eq, Distribution.fderivD_apply, distOfFunction_apply]
+  change Filter.Tendsto (fun n => -
+    ∫ (x : Space d.succ.succ), fderiv ℝ η x y * Real.log (normPowerSeries n x))
+    Filter.atTop (𝓝 (- ∫ (x : Space d.succ.succ), fderiv ℝ η x y * Real.log ‖x‖))
+  apply Filter.Tendsto.neg
+  apply MeasureTheory.tendsto_integral_of_dominated_convergence
+    (bound := fun x => |fderiv ℝ η x y| * (‖x‖⁻¹ + (‖x‖ + 1)))
+  · intro n
+    apply IsDistBounded.aeStronglyMeasurable_fderiv_schwartzMap_smul (F := ℝ) ?_
+    fun_prop
+  · have h1 : Integrable (fun x => (fderiv ℝ (⇑η) x) y * (‖x‖⁻¹ + (‖x‖ + 1))) volume := by
+      apply IsDistBounded.integrable_space_fderiv ?_
+      fun_prop
+    rw [← integrable_norm_iff] at h1
+    convert h1 using 1
+    funext x
+    simp only [Nat.succ_eq_add_one, norm_mul, Real.norm_eq_abs, mul_eq_mul_left_iff, abs_eq_zero]
+    left
+    rw [abs_of_nonneg (by positivity)]
+    fun_prop
+  · intro n
+    rw [Filter.eventually_iff_exists_mem]
+    use {0}ᶜ
+    constructor
+    · rw [compl_mem_ae_iff, measure_singleton]
+    intro x hx
+    simp at hx
+    simp
+    apply mul_le_mul (by rfl) _ (by positivity) (by positivity)
+    exact normPowerSeries_log_le n x hx
+  · rw [Filter.eventually_iff_exists_mem]
+    use {0}ᶜ
+    constructor
+    · rw [compl_mem_ae_iff, measure_singleton]
+    intro x hx
+    apply Filter.Tendsto.mul
+    · exact tendsto_const_nhds
+    apply Filter.Tendsto.log
+    · exact normPowerSeries_tendsto x hx
+    · simpa using hx
+
+lemma gradient_dist_normPowerSeries_log_tendsTo {d : ℕ}
+    (η : 𝓢(Space d.succ.succ, ℝ)) (y : EuclideanSpace ℝ (Fin d.succ.succ)) :
+    Filter.Tendsto (fun n =>
+    ⟪(distGrad (distOfFunction (fun x : Space d.succ.succ => Real.log (normPowerSeries n x))
+    (by fun_prop))) η, y⟫_ℝ)
+    Filter.atTop
+    (𝓝 (⟪distOfFunction (fun x : Space d.succ.succ => (‖x‖ ^ (- 2 : ℤ)) • x) (by
+    refine (IsDistBounded.zpow_smul_self _ ?_)
+    simp_all) η, y⟫_ℝ)) := by
+  conv =>
+    enter [1, n];
+    rw [gradient_dist_normPowerSeries_log]
+  simp only [Nat.succ_eq_add_one, Int.reduceNeg, distOfFunction_inner]
+  have h1 (n : ℕ) (x : Space d.succ.succ) :
+    η x * ⟪(normPowerSeries n x ^ (- 2 : ℤ)) • x, y⟫_ℝ =
+    η x * ((⟪x, y⟫_ℝ * (normPowerSeries n x) ^ (- 2 : ℤ))) := by
+    simp [inner_smul_left]
+    ring_nf
+    left
+    trivial
+  conv =>
+    enter [1, n, 2, x];
+    rw [h1 n x]
+  apply MeasureTheory.tendsto_integral_of_dominated_convergence
+    (bound := fun x => |η x| * |⟪x, y⟫_ℝ| * ((‖x‖ + 1) ^ (- 2 : ℤ) + ‖x‖ ^ (- 2 : ℤ)))
+  · intro n
+    apply IsDistBounded.aeStronglyMeasurable_schwartzMap_smul (F := ℝ) ?_ η
+    apply IsDistBounded.isDistBounded_mul_inner'
+    fun_prop
+  · have h1 : Integrable (fun x =>
+        η x * ((⟪x, y⟫_ℝ * ((‖x‖ + 1) ^ (- 2 : ℤ) + ‖x‖ ^ (- 2 : ℤ))))) volume := by
+      apply IsDistBounded.integrable_space_mul ?_ η
+      simp [mul_add]
+      apply IsDistBounded.add
+      · apply IsDistBounded.isDistBounded_mul_inner'
+
+        refine IsDistBounded.norm_add_pos_nat_zpow (- 2) 1 ?_
+        simp
+      · convert IsDistBounded.mul_inner_pow_neg_two y using 1
+        funext x
+        simp [real_inner_comm]
+
+    rw [← integrable_norm_iff] at h1
+    convert h1 using 1
+    funext x
+    simp [mul_assoc]
+    rw [abs_of_nonneg (by positivity)]
+    simp only [true_or]
+    fun_prop
+  · intro n
+    rw [Filter.eventually_iff_exists_mem]
+    use {0}ᶜ
+    constructor
+    · rw [compl_mem_ae_iff, measure_singleton]
+    intro x hx
+    simp at hx
+    simp [mul_assoc]
+    apply mul_le_mul (by rfl) _ (by positivity) (by positivity)
+    apply mul_le_mul (by rfl) _ (by positivity) (by positivity)
+    rw [abs_of_nonneg (by simp)]
+    exact normPowerSeries_zpow_le_norm_sq_add_one n (- 2 : ℤ) x hx
+  · rw [Filter.eventually_iff_exists_mem]
+    use {0}ᶜ
+    constructor
+    · rw [compl_mem_ae_iff, measure_singleton]
+    intro x hx
+    apply Filter.Tendsto.mul
+    · exact tendsto_const_nhds
+    simp [inner_smul_left, inner_smul_left]
+    rw [mul_comm]
+    apply Filter.Tendsto.mul
+    · exact tendsto_const_nhds
+    have h1 : Filter.Tendsto (fun x_1 => normPowerSeries x_1 x ^ ((- 2 : ℤ) : ℝ))
+      Filter.atTop (𝓝 (‖x‖ ^ ((- 2 : ℤ) : ℝ))) := by
+      refine Filter.Tendsto.rpow ?_ ?_ ?_
+      · apply normPowerSeries_tendsto x hx
+      · simp
+      · left
+        simpa using hx
+    simpa using h1
+
 /-!
 
 ## B. Distributions involving norms
+
+-/
+
+/-!
+
+### B.1. The gradient of distributions based on powers
 
 -/
 
@@ -681,10 +869,183 @@ lemma distGrad_distOfFunction_norm_zpow {d : ℕ} (m : ℤ) (hm : - (d.succ - 1 
       simp_all
       omega) := by
   ext1 η
-  apply ext_inner_right ℝ
-  intro y
-  apply tendsto_nhds_unique
+  exact ext_inner_right ℝ fun y => tendsto_nhds_unique
     (gradient_dist_normPowerSeries_zpow_tendsTo_distGrad_norm m (by simp_all; omega) η y)
     (gradient_dist_normPowerSeries_zpow_tendsTo m hm η y)
+
+/-!
+
+### B.2. The gradient of distributions based on logs
+
+-/
+
+lemma distGrad_distOfFunction_log_norm {d : ℕ} :
+    distGrad (distOfFunction (fun x : Space d.succ.succ => Real.log ‖x‖)
+      (by fun_prop))
+    = distOfFunction (fun x : Space d.succ.succ => (‖x‖ ^ (- 2 : ℤ)) • x) (by
+      refine (IsDistBounded.zpow_smul_self _ ?_)
+      simp_all) := by
+  ext1 η
+  exact ext_inner_right ℝ fun y => tendsto_nhds_unique
+    (gradient_dist_normPowerSeries_log_tendsTo_distGrad_norm η y)
+    (gradient_dist_normPowerSeries_log_tendsTo η y)
+
+/-!
+
+### B.3. Divergence equal dirac delta
+
+We show that the divergence of `x ↦ ‖x‖ ^ (- d) • x` is equal to a multiple of the Dirac delta
+at `0`.
+
+The proof
+
+-/
+open Distribution
+
+lemma distDiv_inv_pow_eq_dim {d : ℕ} :
+    distDiv (distOfFunction (fun x : Space d.succ => ‖x‖ ^ (- d.succ : ℤ) • x)
+      (IsDistBounded.zpow_smul_self (- d.succ : ℤ) (by omega))) =
+      (d.succ * (volume (α := Space d.succ)).real (Metric.ball 0 1)) • diracDelta ℝ 0 := by
+  ext η
+  calc _
+      _ = - ∫ x, ⟪‖x‖⁻¹ ^ d.succ • x, Space.grad η x⟫_ℝ := by
+        simp only [Nat.succ_eq_add_one, Nat.cast_add, Nat.cast_one, zpow_neg, distDiv_ofFunction,
+          inv_pow]
+        rfl
+      _ = - ∫ x, ‖x‖⁻¹ ^ d * ⟪‖x‖⁻¹ • x, Space.grad η x⟫_ℝ := by
+        simp only [Nat.succ_eq_add_one, inv_pow, inner_smul_left, map_inv₀, conj_trivial, neg_inj]
+        ring_nf
+      _ = - ∫ x, ‖x‖⁻¹ ^ d * (_root_.deriv (fun a => η (a • ‖x‖⁻¹ • x)) ‖x‖) := by
+        simp only [real_inner_comm,
+          ← grad_inner_space_unit_vector _ _ (SchwartzMap.differentiable η)]
+      _ = - ∫ r, ‖r.2.1‖⁻¹ ^ d * (_root_.deriv (fun a => η (a • r.1)) ‖r.2.1‖)
+        ∂(volume (α := Space d.succ).toSphere.prod
+        (Measure.volumeIoiPow (Module.finrank ℝ (Space d.succ) - 1))) := by
+        rw [← MeasureTheory.MeasurePreserving.integral_comp (f := homeomorphUnitSphereProd _)
+          (MeasureTheory.Measure.measurePreserving_homeomorphUnitSphereProd
+          (volume (α := Space d.succ)))
+          (Homeomorph.measurableEmbedding (homeomorphUnitSphereProd (Space d.succ)))]
+        congr 1
+        simp only [inv_pow, homeomorphUnitSphereProd_apply_snd_coe, norm_norm,
+          homeomorphUnitSphereProd_apply_fst_coe]
+        let f (x : Space d.succ) : ℝ :=
+          (‖↑x‖ ^ d)⁻¹ * _root_.deriv (fun a => η (a • ‖↑x‖⁻¹ • ↑x)) ‖↑x‖
+        conv_rhs =>
+          enter [2, x]
+          change f x.1
+        rw [MeasureTheory.integral_subtype_comap (by simp), ← setIntegral_univ]
+        change ∫ x in Set.univ, f x = ∫ (x : Space d.succ) in _, f x
+        refine (setIntegral_congr_set ?_)
+        rw [← MeasureTheory.ae_eq_set_compl]
+        trans (∅ : Set (Space d.succ))
+        · apply Filter.EventuallyEq.of_eq
+          rw [← Set.compl_empty]
+          exact compl_compl _
+        · symm
+          simp
+      _ = - ∫ n, (∫ r, ‖r.1‖⁻¹ ^ d *
+        (_root_.deriv (fun a => η (a • n)) ‖r.1‖)
+        ∂((Measure.volumeIoiPow (Module.finrank ℝ (Space d.succ) - 1))))
+        ∂(volume (α := Space d.succ).toSphere) := by
+        rw [MeasureTheory.integral_prod]
+        /- Integrable condition. -/
+        convert integrable_isDistBounded_inner_grad_schwartzMap_spherical
+          (IsDistBounded.inv_pow_smul_self (d.succ) (by omega)) η
+        rename_i r
+        simp only [Nat.succ_eq_add_one, Real.norm_eq_abs, inv_pow, Function.comp_apply,
+          homeomorphUnitSphereProd_symm_apply_coe]
+        let x : Space d.succ := r.2.1 • r.1.1
+        have hr := r.2.2
+        simp [-Subtype.coe_prop] at hr
+        have hr2 : r.2.1 ≠ 0 := by exact Ne.symm (ne_of_lt hr)
+        rw [abs_of_nonneg (le_of_lt hr)]
+        trans (r.2.1 ^ d)⁻¹ * _root_.deriv (fun a => η (a • ‖↑x‖⁻¹ • ↑x)) ‖x‖
+        · simp [x, norm_smul]
+          left
+          congr
+          funext a
+          congr
+          simp [smul_smul]
+          rw [abs_of_nonneg (le_of_lt hr)]
+          field_simp
+          simp only [one_smul]
+          rw [abs_of_nonneg (le_of_lt hr)]
+        rw [← grad_inner_space_unit_vector]
+        rw [real_inner_comm]
+        simp [inner_smul_left, x, norm_smul, abs_of_nonneg (le_of_lt hr)]
+        field_simp
+        ring
+        exact SchwartzMap.differentiable η
+      _ = - ∫ n, (∫ (r : Set.Ioi (0 : ℝ)),
+        (_root_.deriv (fun a => η (a • n)) r.1) ∂(.comap Subtype.val volume))
+        ∂(volume (α := Space d.succ).toSphere) := by
+        congr
+        funext n
+        simp [Measure.volumeIoiPow]
+        erw [integral_withDensity_eq_integral_smul]
+        congr
+        funext r
+        have hr := r.2
+        simp [-Subtype.coe_prop] at hr
+        trans ((r.1 ^ d).toNNReal : ℝ) • ((r.1 ^ d)⁻¹ * _root_.deriv (fun a => η (a • ↑n)) |r.1|)
+        · rw [NNReal.smul_def]
+          simp only [Real.coe_toNNReal', smul_eq_mul, Nat.succ_eq_add_one, mul_eq_mul_left_iff,
+            mul_eq_mul_right_iff, inv_inj, sup_eq_right]
+          rw [abs_of_nonneg (le_of_lt hr)]
+          simp
+        trans ((r.1 ^ d) : ℝ) • ((r.1 ^ d)⁻¹ * _root_.deriv (fun a => η (a • ↑n)) |r.1|)
+        · congr
+          rw [Real.coe_toNNReal']
+          rw [max_eq_left]
+          apply pow_nonneg
+          grind
+        have h1 : r.1 ≠ 0 := by exact ne_of_gt r.2
+        simp only [smul_eq_mul]
+        field_simp
+        congr
+        rw [abs_of_nonneg (le_of_lt hr)]
+        fun_prop
+      _ = - ∫ n, (-η 0) ∂(volume (α := Space d.succ).toSphere) := by
+        congr
+        funext n
+        let η' (n : ↑(Metric.sphere 0 1)) : 𝓢(ℝ, ℝ) := compCLM (g := fun a => a • n.1) ℝ (by
+          apply And.intro
+          · fun_prop
+          · intro n'
+            match n' with
+            | 0 =>
+              use 1, 1
+              simp [norm_smul]
+            | 1 =>
+              use 0, 1
+              intro x
+              simp [fderiv_smul_const, iteratedFDeriv_succ_eq_comp_right]
+            | n' + 1 + 1 =>
+              use 0, 0
+              intro x
+              simp only [Real.norm_eq_abs, pow_zero, mul_one, norm_le_zero_iff]
+              rw [iteratedFDeriv_succ_eq_comp_right]
+              simp [fderiv_smul_const]
+              rw [iteratedFDeriv_succ_const]
+              simp
+              rfl) (by use 1, 1; simp [norm_smul]) η
+        rw [MeasureTheory.integral_subtype_comap (by simp)]
+        rw [MeasureTheory.integral_Ioi_of_hasDerivAt_of_tendsto (f := fun a => η (a • n)) (m := 0)]
+        · simp
+        · refine ContinuousAt.continuousWithinAt ?_
+          fun_prop
+        · intro x hx
+          refine DifferentiableAt.hasDerivAt ?_
+          have := η.differentiable
+          fun_prop
+        · exact (integrable ((derivCLM ℝ) (η' n))).integrableOn
+        · exact Filter.Tendsto.mono_left (η' n).toZeroAtInfty.zero_at_infty' atTop_le_cocompact
+      _ = η 0 * (d.succ * (volume (α := Space d.succ)).real (Metric.ball 0 1)) := by
+        simp only [integral_const, Measure.toSphere_real_apply_univ, finrank_euclideanSpace,
+          Fintype.card_fin, smul_eq_mul, mul_neg, neg_neg]
+        ring
+  simp only [Nat.succ_eq_add_one, Nat.cast_add, Nat.cast_one, ContinuousLinearMap.coe_smul',
+    Pi.smul_apply, diracDelta_apply, smul_eq_mul]
+  ring
 
 end Space

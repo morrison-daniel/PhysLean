@@ -978,6 +978,12 @@ lemma zpow_smul_self {d : ℕ} (n : ℤ) (hn : - (d - 1 : ℕ) - 1 ≤ n) :
       simp only [zpow_one]
       ring_nf
       simpa using hx
+
+lemma inv_pow_smul_self {d : ℕ} (n : ℕ) (hn : - (d - 1 : ℕ) - 1 ≤ (- n : ℤ)) :
+    IsDistBounded (d := d) (fun x => ‖x‖⁻¹ ^ n • x) := by
+  convert zpow_smul_self (n := - (n : ℤ)) (by omega) using 1
+  funext x
+  simp
 /-!
 
 ## F. Multiplication by norms and components
@@ -1165,6 +1171,32 @@ lemma isDistBounded_mul_inner' {d : ℕ} {f : Space d → ℝ}
   convert hf.isDistBounded_smul_inner y using 2
   rw [real_inner_comm]
   simp
+
+@[fun_prop]
+lemma mul_inner_pow_neg_two {d : ℕ}
+    (y : Space d.succ.succ) :
+    IsDistBounded (fun x => ⟪y, x⟫_ℝ * ‖x‖ ^ (- 2 : ℤ)) := by
+  apply IsDistBounded.mono (f := fun x => (‖y‖ * ‖x‖) * ‖x‖ ^ (- 2 : ℤ))
+  · simp [mul_assoc]
+    apply IsDistBounded.const_mul_fun
+    apply IsDistBounded.congr (f := fun x => ‖x‖ ^ (- 1 : ℤ))
+    · apply IsDistBounded.pow (d := d.succ.succ) (-1) (by simp)
+    · apply AEMeasurable.aestronglyMeasurable
+      fun_prop
+    · intro x
+      simp only [norm_mul, norm_norm, norm_inv, norm_zpow, Int.reduceNeg, zpow_neg, zpow_one]
+      by_cases hx : x = 0
+      · subst hx
+        simp
+      have hx' : ‖x‖ ≠ 0 := by
+        simpa using hx
+      field_simp
+  · apply AEMeasurable.aestronglyMeasurable
+    fun_prop
+  · intro x
+    simp
+    apply mul_le_mul_of_nonneg _ (by rfl) (by positivity) (by positivity)
+    exact abs_real_inner_le_norm y x
 
 end constructors
 end IsDistBounded
