@@ -3,8 +3,11 @@ Copyright (c) 2025 Joseph Tooby-Smith. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Luis Gabriel C. Bariuan, Joseph Tooby-Smith
 -/
-import Mathlib.Analysis.Complex.Trigonometric
-import PhysLean.Meta.Informal.SemiFormal
+import Mathlib.Analysis.InnerProductSpace.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv
+import Mathlib.Topology.Algebra.Module.ModuleTopology
+import Mathlib.Topology.GDelta.MetrizableSpace
+import PhysLean.Meta.Informal.Basic
 import PhysLean.SpaceAndTime.Space.Basic
 /-!
 
@@ -50,13 +53,19 @@ lemma mul_sinh_as_div (r k : ℝ) :
 
 /-- First, show that limit of `sinh(r * x) / x` is r at the limit x goes to zero.
 Then the next theorem will address the rewrite using Filter.Tendsto.comp -/
-@[sorryful]
 lemma tendsto_sinh_rx_over_x (r : ℝ) :
-    Tendsto (fun x : ℝ => Real.sinh (r * x) / x) (𝓝[≠] 0) (𝓝 r) := by sorry
+    Tendsto (fun x : ℝ => Real.sinh (r * x) / x) (𝓝[≠] 0) (𝓝 r) := by
+  simpa [div_eq_inv_mul] using HasDerivAt.tendsto_slope_zero
+    (HasDerivAt.sinh (HasDerivAt.const_mul r (hasDerivAt_id 0)))
 
-@[sorryful]
-lemma limit_S_saddle(r : ℝ) :
-    Tendsto (fun k : ℝ => k * Real.sinh (r / k)) atTop (𝓝 r) := by sorry
+lemma limit_S_saddle (r : ℝ) :
+    Tendsto (fun k : ℝ => k * Real.sinh (r / k)) atTop (𝓝 r) := by
+  suffices h_sinh_y : Tendsto (fun y => Real.sinh (r * y) / y)
+    (map (fun k => 1 / k) atTop) (𝓝 r) by
+      exact h_sinh_y.congr fun x => by simp [div_eq_mul_inv, mul_comm]
+  have h_deriv : HasDerivAt (fun y => Real.sinh (r * y)) r 0 := by
+    simpa using HasDerivAt.sinh (HasDerivAt.const_mul r (hasDerivAt_id 0))
+  simpa [div_eq_inv_mul] using h_deriv.tendsto_slope_zero_right
 
 /-- The limit of `S (Sphere k) r` as `k → ∞` is equal to `S (Flat) r`.
 First show that `k * sinh(r / k) = sin(r / k) / (1 / k)` pointwise. -/
@@ -65,13 +74,22 @@ lemma mul_sin_as_div (r k : ℝ) :
 
 /-- First, show that limit of `sin(r * x) / x` is r at the limit x goes to zero.
 Then the next theorem will address the rewrite using Filter.Tendsto.comp -/
-@[sorryful]
 lemma tendsto_sin_rx_over_x (r : ℝ) :
-    Tendsto (fun x : ℝ => Real.sin (r * x) / x) (𝓝[≠] 0) (𝓝 r) := by sorry
+    Tendsto (fun x : ℝ => Real.sin (r * x) / x) (𝓝[≠] 0) (𝓝 r) := by
+  simpa [div_eq_inv_mul] using HasDerivAt.tendsto_slope_zero
+    (HasDerivAt.sin (HasDerivAt.const_mul r (hasDerivAt_id 0)))
 
-@[sorryful]
 lemma limit_S_sphere(r : ℝ) :
-    Tendsto (fun k : ℝ => k * Real.sin (r / k)) atTop (𝓝 r) := by sorry
+    Tendsto (fun k : ℝ => k * Real.sin (r / k)) atTop (𝓝 r) := by
+  have h_sin_deriv : Filter.Tendsto (fun x : ℝ => Real.sin x / x) (nhdsWithin 0 {0}ᶜ) (nhds 1) := by
+    simpa [div_eq_inv_mul] using Real.hasDerivAt_sin 0 |> HasDerivAt.tendsto_slope_zero
+  by_cases hr : r = 0
+  · simp [hr]
+  · have h_subst : Filter.Tendsto (fun k : ℝ => Real.sin (r / k) / (r / k)) Filter.atTop (𝓝 1) := by
+      refine h_sin_deriv.comp <| tendsto_inf.mpr
+        ⟨tendsto_const_nhds.div_atTop tendsto_id, tendsto_principal.mpr
+          <| eventually_ne_atTop 0 |> Eventually.mono <| by aesop⟩
+    convert h_subst.const_mul r using 2 <;> field_simp
 
 end SpatialGeometry
 
