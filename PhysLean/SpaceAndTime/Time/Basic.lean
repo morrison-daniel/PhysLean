@@ -3,11 +3,7 @@ Copyright (c) 2025 Joseph Tooby-Smith. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Joseph Tooby-Smith
 -/
-import PhysLean.Meta.Informal.Basic
 import PhysLean.SpaceAndTime.Space.Basic
-import Mathlib.MeasureTheory.Measure.Haar.InnerProductSpace
-import Mathlib.Topology.ContinuousMap.CompactlySupported
-import Mathlib.Geometry.Manifold.IsManifold.Basic
 /-!
 # Time
 
@@ -328,7 +324,7 @@ lemma val_measurableEmbedding : MeasurableEmbedding Time.val where
   measurableSet_image' := by
     intro s hs
     change MeasurableSet (⇑toRealCLE '' s)
-    rw [ContinuousLinearEquiv.image_eq_preimage]
+    rw [ContinuousLinearEquiv.image_eq_preimage_symm]
     exact toRealCLE.symm.continuous.measurable hs
 
 lemma val_measurePreserving : MeasurePreserving Time.val volume volume :=
@@ -348,7 +344,7 @@ lemma fderiv_val (t : Time) : fderiv ℝ Time.val t 1 = 1 := by
 /-- The orthonomral basis on `Time` defined by `1`. -/
 noncomputable def basis : OrthonormalBasis (Fin 1) ℝ Time where
   repr := {
-    toFun := fun x => fun _ => x
+    toFun := fun x => WithLp.toLp 2 (fun _ => x)
     invFun := fun f => ⟨f 0⟩
     left_inv := by
       intro x

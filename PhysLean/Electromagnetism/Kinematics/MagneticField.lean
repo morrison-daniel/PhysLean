@@ -4,10 +4,6 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Joseph Tooby-Smith
 -/
 import PhysLean.Electromagnetism.Kinematics.ElectricField
-import PhysLean.SpaceAndTime.SpaceTime.TimeSlice
-import PhysLean.Relativity.Tensors.RealTensor.CoVector.Basic
-import PhysLean.Mathematics.VariationalCalculus.HasVarGradient
-import PhysLean.SpaceAndTime.TimeAndSpace.Basic
 /-!
 
 # The Magnetic Field
@@ -102,12 +98,9 @@ lemma magneticField_fst_eq_fieldStrengthMatrix {c : SpeedOfLight}
   all_goals
   · rw [SpaceTime.deriv_sum_inr c _ hA]
     simp only [Fin.isValue, ContinuousLinearEquiv.apply_symm_apply]
-    rw [Space.deriv_eq, Space.deriv_eq, fderiv_pi]
+    rw [Space.deriv_eq, Space.deriv_eq, Lorentz.Vector.fderiv_apply]
     rfl
-    · intro μ
-      apply Differentiable.differentiableAt
-      have h1 := (differentiable_component A hA μ)
-      apply Differentiable.comp h1
+    · refine Differentiable.comp hA ?_
       refine Differentiable.fun_comp ?_ ?_
       · exact ContinuousLinearEquiv.differentiable (toTimeAndSpace c).symm
       · fun_prop
@@ -126,12 +119,9 @@ lemma magneticField_snd_eq_fieldStrengthMatrix {c : SpeedOfLight}
   all_goals
   · rw [SpaceTime.deriv_sum_inr c _ hA]
     simp only [Fin.isValue, ContinuousLinearEquiv.apply_symm_apply]
-    rw [Space.deriv_eq, Space.deriv_eq, fderiv_pi]
+    rw [Space.deriv_eq, Space.deriv_eq, Lorentz.Vector.fderiv_apply]
     rfl
-    · intro μ
-      apply Differentiable.differentiableAt
-      have h1 := (differentiable_component A hA μ)
-      apply Differentiable.comp h1
+    · refine Differentiable.comp hA ?_
       refine Differentiable.fun_comp ?_ ?_
       · exact ContinuousLinearEquiv.differentiable (toTimeAndSpace c).symm
       · fun_prop
@@ -149,12 +139,9 @@ lemma magneticField_thd_eq_fieldStrengthMatrix {c : SpeedOfLight} (A : Electroma
   all_goals
   · rw [SpaceTime.deriv_sum_inr c _ hA]
     simp only [Fin.isValue, ContinuousLinearEquiv.apply_symm_apply]
-    rw [Space.deriv_eq, Space.deriv_eq, fderiv_pi]
+    rw [Space.deriv_eq, Space.deriv_eq, Lorentz.Vector.fderiv_apply]
     rfl
-    · intro μ
-      apply Differentiable.differentiableAt
-      have h1 := (differentiable_component A hA μ)
-      apply Differentiable.comp h1
+    · refine Differentiable.comp hA ?_
       refine Differentiable.fun_comp ?_ ?_
       · exact ContinuousLinearEquiv.differentiable (toTimeAndSpace c).symm
       · fun_prop
@@ -302,13 +289,13 @@ lemma magneticFieldMatrix_diag_eq_zero {c : SpeedOfLight}
 
 lemma magneticField_eq_magneticFieldMatrix {c : SpeedOfLight} (A : ElectromagneticPotential)
     (hA : Differentiable ℝ A) :
-    A.magneticField c = fun t x i =>
+    A.magneticField c = fun t x => WithLp.toLp 2 fun i =>
       match i with
       | 0 => - A.magneticFieldMatrix c t x (1, 2)
       | 1 => A.magneticFieldMatrix c t x (0, 2)
       | 2 => - A.magneticFieldMatrix c t x (0, 1) := by
   rw [magneticFieldMatrix_eq]
-  funext t x i
+  ext t x i
   fin_cases i
   · simp [magneticField_fst_eq_fieldStrengthMatrix A t x hA]
   · simp [magneticField_snd_eq_fieldStrengthMatrix A t x hA]

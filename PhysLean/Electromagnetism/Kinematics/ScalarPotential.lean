@@ -4,9 +4,6 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Joseph Tooby-Smith
 -/
 import PhysLean.Electromagnetism.Kinematics.EMPotential
-import PhysLean.SpaceAndTime.SpaceTime.TimeSlice
-import PhysLean.Relativity.Tensors.RealTensor.CoVector.Basic
-import PhysLean.Mathematics.VariationalCalculus.HasVarGradient
 /-!
 
 # The Scalar Potential
@@ -76,7 +73,7 @@ lemma scalarPotential_contDiff {n} {d} (c : SpeedOfLight) (A : ElectromagneticPo
   simp [scalarPotential]
   apply timeSlice_contDiff
   have h1 : ∀ i, ContDiff ℝ n (fun x => A x i) := by
-    rw [← contDiff_euclidean]
+    rw [SpaceTime.contDiff_vector]
     exact hA
   apply ContDiff.mul
   · fun_prop
@@ -110,7 +107,7 @@ lemma scalarPotential_differentiable {d} (c : SpeedOfLight) (A : Electromagnetic
   simp [scalarPotential]
   apply timeSlice_differentiable
   have h1 : ∀ i, Differentiable ℝ (fun x => A x i) := by
-    rw [← differentiable_euclidean]
+    rw [SpaceTime.differentiable_vector]
     exact hA
   apply Differentiable.mul
   · fun_prop

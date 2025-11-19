@@ -3,9 +3,8 @@ Copyright (c) 2025 Joseph Tooby-Smith. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Joseph Tooby-Smith
 -/
-import PhysLean.Meta.Informal.Basic
-import PhysLean.SpaceAndTime.Time.Basic
 import PhysLean.SpaceAndTime.SpaceTime.Basic
+import Mathlib.Analysis.InnerProductSpace.Calculus
 /-!
 
 # Time Derivatives
@@ -115,6 +114,12 @@ lemma deriv_contDiff_of_contDiff {M : Type}
 
 -/
 
+lemma differentiable_euclid {f : Time → EuclideanSpace ℝ (Fin n)}
+    (hf : ∀ i, Differentiable ℝ (fun t => f t i)) :
+    Differentiable ℝ f := by
+  rw [differentiable_euclidean]
+  fun_prop
+
 lemma deriv_euclid { μ} {f : Time→ EuclideanSpace ℝ (Fin n)}
     (hf : Differentiable ℝ f) (t : Time) :
     deriv (fun t => f t μ) t = deriv (fun t => f t) t μ := by
@@ -126,14 +131,24 @@ lemma deriv_euclid { μ} {f : Time→ EuclideanSpace ℝ (Fin n)}
   · fun_prop
   · fun_prop
 
+lemma fderiv_euclid { μ} {f : Time→ EuclideanSpace ℝ (Fin n)}
+    (hf : Differentiable ℝ f) (t dt : Time) :
+    fderiv ℝ (fun t => f t μ) t dt = fderiv ℝ (fun t => f t) t dt μ := by
+  change fderiv ℝ (EuclideanSpace.proj μ ∘ fun x => f x) t dt = _
+  rw [fderiv_comp]
+  · simp
+  · fun_prop
+  · fun_prop
+
 lemma deriv_lorentzVector {d : ℕ} {f : Time → Lorentz.Vector d}
     (hf : Differentiable ℝ f) (t : Time) (i : Fin 1 ⊕ Fin d) :
     deriv (fun t => f t i) t = deriv (fun t => f t) t i := by
   rw [deriv_eq]
-  change fderiv ℝ (EuclideanSpace.proj i ∘ fun x => f x) t 1 = _
+  change fderiv ℝ (Lorentz.Vector.coordCLM i ∘ fun x => f x) t 1 = _
   rw [fderiv_comp]
   · simp
     rw [← deriv_eq]
+    rfl
   · fun_prop
   · fun_prop
 

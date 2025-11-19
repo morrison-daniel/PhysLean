@@ -3,7 +3,6 @@ Copyright (c) 2025 Zhi Kai Pong. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Zhi Kai Pong, Joseph Tooby-Smith
 -/
-import Mathlib.Analysis.Calculus.FDeriv.Mul
 import Mathlib.LinearAlgebra.CrossProduct
 import PhysLean.SpaceAndTime.Time.Derivatives
 /-!
@@ -62,28 +61,29 @@ lemma fderiv_cross_commute {t : Time} {s : Space} {f : Time → EuclideanSpace �
     = fderiv ℝ (fun t' => s ⨯ₑ₃ (f t')) t 1 := by
   have h (i j : Fin 3) : s i * (fderiv ℝ (fun u => f u) t) 1 j -
       s j * (fderiv ℝ (fun u => f u) t) 1 i
-      =
-      (fderiv ℝ (fun t => s i * f t j - s j * f t i) t) 1:= by
+      = (fderiv ℝ (fun t => s i * f t j - s j * f t i) t) 1:= by
     rw [fderiv_fun_sub, fderiv_const_mul, fderiv_const_mul]
-    rw [fderiv_pi]
-    rfl
+    simp only [ContinuousLinearMap.coe_sub', ContinuousLinearMap.coe_smul', Pi.sub_apply,
+      Pi.smul_apply, smul_eq_mul]
+    rw [Time.fderiv_euclid, Time.fderiv_euclid]
     intro i
     repeat fun_prop
   rw [crossProduct]
   ext i
   fin_cases i <;>
   · simp [Nat.succ_eq_add_one, Nat.reduceAdd, Fin.isValue, WithLp.equiv_apply,
-      LinearMap.mk₂_apply, PiLp.ofLp_apply, Fin.reduceFinMk, WithLp.equiv_symm_apply,
+      LinearMap.mk₂_apply, Fin.reduceFinMk, WithLp.equiv_symm_apply,
       PiLp.toLp_apply, cons_val]
     rw [h]
     simp only [Fin.isValue]
-    rw [fderiv_pi]
-    simp only [Fin.isValue, PiLp.toLp_apply]
-    rfl
-    · intro i
-      fin_cases i <;>
-      · simp
-        fun_prop
+    rw [← Time.fderiv_euclid]
+    simp [Fin.isValue, cons_val_zero]
+    apply Time.differentiable_euclid
+    intro i
+    fin_cases i
+    all_goals
+      simp [Fin.zero_eta, Fin.isValue]
+      fun_prop
 
 /-- Cross product and time derivative commute. -/
 lemma time_deriv_cross_commute {s : Space} {f : Time → EuclideanSpace ℝ (Fin 3)}
@@ -103,7 +103,7 @@ lemma inner_cross_self (v w : EuclideanSpace ℝ (Fin 3)) :
     inner ℝ v (w ⨯ₑ₃ v) = 0 := by
   cases v using WithLp.rec with | _ v =>
   cases w using WithLp.rec with | _ w =>
-  simp only [WithLp.equiv_apply, WithLp.ofLp_toLp, WithLp.equiv_symm_apply]
+  simp only [WithLp.equiv_apply, WithLp.equiv_symm_apply]
   change (crossProduct w) v ⬝ᵥ v = _
   rw [dotProduct_comm, dot_cross_self]
 
@@ -111,8 +111,8 @@ lemma inner_self_cross (v w : EuclideanSpace ℝ (Fin 3)) :
     inner ℝ v (v ⨯ₑ₃ w) = 0 := by
   cases v using WithLp.rec with | _ v =>
   cases w using WithLp.rec with | _ w =>
-  simp only [WithLp.equiv_apply, WithLp.ofLp_toLp, WithLp.equiv_symm_apply, PiLp.inner_apply,
-    PiLp.toLp_apply, RCLike.inner_apply, conj_trivial]
+  simp only [WithLp.equiv_apply, WithLp.equiv_symm_apply, PiLp.inner_apply, RCLike.inner_apply,
+    conj_trivial]
   change (crossProduct v) w ⬝ᵥ v = _
   rw [dotProduct_comm, dot_self_cross]
 

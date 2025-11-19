@@ -3,7 +3,6 @@ Copyright (c) 2025 Joseph Tooby-Smith. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Joseph Tooby-Smith
 -/
-import PhysLean.SpaceAndTime.SpaceTime.Basic
 import PhysLean.Relativity.LorentzGroup.Boosts.Basic
 import PhysLean.Meta.Informal.SemiFormal
 import PhysLean.Mathematics.FDerivCurry
@@ -88,6 +87,7 @@ lemma boost_zero_apply_time_space {d : ℕ} {β : ℝ} (hβ : |β| < 1) (c : Spe
     ((boost (0 : Fin d.succ) β hβ)⁻¹ • (SpaceTime.toTimeAndSpace c).symm (t, x)) =
     (SpaceTime.toTimeAndSpace c).symm
     (γ β * (t.val + β /c * x 0),
+    WithLp.toLp 2
     fun | (0 : Fin d.succ) => γ β * (x 0 + c * β * t.val)
         | ⟨Nat.succ n, ih⟩ => x ⟨Nat.succ n, ih⟩) := by
   funext μ

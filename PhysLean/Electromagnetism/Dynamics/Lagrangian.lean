@@ -5,7 +5,6 @@ Authors: Joseph Tooby-Smith
 -/
 import PhysLean.Electromagnetism.Dynamics.CurrentDensity
 import PhysLean.Electromagnetism.Dynamics.KineticTerm
-import PhysLean.Electromagnetism.Kinematics.MagneticField
 /-!
 
 # The Lagrangian in electromagnetism
@@ -117,7 +116,7 @@ lemma freeCurrentPotential_hasVarGradientAt (A : ElectromagneticPotential d)
   intro μ
   have h1 := hasVarAdjDerivAt_component μ A hA
   have h2' : ContDiff ℝ ∞ fun x => η μ μ * J x μ :=
-    ContDiff.mul (by fun_prop) (contDiff_euclidean.mp hJ μ)
+    ContDiff.mul (by fun_prop) ((Lorentz.Vector.contDiff_apply _).mpr hJ μ)
   have h2 := HasVarAdjDerivAt.fun_mul h2' _ _ A h1
   have h3' : (fun (φ : SpaceTime d → Lorentz.Vector d) x => η μ μ * J x μ * φ x μ) =
     (fun (φ : SpaceTime d → Lorentz.Vector d) x => η μ μ * φ x μ * J x μ) := by
