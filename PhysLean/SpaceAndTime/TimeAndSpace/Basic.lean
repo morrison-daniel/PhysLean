@@ -36,8 +36,10 @@ We put these results in the namespace `Space` by convention.
   - A.6. Equal up to a constant of time and space derivatives equal
 - B. Derivatives of distributions on Time × Space d
   - B.1. Time derivatives
+    - B.1.1. Composition with a CLM
   - B.2. Space derivatives
     - B.2.1. Space derivatives commute
+    - B.2.2. Composition with a CLM
   - B.3. Time and space derivatives commute
   - B.4. The spatial gradient
   - B.5. The spatial divergence
@@ -367,6 +369,18 @@ lemma distTimeDeriv_apply {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
 
 /-!
 
+#### B.1.1. Composition with a CLM
+
+-/
+
+lemma distTimeDeriv_apply_CLM {M M2 d} [NormedAddCommGroup M] [NormedSpace ℝ M]
+    [NormedAddCommGroup M2] [NormedSpace ℝ M2] (f : (Time × Space d) →d[ℝ] M)
+    (c : M →L[ℝ] M2) : distTimeDeriv (c ∘L f) = c ∘L (distTimeDeriv f) := by
+  ext ε
+  simp [distTimeDeriv_apply, fderivD_apply]
+
+/-!
+
 ### B.2. Space derivatives
 
 -/
@@ -424,6 +438,19 @@ lemma distSpaceDeriv_commute {M d} [NormedAddCommGroup M] [NormedSpace ℝ M]
   · have h1 := smooth κ 2
     fun_prop
   · fun_prop
+
+/-!
+
+#### B.2.2. Composition with a CLM
+
+-/
+
+lemma distSpaceDeriv_apply_CLM {M M2 d} [NormedAddCommGroup M] [NormedSpace ℝ M]
+    [NormedAddCommGroup M2] [NormedSpace ℝ M2]
+    (i : Fin d) (f : (Time × Space d) →d[ℝ] M)
+    (c : M →L[ℝ] M2) : distSpaceDeriv i (c ∘L f) = c ∘L (distSpaceDeriv i f) := by
+  ext ε
+  simp [distSpaceDeriv_apply, fderivD_apply]
 
 /-!
 
