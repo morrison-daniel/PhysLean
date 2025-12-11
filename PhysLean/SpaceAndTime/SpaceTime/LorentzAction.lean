@@ -29,6 +29,7 @@ we define the induced action on Schwartz functions and distributions.
   - B.1. The SMul instance
   - B.2. The DistribMulAction instance
   - B.3. The SMulCommClass instance
+  - B.4. Action as a linear map
 
 ## iv. References
 
@@ -179,6 +180,24 @@ instance : SMulCommClass ℝ (LorentzGroup d) ((SpaceTime d) →d[ℝ] M) where
     simp [lorentzGroup_smul_dist_apply]
     rw [SMulCommClass.smul_comm]
 
+/-!
+
+### B.4. Action as a linear map
+
+-/
+
+/-- The Lorentz action on distributions as a linear map. -/
+def distActionLinearMap {d} {M : Type} [NormedAddCommGroup M]
+    [NormedSpace ℝ M] [Tensorial (realLorentzTensor d) c M] [T2Space M](Λ : LorentzGroup d) :
+    ((SpaceTime d) →d[ℝ] M) →ₗ[ℝ] ((SpaceTime d) →d[ℝ] M) where
+  toFun f := Λ • f
+  map_add' f1 f2 := by
+    ext η
+    simp [lorentzGroup_smul_dist_apply, ContinuousLinearMap.add_apply, smul_add]
+  map_smul' a f := by
+    ext η
+    simp [lorentzGroup_smul_dist_apply]
+    rw [← @smul_comm]
 end Distribution
 end SpaceTime
 
