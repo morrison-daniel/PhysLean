@@ -51,7 +51,9 @@ In this implementation we set `μ₀ = 1`. It is a TODO to introduce this consta
   - C.7. The lagrangian gradient in tensor notation
 - D. The gradient of the lagrangian density for distributions
   - D.1. The gradient of the free current potential
+    - D.1.1. Free current potential as a tensor
   - D.2. The gradient of the lagrangian density
+    - D.2.1. The lagrangian gradient as a tensor
 
 ## iv. References
 
@@ -447,6 +449,11 @@ noncomputable def gradFreeCurrentPotential {d} :
     funext i
     ring_nf
 
+lemma gradFreeCurrentPotential_eq_sum_basis {d}
+    (J : DistLorentzCurrentDensity d) (ε : 𝓢(SpaceTime d, ℝ)) :
+    (gradFreeCurrentPotential J) ε =
+    (∑ μ, (η μ μ • (J ε μ) • Lorentz.Vector.basis μ)) := rfl
+
 lemma gradFreeCurrentPotential_sum_inl_0 (𝓕 : FreeSpace) {d}
     (J : DistLorentzCurrentDensity d) (ε : 𝓢(SpaceTime d, ℝ)) :
     (gradFreeCurrentPotential J) ε (Sum.inl 0) =
@@ -472,6 +479,26 @@ lemma gradFreeCurrentPotential_sum_inr_i (𝓕 : FreeSpace) {d}
     ContinuousLinearMap.coe_comp', Function.comp_apply]
   rw [← distTimeSlice_symm_apply]
   simp
+
+/-!
+
+#### D.1.1. Free current potential as a tensor
+
+-/
+
+lemma gradFreeCurrentPotential_eq_tensor {d}
+    (J : DistLorentzCurrentDensity d) (ε : 𝓢(SpaceTime d, ℝ))
+    (ν : Fin 1 ⊕ Fin d) :
+    gradFreeCurrentPotential J ε ν = η ν ν * ((Tensorial.toTensor (M := Lorentz.Vector d)).symm
+    (permT id (PermCond.auto) {J ε | ν'}ᵀ)) ν:= by
+  trans η ν ν * (Lorentz.Vector.basis.repr ((Tensorial.toTensor (M := Lorentz.Vector d)).symm
+    (permT id (PermCond.auto) {J ε | ν'}ᵀ))) ν
+  swap
+  · simp [Lorentz.Vector.basis_repr_apply]
+  simp [Lorentz.Vector.basis_repr_apply]
+  rw [gradFreeCurrentPotential_eq_sum_basis]
+  simp [Lorentz.Vector.apply_sum]
+
 /-!
 
 ### D.2. The gradient of the lagrangian density
@@ -504,6 +531,34 @@ lemma gradLagrangian_sum_inr_i {𝓕 : FreeSpace}
         ((distTimeSlice 𝓕.c).symm (Space.distSpaceDeriv j (A.magneticFieldMatrix 𝓕.c)) ε) (j, i)) +
     (distTimeSlice 𝓕.c).symm (J.currentDensity 𝓕.c) ε i := by
   simp [gradLagrangian, gradKineticTerm_sum_inr_eq, gradFreeCurrentPotential_sum_inr_i 𝓕]
+
+/-!
+
+#### D.2.1. The lagrangian gradient as a tensor
+
+-/
+
+lemma gradLagrangian_eq_tensor {𝓕 : FreeSpace}
+    (A : DistElectromagneticPotential d) (J : DistLorentzCurrentDensity d)
+    (ε : 𝓢(SpaceTime d, ℝ)) (ν : Fin 1 ⊕ Fin d) :
+    A.gradLagrangian 𝓕 J ε ν =
+    η ν ν * ((Tensorial.toTensor (M := Lorentz.Vector d)).symm
+    (permT id (PermCond.auto) {((1/ 𝓕.μ₀ : ℝ) • distTensorDeriv A.fieldStrength ε | κ κ ν') +
+    - (J ε | ν')}ᵀ)) ν := by
+  rw [gradLagrangian]
+  simp only [ContinuousLinearMap.coe_sub', Pi.sub_apply, apply_sub, Nat.reduceSucc, Nat.reduceAdd,
+    Fin.isValue, one_div, map_smul, map_neg, map_add, permT_permT, CompTriple.comp_eq, apply_add,
+    apply_smul, Lorentz.Vector.neg_apply]
+  rw [gradKineticTerm_eq_distTensorDeriv, gradFreeCurrentPotential_eq_tensor J ε ν]
+  simp only [Nat.reduceSucc, Nat.reduceAdd, Fin.isValue, one_div, map_smul, apply_smul,
+    permT_id_self, LinearEquiv.symm_apply_apply]
+  ring_nf
+  congr
+  rw [permT_congr_eq_id]
+  simp only [LinearEquiv.symm_apply_apply]
+  funext i
+  fin_cases i
+  simp
 
 end DistElectromagneticPotential
 end Electromagnetism

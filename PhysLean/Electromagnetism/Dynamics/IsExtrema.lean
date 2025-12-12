@@ -41,6 +41,8 @@ Maxwell's equations with sources, i.e. Gauss's law and Ampère's law.
 - E. Is Extema condition in the distributional case
   - E.1. IsExtrema and Gauss's law and Ampère's law
   - E.2. IsExtrema in terms of Vector Potentials
+  - E.3. The exterma condition in terms of tensors
+  - E.4. The invariance of the exterma condition under Lorentz transformations
 
 ## iv. References
 
@@ -293,11 +295,13 @@ lemma time_deriv_electricField_of_isExtrema {A : ElectromagneticPotential d}
 
 ### D.1. Second time derivatives of the magnetic field from the extrema condition
 
+We show that the magnetic field matrix $B_{ij}$ satisfies the following wave-like equation
+
 -/
 
 lemma time_deriv_time_deriv_magneticFieldMatrix_of_isExtrema {A : ElectromagneticPotential d}
     {𝓕 : FreeSpace}
-    (hA : ContDiff ℝ ∞ A) (J : LorentzCurrentDensity d) (hJd : Differentiable ℝ J)
+    (hA : ContDiff ℝ ∞ A) (J : LorentzCurrentDensity d)
     (hJ : ContDiff ℝ ∞ J) (h : IsExtrema 𝓕 A J)
     (t : Time) (x : Space d) (i j : Fin d) :
     ∂ₜ (∂ₜ (A.magneticFieldMatrix 𝓕.c · x (i, j))) t =
@@ -318,7 +322,7 @@ lemma time_deriv_time_deriv_magneticFieldMatrix_of_isExtrema {A : Electromagneti
         apply Space.deriv_differentiable
         apply magneticFieldMatrix_space_contDiff _ (hA.of_le (right_eq_inf.mp rfl)))
           ((LorentzCurrentDensity.currentDensity_apply_differentiable_space
-          hJd _ _).const_mul _).differentiableAt,
+          (hJ.differentiable (ENat.LEInfty.out)) _ _).const_mul _).differentiableAt,
     fderiv_const_mul (by
         apply Differentiable.fun_sum
         intro i _
@@ -326,7 +330,7 @@ lemma time_deriv_time_deriv_magneticFieldMatrix_of_isExtrema {A : Electromagneti
         apply magneticFieldMatrix_space_contDiff _ (hA.of_le (right_eq_inf.mp rfl))),
     fderiv_const_mul (by
         apply (LorentzCurrentDensity.currentDensity_apply_differentiable_space
-        hJd _ _).differentiableAt),
+        (hJ.differentiable (ENat.LEInfty.out)) _ _).differentiableAt),
     fderiv_fun_sum fun i _ => by
         apply Differentiable.differentiableAt
         apply Space.deriv_differentiable
@@ -341,7 +345,7 @@ lemma time_deriv_time_deriv_magneticFieldMatrix_of_isExtrema {A : Electromagneti
         apply Space.deriv_differentiable
         apply magneticFieldMatrix_space_contDiff _ (hA.of_le (right_eq_inf.mp rfl)))
           ((LorentzCurrentDensity.currentDensity_apply_differentiable_space
-          hJd _ _).const_mul _).differentiableAt,
+          (hJ.differentiable (ENat.LEInfty.out)) _ _).const_mul _).differentiableAt,
     fderiv_const_mul (by
         apply Differentiable.fun_sum
         intro i _
@@ -349,7 +353,7 @@ lemma time_deriv_time_deriv_magneticFieldMatrix_of_isExtrema {A : Electromagneti
         apply magneticFieldMatrix_space_contDiff _ (hA.of_le (right_eq_inf.mp rfl))),
     fderiv_const_mul (by
         apply (LorentzCurrentDensity.currentDensity_apply_differentiable_space
-        hJd _ _).differentiableAt),
+        (hJ.differentiable (ENat.LEInfty.out)) _ _).differentiableAt),
     fderiv_fun_sum fun i _ => by
         apply Differentiable.differentiableAt
         apply Space.deriv_differentiable
@@ -678,6 +682,86 @@ lemma isExtrema_iff_vectorPotential {𝓕 : FreeSpace}
   funext j
   rw [magneticFieldMatrix_distSpaceDeriv_basis_repr_eq_vector_potential]
   ring
+
+/-!
+
+### E.3. The exterma condition in terms of tensors
+
+We show that `A` is an extrema of the lagrangian if and only if the equation
+$$(\frac{1}{\mu_0} \partial_\kappa F^{\kappa \nu'} - J^{\nu'}) = 0,$$
+holds.
+
+-/
+open SpaceTime minkowskiMatrix
+lemma isExterma_iff_tensor {𝓕 : FreeSpace}
+    (A : DistElectromagneticPotential d)
+    (J : DistLorentzCurrentDensity d) :
+    IsExtrema 𝓕 A J ↔ ∀ ε,
+    {((1/ 𝓕.μ₀ : ℝ) • distTensorDeriv A.fieldStrength ε | κ κ ν') + - (J ε | ν')}ᵀ = 0 := by
+  apply Iff.intro
+  · intro h
+    simp only [IsExtrema] at h
+    intro x
+    have h1 : ((Tensorial.toTensor (M := Lorentz.Vector d)).symm
+        (permT id (PermCond.auto) {((1/ 𝓕.μ₀ : ℝ) • distTensorDeriv A.fieldStrength x | κ κ ν') +
+        - (J x | ν')}ᵀ)) = 0 := by
+      funext ν
+      have h2 : gradLagrangian 𝓕 A J x ν = 0 := by simp [h]
+      rw [gradLagrangian_eq_tensor A J] at h2
+      simp at h2
+      have hn : minkowskiMatrix ν ν ≠ 0 := minkowskiMatrix.η_diag_ne_zero
+      simp_all
+    rw [EmbeddingLike.map_eq_zero_iff, permT_eq_zero_iff] at h1
+    exact h1
+  · intro h
+    simp only [IsExtrema]
+    ext x
+    funext ν
+    rw [gradLagrangian_eq_tensor A J, h]
+    simp
+
+/-!
+
+### E.4. The invariance of the exterma condition under Lorentz transformations
+
+We show that the Exterma condition is invariant under Lorentz transformations.
+This implies that if an electromagnetic potential is an extrema in one inertial frame,
+it is also an extrema in any other inertial frame.
+In otherwords that the Maxwell's equations are Lorentz invariant.
+A natural consequence of this is that the speed of light is the same in all inertial frames.
+
+-/
+
+lemma isExterma_equivariant {𝓕 : FreeSpace}
+    (A : DistElectromagneticPotential d)
+    (J : DistLorentzCurrentDensity d) (Λ : LorentzGroup d) :
+    IsExtrema 𝓕 (Λ • A) (Λ • J) ↔ IsExtrema 𝓕 A J := by
+  rw [isExterma_iff_tensor]
+  conv_lhs =>
+    enter [x, 1, 1, 2, 2, 2]
+    rw [fieldStrength_equivariant, distTensorDeriv_equivariant]
+    rw [lorentzGroup_smul_dist_apply]
+  conv_lhs =>
+    enter [x]
+    rw [smul_comm]
+    rw [Tensorial.toTensor_smul, lorentzGroup_smul_dist_apply, Tensorial.toTensor_smul]
+    simp only [Nat.reduceAdd, Nat.reduceSucc, Fin.isValue, one_div, map_smul, actionT_smul,
+      contrT_equivariant, map_neg, permT_equivariant]
+    rw [smul_comm, ← Tensor.actionT_neg, ← Tensor.actionT_add]
+  apply Iff.intro
+  · intro h
+    rw [isExterma_iff_tensor A J]
+    intro x
+    apply MulAction.injective Λ
+    simp only [Nat.reduceAdd, Nat.reduceSucc, Fin.isValue, one_div, map_smul, map_neg,
+      _root_.smul_add, actionT_smul, _root_.smul_neg, _root_.smul_zero]
+    simpa [schwartzAction_mul_apply] using h (schwartzAction Λ x)
+  · intro h x
+    rw [isExterma_iff_tensor A J] at h
+    specialize h (schwartzAction Λ⁻¹ x)
+    simp at h
+    rw [h]
+    simp
 
 end DistElectromagneticPotential
 end Electromagnetism
