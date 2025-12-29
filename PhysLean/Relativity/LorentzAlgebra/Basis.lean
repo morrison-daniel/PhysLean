@@ -109,12 +109,12 @@ lemma boostGenerator_mem (i : Fin 3) : boostGenerator i ∈ lorentzAlgebra := by
     have : ν = 0 := Subsingleton.elim _ _
     simp [boostGenerator, *]
   · -- (time, space) case
-    simp only [Sum.elim_inl, Sum.elim_inr]
+    simp only [Sum.elim_inr]
     have : μ = 0 := Subsingleton.elim _ _
     simp [boostGenerator, *]
     split_ifs <;> norm_num
   · -- (space, time) case
-    simp only [Sum.elim_inr, Sum.elim_inl]
+    simp only [Sum.elim_inl]
     have : ν = 0 := Subsingleton.elim _ _
     simp [boostGenerator, *]
   · -- (space, space) case
@@ -139,7 +139,7 @@ lemma rotationGenerator_mem (i : Fin 3) : rotationGenerator i ∈ lorentzAlgebra
     simp [rotationGenerator, *]
   · -- (space, space) case: need explicit computation
     simp only [Sum.elim_inr]
-    fin_cases i <;> fin_cases μ <;> fin_cases ν <;> simp [rotationGenerator] <;> norm_num
+    fin_cases i <;> fin_cases μ <;> fin_cases ν <;> simp [rotationGenerator]
 
 /-!
 ## TODO: Properties of Generators
