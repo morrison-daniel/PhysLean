@@ -6,6 +6,8 @@ Authors: Nicola Bernini
 import PhysLean.Meta.Informal.SemiFormal
 import PhysLean.ClassicalMechanics.EulerLagrange
 import PhysLean.ClassicalMechanics.HamiltonsEquations
+import PhysLean.SpaceAndTime.Time.Derivatives
+
 /-!
 
 # The Damped Harmonic Oscillator
@@ -141,6 +143,30 @@ lemma ω₀_sq : S.ω₀^2 = S.k / S.m := by
 
 /-!
 
+/-!
+## C. Equation of motion (Tag: DHO03)
+
+The damped harmonic oscillator with mass `m`, spring
+constant `k`, and damping coefficient `γ` satisfies
+
+    m ẍ + γ ẋ + k x = 0,
+
+where `x : Time → ℝ` is the position as a function of time.
+-/
+
+/-- The equation of motion for the damped harmonic oscillator.
+
+A function `x : Time → ℝ` is a solution if it satisfies
+
+    S.m * x¨ + S.γ * ẋ + S.k * x = 0
+
+for all times `t`. -/
+noncomputable def EquationOfMotion (x : Time → ℝ) : Prop :=
+  ∀ t : Time,
+    S.m * (Time.deriv (Time.deriv x) t) +
+    S.γ * (Time.deriv x t) +
+    S.k * x t = 0
+
 ## C. Damping regimes (placeholder)
 
 The three damping regimes will be defined based on the discriminant γ² - 4mk.
@@ -158,6 +184,7 @@ def IsCriticallyDamped : Prop := S.discriminant = 0
 
 /-- The system is overdamped when γ² > 4mk. -/
 def IsOverdamped : Prop := S.discriminant > 0
+
 
 end DampedHarmonicOscillator
 
