@@ -512,7 +512,11 @@ def solsInclLinSols (χ : ACCSystem) : χ.Sols →[ℚ] χ.LinSols :=
 @[sorryful]
 lemma solsInclLinSols_injective (χ : ACCSystem) :
     Function.Injective χ.solsInclLinSols := by
-  sorry
+  intro S T h
+  have h' : χ.solsInclQuadSols S = χ.solsInclQuadSols T := by
+    apply ACCSystemQuad.quadSolsInclLinSols_injective (χ := χ.toACCSystemQuad)
+    simpa [ACCSystem.solsInclLinSols, MulActionHom.comp_apply] using h
+  exact solsInclQuadSols_injective χ h'
 
 /-!
 
