@@ -416,7 +416,16 @@ in the rational charges. This corresponds to the `u(1)^3` anomaly.
 
 -/
 
-/-- The type of charges plus the anomaly cancellation conditions. -/
+/--
+The type of charges plus the anomaly cancellation conditions.
+
+In many physical settings these conditions are derived formally from the gauge group and the
+fermionic representations. They arise from triangle Feynman diagrams, and can also be obtained
+using index-theoretic or characteristic-class constructions.
+
+In this file, we take the resulting conditions as input data: linear, quadratic and cubic
+homogeneous forms on the space of rational charges.
+-/
 structure ACCSystem extends ACCSystemQuad where
   /-- The cubic ACC. -/
   cubicACC : HomogeneousCubic toACCSystemCharges.Charges
@@ -576,6 +585,12 @@ end ACCSystem
 ## J. Open TODO items
 
 We give some open TODO items for future work.
+
+One natural direction is to formalize how the anomaly cancellation conditions defining an
+`ACCSystem` arise from gauge-theoretic data (a gauge group together with fermionic representations).
+Physically these arise from triangle Feynman diagrams, and can also be described via index-theoretic
+or characteristic-class constructions (e.g. through an anomaly polynomial). At present we do not
+formalize this derivation in Lean, and instead take the resulting homogeneous forms as data.
 
 (To view these you may need to go to the GitHub source code for the file.)
 
