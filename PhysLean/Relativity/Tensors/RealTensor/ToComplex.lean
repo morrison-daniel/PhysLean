@@ -138,10 +138,39 @@ lemma permT_toComplex {n m : ℕ}
       (toComplex (c := c) t) := by
   sorry
 
+/-- `colorToComplex` commutes with `Fin.append` (as functions). -/
+@[simp]
+lemma colorToComplex_append {n m : ℕ}
+    (c : Fin n → realLorentzTensor.Color) (c1 : Fin m → realLorentzTensor.Color) :
+    (colorToComplex ∘ Fin.append c c1) = Fin.append (colorToComplex ∘ c) (colorToComplex ∘ c1) := by
+  funext x
+  -- breaking down x : Fin (n+m) into left/right parts
+  refine Fin.addCases (fun i => ?_) (fun j => ?_) x
+  · -- left case: x = castAdd m i
+    -- here `simp` should expand `Fin.append` on castAdd
+    simp [Fin.append, Function.comp_apply]
+  · -- right case: x = natAdd n j
+    simp [Fin.append, Function.comp_apply]
+
+/-- `prodT` on the complex side, with colors written as `colorToComplex ∘ Fin.append ...`.
+This is `prodT` followed by a cast using `colorToComplex_append`. -/
+noncomputable def prodTColorToComplex {n m : ℕ}
+    {c : Fin n → realLorentzTensor.Color} {c1 : Fin m → realLorentzTensor.Color} :
+    ℂT(colorToComplex ∘ c) → ℂT(colorToComplex ∘ c1) → ℂT(colorToComplex ∘ Fin.append c c1) :=
+    fun x y => permT (S := complexLorentzTensor) id (by simp) <|
+      prodT (S := complexLorentzTensor) x y
+
 /-- The map `toComplex` commutes with prodT. -/
-informal_lemma prodT_toComplex where
-  deps := [``prodT]
-  tag := "7RKFF"
+@[sorryful]
+lemma prodT_toComplex {n m : ℕ}
+    {c : Fin n → realLorentzTensor.Color}
+    {c1 : Fin m → realLorentzTensor.Color}
+    (t : ℝT(3, c)) (t1 : ℝT(3, c1)) :
+    toComplex (c := Fin.append c c1) (prodT (S := realLorentzTensor) t t1)
+      =
+    prodTColorToComplex (c := c) (c1 := c1)
+      (toComplex (c := c) t) (toComplex (c := c1) t1) := by
+  sorry
 
 /-- The map `toComplex` commutes with contrT. -/
 informal_lemma contrT_toComplex where
