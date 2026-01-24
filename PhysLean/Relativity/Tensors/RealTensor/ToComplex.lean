@@ -172,10 +172,29 @@ lemma prodT_toComplex {n m : ℕ}
       (toComplex (c := c) t) (toComplex (c := c1) t1) := by
   sorry
 
+/-- `τ` commutes with `colorToComplex` on the Lorentz `up/down` colors. -/
+@[simp]
+lemma tau_colorToComplex (x : realLorentzTensor.Color) :
+    (complexLorentzTensor).τ (colorToComplex x) = colorToComplex ((realLorentzTensor).τ x) := by
+  cases x <;> rfl
+
 /-- The map `toComplex` commutes with contrT. -/
-informal_lemma contrT_toComplex where
-  deps := [``contrT]
-  tag := "7RKFR"
+@[sorryful]
+lemma contrT_toComplex {n : ℕ}
+    {c : Fin (n + 1 + 1) → realLorentzTensor.Color} {i j : Fin (n + 1 + 1)}
+    (h : i ≠ j ∧ (realLorentzTensor).τ (c i) = c j) (t : ℝT(3, c)) :
+    toComplex (c := c ∘ Pure.dropPairEmb i j) (contrT (S := realLorentzTensor) n i j h t)
+      =
+    contrT (S := complexLorentzTensor) n i j (by
+        -- если у simp достаточно информации, то это закрывается:
+        simpa [Function.comp_apply] using
+          And.intro h.1 (by
+            -- τ-совместимость
+            simpa [tau_colorToComplex] using congrArg colorToComplex h.2
+          )
+      )
+      (toComplex (c := c) t) := by
+  sorry
 
 /-- The map `toComplex` commutes with evalT. -/
 informal_lemma evalT_toComplex where
