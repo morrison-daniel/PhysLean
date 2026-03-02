@@ -15,10 +15,48 @@ import Mathlib.Analysis.InnerProductSpace.Calculus
 # Space
 
 In this module, we define the the type `Space d` which corresponds
-to a `d`-dimensional Euclidean space and prove some properties about it.
+to `d`-dimensional flat Euclidean space and prove some properties about it.
 
 PhysLean sits downstream of Mathlib, and above we import the necessary Mathlib modules
 which contain (perhaps transitively through imports) the definitions and theorems we need.
+
+## Implementation details
+
+The exact implementation of `Space d` into PhysLean is discussed in numerous places
+on the Lean Zulip, including:
+
+- https://leanprover.zulipchat.com/#narrow/channel/479953-PhysLean/topic/Space.20vs.20EuclideanSpace/with/575332888
+
+There is a choice between defining `Space d` as an `abbrev` of `EuclideanSpace ℝ (Fin d)`,
+as a `def` of a type with value `EuclideanSpace ℝ (Fin d)` or as a structure
+with a field `val : Fin d → ℝ` :
+
++---------------------------------------------------+---------+-------+-----------+
+|                                                   | abbrev  |  def  | structure |
++---------------------------------------------------+---------+-------+-----------+
+| allows casting from `EuclideanSpace`              |   yes   |  yes  |    no     |
+| carries instances from `EuclideanSpace`           |   yes   |  no   |    no     |
+| requires reproving of lemmas from `EuclideanSpace`|   no    |  yes  |    yes    |
++---------------------------------------------------+---------+-------+-----------+
+
+The `structure` is the most conservative choice, as everything needs redefining. However,
+there is are two benefits of using it:
+
+1. It allows us to be precise about the instances we define on `Space d`, and makes
+  future refactoring of those instances easier.
+2. It allows us to give the necessary physics context to results about `Space d`, which
+  would not otherwise be possible if we reuse results from Mathlib.
+
+Currently `Space d` has the instances of `Module` (which requires the choice
+of a zero), `Norm` and `InnerProductSpace`.
+A future refactor should instead give `Space d` the instance of `NormedAddTorsor` and
+`MetricSpace` giving it directly the Euclidean distance.
+
+This has not been done yet since `fderiv` requires a `Module` instance.
+
+Because of this, one should be careful to avoid using the explicit zero in `Space d`,
+or adding two `Space d` values together. Where possible one should use
+the `VAdd (EuclideanSpace ℝ (Fin d)) (Space d)` instance instead.
 
 -/
 
@@ -33,8 +71,11 @@ TODO "HB6RR" "In the above documentation describe the notion of a type, and
 
 TODO "HB6VC" "Convert `Space` from an `abbrev` to a `def`."
 
-/-- The type `Space d` represents `d` dimensional Euclidean space.
-  The default value of `d` is `3`. Thus `Space = Space 3`. -/
+/-- The type `Space d` is the world-volume which corresponds to
+ `d` dimensional (flat) Euclidean space with a given (but arbitrary)
+choice of length unit, and a given (but arbitrary) choice of zero.
+
+The default value of `d` is `3`. Thus `Space = Space 3`-/
 structure Space (d : ℕ := 3) where
   /-- The underlying map `Fin d → ℝ` associated with a point in `Space`. -/
   val : Fin d → ℝ
