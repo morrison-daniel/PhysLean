@@ -3,7 +3,9 @@ Copyright (c) 2026 Gregory J. Loges. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gregory J. Loges
 -/
-import PhysLean.Mathematics.InnerProductSpace.Submodule
+module
+
+public import PhysLean.Mathematics.InnerProductSpace.Submodule
 /-!
 
 # Unbounded operators
@@ -25,6 +27,8 @@ We prove some basic relations, making use of the density and closability assumpt
   https://doi.org/10.1007/978-94-007-4753-1
 
 -/
+
+@[expose] public section
 
 namespace QuantumMechanics
 

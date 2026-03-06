@@ -3,13 +3,15 @@ Copyright (c) 2025 Joseph Tooby-Smith. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Joseph Tooby-Smith
 -/
-import PhysLean.Meta.Informal.Basic
-import PhysLean.Meta.TODO.Basic
-import PhysLean.Meta.Linters.Sorry
-import Mathlib.Topology.ContinuousMap.CompactlySupported
-import Mathlib.Geometry.Manifold.IsManifold.Basic
-import Mathlib.MeasureTheory.Measure.Lebesgue.VolumeOfBalls
-import Mathlib.Analysis.InnerProductSpace.Calculus
+module
+
+public import PhysLean.Meta.Informal.Basic
+public import PhysLean.Meta.TODO.Basic
+public import PhysLean.Meta.Linters.Sorry
+public import Mathlib.Topology.ContinuousMap.CompactlySupported
+public import Mathlib.Geometry.Manifold.IsManifold.Basic
+public import Mathlib.MeasureTheory.Measure.Lebesgue.VolumeOfBalls
+public import Mathlib.Analysis.InnerProductSpace.Calculus
 /-!
 
 # Space
@@ -59,6 +61,8 @@ or adding two `Space d` values together. Where possible one should use
 the `VAdd (EuclideanSpace ℝ (Fin d)) (Space d)` instance instead.
 
 -/
+
+@[expose] public section
 
 /-!
 

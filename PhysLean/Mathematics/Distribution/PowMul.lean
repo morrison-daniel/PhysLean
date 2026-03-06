@@ -3,8 +3,10 @@ Copyright (c) 2025 Joseph Tooby-Smith. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Joseph Tooby-Smith
 -/
-import PhysLean.Mathematics.Distribution.Basic
-import Mathlib.MeasureTheory.Constructions.HaarToSphere
+module
+
+public import PhysLean.Mathematics.Distribution.Basic
+public import Mathlib.MeasureTheory.Constructions.HaarToSphere
 /-!
 
 ## The multiple of a Schwartz map by `x`
@@ -13,6 +15,8 @@ In this module we define the continuous linear map from the Schwartz space
 `𝓢(ℝ, 𝕜)` to itself which takes a Schwartz map `η` to the Schwartz map `x * η`.
 
 -/
+
+@[expose] public section
 open SchwartzMap NNReal
 noncomputable section
 

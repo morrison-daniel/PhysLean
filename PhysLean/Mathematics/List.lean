@@ -3,13 +3,17 @@ Copyright (c) 2024 Joseph Tooby-Smith. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Joseph Tooby-Smith
 -/
-import PhysLean.Mathematics.Fin
-import Mathlib.Data.Nat.Lattice
-import Mathlib.Data.List.TakeWhile
+module
+
+public import PhysLean.Mathematics.Fin
+public import Mathlib.Data.Nat.Lattice
+public import Mathlib.Data.List.TakeWhile
 /-!
 # List lemmas
 
 -/
+
+@[expose] public section
 namespace PhysLean.List
 
 open Fin

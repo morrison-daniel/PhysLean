@@ -3,13 +3,17 @@ Copyright (c) 2024 Joseph Tooby-Smith. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Joseph Tooby-Smith
 -/
-import PhysLean.QFT.PerturbationTheory.Koszul.KoszulSignInsert
-import PhysLean.Mathematics.List.InsertionSort
+module
+
+public import PhysLean.QFT.PerturbationTheory.Koszul.KoszulSignInsert
+public import PhysLean.Mathematics.List.InsertionSort
 /-!
 
 # Koszul sign
 
 -/
+
+@[expose] public section
 
 namespace Wick
 

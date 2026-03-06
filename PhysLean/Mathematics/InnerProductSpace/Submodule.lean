@@ -3,7 +3,9 @@ Copyright (c) 2026 Gregory J. Loges. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gregory J. Loges
 -/
-import Mathlib.Analysis.InnerProductSpace.LinearPMap
+module
+
+public import Mathlib.Analysis.InnerProductSpace.LinearPMap
 /-!
 
 # Submodules of `E × E`
@@ -14,6 +16,8 @@ This allows us to take advantage of the inner product structure, since otherwise
 by default `E × E` is given the sup norm.
 
 -/
+
+@[expose] public section
 
 namespace InnerProductSpaceSubmodule
 

@@ -3,11 +3,13 @@ Copyright (c) 2025 Joseph Tooby-Smith. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Joseph Tooby-Smith
 -/
-import Mathlib.Data.Fintype.Prod
-import Mathlib.Data.ZMod.Defs
-import PhysLean.Particles.SuperSymmetry.SU5.ChargeSpectrum.Yukawa
-import PhysLean.Particles.SuperSymmetry.SU5.ChargeSpectrum.Completions
-import PhysLean.Meta.Linters.Sorry
+module
+
+public import Mathlib.Data.Fintype.Prod
+public import Mathlib.Data.ZMod.Defs
+public import PhysLean.Particles.SuperSymmetry.SU5.ChargeSpectrum.Yukawa
+public import PhysLean.Particles.SuperSymmetry.SU5.ChargeSpectrum.Completions
+public import PhysLean.Meta.Linters.Sorry
 /-!
 
 # Charge spectra with values in `ZMod n`
@@ -50,6 +52,8 @@ In other files we usually just consider one.
 There are no known references for the material in this module.
 
 -/
+
+@[expose] public section
 
 namespace SuperSymmetry
 

@@ -3,8 +3,10 @@ Copyright (c) 2025 Joseph Tooby-Smith. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Joseph Tooby-Smith
 -/
-import PhysLean.QFT.PerturbationTheory.FieldSpecification.CrAnFieldOp
-import PhysLean.Mathematics.List
+module
+
+public import PhysLean.QFT.PerturbationTheory.FieldSpecification.CrAnFieldOp
+public import PhysLean.Mathematics.List
 /-!
 
 # Creation and annihilation sections
@@ -28,6 +30,8 @@ Looking forward the main consequence of this definition is the lemma
 In this module we define various properties of `CrAnSection`.
 
 -/
+
+@[expose] public section
 
 namespace FieldSpecification
 variable {𝓕 : FieldSpecification}

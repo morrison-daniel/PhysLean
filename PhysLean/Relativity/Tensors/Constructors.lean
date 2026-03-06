@@ -3,13 +3,17 @@ Copyright (c) 2025 Joseph Tooby-Smith. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Joseph Tooby-Smith
 -/
-import PhysLean.Relativity.Tensors.Contraction.Products
+module
+
+public import PhysLean.Relativity.Tensors.Contraction.Products
 /-!
 
 # Constructors of tensors.
 
 There are a number of ways to construct explicit tensors.
 -/
+
+@[expose] public section
 
 open Module IndexNotation
 open CategoryTheory
