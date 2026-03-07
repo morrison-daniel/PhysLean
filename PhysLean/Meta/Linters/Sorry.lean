@@ -36,7 +36,7 @@ to be downloaded.
 
 open Lean
 
-/-- The information for stored for a declazration marked with `sorryful`. -/
+/-- The information for stored for a declaration marked with `sorryful`. -/
 structure SorryfulInfo where
   /-- Name of result. -/
   name : Name
