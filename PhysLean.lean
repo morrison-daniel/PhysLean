@@ -354,6 +354,7 @@ public import PhysLean.SpaceAndTime.Space.Integrals.Basic
 public import PhysLean.SpaceAndTime.Space.Integrals.RadialAngularMeasure
 public import PhysLean.SpaceAndTime.Space.IsDistBounded
 public import PhysLean.SpaceAndTime.Space.LengthUnit
+public import PhysLean.SpaceAndTime.Space.Module
 public import PhysLean.SpaceAndTime.Space.Norm
 public import PhysLean.SpaceAndTime.Space.Slice
 public import PhysLean.SpaceAndTime.Space.Translations
