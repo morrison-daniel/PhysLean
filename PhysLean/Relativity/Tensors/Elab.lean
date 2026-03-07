@@ -52,7 +52,7 @@ public import PhysLean.Relativity.Tensors.Tensorial
 
 -/
 
-@[expose] public section
+@[expose] public meta section
 open Lean Meta Elab Tactic Term
 namespace TensorSpecies
 namespace Tensor

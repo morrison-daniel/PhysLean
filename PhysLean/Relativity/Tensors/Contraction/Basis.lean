@@ -72,7 +72,7 @@ def ofFin {n : ℕ} {c : Fin (n + 1 + 1) → C}
   if hi : m = i then Fin.cast (by subst hi; rfl) x.1
   else if hj : m = j then Fin.cast (by subst hj; rfl) x.2
   else
-    Fin.cast (by simp; rw [Pure.dropPairEmb_dropPairEmbPre])
+    Fin.cast (by simp)
     (b (Pure.dropPairEmbPre i j hij m (by omega)))
 
 @[simp]

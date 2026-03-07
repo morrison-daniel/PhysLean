@@ -126,7 +126,7 @@ This can be constructed via
 
 `#eval completeMinSubset same.allowedBarFiveCharges same.allowedTenCharges`
 -/
-private def viableCompletions (I : CodimensionOneConfig) : Multiset (ChargeSpectrum ℤ) :=
+def viableCompletions (I : CodimensionOneConfig) : Multiset (ChargeSpectrum ℤ) :=
   match I with
   | same => {
     /- qHu = -3, and Q10 = {-3, 0} -/

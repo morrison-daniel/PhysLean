@@ -196,7 +196,8 @@ lemma actionT_fromPairT {c1 c2 : C}
 
 lemma fromPairT_map_right {c1 c2 c2' : C} (h :c2 = c2')
     (x : (S.FD.obj (Discrete.mk c1)).V ⊗[k] (S.FD.obj (Discrete.mk c2)).V) :
-    fromPairT (TensorProduct.map LinearMap.id (S.FD.map (eqToHom (by rw [h]))).hom.hom' x) =
+    fromPairT (TensorProduct.map LinearMap.id
+    (S.FD.map (eqToHom (congrArg Discrete.mk h))).hom.hom' x) =
     permT id (by simp [h])
     (fromPairT x) := by
   let P (x : (S.FD.obj (Discrete.mk c1)).V ⊗[k] (S.FD.obj (Discrete.mk c2)).V) : Prop :=

@@ -41,7 +41,7 @@ copyright (c) 2020 Microsoft Corporation. Authored by Leonardo de Moura.
 
 -/
 
-@[expose] public section
+@[expose] public meta section
 open Lean
 namespace PhysLean
 

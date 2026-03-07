@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.Meta.Basic
+public meta import PhysLean.Meta.Basic
 /-!
 
 # The linter for `sorry` declarations and the sorryful attribute
@@ -26,7 +26,7 @@ to be downloaded.
 
 -/
 
-@[expose] public section
+@[expose] public meta section
 
 /-!
 
@@ -36,7 +36,7 @@ to be downloaded.
 
 open Lean
 
-/-- The information for stored for a declaration marked with `sorryful`. -/
+/-- The information for stored for a declazration marked with `sorryful`. -/
 structure SorryfulInfo where
   /-- Name of result. -/
   name : Name

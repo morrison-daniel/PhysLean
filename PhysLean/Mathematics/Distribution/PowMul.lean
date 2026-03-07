@@ -28,7 +28,7 @@ variable [NormedSpace ℝ E]
 open ContDiff
 open MeasureTheory
 
-private lemma norm_iteratedFDeriv_ofRealCLM {x} (i : ℕ) :
+lemma norm_iteratedFDeriv_ofRealCLM {x} (i : ℕ) :
     ‖iteratedFDeriv ℝ i (RCLike.ofRealCLM (K := 𝕜)) x‖ =
       if i = 0 then |x| else if i = 1 then 1 else 0 := by
   match i with
@@ -116,7 +116,7 @@ def powOneMul : 𝓢(ℝ, 𝕜) →L[𝕜] 𝓢(ℝ, 𝕜) := by
         zero_mul, Finset.sum_singleton, ↓reduceIte, Nat.choose_self, Nat.cast_one, one_mul,
         Nat.sub_zero, norm_iteratedFDeriv_zero, CharP.cast_eq_zero, ge_iff_le]
       trans (SchwartzMap.seminorm 𝕜 (k + 1) 0) ψ
-      · apply le_trans ?_ (ψ.le_seminorm ℝ _ _ x)
+      · apply le_trans ?_ (ψ.le_seminorm 𝕜 _ _ x)
         simp only [Real.norm_eq_abs, norm_iteratedFDeriv_zero]
         ring_nf
         rfl
@@ -139,8 +139,8 @@ def powOneMul : 𝓢(ℝ, 𝕜) →L[𝕜] 𝓢(ℝ, 𝕜) := by
         refine Left.add_nonneg ?_ ?_
         · exact Nat.cast_nonneg' n
         · exact zero_le_one' ℝ
-        · exact ψ.le_seminorm ℝ k n x
-        · exact ψ.le_seminorm ℝ (k + 1) (n + 1) x
+        · exact ψ.le_seminorm 𝕜 k n x
+        · exact ψ.le_seminorm 𝕜 (k + 1) (n + 1) x
       · by_cases h1 :((SchwartzMap.seminorm 𝕜 (k + 1) (n + 1)) ψ) <
           ((SchwartzMap.seminorm 𝕜 k n) ψ)
         · rw [max_eq_left_of_lt h1]

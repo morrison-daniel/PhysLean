@@ -166,8 +166,7 @@ lemma orderedInsertPos_cons {I : Type} (le1 : I → I → Prop) [DecidableRel le
     (r : List I) (r0 r1 : I) :
     (orderedInsertPos le1 (r1 ::r) r0).val =
     if le1 r0 r1 then ⟨0, by simp⟩ else (Fin.succ (orderedInsertPos le1 r r0)) := by
-  simp only [List.orderedInsert.eq_2, orderedInsertPos, List.takeWhile, decide_not, Fin.zero_eta,
-    Fin.succ_mk]
+  simp only [orderedInsertPos, List.takeWhile, decide_not, Fin.zero_eta, Fin.succ_mk]
   by_cases h : le1 r0 r1
   · simp [h]
   · simp [h]
@@ -368,11 +367,11 @@ lemma orderedInsertEquiv_succ {I : Type} (le1 : I → I → Prop) [DecidableRel 
   simp only [List.length_cons, orderedInsertEquiv, Nat.succ_eq_add_one, Equiv.trans_apply]
   match r with
   | [] =>
-    simp [List.orderedInsert.eq_1]
+    simp [orderedInsertPos]
   | r1 :: r =>
-    simp only [List.orderedInsert.eq_2, List.length_cons]
+    simp only [List.length_cons]
     rw [finExtractOne_apply_neq]
-    simp only [List.orderedInsert.eq_2, orderedInsertPos, decide_not, Nat.succ_eq_add_one,
+    simp only [orderedInsertPos, decide_not, Nat.succ_eq_add_one,
       finExtractOne_symm_inr_apply]
     rfl
     exact ne_of_beq_false rfl
@@ -385,11 +384,11 @@ lemma orderedInsertEquiv_fin_succ {I : Type} (le1 : I → I → Prop) [Decidable
   simp only [orderedInsertEquiv, Equiv.trans_apply]
   match r with
   | [] =>
-    simp [List.orderedInsert.eq_1]
+    simp [orderedInsertPos]
   | r1 :: r =>
-    simp only [List.orderedInsert.eq_2, List.length_cons, Fin.eta]
+    simp only [List.length_cons, Fin.eta]
     rw [finExtractOne_apply_neq]
-    simp only [orderedInsertPos, List.orderedInsert.eq_2, decide_not, Nat.succ_eq_add_one,
+    simp only [orderedInsertPos, decide_not, Nat.succ_eq_add_one,
       finExtractOne_symm_inr_apply]
     rfl
     exact ne_of_beq_false rfl
@@ -568,15 +567,16 @@ lemma orderedInsert_eq_insertIdx_orderedInsertPos {I : Type} (le1 : I → I → 
   sorting algorithm. -/
 def insertionSortEquiv {α : Type} (r : α → α → Prop) [DecidableRel r] : (l : List α) →
     Fin l.length ≃ Fin (List.insertionSort r l).length
-  | [] => Equiv.refl _
-  | a :: l =>
-    (Fin.equivCons (insertionSortEquiv r l)).trans (orderedInsertEquiv r (List.insertionSort r l) a)
+  | [] => by simp only [List.length_nil, List.insertionSort_nil]; rfl
+  | a :: l => by
+      simp only [List.length_cons, List.insertionSort_cons]
+      exact (Fin.equivCons (insertionSortEquiv r l)).trans
+        (orderedInsertEquiv r (List.insertionSort r l) a)
 
 lemma insertionSortEquiv_get {α : Type} {r : α → α → Prop} [DecidableRel r] : (l : List α) →
     l.get ∘ (insertionSortEquiv r l).symm = (List.insertionSort r l).get
-  | [] => by rfl
+  | [] => by grind
   | a :: l => by
-    rw [insertionSortEquiv]
     change ((a :: l).get ∘ ((Fin.equivCons (insertionSortEquiv r l))).symm) ∘
       (orderedInsertEquiv r (List.insertionSort r l) a).symm = _
     have hl : (a :: l).get ∘ ((Fin.equivCons (insertionSortEquiv r l))).symm =

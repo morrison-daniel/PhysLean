@@ -5,6 +5,9 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
+meta import Mathlib.Data.ZMod.Defs
+meta import PhysLean.Particles.SuperSymmetry.SU5.ChargeSpectrum.Yukawa
+meta import PhysLean.Particles.SuperSymmetry.SU5.ChargeSpectrum.Completions
 public import Mathlib.Data.Fintype.Prod
 public import Mathlib.Data.ZMod.Defs
 public import PhysLean.Particles.SuperSymmetry.SU5.ChargeSpectrum.Yukawa
