@@ -404,7 +404,7 @@ lemma eraseIdxEquiv_symm_getElem {n : ℕ} (φs : List 𝓕.FieldOp) (hn : n < �
     getElem ((eraseIdxEquiv n φs hn).symm ⟨a,s⟩).1 n
     (by rw [length_eq]; exact hn) = ⟨φs[n], a⟩ := by
   rw [eraseIdxEquiv_symm_eq_take_cons_drop]
-  simp only [append, take, cons, drop, congr_fst]
+  simp [append, take, cons, drop, congr_fst]
   rw [List.getElem_append]
   simp only [List.length_take, length_eq, lt_inf_iff, lt_self_iff_false, false_and, ↓reduceDIte]
   have h0 : n ⊓ (φs.eraseIdx n).length = n := by

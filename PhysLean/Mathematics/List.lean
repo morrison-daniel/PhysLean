@@ -627,8 +627,7 @@ lemma insertionSortEquiv_order {α : Type} {r : α → α → Prop} [DecidableRe
     simp only [List.length_cons, Fin.zero_eta, Fin.getElem_fin, Fin.val_zero,
       List.getElem_cons_zero, List.getElem_cons_succ]
     nth_rewrite 2 [insertionSortEquiv] at hij'
-    simp only [List.length_cons, Nat.succ_eq_add_one, Fin.zero_eta,
-      Equiv.trans_apply, equivCons_zero] at hij'
+    simp only [List.length_cons, Nat.succ_eq_add_one, Fin.zero_eta,] at hij'
     have hx := orderedInsertEquiv_zero r (List.insertionSort r as) a
     simp only at hx
     convert lt_orderedInsertPos_rel_fin r a (List.insertionSort r as) _ hij'
@@ -636,9 +635,8 @@ lemma insertionSortEquiv_order {α : Type} {r : α → α → Prop} [DecidableRe
     rw [← insertionSortEquiv_get]
     simp
   | a :: as, ⟨i + 1, hi⟩, ⟨j + 1, hj⟩, hij, hij' => by
-    simp only [List.length_cons, insertionSortEquiv, Nat.succ_eq_add_one, Equiv.trans_apply,
-      equivCons_succ] at hij'
-    have h1 := orderedInsertEquiv_monotone_fin_succ _ _ _ _ _ hij'
+    simp only [List.length_cons, insertionSortEquiv, Nat.succ_eq_add_one] at hij'
+    have h1 := orderedInsertEquiv_monotone_fin_succ r (List.insertionSort r as) _ _ _ hij'
     have h2 := insertionSortEquiv_order as ⟨i, Nat.succ_lt_succ_iff.mp hi⟩
       ⟨j, Nat.succ_lt_succ_iff.mp hj⟩ (by simpa using hij) h1
     simpa using h2

@@ -182,7 +182,7 @@ lemma koszulSignInsert_eq_exchangeSign_take [Std.Total le] [IsTrans 𝓕 le] (φ
     induction φs with
     | nil => simp
     | cons r1 r ih =>
-      simp only [decide_not, List.insertionSort, List.filter_eq_self, Bool.not_eq_eq_eq_not,
+      simp only [decide_not, List.insertionSort_cons, List.filter_eq_self, Bool.not_eq_eq_eq_not,
         Bool.not_true, decide_eq_false_iff_not]
       intro a ha
       have ha' := List.mem_takeWhile_imp ha
@@ -198,7 +198,7 @@ lemma koszulSignInsert_eq_exchangeSign_take [Std.Total le] [IsTrans 𝓕 le] (φ
   refine List.Pairwise.rel_of_mem_take_of_mem_drop
     (i := (orderedInsertPos le (List.insertionSort le φs) φ).1 + 1)
     (List.pairwise_insertionSort le (φ :: φs)) ?_ ?_
-  · simp only [List.insertionSort, List.foldr_cons, List.orderedInsert_eq_take_drop, decide_not]
+  · simp only [List.insertionSort_cons, List.orderedInsert_eq_take_drop, decide_not]
     rw [List.take_append]
     rw [List.take_of_length_le]
     · simp [orderedInsertPos]
