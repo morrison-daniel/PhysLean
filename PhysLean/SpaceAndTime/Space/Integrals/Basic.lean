@@ -5,7 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
-public import PhysLean.SpaceAndTime.Space.Basic
+public import PhysLean.SpaceAndTime.Space.Module
 /-!
 
 # Integrals in Space

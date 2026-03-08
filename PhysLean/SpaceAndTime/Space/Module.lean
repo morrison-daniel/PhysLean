@@ -18,6 +18,8 @@ of a zero and for a basis, a choice of orientation.
 
 -/
 
+@[expose] public section
+
 namespace Space
 
 /-!

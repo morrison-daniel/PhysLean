@@ -8,6 +8,7 @@ module
 public import PhysLean.Mathematics.Fin
 public import Mathlib.Data.Nat.Lattice
 public import Mathlib.Data.List.TakeWhile
+import all Mathlib.Data.List.Sort
 /-!
 # List lemmas
 
@@ -367,7 +368,7 @@ lemma orderedInsertEquiv_succ {I : Type} (le1 : I → I → Prop) [DecidableRel 
   simp only [List.length_cons, orderedInsertEquiv, Nat.succ_eq_add_one, Equiv.trans_apply]
   match r with
   | [] =>
-    simp [orderedInsertPos]
+    simp [List.orderedInsert.eq_1]
   | r1 :: r =>
     simp only [List.length_cons]
     rw [finExtractOne_apply_neq]
@@ -384,7 +385,7 @@ lemma orderedInsertEquiv_fin_succ {I : Type} (le1 : I → I → Prop) [Decidable
   simp only [orderedInsertEquiv, Equiv.trans_apply]
   match r with
   | [] =>
-    simp [orderedInsertPos]
+    simp [List.orderedInsert.eq_1]
   | r1 :: r =>
     simp only [List.length_cons, Fin.eta]
     rw [finExtractOne_apply_neq]
@@ -575,8 +576,9 @@ def insertionSortEquiv {α : Type} (r : α → α → Prop) [DecidableRel r] : (
 
 lemma insertionSortEquiv_get {α : Type} {r : α → α → Prop} [DecidableRel r] : (l : List α) →
     l.get ∘ (insertionSortEquiv r l).symm = (List.insertionSort r l).get
-  | [] => by grind
+  | [] => by rfl
   | a :: l => by
+    rw [insertionSortEquiv]
     change ((a :: l).get ∘ ((Fin.equivCons (insertionSortEquiv r l))).symm) ∘
       (orderedInsertEquiv r (List.insertionSort r l) a).symm = _
     have hl : (a :: l).get ∘ ((Fin.equivCons (insertionSortEquiv r l))).symm =
@@ -691,15 +693,17 @@ lemma eraseIdx_insertionSort {I : Type} (le1 : I → I → Prop) [DecidableRel l
     (n : ℕ) → (r : List I) → (hn : n < r.length) →
     (List.insertionSort le1 r).eraseIdx ↑((insertionSortEquiv le1 r) ⟨n, hn⟩)
     = List.insertionSort le1 (r.eraseIdx n)
-  | 0, [], _ => by rfl
+  | 0, [], _ => by simp
   | 0, (r0 :: r), hn => by
     simp only [List.insertionSort, List.foldr_cons, List.length_cons, insertionSortEquiv,
-      Nat.succ_eq_add_one, Fin.zero_eta, Equiv.trans_apply, equivCons_zero, orderedInsertEquiv_zero,
-      orderedInsert_eraseIdx_orderedInsertPos, List.eraseIdx_zero, List.tail_cons]
+      Nat.succ_eq_add_one, eq_mpr_eq_cast, cast_eq, Fin.zero_eta, Equiv.trans_apply, equivCons_zero,
+      orderedInsertEquiv_zero, orderedInsert_eraseIdx_orderedInsertPos, List.eraseIdx_zero,
+      List.tail_cons]
   | Nat.succ n, [], hn => by rfl
   | Nat.succ n, (r0 :: r), hn => by
-    simp only [List.insertionSort, List.length_cons, insertionSortEquiv, Nat.succ_eq_add_one,
-      Equiv.trans_apply, equivCons_succ]
+    simp only [List.insertionSort, List.foldr_cons, List.length_cons, insertionSortEquiv,
+      Nat.succ_eq_add_one, eq_mpr_eq_cast, cast_eq, Equiv.trans_apply, equivCons_succ,
+      List.eraseIdx_cons_succ]
     have hOr := orderedInsert_eraseIdx_orderedInsertEquiv_fin_succ le1
       (List.insertionSort le1 r) r0 ((insertionSortEquiv le1 r) ⟨n, by simpa using hn⟩)
     erw [hOr]
@@ -762,7 +766,7 @@ lemma insertionSort_eq_insertionSortMin_cons {α : Type} (r : α → α → Prop
     rhs
     rhs
     rw [insertionSortMinPos, Equiv.apply_symm_apply]
-  simp only [List.insertionSort, List.eraseIdx_zero]
+  simp only [List.eraseIdx_zero]
   rw [insertionSortMin_eq_insertionSort_head]
   exact (List.cons_head_tail _).symm
 
