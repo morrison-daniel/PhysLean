@@ -133,7 +133,8 @@ lemma insertionSort_length {I : Type} (le1 : I → I → Prop) [DecidableRel le1
   List.Perm.length_eq (List.perm_insertionSort le1 l)
 
 /-- The position `r0` ends up in `r` on adding it via `List.orderedInsert _ r0 r`. -/
-@[expose] def orderedInsertPos {I : Type} (le1 : I → I → Prop) [DecidableRel le1] (r : List I) (r0 : I) :
+@[expose]
+def orderedInsertPos {I : Type} (le1 : I → I → Prop) [DecidableRel le1] (r : List I) (r0 : I) :
     Fin (List.orderedInsert le1 r0 r).length :=
   ⟨(List.takeWhile (fun b => decide ¬ le1 r0 b) r).length, by
     rw [List.orderedInsert_length]
@@ -346,7 +347,8 @@ lemma orderedInsert_eraseIdx_orderedInsertPos_le {I : Type} (le1 : I → I → P
 
 /-- The equivalence between `Fin (r0 :: r).length` and `Fin (List.orderedInsert le1 r0 r).length`
   according to where the elements map, i.e. `0` is taken to `orderedInsertPos le1 r r0`. -/
-@[expose] def orderedInsertEquiv {I : Type} (le1 : I → I → Prop) [DecidableRel le1] (r : List I) (r0 : I) :
+@[expose]
+def orderedInsertEquiv {I : Type} (le1 : I → I → Prop) [DecidableRel le1] (r : List I) (r0 : I) :
     Fin (r.length + 1) ≃ Fin (List.orderedInsert le1 r0 r).length := by
   let e2 : Fin (List.orderedInsert le1 r0 r).length ≃ Fin (r0 :: r).length :=
     (Fin.castOrderIso (List.orderedInsert_length le1 r r0)).toEquiv
@@ -726,7 +728,8 @@ lemma eraseIdx_insertionSort_fin {I : Type} (le1 : I → I → Prop) [DecidableR
   of `l` such that for every element `(i :: l)[b]` before that position
   `r ((i :: l)[b]) ((i :: l)[a])` is not true. The use of `i :: l` here
   rather then just `l` is to ensure that such a position exists. . -/
-@[expose] def insertionSortMinPos {α : Type} (r : α → α → Prop) [DecidableRel r] (i : α) (l : List α) :
+@[expose]
+def insertionSortMinPos {α : Type} (r : α → α → Prop) [DecidableRel r] (i : α) (l : List α) :
     Fin (i :: l).length := (insertionSortEquiv r (i :: l)).symm ⟨0, by
     rw [insertionSort_length]
     exact Nat.zero_lt_succ l.length⟩
@@ -751,7 +754,8 @@ lemma insertionSortMin_eq_insertionSort_head {α : Type} (r : α → α → Prop
 
 /-- The list remaining after dropping the element at the position determined by
   `insertionSortMinPos`. -/
-@[expose] def insertionSortDropMinPos {α : Type} (r : α → α → Prop) [DecidableRel r] (i : α) (l : List α) :
+@[expose]
+def insertionSortDropMinPos {α : Type} (r : α → α → Prop) [DecidableRel r] (i : α) (l : List α) :
     List α := (i :: l).eraseIdx (insertionSortMinPos r i l)
 
 lemma insertionSort_eq_insertionSortMin_cons {α : Type} (r : α → α → Prop) [DecidableRel r]
