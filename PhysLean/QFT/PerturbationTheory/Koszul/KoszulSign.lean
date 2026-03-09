@@ -7,6 +7,7 @@ module
 
 public import PhysLean.QFT.PerturbationTheory.Koszul.KoszulSignInsert
 public import PhysLean.Mathematics.List.InsertionSort
+import all Mathlib.Data.List.Sort
 /-!
 
 # Koszul sign
@@ -104,18 +105,18 @@ lemma koszulSign_insertIdx [Std.Total le] [IsTrans 𝓕 le] (φ : 𝓕) :
     rw [koszulSign]
     trans koszulSign q le (φ1 :: φs) * koszulSignInsert q le φ (φ1 :: φs)
     · ring
-    simp only [insertionSortEquiv, List.length_cons, Nat.succ_eq_add_one, orderedInsertEquiv,
-      PhysLean.Fin.equivCons_trans, Equiv.trans_apply, PhysLean.Fin.equivCons_zero]
-    conv_rhs =>
-      enter [2,2, 2, 2]
+    simp only [instCommGroup.eq_1, List.take_zero, ofList_empty, exchangeSign_bosonic, one_mul,
+      insertionSortEquiv, List.length_cons, Nat.succ_eq_add_one, orderedInsertEquiv, eq_mpr_eq_cast,
+      cast_eq, PhysLean.Fin.equivCons_trans, mul_eq_mul_left_iff]
+    conv_lhs =>
+      enter [2, 2, 2, 2]
       rw [orderedInsert_eq_insertIdx_orderedInsertPos]
-    conv_rhs =>
+    conv_lhs =>
       rhs
       erw [← ofList_take_insert]
       change 𝓢(q φ, ofList q ((List.insertionSort le (φ1 :: φs)).take
         (↑(orderedInsertPos le ((List.insertionSort le (φ1 :: φs))) φ))))
       rw [← koszulSignInsert_eq_exchangeSign_take q le]
-    rw [ofList_take_zero]
     simp
   | φ1 :: φs, n + 1, h => by
     conv_lhs =>
@@ -127,7 +128,6 @@ lemma koszulSign_insertIdx [Std.Total le] [IsTrans 𝓕 le] (φ : 𝓕) :
       simp only [List.insertIdx_succ_cons]
       simp only [List.insertionSort_cons, List.length_cons, insertionSortEquiv, Nat.succ_eq_add_one,
         Equiv.trans_apply, PhysLean.Fin.equivCons_succ]
-      erw [orderedInsertEquiv_fin_succ]
       simp only [Fin.eta, Fin.val_cast]
       rhs
       simp [orderedInsert_eq_insertIdx_orderedInsertPos]
@@ -161,7 +161,20 @@ lemma koszulSign_insertIdx [Std.Total le] [IsTrans 𝓕 le] (φ : 𝓕) :
           𝓢(q φ, ofList q ((List.insertIdx rs nro φ1).take (nro.succAbove ni))))
     swap
     · simp only [rs, nro, ni]
-      ring
+      conv =>
+        enter [2, 2, 2, 2, 2, 1, 1, 2, 1]
+        rw [add_comm]
+      conv =>
+        enter [2, 2, 2, 2, 2, 1, 1]
+        change (orderedInsertEquiv le (List.insertionSort le (φs.insertIdx n φ)) φ1)
+          ((PhysLean.Fin.equivCons (insertionSortEquiv le (φs.insertIdx n φ))) ⟨n.succ, _⟩)
+        simp only [Nat.succ_eq_add_one, PhysLean.Fin.equivCons, Equiv.toFun_as_coe,
+          Equiv.invFun_as_coe, Equiv.coe_fn_mk]
+        change orderedInsertEquiv le (List.insertionSort le (φs.insertIdx n φ)) φ1
+          ((Fin.succ ∘ ⇑(insertionSortEquiv le (φs.insertIdx n φ))) ⟨n, _⟩)
+        simp
+        rw [orderedInsertEquiv_fin_succ]
+      grind
     congr 1
     simp only [Fin.succAbove]
     have hns : rs.get ni = φ := by

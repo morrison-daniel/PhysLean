@@ -7,6 +7,7 @@ module
 
 public import PhysLean.QFT.PerturbationTheory.FieldSpecification.Filters
 public import PhysLean.QFT.PerturbationTheory.Koszul.KoszulSign
+import all Mathlib.Data.List.Sort
 /-!
 
 # Normal Ordering of states

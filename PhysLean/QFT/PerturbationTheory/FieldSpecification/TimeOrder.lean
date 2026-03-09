@@ -7,6 +7,7 @@ module
 
 public import PhysLean.QFT.PerturbationTheory.FieldSpecification.CrAnSection
 public import PhysLean.QFT.PerturbationTheory.FieldSpecification.NormalOrder
+import all Mathlib.Data.List.Sort
 /-!
 
 # Time ordering of states
