@@ -138,7 +138,6 @@ lemma mem_three (c : WickContraction 3) : c.1 ∈ ({∅, {{0, 1}}, {{0, 2}}, {{1
 The proof of this result uses the fact that Lean is an executable programming language
 and can calculate all Wick contractions for a given `n`.
 -/
-@[pseudo]
 lemma mem_four (c : WickContraction 4) : c.1 ∈ ({∅,
     {{0, 1}}, {{0, 2}}, {{0, 3}}, {{1, 2}}, {{1, 3}}, {{2,3}},
     {{0, 1}, {2, 3}}, {{0, 2}, {1, 3}}, {{0, 3}, {1, 2}}} :
