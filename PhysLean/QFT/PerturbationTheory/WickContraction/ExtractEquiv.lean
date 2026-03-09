@@ -4,9 +4,10 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Joseph Tooby-Smith
 -/
 module
-
+prelude
 meta import Mathlib.Data.Fintype.Sigma
 meta import PhysLean.QFT.PerturbationTheory.WickContraction.InsertAndContractNat
+import all Init.Data.Fin.Fold
 public import PhysLean.QFT.PerturbationTheory.WickContraction.InsertAndContractNat
 /-!
 
@@ -122,11 +123,10 @@ lemma sum_extractEquiv_congr [AddCommMonoid M] {n m : ℕ} (i : Fin n) (f : Wick
 
 The proof of this result uses the fact that Lean is an executable programming language
 and can calculate all Wick contractions for a given `n`. -/
-@[pseudo]
 lemma mem_three (c : WickContraction 3) : c.1 ∈ ({∅, {{0, 1}}, {{0, 2}}, {{1, 2}}} :
     Finset (Finset (Finset (Fin 3)))) := by
   revert c
-  native_decide
+  decide +kernel
 
 /-- For `n = 4` there are `10` possible Wick contractions including e.g.
 
@@ -145,6 +145,6 @@ lemma mem_four (c : WickContraction 4) : c.1 ∈ ({∅,
     {{0, 1}, {2, 3}}, {{0, 2}, {1, 3}}, {{0, 3}, {1, 2}}} :
     Finset (Finset (Finset (Fin 4)))) := by
   revert c
-  native_decide
+  decide +kernel
 
 end WickContraction
