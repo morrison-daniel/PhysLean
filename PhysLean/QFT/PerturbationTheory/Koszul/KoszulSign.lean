@@ -172,7 +172,7 @@ lemma koszulSign_insertIdx [Std.Total le] [IsTrans 𝓕 le] (φ : 𝓕) :
           Equiv.invFun_as_coe, Equiv.coe_fn_mk]
         change orderedInsertEquiv le (List.insertionSort le (φs.insertIdx n φ)) φ1
           ((Fin.succ ∘ ⇑(insertionSortEquiv le (φs.insertIdx n φ))) ⟨n, _⟩)
-        simp
+        simp only [Function.comp_apply]
         rw [orderedInsertEquiv_fin_succ]
       grind
     congr 1
