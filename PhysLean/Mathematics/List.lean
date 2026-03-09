@@ -4,17 +4,17 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Joseph Tooby-Smith
 -/
 module
-
 public import PhysLean.Mathematics.Fin
 public import Mathlib.Data.Nat.Lattice
 public import Mathlib.Data.List.TakeWhile
 import all Mathlib.Data.List.Sort
+public import Mathlib.Logic.Equiv.Defs
 /-!
 # List lemmas
 
 -/
+public section
 
-@[expose] public section
 namespace PhysLean.List
 
 open Fin
@@ -133,7 +133,7 @@ lemma insertionSort_length {I : Type} (le1 : I → I → Prop) [DecidableRel le1
   List.Perm.length_eq (List.perm_insertionSort le1 l)
 
 /-- The position `r0` ends up in `r` on adding it via `List.orderedInsert _ r0 r`. -/
-def orderedInsertPos {I : Type} (le1 : I → I → Prop) [DecidableRel le1] (r : List I) (r0 : I) :
+@[expose] def orderedInsertPos {I : Type} (le1 : I → I → Prop) [DecidableRel le1] (r : List I) (r0 : I) :
     Fin (List.orderedInsert le1 r0 r).length :=
   ⟨(List.takeWhile (fun b => decide ¬ le1 r0 b) r).length, by
     rw [List.orderedInsert_length]
@@ -167,7 +167,8 @@ lemma orderedInsertPos_cons {I : Type} (le1 : I → I → Prop) [DecidableRel le
     (r : List I) (r0 r1 : I) :
     (orderedInsertPos le1 (r1 ::r) r0).val =
     if le1 r0 r1 then ⟨0, by simp⟩ else (Fin.succ (orderedInsertPos le1 r r0)) := by
-  simp only [orderedInsertPos, List.takeWhile, decide_not, Fin.zero_eta, Fin.succ_mk]
+  simp only [List.orderedInsert.eq_2, orderedInsertPos, List.takeWhile, decide_not, Fin.zero_eta,
+    Fin.succ_mk]
   by_cases h : le1 r0 r1
   · simp [h]
   · simp [h]
@@ -345,7 +346,7 @@ lemma orderedInsert_eraseIdx_orderedInsertPos_le {I : Type} (le1 : I → I → P
 
 /-- The equivalence between `Fin (r0 :: r).length` and `Fin (List.orderedInsert le1 r0 r).length`
   according to where the elements map, i.e. `0` is taken to `orderedInsertPos le1 r r0`. -/
-def orderedInsertEquiv {I : Type} (le1 : I → I → Prop) [DecidableRel le1] (r : List I) (r0 : I) :
+@[expose] def orderedInsertEquiv {I : Type} (le1 : I → I → Prop) [DecidableRel le1] (r : List I) (r0 : I) :
     Fin (r.length + 1) ≃ Fin (List.orderedInsert le1 r0 r).length := by
   let e2 : Fin (List.orderedInsert le1 r0 r).length ≃ Fin (r0 :: r).length :=
     (Fin.castOrderIso (List.orderedInsert_length le1 r r0)).toEquiv
@@ -370,9 +371,9 @@ lemma orderedInsertEquiv_succ {I : Type} (le1 : I → I → Prop) [DecidableRel 
   | [] =>
     simp [List.orderedInsert.eq_1]
   | r1 :: r =>
-    simp only [List.length_cons]
+    simp only [List.orderedInsert.eq_2, List.length_cons]
     rw [finExtractOne_apply_neq]
-    simp only [orderedInsertPos, decide_not, Nat.succ_eq_add_one,
+    simp only [List.orderedInsert.eq_2, orderedInsertPos, decide_not, Nat.succ_eq_add_one,
       finExtractOne_symm_inr_apply]
     rfl
     exact ne_of_beq_false rfl
@@ -387,9 +388,9 @@ lemma orderedInsertEquiv_fin_succ {I : Type} (le1 : I → I → Prop) [Decidable
   | [] =>
     simp [List.orderedInsert.eq_1]
   | r1 :: r =>
-    simp only [List.length_cons, Fin.eta]
+    simp only [List.orderedInsert.eq_2, List.length_cons, Fin.eta]
     rw [finExtractOne_apply_neq]
-    simp only [orderedInsertPos, decide_not, Nat.succ_eq_add_one,
+    simp only [orderedInsertPos, List.orderedInsert.eq_2, decide_not, Nat.succ_eq_add_one,
       finExtractOne_symm_inr_apply]
     rfl
     exact ne_of_beq_false rfl
@@ -568,11 +569,9 @@ lemma orderedInsert_eq_insertIdx_orderedInsertPos {I : Type} (le1 : I → I → 
   sorting algorithm. -/
 def insertionSortEquiv {α : Type} (r : α → α → Prop) [DecidableRel r] : (l : List α) →
     Fin l.length ≃ Fin (List.insertionSort r l).length
-  | [] => by simp only [List.length_nil, List.insertionSort_nil]; rfl
-  | a :: l => by
-      simp only [List.length_cons, List.insertionSort_cons]
-      exact (Fin.equivCons (insertionSortEquiv r l)).trans
-        (orderedInsertEquiv r (List.insertionSort r l) a)
+  | [] => Equiv.refl _
+  | a :: l =>
+    (Fin.equivCons (insertionSortEquiv r l)).trans (orderedInsertEquiv r (List.insertionSort r l) a)
 
 lemma insertionSortEquiv_get {α : Type} {r : α → α → Prop} [DecidableRel r] : (l : List α) →
     l.get ∘ (insertionSortEquiv r l).symm = (List.insertionSort r l).get
@@ -627,7 +626,8 @@ lemma insertionSortEquiv_order {α : Type} {r : α → α → Prop} [DecidableRe
     simp only [List.length_cons, Fin.zero_eta, Fin.getElem_fin, Fin.val_zero,
       List.getElem_cons_zero, List.getElem_cons_succ]
     nth_rewrite 2 [insertionSortEquiv] at hij'
-    simp only [List.length_cons, Nat.succ_eq_add_one, Fin.zero_eta,] at hij'
+    simp only [List.length_cons, Nat.succ_eq_add_one, Fin.zero_eta,
+      Equiv.trans_apply, equivCons_zero] at hij'
     have hx := orderedInsertEquiv_zero r (List.insertionSort r as) a
     simp only at hx
     convert lt_orderedInsertPos_rel_fin r a (List.insertionSort r as) _ hij'
@@ -635,15 +635,16 @@ lemma insertionSortEquiv_order {α : Type} {r : α → α → Prop} [DecidableRe
     rw [← insertionSortEquiv_get]
     simp
   | a :: as, ⟨i + 1, hi⟩, ⟨j + 1, hj⟩, hij, hij' => by
-    simp only [List.length_cons, insertionSortEquiv, Nat.succ_eq_add_one] at hij'
-    have h1 := orderedInsertEquiv_monotone_fin_succ r (List.insertionSort r as) _ _ _ hij'
+    simp only [List.length_cons, insertionSortEquiv, Nat.succ_eq_add_one, Equiv.trans_apply,
+      equivCons_succ] at hij'
+    have h1 := orderedInsertEquiv_monotone_fin_succ _ _ _ _ _ hij'
     have h2 := insertionSortEquiv_order as ⟨i, Nat.succ_lt_succ_iff.mp hi⟩
       ⟨j, Nat.succ_lt_succ_iff.mp hj⟩ (by simpa using hij) h1
     simpa using h2
 
 /-- Optional erase of an element in a list. For `none` returns the list, for `some i` returns
   the list with the `i`'th element erased. -/
-def optionErase {I : Type} (l : List I) (i : Option (Fin l.length)) : List I :=
+@[expose] def optionErase {I : Type} (l : List I) (i : Option (Fin l.length)) : List I :=
   match i with
   | none => l
   | some i => List.eraseIdx l i
@@ -691,17 +692,15 @@ lemma eraseIdx_insertionSort {I : Type} (le1 : I → I → Prop) [DecidableRel l
     (n : ℕ) → (r : List I) → (hn : n < r.length) →
     (List.insertionSort le1 r).eraseIdx ↑((insertionSortEquiv le1 r) ⟨n, hn⟩)
     = List.insertionSort le1 (r.eraseIdx n)
-  | 0, [], _ => by simp
+  | 0, [], _ => by rfl
   | 0, (r0 :: r), hn => by
     simp only [List.insertionSort, List.foldr_cons, List.length_cons, insertionSortEquiv,
-      Nat.succ_eq_add_one, eq_mpr_eq_cast, cast_eq, Fin.zero_eta, Equiv.trans_apply, equivCons_zero,
-      orderedInsertEquiv_zero, orderedInsert_eraseIdx_orderedInsertPos, List.eraseIdx_zero,
-      List.tail_cons]
+      Nat.succ_eq_add_one, Fin.zero_eta, Equiv.trans_apply, equivCons_zero, orderedInsertEquiv_zero,
+      orderedInsert_eraseIdx_orderedInsertPos, List.eraseIdx_zero, List.tail_cons]
   | Nat.succ n, [], hn => by rfl
   | Nat.succ n, (r0 :: r), hn => by
-    simp only [List.insertionSort, List.foldr_cons, List.length_cons, insertionSortEquiv,
-      Nat.succ_eq_add_one, eq_mpr_eq_cast, cast_eq, Equiv.trans_apply, equivCons_succ,
-      List.eraseIdx_cons_succ]
+    simp only [List.insertionSort, List.length_cons, insertionSortEquiv, Nat.succ_eq_add_one,
+      Equiv.trans_apply, equivCons_succ]
     have hOr := orderedInsert_eraseIdx_orderedInsertEquiv_fin_succ le1
       (List.insertionSort le1 r) r0 ((insertionSortEquiv le1 r) ⟨n, by simpa using hn⟩)
     erw [hOr]
@@ -727,13 +726,13 @@ lemma eraseIdx_insertionSort_fin {I : Type} (le1 : I → I → Prop) [DecidableR
   of `l` such that for every element `(i :: l)[b]` before that position
   `r ((i :: l)[b]) ((i :: l)[a])` is not true. The use of `i :: l` here
   rather then just `l` is to ensure that such a position exists. . -/
-def insertionSortMinPos {α : Type} (r : α → α → Prop) [DecidableRel r] (i : α) (l : List α) :
+@[expose] def insertionSortMinPos {α : Type} (r : α → α → Prop) [DecidableRel r] (i : α) (l : List α) :
     Fin (i :: l).length := (insertionSortEquiv r (i :: l)).symm ⟨0, by
     rw [insertionSort_length]
     exact Nat.zero_lt_succ l.length⟩
 
 /-- The element of `i :: l` at `insertionSortMinPos`. -/
-def insertionSortMin {α : Type} (r : α → α → Prop) [DecidableRel r] (i : α) (l : List α) :
+@[expose] def insertionSortMin {α : Type} (r : α → α → Prop) [DecidableRel r] (i : α) (l : List α) :
     α := (i :: l).get (insertionSortMinPos r i l)
 
 lemma insertionSortMin_eq_insertionSort_head {α : Type} (r : α → α → Prop) [DecidableRel r]
@@ -752,7 +751,7 @@ lemma insertionSortMin_eq_insertionSort_head {α : Type} (r : α → α → Prop
 
 /-- The list remaining after dropping the element at the position determined by
   `insertionSortMinPos`. -/
-def insertionSortDropMinPos {α : Type} (r : α → α → Prop) [DecidableRel r] (i : α) (l : List α) :
+@[expose] def insertionSortDropMinPos {α : Type} (r : α → α → Prop) [DecidableRel r] (i : α) (l : List α) :
     List α := (i :: l).eraseIdx (insertionSortMinPos r i l)
 
 lemma insertionSort_eq_insertionSortMin_cons {α : Type} (r : α → α → Prop) [DecidableRel r]
@@ -764,7 +763,7 @@ lemma insertionSort_eq_insertionSortMin_cons {α : Type} (r : α → α → Prop
     rhs
     rhs
     rw [insertionSortMinPos, Equiv.apply_symm_apply]
-  simp only [List.eraseIdx_zero]
+  simp only [List.insertionSort, List.eraseIdx_zero]
   rw [insertionSortMin_eq_insertionSort_head]
   exact (List.cons_head_tail _).symm
 
@@ -772,7 +771,7 @@ lemma insertionSort_eq_insertionSortMin_cons {α : Type} (r : α → α → Prop
   front of the list, for `some i` removes the `i`th element of the list (does not add `a`).
   E.g. `optionEraseZ [0, 1, 2] 4 none = [4, 0, 1, 2]` and
   `optionEraseZ [0, 1, 2] 4 (some 1) = [0, 2]`. -/
-def optionEraseZ {I : Type} (l : List I) (a : I) (i : Option (Fin l.length)) : List I :=
+@[expose] def optionEraseZ {I : Type} (l : List I) (a : I) (i : Option (Fin l.length)) : List I :=
   match i with
   | none => a :: l
   | some i => List.eraseIdx l i
