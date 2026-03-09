@@ -3,8 +3,10 @@ Copyright (c) 2026 Gregory J. Loges. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gregory J. Loges
 -/
-import Mathlib.Algebra.Ring.Basic
-import PhysLean.Meta.TODO.Basic
+module
+
+public import Mathlib.Algebra.Ring.Basic
+public import PhysLean.Meta.TODO.Basic
 /-!
 
 # Kronecker delta
@@ -12,6 +14,8 @@ import PhysLean.Meta.TODO.Basic
 This file defines the Kronecker delta, `δ[i,j] ≔ if (i = j) then 1 else 0`.
 
 -/
+
+@[expose] public section
 TODO "YVABB" "Build functionality for working with sums involving Kronecker deltas."
 
 namespace KroneckerDelta

@@ -3,10 +3,12 @@ Copyright (c) 2026 Gregory J. Loges. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gregory J. Loges
 -/
-import PhysLean.QuantumMechanics.DDimensions.Operators.Unbounded
-import PhysLean.QuantumMechanics.DDimensions.SpaceDHilbertSpace.SchwartzSubmodule
-import PhysLean.QuantumMechanics.PlanckConstant
-import PhysLean.SpaceAndTime.Space.Derivatives.Basic
+module
+
+public import PhysLean.QuantumMechanics.DDimensions.Operators.Unbounded
+public import PhysLean.QuantumMechanics.DDimensions.SpaceDHilbertSpace.SchwartzSubmodule
+public import PhysLean.QuantumMechanics.PlanckConstant
+public import PhysLean.SpaceAndTime.Space.Derivatives.Basic
 /-!
 
 # Momentum operators
@@ -37,6 +39,8 @@ Notation:
 ## iv. References
 
 -/
+
+@[expose] public section
 
 namespace QuantumMechanics
 noncomputable section
